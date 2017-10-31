@@ -1,0 +1,69 @@
+/*
+ * Page: Login & Register
+ * ----------------------
+ */
+
+select:invalid {
+    color: gray;
+}
+.main {
+    height: 100%;
+    font-family: 'Source Sans Pro', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-weight: 400;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+.ui-button {
+    background-color: #3c8dbc;
+}
+.login-logo, .register-logo {
+    font-size: 35px;
+    text-align: center;
+    margin-bottom: 25px;
+    font-weight: 300;
+}
+.login-logo a, .register-logo a {
+    color: #444;
+}
+.login-page, .register-page {
+    background: #d2d6de;
+}
+.login-box, .register-box {
+    width: 720px;
+    margin: 7% auto;
+}
+@media (max-width: 768px) {
+    .login-box, .register-box {
+        width: 90%;
+        margin-top: 20px;
+    }
+}
+.login-box-body, .register-box-body {
+    background: #fff;
+    padding: 20px;
+    border-top: 0;
+    color: #666;
+}
+.login-box-body .form-control-feedback, .register-box-body .form-control-feedback {
+    color: #777;
+}
+.login-box-msg, .register-box-msg {
+    margin: 0;
+    text-align: center;
+    padding: 0 20px 20px 20px;
+}
+.social-auth-links {
+    margin: 10px 0;
+}
+select.form-control {
+    padding-right: 25px;
+    background-image: url("data:image/svg+xml,\
+      <svg version='1.1' xmlns='http://www.w3.org/2000/svg' width='14px'\
+           height='14px' viewBox='0 0 1200 1000' fill='rgb(119,119,119)'>\
+        <path d='M1100 411l-198 -199l-353 353l-353 -353l-197 199l551 551z'/>\
+      </svg>");
+    background-repeat: no-repeat;
+    background-position: calc(100% - 7px) 50%;
+    -moz-appearance: none;
+    appearance: none;
+}

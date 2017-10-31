@@ -1,0 +1,39 @@
+{
+    "project": {
+        "version": "1.0.0",
+        "name": "burst-particle"
+    },
+    "apps": [{
+        "root": "src",
+        "outDir": "dist",
+        "assets": ["public"],
+        "index": "index.html",
+        "main": "main.ts",
+        "test": "test.ts",
+        "tsconfig": "tsconfig.json",
+        "prefix": "app",
+        "mobile": false,
+        "styles": [
+            "styles.less"
+        ],
+        "scripts": [
+            "../node_modules/jquery/dist/jquery.js",
+            "../node_modules/bootstrap/dist/js/bootstrap.js",
+            "../node_modules/chart.js/dist/Chart.js",
+            "../node_modules/crypto-js/crypto-js.js",
+            "public/assets/js/app.js"
+        ],
+        "environmentSource": "environments/environment.ts",
+        "environments": {
+            "dev": "environments/environment.ts",
+            "prod": "environments/environment.prod.ts",
+            "demo": "environments/environment.demo.ts"
+        }
+    }],
+    "addons": [],
+    "packages": [],
+    "defaults": {
+        "styleExt": "css",
+        "component": {}
+    }
+}
