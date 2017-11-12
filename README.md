@@ -12,7 +12,7 @@
 
 2. Clone this project:
     ```
-    git clone git@github.com:cgebe/donut-frontend.git
+    git clone git@github.com:cgebe/burst-particle.git
     ```
 
 3. Uninstall old versions of the cli and Install latest version of angular-cli
