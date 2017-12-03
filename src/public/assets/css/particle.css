@@ -14,15 +14,6 @@ body {
   overflow-x: hidden;
   overflow-y: auto;
 }
-/* Custom Rules */
-.donut-calender .input-group {
-    width: 100% !important;
-}
-
-.donut-calender .input-group-addon {
-    width: 40px !important;
-}
-
 /* Layout */
 .wrapper {
   height: 100%;
@@ -191,7 +182,7 @@ a:focus {
 .main-header {
   position: relative;
   max-height: 100px;
-  z-index: 1030;
+  z-index: 900;
 }
 .main-header .navbar {
   -webkit-transition: margin-left 0.3s ease-in-out;

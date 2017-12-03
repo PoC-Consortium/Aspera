@@ -5,8 +5,9 @@
 
 @import "~@angular/material/prebuilt-themes/indigo-pink.css";
 
-@import "./public/assets/css/particle.css";
-@import "./public/assets/css/particle-skin.css";
+@import "/public/assets/css/particle.css";
+@import "/public/assets/css/particle-skin.css";
+@import "/public/fonts/material-icons/material-icons.css";
 
 // Loading page with cubes
 .loading {

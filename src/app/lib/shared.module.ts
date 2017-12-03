@@ -4,6 +4,10 @@ import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { MatMenuModule } from '@angular/material/menu';
+
 import {
     AppFooterComponent,
     AppHeaderComponent,
@@ -70,7 +74,10 @@ const NGA_VALIDATORS = [
         RouterModule,
         FormsModule,
         ReactiveFormsModule,
-        TranslateModule.forRoot()
+        TranslateModule.forRoot(),
+        MatButtonModule,
+        MatIconModule,
+        MatMenuModule
     ],
     exports: [
         ...NGA_PIPES,
