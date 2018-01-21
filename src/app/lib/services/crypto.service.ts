@@ -1,15 +1,23 @@
+/*
+* Copyright 2018 PoC-Consortium
+*/
+
 import { Injectable } from '@angular/core';
 import { Converter } from "../util";
 import { PassPhraseGenerator, ECKCDSA } from "../util/crypto";
-import { Keypair } from "../model";
-import { BurstUtil } from "../util";
+import { BurstAddress, Keys } from "../model";
 
-import * as CryptoJS from "crypto-js";
-import * as BN from "bn.js";
+let CryptoJS = require("crypto-js");
+let BN = require('bn.js');
+let pako = require('pako');
 
+/*
+* CryptoService class
+*
+* The CryptoService class takes care of everything crypto related.
+*/
 @Injectable()
 export class CryptoService {
-
     private passPhraseGenerator: PassPhraseGenerator;
 
     constructor() {
@@ -20,7 +28,7 @@ export class CryptoService {
     * Generate a passphrase with the help of the PassPhraseGenerator
     * pass optional seed for seeding generation
     */
-    public generatePassPhrase(seed: any[] = []): Promise<string> {
+    public generatePassPhrase(seed: any[] = []): Promise<string[]> {
         return new Promise((resolve, reject) => {
             this.passPhraseGenerator.reSeed(seed);
             resolve(this.passPhraseGenerator.generatePassPhrase());
@@ -29,24 +37,25 @@ export class CryptoService {
 
     /*
     * Generate the Master Public Key and Master Private Key for a new passphrase
-    * EC-KCDSA key pair.
+    * EC-KCDSA sign key pair + agreement key.
     */
-    public generateMasterPublicAndPrivateKey(passPhrase: string): Promise<Keypair> {
+    public generateMasterKeys(passPhrase: string): Promise<Keys> {
         return new Promise((resolve, reject) => {
             // hash passphrase with sha256
             let hashedPassPhrase = CryptoJS.SHA256(passPhrase);
-            // use ec-kcdsa to generate keypair from passphrase
+            // use ec-kcdsa to generate keys from passphrase
             let keys = ECKCDSA.keygen(Converter.convertWordArrayToByteArray(hashedPassPhrase));
-            let keypair: Keypair = new Keypair({
+            let keyObject: Keys = new Keys({
                 "publicKey": Converter.convertByteArrayToHexString(keys.p),
-                "privateKey": Converter.convertByteArrayToHexString(keys.s)
+                "signPrivateKey": Converter.convertByteArrayToHexString(keys.s),
+                "agreementPrivateKey": Converter.convertByteArrayToHexString(keys.k)
             });
-            resolve(keypair);
+            resolve(keyObject);
         });
     }
 
     /*
-    *   Convert hex string of the public key to the account id
+    * Convert hex string of the public key to the account id
     */
     public getAccountIdFromPublicKey(publicKey: string): Promise<string> {
         return new Promise((resolve, reject) => {
@@ -71,7 +80,7 @@ export class CryptoService {
     public getBurstAddressFromAccountId(id: string): Promise<string> {
         return new Promise((resolve, reject) => {
             // TODO: refactor shitty nxt address resolution
-            resolve(BurstUtil.encode(id));
+            resolve(BurstAddress.encode(id));
         });
     }
 
@@ -81,7 +90,7 @@ export class CryptoService {
     public getAccountIdFromBurstAddress(address: string): Promise<string> {
         return new Promise((resolve, reject) => {
             // TODO: refactor shitty nxt address resolution
-            resolve(BurstUtil.decode(address));
+            resolve(BurstAddress.decode(address));
         });
     }
 
@@ -105,7 +114,73 @@ export class CryptoService {
     }
 
     /*
-    *
+    * Encrypt a message attached to a transaction
+    */
+    public encryptMessage(message: string, encryptedPrivateKey: string, pinHash: string, recipientPublicKey: string): Promise<any> {
+        return new Promise((resolve, reject) => {
+            this.decryptAES(encryptedPrivateKey, pinHash)
+                .then(privateKey => {
+                    // generate shared key
+                    let sharedKey =
+                        ECKCDSA.sharedkey(
+                            Converter.convertHexStringToByteArray(privateKey),
+                            Converter.convertHexStringToByteArray(recipientPublicKey)
+                        );
+                    // Create random nonce
+                    let random_bytes = CryptoJS.lib.WordArray.random(32);
+                    let r_nonce = Converter.convertWordArrayToUint8Array(random_bytes);
+                    // combine
+                    for (let i = 0; i < 32; i++) {
+                        sharedKey[i] ^= r_nonce[i];
+                    }
+                    // hash shared key
+                    let key = CryptoJS.SHA256(Converter.convertByteArrayToWordArray(sharedKey));
+                    // ENCRYPT
+                    let iv = CryptoJS.lib.WordArray.random(16);
+                    let messageB64 = CryptoJS.AES.encrypt(message, key.toString(), {iv: iv}).toString();
+                    // convert base 64 to hex due to node limitation
+                    let messageHex = iv.toString(CryptoJS.enc.Hex) + CryptoJS.enc.Base64.parse(messageB64.ciphertext).toString(CryptoJS.enc.Hex);
+                    // Uint 8 to hex
+                    let nonce = random_bytes.toString(CryptoJS.enc.Hex);
+                    // return encrypted pair
+                    resolve({ m: messageHex, n: nonce })
+                })
+        })
+    }
+
+    /*
+    * Decrypt a message attached to transaction
+    */
+    public decryptMessage(encryptedMessage: string, nonce: string, encryptedPrivateKey: string, pinHash: string, senderPublicKey: string): Promise<any> {
+        return new Promise((resolve, reject) => {
+            this.decryptAES(encryptedPrivateKey, pinHash)
+                .then(privateKey => {
+                    // generate shared key
+                    let sharedKey =
+                        ECKCDSA.sharedkey(
+                            Converter.convertHexStringToByteArray(privateKey),
+                            Converter.convertHexStringToByteArray(senderPublicKey)
+                        );
+                    // convert nonce to uint8array
+                    let nonce_array = Converter.convertWordArrayToUint8Array(CryptoJS.enc.Hex.parse(nonce));
+                    // combine
+                    for (let i = 0; i < 32; i++) {
+                        sharedKey[i] ^= nonce_array[i];
+                    }
+                    // hash shared key
+                    let key = CryptoJS.SHA256(Converter.convertByteArrayToWordArray(sharedKey))
+                    // convert message hex back to base 64 due to limitation of node
+                    let messageB64 = CryptoJS.enc.Hex.parse(encryptedMessage).toString(CryptoJS.enc.Base64);
+                    // DECRYPT
+                    let message = CryptoJS.AES.decrypt(messageB64, key.toString()).toString(CryptoJS.enc.Utf8);
+                    // return decrypted message
+                    resolve(message);
+                })
+        })
+    }
+
+    /*
+    * Hash string into hex string
     */
     public hashSHA256(input: string): string {
         return CryptoJS.SHA256(input).toString();
@@ -113,6 +188,10 @@ export class CryptoService {
 
     /*
     * Generate signature for transaction
+    * s = sign(sha256(sha256(transactionHex)_keygen(sha256(sha256(transactionHex)_privateKey)).publicKey),
+    *          sha256(sha256(transactionHex)_privateKey),
+    *          privateKey)
+    * p = sha256(sha256(transactionHex)_keygen(sha256(transactionHex_privateKey)).publicKey)
     */
     public generateSignature(transactionHex: string, encryptedPrivateKey: string, pinHash: string): Promise<string> {
         return new Promise((resolve, reject) => {
@@ -134,29 +213,35 @@ export class CryptoService {
 
     /*
     * Verify signature for transaction
+    * h1 = sha256(sha256(transactionHex)_keygen(sha256(transactionHex_privateKey)).publicKey)
+    * ==
+    * sha256(sha256(transactionHex)_verify(v, h1, publickey)) = h2
     */
     public verifySignature(signature: string, transactionHex: string, publicKey: string): Promise<boolean> {
         return new Promise((resolve, reject) => {
+            // get bytes
             let signatureBytes = Converter.convertHexStringToByteArray(signature);
             let publicKeyBytes = Converter.convertHexStringToByteArray(publicKey);
             let v = signatureBytes.slice(0, 32);
             let h1 = signatureBytes.slice(32);
             let y = ECKCDSA.verify(v, h1, publicKeyBytes);
-
             let m = Converter.convertWordArrayToByteArray(CryptoJS.SHA256(CryptoJS.enc.Hex.parse(transactionHex)));
-            let m_y  = m.concat(y);
+            let m_y = m.concat(y);
             let h2 = Converter.convertWordArrayToByteArray(CryptoJS.SHA256(Converter.convertByteArrayToWordArray(m_y)));
-
+            // Convert to hex
             let h1hex = Converter.convertByteArrayToHexString(h1);
             let h2hex = Converter.convertByteArrayToHexString(h2);
-
+            // compare
             resolve(h1hex == h2hex);
         });
     }
 
+    /*
+    * Concat signature with transactionHex
+    */
     public generateSignedTransactionBytes(unsignedTransactionHex: string, signature: string): Promise<string> {
         return new Promise((resolve, reject) => {
-            // TODO: other message types
+            // TODO: verification - duplicate?
             resolve(unsignedTransactionHex.substr(0, 192) + signature + unsignedTransactionHex.substr(320))
         });
     }

@@ -1,15 +1,24 @@
+/*
+* Copyright 2018 PoC-Consortium
+*/
+
 import { Injectable } from "@angular/core";
 import { Http, Headers, RequestOptions, Response, URLSearchParams } from "@angular/http";
-import { Observable, BehaviorSubject } from 'rxjs/Rx';
-import { Currency, HttpError } from "../model";
+import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import 'rxjs/add/operator/timeout'
+
+import { Currency, HttpError, constants } from "../model";
 import { NoConnectionError } from "../model/error";
 import { StoreService } from "./store.service";
 
+/*
+* MarketService class
+*
+* The MarketService is responsible for getting currency information. (right now, only from coinmarketcap.com)
+*/
 @Injectable()
 export class MarketService {
-
     public currency: BehaviorSubject<any> = new BehaviorSubject(undefined);
-    private timeout: number = 10000; // 10 seconds
 
     constructor(
         private storeService: StoreService,
@@ -36,8 +45,8 @@ export class MarketService {
                 params.set("convert", currency);
                 requestOptions.params = params;
             }
-            return this.http.get("https://api.coinmarketcap.com/v1/ticker/burst", requestOptions)
-                .timeout(this.timeout)
+            return this.http.get(constants.marketUrl, requestOptions)
+                .timeout(constants.connectionTimeout)
                 .toPromise()
                 .then(response => {
                     let r = response.json() || [];
@@ -55,16 +64,33 @@ export class MarketService {
         });
     }
 
-    public getPriceBurstcoin(coins: number) {
-        if (coins % 1 === 0) {
-            // whole number
-            return coins.toString() + " BURST";
+    /*
+    * Format a coin amount number to 8 decimals and return string with BURST addition
+    */
+    public formatBurstcoin(coins: number): string {
+        if (isNaN(coins)) {
+            return "0 BURST";
         } else {
-            return coins.toFixed(8) + " BURST";
+            if (coins % 1 === 0) {
+                // whole number
+                return coins.toString() + " BURST";
+            } else {
+                return coins.toFixed(8) + " BURST";
+            }
         }
     }
 
-    public getPriceBTC(coins: number, decimals: number = 8) : string {
+    /*
+    * Convert fiat amount to burst amunt
+    */
+    public convertFiatCurrencyToBurstcoin(amount: number): number {
+        return amount / this.currency.value.priceCur;
+    }
+
+    /*
+    * Format number to 8 decimals string and BTC addition
+    */
+    public getPriceBTC(coins: number, decimals: number = 8): string {
         if (this.currency.value != undefined) {
             return (coins * this.currency.value.priceBTC).toFixed(decimals) + " BTC";
         } else {
@@ -72,62 +98,44 @@ export class MarketService {
         }
     }
 
-    public getPriceFiatCurrency(coins: number, decimals: number = 2) : string {
+    /*
+    * Format fiat amount to Burst amount string with BURST addition
+    */
+    public getPriceBurstcoin(amount: number): string {
+        if (isNaN(amount)) {
+            return "0 BURST";
+        } else {
+            let coins = amount / this.currency.value.priceCur;
+            if (coins % 1 === 0) {
+                // whole number
+                return coins.toString() + " BURST";
+            } else {
+                return coins.toFixed(8) + " BURST";
+            }
+        }
+    }
+
+    /*
+    * Format number to 8 decimals string and fiat addition
+    */
+    public getPriceFiatCurrency(coins: number, decimals: number = 2): string {
         if (this.currency.value != undefined) {
-            switch (this.currency.value.currency) {
-                case "AUD":
-                case "CAD":
-                case "CLP":
-                case "HKD":
-                case "MXN":
-                case "NZD":
-                case "SGD":
-                case "TWD":
-                case "USD":
-                    return (coins * this.currency.value.priceCur).toFixed(decimals) + " $" ;
-                case "BRL":
-                    return (coins * this.currency.value.priceCur).toFixed(decimals) + " R$" ;
-                case "CNY":
-                case "JPY":
-                    return (coins * this.currency.value.priceCur).toFixed(decimals) + " ¥" ;
-                case "CZK":
-                    return (coins * this.currency.value.priceCur).toFixed(decimals) + " Kč" ;
-                case "DKK":
-                case "NOK":
-                case "SEK":
-                    return (coins * this.currency.value.priceCur).toFixed(decimals) + " kr" ;
-                case "EUR":
-                    return (coins * this.currency.value.priceCur).toFixed(decimals) + " €" ;
-                case "GBP":
-                    return (coins * this.currency.value.priceCur).toFixed(decimals) + " £" ;
-                case "HUF":
-                    return (coins * this.currency.value.priceCur).toFixed(decimals) + " Ft" ;
-                case "IDR":
-                    return (coins * this.currency.value.priceCur).toFixed(decimals) + " Rp" ;
-                case "ILS":
-                    return (coins * this.currency.value.priceCur).toFixed(decimals) + " ₪" ;
-                case "INR":
-                    return (coins * this.currency.value.priceCur).toFixed(decimals) + " ₹" ;
-                case "KRW":
-                    return (coins * this.currency.value.priceCur).toFixed(decimals) + " ₩" ;
-                case "MYR":
-                    return (coins * this.currency.value.priceCur).toFixed(decimals) + " RM" ;
-                case "PHP":
-                    return (coins * this.currency.value.priceCur).toFixed(decimals) + " ₱" ;
-                case "PKR":
-                    return (coins * this.currency.value.priceCur).toFixed(decimals) + " ₨" ;
-                case "PLN":
-                    return (coins * this.currency.value.priceCur).toFixed(decimals) + " zł" ;
-                case "RUB":
-                    return (coins * this.currency.value.priceCur).toFixed(decimals) + " ₽" ;
-                case "THB":
-                    return (coins * this.currency.value.priceCur).toFixed(decimals) + " ฿" ;
-                case "TRY":
-                    return (coins * this.currency.value.priceCur).toFixed(decimals) + " ₺" ;
-                case "ZAR":
-                    return (coins * this.currency.value.priceCur).toFixed(decimals) + " Rs" ;
-                default:
-                    return (coins * this.currency.value.priceCur).toFixed(decimals) + " " + this.currency.value.currency.toUpperCase();
+            return (coins * this.currency.value.priceCur).toFixed(decimals) + " " + this.getCurrencySymbol();
+        } else {
+            return "...";
+        }
+    }
+
+    /*
+    * Get current fiat currency symbol
+    */
+    public getCurrencySymbol(): string {
+        if (this.currency.value != undefined) {
+            let currency = constants.currencies.find(c => c.code === this.currency.value.currency);
+            if (currency != undefined) {
+                return currency.symbol;
+            } else {
+                this.currency.value.currency.toUpperCase();
             }
         } else {
             return "...";
@@ -143,6 +151,9 @@ export class MarketService {
         return options;
     }
 
+    /*
+    * Helper Method to handle HTTP errors
+    */
     private handleError(error: Response | any) {
         return Promise.reject(new HttpError(error.json()));
     }

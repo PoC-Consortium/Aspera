@@ -1,3 +1,12 @@
+/*
+* Copyright 2018 PoC-Consortium
+*/
+
+/*
+* HttpError class
+*
+* Thrown on HTTP errors
+*/
 export class HttpError {
     public status: number;
     public error: string;

@@ -8,6 +8,7 @@ import { routing } from './home.routing';
 
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatGridListModule } from '@angular/material/grid-list';
 import { MatInputModule, MatSortModule } from '@angular/material';
 import { MatTableModule } from '@angular/material/table';
 
@@ -19,6 +20,7 @@ import { MatTableModule } from '@angular/material/table';
         routing,
         MatCardModule,
         MatFormFieldModule,
+        MatGridListModule,
         MatInputModule,
         MatSortModule,
         MatTableModule

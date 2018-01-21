@@ -1,36 +1,45 @@
-import { Keypair } from "./keypair";
+/*
+* Copyright 2018 PoC-Consortium
+*/
+
+import { Keys } from "./keys";
 import { Transaction } from "./transaction";
 
+/*
+* Account class
+*
+* The account class serves as a model for a Burstcoin account.
+* Each account contains its Burst address and numeric id.
+*/
 export class Account {
-
-    id: string;
-    address: string;
-    unconfirmedBalance: number;
-    balance: number;
-    type: string;
-    selected: boolean;
-
-    pinHash: string;
-    keypair: Keypair;
-    transactions: Transaction[];
+    public id: string;
+    public address: string;
+    public balance: number;
+    public keys: Keys;
+    public pinHash: string;
+    public selected: boolean;
+    public transactions: Transaction[];
+    public type: string;
+    public unconfirmedBalance: number;
 
     constructor(data: any = {}) {
         this.id = data.id || undefined;
         this.address = data.address || undefined;
         this.balance = data.balance || 0;
-        this.unconfirmedBalance = data.unconfirmedBalance || 0;
-        this.type = data.type || "offline";
-        this.selected = data.selected || false;
-        this.keypair = new Keypair();
-        if (data.keypair != undefined) {
+        if (data.keys != undefined) {
+            this.keys = new Keys();
             this.pinHash = data.pinHash || undefined;
-            this.keypair.publicKey = data.keypair.publicKey || undefined;
-            this.keypair.privateKey = data.keypair.privateKey || undefined;
+            this.keys.publicKey = data.keys.publicKey || undefined;
+            this.keys.signPrivateKey = data.keys.signPrivateKey || undefined;
+            this.keys.agreementPrivateKey = data.keys.agreementPrivateKey || undefined;
         }
+        this.selected = data.selected || false;
         if (data.transactions != undefined && data.transactions.length > 0) {
             this.transactions = data.transactions;
         } else {
             this.transactions = [];
         }
+        this.type = data.type || "offline";
+        this.unconfirmedBalance = data.unconfirmedBalance || 0;
     }
 }

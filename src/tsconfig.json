@@ -7,7 +7,6 @@
             "es2016",
             "dom"
         ],
-
         "mapRoot": "./",
         "module": "es6",
         "moduleResolution": "node",
@@ -15,7 +14,7 @@
         "sourceMap": true,
         "target": "es5",
         "module": "es2015",
-        "types": []
+        "types": ["node"]
     },
     "exclude": [
         "test.ts",

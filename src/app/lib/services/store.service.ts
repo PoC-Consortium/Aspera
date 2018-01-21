@@ -3,7 +3,7 @@ import { Loki, LokiIndexedAdapter } from 'lokijs';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
 import { Store } from "../model/abstract";
-import { Account, Settings } from "../model";
+import { Account, Settings, constants } from "../model";
 
 @Injectable()
 export class StoreService extends Store {
@@ -15,13 +15,16 @@ export class StoreService extends Store {
 
     constructor() {
         super();
-        this.store = new Loki("loki.db", {
+        this.store = new Loki(constants.database, {
             autoload: true,
             autoloadCallback: this.init.bind(this),
             adapter: new LokiIndexedAdapter()
         });
     }
 
+    /*
+    * Called on db start
+    */
     public init() {
         let accounts = this.store.getCollection("accounts");
         if (accounts == null) {
@@ -51,6 +54,9 @@ export class StoreService extends Store {
         this.settings.next(state);
     }
 
+    /*
+    * Method reponsible for saving/updating Account objects to the database.
+    */
     public saveAccount(account: Account): Promise<Account> {
         return new Promise((resolve, reject) => {
             if (this.ready.value) {
@@ -63,8 +69,7 @@ export class StoreService extends Store {
                         w.balance = account.balance;
                         w.type = account.type;
                         w.selected = account.selected;
-                        w.keypair.publicKey = account.keypair.publicKey;
-                        w.keypair.privateKey = account.keypair.privateKey;
+                        w.keys = account.keys;
                         w.transactions = account.transactions;
                     });
                 }
@@ -76,6 +81,9 @@ export class StoreService extends Store {
         });
     }
 
+    /*
+    * Method reponsible for getting the selected account from the database.
+    */
     public getSelectedAccount(): Promise<Account> {
         return new Promise((resolve, reject) => {
             if (this.ready.value) {
@@ -104,6 +112,9 @@ export class StoreService extends Store {
         });
     }
 
+    /*
+    * Method reponsible for selecting a new Account.
+    */
     public selectAccount(account: Account): Promise<Account> {
         return new Promise((resolve, reject) => {
             if (this.ready.value) {
@@ -123,6 +134,9 @@ export class StoreService extends Store {
         });
     }
 
+    /*
+    * Method reponsible for fetching all accounts from the database.
+    */
     public getAllAccounts(): Promise<Account[]> {
         return new Promise((resolve, reject) => {
             if (this.ready.value) {
@@ -139,6 +153,9 @@ export class StoreService extends Store {
         });
     }
 
+    /*
+    * Method reponsible for finding an account by its numeric id from the database.
+    */
     public findAccount(id: string): Promise<Account> {
         return new Promise((resolve, reject) => {
             if (this.ready.value) {
@@ -156,6 +173,9 @@ export class StoreService extends Store {
         });
     }
 
+    /*
+    * Method reponsible for removing an account from the database.
+    */
     public removeAccount(account: Account): Promise<boolean> {
         return new Promise((resolve, reject) => {
             if (this.ready.value) {
@@ -169,6 +189,9 @@ export class StoreService extends Store {
         });
     }
 
+    /*
+    * Method reponsible for saving/updating the global Settings object to the database.
+    */
     public saveSettings(save: Settings): Promise<Settings> {
         return new Promise((resolve, reject) => {
             if (this.ready.value) {
@@ -181,6 +204,7 @@ export class StoreService extends Store {
                         s.node = save.node;
                         s.version = save.version;
                         s.theme = save.theme;
+                        s.contacts = save.contacts;
                     });
                 } else {
                     settings.insert(save);
@@ -194,6 +218,9 @@ export class StoreService extends Store {
         });
     }
 
+    /*
+    * Method reponsible for fetching the global Settings object from the database.
+    */
     public getSettings(): Promise<Settings> {
         return new Promise((resolve, reject) => {
             if (this.ready.value) {
@@ -205,5 +232,4 @@ export class StoreService extends Store {
             }
         });
     }
-
 }

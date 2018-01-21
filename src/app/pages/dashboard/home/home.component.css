@@ -1,13 +1,5 @@
-.mat-form-field {
-  font-size: 14px;
-  width: 100%;
-}
 
-.mat-table {
-  overflow: auto;
-  max-height: 500px;
-}
 
 .mat-header-cell.mat-sort-header-sorted {
-  color: black;
+    color: black;
 }

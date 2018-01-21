@@ -42,6 +42,7 @@
     "@types/chart.js": "^2.4.2",
     "@types/crypto-js": "^3.1.33",
     "@types/jquery": "^2.0.37",
+    "@types/node": "^9.3.0",
     "codelyzer": "~0.0.26",
     "ts-node": "1.2.1",
     "tslint": "3.13.0",
