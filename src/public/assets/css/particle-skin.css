@@ -89,8 +89,8 @@
   color: #4b646f;
   background: #1a2226;
 }
-.particle .sidebar-menu > li > a {
-  border-left: 3px solid transparent;
+.particle .sidebar-menu > li > a > i {
+  font-size: 40px;
 }
 .particle .sidebar-menu > li:hover > a,
 .particle .sidebar-menu > li.active > a {

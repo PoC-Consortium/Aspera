@@ -28,9 +28,9 @@ export class DashboardComponent implements OnInit {
         // define here your own links menu structure
         this.mylinks = [
             {
-                'title': 'Home',
-                'icon': 'home',
-                'link': ['/dashboard']
+                'title': 'Accounts',
+                'icon': 'account_balance_wallet',
+                'link': ['/accounts']
             }
         ];
     }
