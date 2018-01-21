@@ -8,8 +8,9 @@ import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import 'rxjs/add/operator/toPromise';
 import 'rxjs/add/operator/timeout'
 
-import { Account, BurstAddress, Currency, EncryptedMessage, HttpError, Keys, Message, Settings, Transaction, constants } from "../model";
+import { Account, Currency, EncryptedMessage, HttpError, Keys, Message, Settings, Transaction, constants } from "../model";
 import { NoConnectionError, UnknownAccountError } from "../model/error";
+import { BurstUtil } from "../util"
 import { CryptoService } from "./crypto.service";
 import { NotificationService} from "./notification.service";
 import { StoreService } from "./store.service";
@@ -90,7 +91,7 @@ export class AccountService {
     public createOfflineAccount(address: string): Promise<Account> {
         return new Promise((resolve, reject) => {
             let account: Account = new Account();
-            this.storeService.findAccount(BurstAddress.decode(address))
+            this.storeService.findAccount(BurstUtil.decode(address))
                 .then(found => {
                     if (found == undefined) {
                         // import offline account

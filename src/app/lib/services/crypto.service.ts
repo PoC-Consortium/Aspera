@@ -5,7 +5,8 @@
 import { Injectable } from '@angular/core';
 import { Converter } from "../util";
 import { PassPhraseGenerator, ECKCDSA } from "../util/crypto";
-import { BurstAddress, Keys } from "../model";
+import { Keys } from "../model";
+import { BurstUtil } from "../util";
 
 let CryptoJS = require("crypto-js");
 let BN = require('bn.js');
@@ -80,7 +81,7 @@ export class CryptoService {
     public getBurstAddressFromAccountId(id: string): Promise<string> {
         return new Promise((resolve, reject) => {
             // TODO: refactor shitty nxt address resolution
-            resolve(BurstAddress.encode(id));
+            resolve(BurstUtil.encode(id));
         });
     }
 
@@ -90,7 +91,7 @@ export class CryptoService {
     public getAccountIdFromBurstAddress(address: string): Promise<string> {
         return new Promise((resolve, reject) => {
             // TODO: refactor shitty nxt address resolution
-            resolve(BurstAddress.decode(address));
+            resolve(BurstUtil.decode(address));
         });
     }
 
