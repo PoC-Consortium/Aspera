@@ -15,7 +15,7 @@
   border-right: 1px solid #eee;
 }
 .particle .main-header .navbar {
-  background-color: #000579D;
+  background-color: #fff;
 }
 .particle .main-header .navbar .nav > li > a {
   color: #333333;
@@ -70,14 +70,15 @@
 .particle .wrapper,
 .particle .main-sidebar,
 .particle .left-side {
-  background-color: #00579D;
+  background-color: #fff;
+  border-right: 1px solid #eee;
 }
 .particle .main-sidebar > .sidebar > div {
     padding: 10px 0px 10px 0px;
     margin: 0px 0px 20px 0px;
     background-color: #fff;
+    border-bottom: 1px solid #eee;
     text-align: center;
-    box-shadow: 0 6px 20px 0 rgba(0, 0, 0, 0.30);
 }
 .particle .main-sidebar > .sidebar > div > .logo {
     width: 60px;
@@ -92,10 +93,11 @@
 }
 .particle .sidebar-menu > li > a > i {
   font-size: 40px;
+  color: #262626;
 }
 .particle .sidebar-menu > li:hover > a,
 .particle .sidebar-menu > li.active > a {
-  color: #ffffff;
+  color: #669ac4;
   border-left-color: #ffffff;
 }
 .particle .sidebar-menu > li > .treeview-menu {
