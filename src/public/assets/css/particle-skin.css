@@ -15,7 +15,7 @@
   border-right: 1px solid #eee;
 }
 .particle .main-header .navbar {
-  background-color: #ffffff;
+  background-color: #000579D;
 }
 .particle .main-header .navbar .nav > li > a {
   color: #333333;
@@ -74,9 +74,10 @@
 }
 .particle .main-sidebar > .sidebar > div {
     padding: 10px 0px 10px 0px;
-    border-bottom: 1px solid #fff;
+    margin: 0px 0px 20px 0px;
+    background-color: #fff;
     text-align: center;
-    box-shadow: 0 6px 20px 0 rgba(0, 0, 0, 0.40);
+    box-shadow: 0 6px 20px 0 rgba(0, 0, 0, 0.30);
 }
 .particle .main-sidebar > .sidebar > div > .logo {
     width: 60px;
