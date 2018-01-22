@@ -49,15 +49,6 @@
   border-left: 1px solid #eee;
   border-right-width: 0;
 }
-.particle .main-header > .logo {
-  background-color: #ffffff;
-  color: #333333;
-  border-bottom: 0 solid transparent;
-  border-right: 1px solid #eee;
-}
-.particle .main-header > .logo:hover {
-  background-color: #fcfcfc;
-}
 @media (max-width: 767px) {
   .particle .main-header > .logo {
     background-color: #222222;
@@ -79,7 +70,16 @@
 .particle .wrapper,
 .particle .main-sidebar,
 .particle .left-side {
-  background-color: #222d32;
+  background-color: #00579D;
+}
+.particle .main-sidebar > .sidebar > div {
+    padding: 10px 0px 10px 0px;
+    border-bottom: 1px solid #fff;
+    text-align: center;
+    box-shadow: 0 6px 20px 0 rgba(0, 0, 0, 0.40);
+}
+.particle .main-sidebar > .sidebar > div > .logo {
+    width: 60px;
 }
 .particle .user-panel > .info,
 .particle .user-panel > .info > a {
@@ -95,7 +95,6 @@
 .particle .sidebar-menu > li:hover > a,
 .particle .sidebar-menu > li.active > a {
   color: #ffffff;
-  background: #1e282c;
   border-left-color: #ffffff;
 }
 .particle .sidebar-menu > li > .treeview-menu {
@@ -103,7 +102,7 @@
   background: #2c3b41;
 }
 .particle .sidebar a {
-  color: #b8c7ce;
+  color: #f6f6f6;
 }
 .particle .sidebar a:hover {
   text-decoration: none;
