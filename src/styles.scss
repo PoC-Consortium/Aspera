@@ -1,4 +1,6 @@
 /* You can add global styles to this file, and also import other style files */
+@import "/public/assets/css/app_variables.scss";
+
 @import "~bootstrap/dist/css/bootstrap.css";
 @import "~font-awesome/css/font-awesome.css";
 @import "~ionicons/dist/css/ionicons.css";
@@ -8,6 +10,14 @@
 @import "/public/assets/css/particle.css";
 @import "/public/assets/css/particle-skin.css";
 @import "/public/fonts/material-icons/material-icons.css";
+
+.danger {
+    color: $error-light;
+}
+
+.success {
+    color: $success-dark;
+}
 
 // Loading page with cubes
 .loading {

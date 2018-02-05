@@ -15,6 +15,7 @@
   border-right: 1px solid #eee;
 }
 .particle .main-header .navbar {
+    margin-left: 80px;
   background-color: #fff;
 }
 .particle .main-header .navbar .nav > li > a {
@@ -94,6 +95,9 @@
 .particle .sidebar-menu > li > a > i {
   font-size: 40px;
   color: #262626;
+}
+.particle .sidebar-menu > li > a:hover > i {
+  color: #00579D;
 }
 .particle .sidebar-menu > li:hover > a,
 .particle .sidebar-menu > li.active > a {
