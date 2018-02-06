@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation} from '@angular/core';
+import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { LoggerService } from '../../lib/services';
 
 @Component({
@@ -29,8 +29,18 @@ export class DashboardComponent implements OnInit {
         this.mylinks = [
             {
                 'title': 'Accounts',
-                'icon': 'account_balance_wallet',
+                'icon': 'account_box',
                 'link': ['/accounts']
+            },
+            {
+                'title': 'Transactions',
+                'icon': 'account_balance_wallet',
+                'link': ['/transactions']
+            },
+            {
+                'title': 'Assets',
+                'icon': 'clear_all',
+                'link': ['/transactions']
             }
         ];
     }

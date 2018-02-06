@@ -6,11 +6,8 @@ import { AccountsComponent } from './accounts.component';
 const routes: Routes = [
   {
     path: '',
-    component: AccountsComponent,
-    children: [
-      //{ path: 'treeview', component: TreeViewComponent }
-    ]
+    component: AccountsComponent
   }
 ];
 
-export const routing = RouterModule.forChild(routes);
+export const AccountsRouting = RouterModule.forChild(routes);

@@ -14,6 +14,7 @@ import { Transaction } from "./transaction";
 export class Account {
     public id: string;
     public address: string;
+    public alias: string;
     public balance: number;
     public keys: Keys;
     public pinHash: string;
@@ -25,6 +26,7 @@ export class Account {
     constructor(data: any = {}) {
         this.id = data.id || undefined;
         this.address = data.address || undefined;
+        this.alias = data.alias || undefined;
         this.balance = data.balance || 0;
         if (data.keys != undefined) {
             this.keys = new Keys();
