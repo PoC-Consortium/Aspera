@@ -1,0 +1,171 @@
+.left-side,
+.main-sidebar,
+.wrapper {
+    background-color: #fff;
+    border-right: 1px solid #eee;
+}
+
+.main-sidebar > .sidebar > div {
+    padding: 10px 0;
+    margin: 0 0 20px;
+    background-color: #fff;
+    border-bottom: 1px solid #eee;
+    text-align: center;
+}
+
+.main-sidebar > .sidebar > div > .logo {
+    width: 60px;
+}
+
+.user-panel > .info,
+.user-panel > .info > a {
+    color: #fff;
+}
+
+.sidebar a {
+    color: #f6f6f6;
+}
+
+.sidebar a:hover {
+    text-decoration: none;
+}
+
+.treeview-menu > li > a {
+    color: #8aa4af;
+}
+
+.treeview-menu > li > a:hover,
+.treeview-menu > li.active > a {
+    color: #ffffff;
+}
+
+.sidebar-form {
+    border-radius: 3px;
+    border: 1px solid #374850;
+    margin: 10px;
+}
+
+.sidebar-form input[type="text"],
+.sidebar-form .btn {
+    box-shadow: none;
+    background-color: #374850;
+    border: 1px solid transparent;
+    height: 35px;
+}
+
+.sidebar-form input[type="text"] {
+    color: #666;
+    border-top-left-radius: 2px;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    border-bottom-left-radius: 2px;
+}
+
+.sidebar-form input[type="text"]:focus,
+.sidebar-form input[type="text"]:focus + .input-group-btn .btn {
+    background-color: #fff;
+    color: #666;
+}
+
+.sidebar-form input[type="text"]:focus + .input-group-btn .btn {
+    border-left-color: #fff;
+}
+
+.sidebar-form .btn {
+    color: #999;
+    border-top-left-radius: 0;
+    border-top-right-radius: 2px;
+    border-bottom-right-radius: 2px;
+    border-bottom-left-radius: 0;
+}
+
+.pace .pace-progress {
+    background: #222;
+}
+
+.pace .pace-activity {
+    border-top-color: #222;
+    border-left-color: #222;
+}
+
+rticle .sidebar-form .btn {
+    box-shadow: none;
+    background-color: #374850;
+    border: 1px solid transparent;
+    height: 35px;
+}
+
+.sidebar-form input[type="text"] {
+    color: #666;
+    border-top-left-radius: 2px;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    border-bottom-left-radius: 2px;
+}
+
+.sidebar-form input[type="text"]:focus,
+.sidebar-form input[type="text"]:focus + .input-group-btn .btn {
+    background-color: #fff;
+    color: #666;
+}
+
+.sidebar-form input[type="text"]:focus + .input-group-btn .btn {
+    border-left-color: #fff;
+}
+
+.sidebar-form .btn {
+    color: #999;
+    border-top-left-radius: 0;
+    border-top-right-radius: 2px;
+    border-bottom-right-radius: 2px;
+    border-bottom-left-radius: 0;
+}
+
+.pace .pace-progress {
+    background: #222;
+}
+
+.pace .pace-activity {
+    border-top-color: #222;
+    border-left-color: #222;
+}
+
+.sidebar-menu {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.sidebar-menu > li {
+    text-align: center;
+    position: relative;
+    margin: 0;
+    padding: 0;
+}
+
+.sidebar-menu > li > a {
+    display: block;
+}
+
+.sidebar-menu > li > a > button {
+    min-width: 80px !important;
+    height: 80px !important;
+    border-radius: 0px;
+    color: #262626;
+}
+
+.sidebar-menu > li > a > button > span > .mat-icon {
+    font-size: 40px !important;
+    height: 40px !important;
+    width: 40px !important;
+}
+
+.sidebar-menu > li > a:hover > i {
+    color: #00579D;
+}
+
+.sidebar-menu > li.active > a,
+.sidebar-menu > li:hover > a {
+    color: #669ac4;
+    border-left-color: #ffffff;
+}

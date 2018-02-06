@@ -11,7 +11,9 @@
                 <ng-template [ngIf]="!item.sublinks">
                     <li [class.active]="item.link[0] === current_url">
                         <a *ngIf="!item.external" [routerLink]="item.link">
-                            <i class="material-icons menu-icon">{{item.icon}}</i>
+                            <button mat-button>
+                              <mat-icon>{{item.icon}}</mat-icon>
+                            </button>
 			            </a>
                         <a *ngIf="item.external" [href]="item.link" [target]="item.target">
 					        <i class="fa fa-{{item.icon}}"></i>

@@ -1,3 +1,7 @@
 /deep/ .mat-menu-panel {
     max-width: none !important;
 }
+
+/deep/ .mat-button {
+    padding: 0px 5px !important;
+}
