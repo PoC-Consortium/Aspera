@@ -1,9 +1,11 @@
 import { Injectable } from '@angular/core';
-import { Loki, LokiIndexedAdapter } from 'lokijs';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
 import { Store } from "../model/abstract";
 import { Account, Settings, constants } from "../model";
+
+import * as Loki from "lokijs";
+import * as LokiIndexedAdapter from "lokijs/src/loki-indexed-adapter.js";
 
 @Injectable()
 export class StoreService extends Store {
@@ -26,6 +28,7 @@ export class StoreService extends Store {
     * Called on db start
     */
     public init() {
+        console.log("called2")
         let accounts = this.store.getCollection("accounts");
         if (accounts == null) {
             accounts = this.store.addCollection("accounts", { unique : ["id"]});

@@ -38,6 +38,7 @@ export class AccountService {
         this.storeService.settings.subscribe((settings: Settings) => {
             this.nodeUrl = settings.node;
         });
+        this.nodeUrl = "https://wallet.burst.cryptoguru.org:8125/burst"
     }
 
     public setCurrentAccount(account: Account) {
@@ -204,6 +205,7 @@ export class AccountService {
             params.set("account", id);
             let requestOptions = this.getRequestOptions();
             requestOptions.params = params;
+            console.log(this.nodeUrl)
             return this.http.get(this.nodeUrl, requestOptions).timeout(constants.connectionTimeout).toPromise()
                 .then(response => {
                     let transactions: Transaction[] = [];
@@ -214,7 +216,7 @@ export class AccountService {
                     });
                     resolve(transactions);
                 })
-                .catch(error => reject(new NoConnectionError()));
+                .catch(error => {console.log(error);reject(new NoConnectionError())});
         });
     }
 

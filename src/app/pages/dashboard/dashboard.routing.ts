@@ -13,7 +13,8 @@ const routes: Routes = [
         children: [
             { path: '', redirectTo: 'home', pathMatch: 'full' },
             { path: 'accounts', loadChildren: './accounts/accounts.module#AccountsModule' },
-            { path: 'home', loadChildren: './home/home.module#HomeModule' }
+            { path: 'home', loadChildren: './home/home.module#HomeModule' },
+            { path: 'transactions', loadChildren: './transactions/transactions.module#TransactionsModule' }
         ]
     }
 ];

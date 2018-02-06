@@ -1,0 +1,58 @@
+<mat-card>
+    <mat-form-field>
+        <input matInput (keyup)="applyFilter($event.target.value)" placeholder="Filter">
+    </mat-form-field>
+    <mat-table #table [dataSource]="dataSource" matSort>
+
+        <!-- Position Column -->
+        <ng-container matColumnDef="id">
+            <mat-header-cell *matHeaderCellDef mat-sort-header><mat-icon>bookmark</mat-icon> Id</mat-header-cell>
+            <mat-cell *matCellDef="let transaction"> {{transaction.id}} </mat-cell>
+        </ng-container>
+
+        <!-- Name Column -->
+        <ng-container matColumnDef="sender">
+            <mat-header-cell *matHeaderCellDef mat-sort-header><mat-icon>transaction_box</mat-icon> Sender</mat-header-cell>
+            <mat-cell *matCellDef="let transaction"> {{transaction.senderAddress}} </mat-cell>
+        </ng-container>
+
+        <!-- Name Column -->
+        <ng-container matColumnDef="recipient">
+            <mat-header-cell *matHeaderCellDef mat-sort-header><mat-icon>transaction_box</mat-icon> Recipient</mat-header-cell>
+            <mat-cell *matCellDef="let transaction"> {{transaction.recipientAddress}} </mat-cell>
+        </ng-container>
+
+        <!-- Weight Column -->
+        <ng-container matColumnDef="amount">
+            <mat-header-cell *matHeaderCellDef mat-sort-header><mat-icon>local_atm</mat-icon> Amount</mat-header-cell>
+            <mat-cell *matCellDef="let transaction"> {{transaction.amountNQT}} BURST</mat-cell>
+        </ng-container>
+
+        <!-- Color Column -->
+        <ng-container matColumnDef="fee">
+            <mat-header-cell *matHeaderCellDef mat-sort-header><mat-icon>keyboard_arrow_down</mat-icon> Fee</mat-header-cell>
+            <mat-cell *matCellDef="let transaction"> {{transaction.feeNQT}} </mat-cell>
+        </ng-container>
+
+        <!-- Color Column -->
+        <ng-container matColumnDef="type">
+            <mat-header-cell *matHeaderCellDef mat-sort-header><mat-icon>keyboard_arrow_down</mat-icon> Fee</mat-header-cell>
+            <mat-cell *matCellDef="let transaction"> {{transaction.feeNQT}} </mat-cell>
+        </ng-container>
+
+        <!-- Color Column -->
+        <ng-container matColumnDef="attachment">
+            <mat-header-cell *matHeaderCellDef mat-sort-header><mat-icon>keyboard_arrow_down</mat-icon> Fee</mat-header-cell>
+            <mat-cell *matCellDef="let transaction"> {{transaction.feeNQT}} </mat-cell>
+        </ng-container>
+
+        <!-- Color Column -->
+        <ng-container matColumnDef="timestamp">
+            <mat-header-cell *matHeaderCellDef mat-sort-header><mat-icon>keyboard_arrow_down</mat-icon> Fee</mat-header-cell>
+            <mat-cell *matCellDef="let transaction"> {{transaction.feeNQT}} </mat-cell>
+        </ng-container>
+
+        <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+        <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+    </mat-table>
+</mat-card>
