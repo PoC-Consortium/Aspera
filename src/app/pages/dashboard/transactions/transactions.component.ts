@@ -20,7 +20,7 @@ export class TransactionsComponent {
     ) {}
 
     public ngOnInit() {
-        this.displayedColumns = ['id', 'sender', 'recipient', 'amount', 'fee', 'type', 'attachment', 'timestamp'];
+        this.displayedColumns = ['opposite', 'type', 'amount', 'fee', 'attachment', 'timestamp'];
         this.dataSource = new MatTableDataSource<Transaction>();
 
         this.accountService.getTransactions("14276304710264415646").then(transactions => {

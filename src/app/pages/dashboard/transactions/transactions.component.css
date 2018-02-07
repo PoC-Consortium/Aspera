@@ -1,0 +1,7 @@
+.mat-column-type {
+  flex: 0 0 50px;
+}
+
+.mat-column-opposite {
+  flex: 0 1 300px;
+}

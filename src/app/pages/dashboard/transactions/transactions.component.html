@@ -4,22 +4,22 @@
     </mat-form-field>
     <mat-table #table [dataSource]="dataSource" matSort>
 
-        <!-- Position Column -->
-        <ng-container matColumnDef="id">
-            <mat-header-cell *matHeaderCellDef mat-sort-header><mat-icon>bookmark</mat-icon> Id</mat-header-cell>
-            <mat-cell *matCellDef="let transaction"> {{transaction.id}} </mat-cell>
+        <!-- Name Column -->
+        <ng-container matColumnDef="opposite">
+            <mat-header-cell *matHeaderCellDef mat-sort-header><mat-icon>account_box</mat-icon> Opposite</mat-header-cell>
+            <mat-cell *matCellDef="let transaction">
+                <span *ngIf="transaction.senderAddress == 'BURST-RTEY-HUSA-BJG4-EZW9E'">{{transaction.recipientAddress}}</span>
+                <span *ngIf="transaction.senderAddress != 'BURST-RTEY-HUSA-BJG4-EZW9E'">{{transaction.senderAddress}}</span>
+            </mat-cell>
         </ng-container>
 
-        <!-- Name Column -->
-        <ng-container matColumnDef="sender">
-            <mat-header-cell *matHeaderCellDef mat-sort-header><mat-icon>transaction_box</mat-icon> Sender</mat-header-cell>
-            <mat-cell *matCellDef="let transaction"> {{transaction.senderAddress}} </mat-cell>
-        </ng-container>
-
-        <!-- Name Column -->
-        <ng-container matColumnDef="recipient">
-            <mat-header-cell *matHeaderCellDef mat-sort-header><mat-icon>transaction_box</mat-icon> Recipient</mat-header-cell>
-            <mat-cell *matCellDef="let transaction"> {{transaction.recipientAddress}} </mat-cell>
+        <!-- Color Column -->
+        <ng-container matColumnDef="type">
+            <mat-header-cell *matHeaderCellDef mat-sort-header><mat-icon>compare_arrows</mat-icon></mat-header-cell>
+            <mat-cell *matCellDef="let transaction">
+                <i *ngIf="transaction.senderAddress == 'BURST-RTEY-HUSA-BJG4-EZW9E'" class="material-icons">keyboard_arrow_left</i>
+                <i *ngIf="transaction.senderAddress != 'BURST-RTEY-HUSA-BJG4-EZW9E'" class="material-icons">keyboard_arrow_right</i>
+            </mat-cell>
         </ng-container>
 
         <!-- Weight Column -->
@@ -31,24 +31,20 @@
         <!-- Color Column -->
         <ng-container matColumnDef="fee">
             <mat-header-cell *matHeaderCellDef mat-sort-header><mat-icon>keyboard_arrow_down</mat-icon> Fee</mat-header-cell>
-            <mat-cell *matCellDef="let transaction"> {{transaction.feeNQT}} </mat-cell>
-        </ng-container>
-
-        <!-- Color Column -->
-        <ng-container matColumnDef="type">
-            <mat-header-cell *matHeaderCellDef mat-sort-header><mat-icon>keyboard_arrow_down</mat-icon> Fee</mat-header-cell>
-            <mat-cell *matCellDef="let transaction"> {{transaction.feeNQT}} </mat-cell>
+            <mat-cell *matCellDef="let transaction"> {{transaction.feeNQT}} BURST</mat-cell>
         </ng-container>
 
         <!-- Color Column -->
         <ng-container matColumnDef="attachment">
-            <mat-header-cell *matHeaderCellDef mat-sort-header><mat-icon>keyboard_arrow_down</mat-icon> Fee</mat-header-cell>
-            <mat-cell *matCellDef="let transaction"> {{transaction.feeNQT}} </mat-cell>
+            <mat-header-cell *matHeaderCellDef mat-sort-header><mat-icon>note</mat-icon> Note</mat-header-cell>
+            <mat-cell *matCellDef="let transaction">
+                <span *ngIf="transaction.attachment == undefined">-</span>
+            </mat-cell>
         </ng-container>
 
         <!-- Color Column -->
         <ng-container matColumnDef="timestamp">
-            <mat-header-cell *matHeaderCellDef mat-sort-header><mat-icon>keyboard_arrow_down</mat-icon> Fee</mat-header-cell>
+            <mat-header-cell *matHeaderCellDef mat-sort-header><mat-icon>keyboard_arrow_down</mat-icon> Date</mat-header-cell>
             <mat-cell *matCellDef="let transaction"> {{transaction.feeNQT}} </mat-cell>
         </ng-container>
 
