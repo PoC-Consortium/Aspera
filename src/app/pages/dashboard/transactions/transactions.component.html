@@ -1,15 +1,9 @@
 <mat-card class="transaction-header">
-    <mat-grid-list cols="8" rowHeight="50px">
+    <mat-grid-list cols="8" rowHeight="80px">
         <mat-grid-tile class="border-divide-right" [colspan]="2" [rowspan]="1">
             {{ account }}
         </mat-grid-tile>
-        <mat-grid-tile [colspan]="5" [rowspan]="1">
-
-        </mat-grid-tile>
-        <mat-grid-tile class="border-divide-left" [colspan]="1" [rowspan]="2">
-            <mat-icon class="sync-icon">check</mat-icon>
-        </mat-grid-tile>
-        <mat-grid-tile class="border-divide-top" [colspan]="7" [rowspan]="1">
+        <mat-grid-tile class="border-divide-right" [colspan]="5" [rowspan]="1">
             <div class="transaction-filter">
                 Filter:
             </div>
@@ -35,6 +29,9 @@
                     <mat-datepicker #pickerTo></mat-datepicker>
                 </mat-form-field>
             </div>
+        </mat-grid-tile>
+        <mat-grid-tile [colspan]="1" [rowspan]="1">
+            <mat-icon class="sync-icon">check</mat-icon>
         </mat-grid-tile>
     </mat-grid-list>
 </mat-card>
