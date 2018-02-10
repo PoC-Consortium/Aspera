@@ -34,6 +34,7 @@
     "lokijs": "^1.5.1",
     "rxjs": "5.5.2",
     "seedrandom": "^2.4.3",
+    "time-ago-pipe": "^1.2.1",
     "ts-helpers": "^1.1.1",
     "zone.js": "^0.8.4"
   },

@@ -9,8 +9,43 @@
 @import "~@angular/material/prebuilt-themes/indigo-pink.css";
 
 @import "/public/assets/css/particle.css";
-@import "/public/assets/css/particle-skin.css";
 @import "/public/fonts/material-icons/material-icons.css";
+
+.danger {
+    color: $red;
+}
+
+.success {
+    color: $lime;
+}
+
+.danger-bg {
+    background-color: $red;
+}
+
+.success-bg {
+    background-color: $lime;
+}
+
+.border-divide-top {
+    border-top: solid 1px;
+    border-top-color: rgba(0,0,0,.12);
+}
+
+.border-divide-bottom {
+    border-bottom: solid 1px;
+    border-bottom-color: rgba(0,0,0,.12);
+}
+
+.border-divide-left {
+    border-left: solid 1px;
+    border-left-color: rgba(0,0,0,.12);
+}
+
+.border-divide-right {
+    border-right: solid 1px;
+    border-right-color: rgba(0,0,0,.12);
+}
 
 // Loading page with cubes
 .loading {
