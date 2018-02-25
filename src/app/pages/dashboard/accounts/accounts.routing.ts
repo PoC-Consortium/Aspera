@@ -6,7 +6,10 @@ import { AccountsComponent } from './accounts.component';
 const routes: Routes = [
   {
     path: '',
-    component: AccountsComponent
+    component: AccountsComponent,
+    children: [
+        { path: 'create', loadChildren: './create/create.module#AccountsCreateModule' }
+    ]
   }
 ];
 

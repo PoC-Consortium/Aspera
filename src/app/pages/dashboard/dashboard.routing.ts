@@ -6,14 +6,15 @@ import { HomeComponent } from './home';
 
 // noinspection TypeScriptValidateTypes
 const routes: Routes = [
-    { path: 'create', loadChildren: '../create/create.module#CreateModule' },
     {
         path: 'dashboard',
         component: DashboardComponent,
         children: [
             { path: '', redirectTo: 'home', pathMatch: 'full' },
             { path: 'accounts', loadChildren: './accounts/accounts.module#AccountsModule' },
+            { path: 'accounts/create', loadChildren: './accounts/create/create.module#AccountsCreateModule' },
             { path: 'home', loadChildren: './home/home.module#HomeModule' },
+            { path: 'setup', loadChildren: './setup/setup.module#SetupModule' },
             { path: 'transactions', loadChildren: './transactions/transactions.module#TransactionsModule' }
         ]
     }

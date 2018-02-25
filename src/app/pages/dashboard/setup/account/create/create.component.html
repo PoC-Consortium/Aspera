@@ -1,0 +1,22 @@
+<mat-card>
+    <h3>Setup</h3>
+    <mat-divider>
+    <mat-horizontal-stepper [linear]="true" #stepper="matHorizontalStepper">
+      <mat-step [completed]="true">
+          <ng-template matStepLabel>Seed</ng-template>
+
+      </mat-step>
+      <mat-step [completed]="true">
+          <ng-template matStepLabel>Record</ng-template>
+
+      </mat-step>
+      <mat-step [completed]="true">
+          <ng-template matStepLabel>Reproduce</ng-template>
+
+      </mat-step>
+      <mat-step [completed]="true">
+          <ng-template matStepLabel>Verify</ng-template>
+
+      </mat-step>
+    </mat-horizontal-stepper>
+</mat-card>
