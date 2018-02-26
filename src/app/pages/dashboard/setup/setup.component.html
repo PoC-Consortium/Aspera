@@ -11,11 +11,11 @@
       </mat-step>
       <mat-step [completed]="true">
           <ng-template matStepLabel>Account</ng-template>
-
+          <app-account-new></app-account-new>
       </mat-step>
       <mat-step [completed]="true">
         <ng-template matStepLabel>Done</ng-template>
-        You are now done.
+        You are now done
         <div>
           <button mat-button matStepperPrevious>Back</button>
           <button mat-button (click)="stepper.reset()">Reset</button>

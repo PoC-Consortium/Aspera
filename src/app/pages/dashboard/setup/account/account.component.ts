@@ -2,11 +2,11 @@ import { Component, OnInit, OnDestroy, ViewEncapsulation } from '@angular/core';
 import { Router } from '@angular/router';
 
 @Component({
-    selector: 'app-setup-node',
-    styleUrls: ['./node.component.css'],
-    templateUrl: './node.component.html'
+    selector: 'app-account-new',
+    styleUrls: ['./account.component.scss'],
+    templateUrl: './account.component.html'
 })
-export class NodeComponent implements OnInit {
+export class AccountNewComponent implements OnInit {
 
 
     constructor(

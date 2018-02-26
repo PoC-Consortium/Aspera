@@ -3,10 +3,10 @@ import { Router } from '@angular/router';
 
 @Component({
     selector: 'app-account-create',
-    styleUrls: ['./node.component.css'],
-    templateUrl: './node.component.html'
+    styleUrls: ['./create.component.scss'],
+    templateUrl: './create.component.html'
 })
-export class CreateComponent implements OnInit {
+export class AccountCreateComponent implements OnInit {
 
 
     constructor(
