@@ -3,6 +3,10 @@
 .seed-area {
     height: 200px;
     text-align: center;
-    vertical-align: middle;
-    background-color: $light-background;
+    border-radius: $default-border-radius;
+    border: solid 1px $default-border-color;
+}
+
+.seed-info {
+    margin: 0 auto;
 }
