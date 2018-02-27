@@ -9,6 +9,8 @@ import { AccountNewComponent } from './account/account.component';
 import { AccountCreateComponent } from './account/create/create.component';
 import { AccountCreateSeedComponent } from './account/create/seed/seed.component';
 
+import { CreateService } from './account/create/create.service';
+
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatDividerModule } from '@angular/material/divider';
@@ -42,7 +44,7 @@ import { MatStepperModule } from '@angular/material/stepper';
         AccountNewComponent
     ],
     providers: [
-
+        CreateService
     ]
 })
 export class SetupModule { }

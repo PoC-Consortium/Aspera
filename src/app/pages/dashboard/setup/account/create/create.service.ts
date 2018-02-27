@@ -15,7 +15,7 @@ export class CreateService {
         this.passphrase = passphrase;
     }
 
-    public getPassPhrase(): string[] {
+    public getPassphrase(): string[] {
         return this.passphrase;
     }
 
