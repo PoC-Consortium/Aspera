@@ -7,12 +7,14 @@ import { SetupRouting } from './setup.routing';
 import { SetupComponent } from './setup.component';
 import { AccountNewComponent } from './account/account.component';
 import { AccountCreateComponent } from './account/create/create.component';
+import { AccountCreateRecordComponent } from './account/create/record/record.component';
 import { AccountCreateSeedComponent } from './account/create/seed/seed.component';
 
 import { CreateService } from './account/create/create.service';
 
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
+import { MatChipsModule } from '@angular/material/chips';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatGridListModule } from '@angular/material/grid-list';
@@ -26,6 +28,7 @@ import { MatStepperModule } from '@angular/material/stepper';
         CommonModule,
         MatButtonModule,
         MatCardModule,
+        MatChipsModule,
         MatDividerModule,
         MatFormFieldModule,
         MatGridListModule,
@@ -40,6 +43,7 @@ import { MatStepperModule } from '@angular/material/stepper';
     declarations: [
         SetupComponent,
         AccountCreateComponent,
+        AccountCreateRecordComponent,
         AccountCreateSeedComponent,
         AccountNewComponent
     ],

@@ -44,4 +44,9 @@ export class AccountCreateSeedComponent implements OnInit {
                 });
         }
     }
+
+    public reset() {
+        this.seed = [];
+        this.createService.setPassphrase([]);
+    }
 }

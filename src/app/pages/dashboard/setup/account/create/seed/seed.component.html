@@ -4,5 +4,6 @@
     Move your mouse across the area to create a seed for the password generation.
 </div>
 <div *ngIf="this.createService.getPassphrase().length > 0">
+    <button mat-button (click)="reset()">Reset</button>
     <button mat-button matStepperNext>Next</button>
 </div>
