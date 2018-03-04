@@ -1,5 +1,7 @@
-import { Component, OnInit, OnDestroy, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, ViewEncapsulation } from '@angular/core';
 import { Router } from '@angular/router';
+import { MatStepper } from '@angular/material';
+import { CreateService } from './create.service';
 
 @Component({
     selector: 'app-account-create',
@@ -7,10 +9,12 @@ import { Router } from '@angular/router';
     templateUrl: './create.component.html'
 })
 export class AccountCreateComponent implements OnInit {
-
+    private stepIndex: number;
+    @ViewChild(MatStepper) stepper: MatStepper;
 
     constructor(
         private router: Router,
+        private createService: CreateService
     ) {}
 
     public ngOnInit() {
@@ -19,6 +23,10 @@ export class AccountCreateComponent implements OnInit {
 
     public ngOnDestroy() {
 
+    }
+
+    public setIndex() {
+        this.stepper.selectedIndex = 1
     }
 
 }

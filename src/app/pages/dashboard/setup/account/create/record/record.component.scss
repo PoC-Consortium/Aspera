@@ -1,7 +1,11 @@
 @import 'src/public/assets/scss/variables/light';
 
-.part-chip {
-    border-radius: 0px;
+/deep/ .chip-list {
+    flex-wrap: nowrap;
+}
+
+/deep/ .chip-part {
+    border-radius: 0px !important;
 }
 
 .unselectable {

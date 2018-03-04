@@ -5,7 +5,10 @@ import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 @Injectable()
 export class CreateService {
     private passphrase: string[];
+    private id: string;
+    private address: string;
     private progress: number;
+    private stepIndex: number;
 
     constructor() {
         this.reset();
@@ -27,6 +30,30 @@ export class CreateService {
         return this.passphrase.join(" ");
     }
 
+    public setId(id: string) {
+        this.id = id;
+    }
+
+    public getId(id: string) {
+        return this.id;
+    }
+
+    public setAddress(address: string) {
+        this.address = address;
+    }
+
+    public getAddress() : string {
+        return this.address;
+    }
+
+    public setStepIndex(index: number) {
+        this.stepIndex = index;
+    }
+
+    public getStepIndex() : number {
+        return this.stepIndex;
+    }
+
     public setProgress(progress: number) {
         this.progress = progress;
     }
@@ -35,8 +62,15 @@ export class CreateService {
         return this.progress;
     }
 
+    public isPassphraseGenerated() : boolean {
+        return this.passphrase.length > 0 && this.address != undefined && this.id != undefined
+    }
+
     public reset() {
         this.passphrase = [];
+        this.id = undefined;
+        this.address = undefined;
+        this.stepIndex = 0;
         this.progress = 0;
     }
 }

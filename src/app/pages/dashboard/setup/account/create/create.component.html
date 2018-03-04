@@ -1,15 +1,15 @@
-<mat-horizontal-stepper [linear]="true" #stepper="matHorizontalStepper">
-    <mat-step [completed]="true">
+<mat-horizontal-stepper #stepper [linear]="true" [selectedIndex]="this.createService.getStepIndex()">
+    <mat-step [completed]="this.createService.isPassphraseGenerated()">
         <ng-template matStepLabel>Seed</ng-template>
-        <app-account-create-seed></app-account-create-seed>
+        <div class="step-container">
+            <app-account-create-seed></app-account-create-seed>
+        </div>
     </mat-step>
     <mat-step [completed]="true">
         <ng-template matStepLabel>Record</ng-template>
-        <app-account-create-record></app-account-create-record>
-    </mat-step>
-    <mat-step [completed]="true">
-        <ng-template matStepLabel>Reproduce</ng-template>
-
+        <div class="step-container">
+            <app-account-create-record></app-account-create-record>
+        </div>
     </mat-step>
     <mat-step [completed]="true">
         <ng-template matStepLabel>Verify</ng-template>

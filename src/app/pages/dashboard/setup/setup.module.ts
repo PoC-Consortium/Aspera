@@ -16,11 +16,13 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatDividerModule } from '@angular/material/divider';
+import { MatExpansionModule } from '@angular/material/expansion';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatGridListModule } from '@angular/material/grid-list';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatStepperModule } from '@angular/material/stepper';
 
 @NgModule({
@@ -30,11 +32,13 @@ import { MatStepperModule } from '@angular/material/stepper';
         MatCardModule,
         MatChipsModule,
         MatDividerModule,
+        MatExpansionModule,
         MatFormFieldModule,
         MatGridListModule,
         MatIconModule,
         MatInputModule,
         MatProgressBarModule,
+        MatProgressSpinnerModule,
         MatStepperModule,
         ReactiveFormsModule,
         SetupRouting,

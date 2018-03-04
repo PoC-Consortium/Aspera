@@ -1,3 +1,34 @@
-<mat-chip-list>
-    <mat-chip class="part-chip unselectable" *ngFor="let part of this.createService.getPassphrase()">{{part}}</mat-chip>
-</mat-chip-list>
+<div class="row">
+    <div class="col-sm-2">
+    </div>
+    <div class="col-sm-8 text-center">
+        <mat-expansion-panel [expanded]="step === 0" (opened)="setStep(0)" hideToggle="true">
+            <mat-expansion-panel-header>
+                <mat-panel-title>
+                    Personal data
+                </mat-panel-title>
+                <mat-panel-description>
+                    Type your name and age
+                    <mat-icon>account_circle</mat-icon>
+                </mat-panel-description>
+            </mat-expansion-panel-header>
+
+            <mat-form-field>
+                <input matInput placeholder="First name">
+            </mat-form-field>
+
+            <mat-form-field>
+                <input matInput type="number" min="1" placeholder="Age">
+            </mat-form-field>
+
+            <mat-action-row>
+                <button mat-button color="primary" (click)="nextStep()">Next</button>
+            </mat-action-row>
+        </mat-expansion-panel>
+        <mat-chip-list>
+            <mat-chip class="chip-part unselectable" *ngFor="let part of this.createService.getPassphrase()">{{part}}</mat-chip>
+        </mat-chip-list>
+    </div>
+    <div class="col-sm-2">
+    </div>
+</div>
