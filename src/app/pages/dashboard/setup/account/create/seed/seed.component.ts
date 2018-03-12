@@ -50,7 +50,7 @@ export class AccountCreateSeedComponent implements OnInit {
                                 this.createService.setAddress(address);
                                 setTimeout(x => {
                                     this.createService.setStepIndex(1)
-                                }, 1000);
+                                }, 500);
                                 this.generating = false;
                             })
                         })

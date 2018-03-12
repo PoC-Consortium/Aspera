@@ -1,11 +1,7 @@
 @import 'src/public/assets/scss/variables/light';
 
-/deep/ .chip-list {
-    flex-wrap: nowrap;
-}
-
-/deep/ .chip-part {
-    border-radius: 0px !important;
+td {
+    padding: 10px;
 }
 
 .unselectable {
@@ -15,4 +11,8 @@
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
+}
+
+.navigation {
+    margin: 10px;
 }

@@ -1,33 +1,48 @@
 <div class="row">
     <div class="col-sm-2">
     </div>
-    <div class="col-sm-8 text-center">
-        <mat-expansion-panel [expanded]="step === 0" (opened)="setStep(0)" hideToggle="true">
+    <div class="col-sm-8">
+        <mat-expansion-panel expanded="true" disabled="true" hideToggle="true">
             <mat-expansion-panel-header>
                 <mat-panel-title>
-                    Personal data
+                    Account has been created!
                 </mat-panel-title>
-                <mat-panel-description>
-                    Type your name and age
-                    <mat-icon>account_circle</mat-icon>
-                </mat-panel-description>
             </mat-expansion-panel-header>
-
-            <mat-form-field>
-                <input matInput placeholder="First name">
-            </mat-form-field>
-
-            <mat-form-field>
-                <input matInput type="number" min="1" placeholder="Age">
-            </mat-form-field>
-
-            <mat-action-row>
-                <button mat-button color="primary" (click)="nextStep()">Next</button>
-            </mat-action-row>
+            <table cellspacing="10">
+                <tr>
+                    <td>
+                        ID:
+                    </td>
+                    <td>
+                        {{ this.createService.getId() }}
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Address:
+                    </td>
+                    <td>
+                        {{ this.createService.getAddress() }}
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Passphrase:
+                    </td>
+                    <td class="unselectable">
+                        {{ this.createService.getCompletePassphrase() }}
+                    </td>
+                </tr>
+            </table>
+            <hr>
+            <small>
+                Note down your passphrase. The passphrase is the master key to your account. Therefore, keep your passphrase always safe and private!
+            </small>
         </mat-expansion-panel>
-        <mat-chip-list>
-            <mat-chip class="chip-part unselectable" *ngFor="let part of this.createService.getPassphrase()">{{part}}</mat-chip>
-        </mat-chip-list>
+        <div class="text-center navigation">
+            <button mat-raised-button>Back</button>
+            <button mat-raised-button>Next</button>
+        </div>
     </div>
     <div class="col-sm-2">
     </div>

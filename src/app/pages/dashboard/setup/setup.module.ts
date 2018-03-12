@@ -7,6 +7,7 @@ import { SetupRouting } from './setup.routing';
 import { SetupComponent } from './setup.component';
 import { AccountNewComponent } from './account/account.component';
 import { AccountCreateComponent } from './account/create/create.component';
+import { AccountCreatePinComponent } from './account/create/pin/pin.component';
 import { AccountCreateRecordComponent } from './account/create/record/record.component';
 import { AccountCreateSeedComponent } from './account/create/seed/seed.component';
 
@@ -47,6 +48,7 @@ import { MatStepperModule } from '@angular/material/stepper';
     declarations: [
         SetupComponent,
         AccountCreateComponent,
+        AccountCreatePinComponent,
         AccountCreateRecordComponent,
         AccountCreateSeedComponent,
         AccountNewComponent

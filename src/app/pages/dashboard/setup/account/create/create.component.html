@@ -13,6 +13,8 @@
     </mat-step>
     <mat-step [completed]="true">
         <ng-template matStepLabel>Verify</ng-template>
-
+        <div class="step-container">
+            <app-account-create-pin></app-account-create-pin>
+        </div>
     </mat-step>
 </mat-horizontal-stepper>
