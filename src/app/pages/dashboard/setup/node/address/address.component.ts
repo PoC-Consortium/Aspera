@@ -1,18 +1,20 @@
 import { Component, OnInit, OnDestroy, ViewEncapsulation } from '@angular/core';
 import { Router } from '@angular/router';
-import { SetupService } from './setup.service';
+
+import { NodeService } from '../node.service';
+import { SetupService } from '../../setup.service';
 
 @Component({
-    selector: 'app-setup',
-    styleUrls: ['./setup.component.css'],
-    templateUrl: './setup.component.html'
+    selector: 'app-node-setup-address',
+    styleUrls: ['./address.component.scss'],
+    templateUrl: './address.component.html'
 })
-export class SetupComponent implements OnInit {
+export class NodeSetupAddressComponent implements OnInit {
 
     constructor(
         private router: Router,
         private setupService: SetupService
-    ) {}
+    ) { }
 
     public ngOnInit() {
 

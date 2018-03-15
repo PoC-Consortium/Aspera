@@ -5,6 +5,8 @@ import { SharedModule } from '../../../lib/shared.module';
 
 import { SetupRouting } from './setup.routing';
 import { SetupComponent } from './setup.component';
+import { NodeSetupComponent } from './node/node.component';
+import { NodeSetupAddressComponent } from './node/address/address.component';
 import { AccountNewComponent } from './account/account.component';
 import { AccountCreateComponent } from './account/create/create.component';
 import { AccountCreatePinComponent } from './account/create/pin/pin.component';
@@ -13,6 +15,7 @@ import { AccountCreateSeedComponent } from './account/create/seed/seed.component
 
 import { SetupService } from './setup.service';
 import { CreateService } from './account/create/create.service';
+import { NodeService } from './node/node.service';
 
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -23,6 +26,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatGridListModule } from '@angular/material/grid-list';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material';
+import { MatListModule } from '@angular/material/list';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatStepperModule } from '@angular/material/stepper';
@@ -39,6 +43,7 @@ import { MatStepperModule } from '@angular/material/stepper';
         MatGridListModule,
         MatIconModule,
         MatInputModule,
+        MatListModule,
         MatProgressBarModule,
         MatProgressSpinnerModule,
         MatStepperModule,
@@ -52,10 +57,13 @@ import { MatStepperModule } from '@angular/material/stepper';
         AccountCreatePinComponent,
         AccountCreateRecordComponent,
         AccountCreateSeedComponent,
-        AccountNewComponent
+        AccountNewComponent,
+        NodeSetupComponent,
+        NodeSetupAddressComponent
     ],
     providers: [
         CreateService,
+        NodeService,
         SetupService
     ]
 })

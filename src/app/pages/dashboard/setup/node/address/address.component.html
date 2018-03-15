@@ -1,0 +1,43 @@
+<div class="row">
+    <div class="col-sm-2">
+    </div>
+    <div class="col-sm-8">
+        <mat-expansion-panel expanded="true" disabled="true" hideToggle="true">
+            <mat-expansion-panel-header>
+                <mat-panel-title>
+                    Choose a Burst node!
+                </mat-panel-title>
+            </mat-expansion-panel-header>
+            <mat-list>
+                <h3 mat-subheader>Global</h3>
+                <mat-list-item *ngFor="let folder of folders">
+                    <mat-icon mat-list-icon>folder</mat-icon>
+                    <h4 mat-line>{{folder.name}}</h4>
+                    <p mat-line> {{folder.updated | date}} </p>
+                </mat-list-item>
+                <hr>
+                <h3 mat-subheader>North America</h3>
+                <mat-list-item *ngFor="let note of notes">
+                    <mat-icon mat-list-icon>note</mat-icon>
+                    <h4 mat-line>{{note.name}}</h4>
+                    <p mat-line> {{note.updated | date}} </p>
+                </mat-list-item>
+                <hr>
+                <h3 mat-subheader>South America</h3>
+                <hr>
+                <h3 mat-subheader>Europe</h3>
+                <hr>
+                <h3 mat-subheader>Asia</h3>
+                <hr>
+                <h3 mat-subheader>Australia</h3>
+            </mat-list>
+
+            <hr>
+            <small>
+                The Burst node is used to communicate with the Burst network. You can also choose a custom node.
+            </small>
+        </mat-expansion-panel>
+    </div>
+    <div class="col-sm-2">
+    </div>
+</div>
