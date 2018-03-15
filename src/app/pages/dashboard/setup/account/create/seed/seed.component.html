@@ -1,5 +1,5 @@
-<div *ngIf="!this.createService.isPassphraseGenerated()">
+<div>
     <div class="seed-area" (mousemove)="movement($event)"></div>
     <mat-progress-bar mode="determinate" [value]="this.progress"></mat-progress-bar>
-    Move your mouse across the area to create a seed for the password generation.
+    Move your mouse across the area to create a random seed for the password generation.
 </div>

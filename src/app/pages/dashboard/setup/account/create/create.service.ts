@@ -7,10 +7,10 @@ export class CreateService {
     private passphrase: string[];
     private id: string;
     private address: string;
-    private progress: number;
     private stepIndex: number;
 
     constructor() {
+        this.stepIndex = 0;
         this.reset();
     }
 
@@ -54,14 +54,6 @@ export class CreateService {
         return this.stepIndex;
     }
 
-    public setProgress(progress: number) {
-        this.progress = progress;
-    }
-
-    public getProgress(): number {
-        return this.progress;
-    }
-
     public isPassphraseGenerated() : boolean {
         return this.passphrase.length > 0 && this.address != undefined && this.id != undefined
     }
@@ -70,7 +62,5 @@ export class CreateService {
         this.passphrase = [];
         this.id = undefined;
         this.address = undefined;
-        this.stepIndex = 0;
-        this.progress = 0;
     }
 }

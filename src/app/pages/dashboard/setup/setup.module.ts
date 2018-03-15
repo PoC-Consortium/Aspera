@@ -11,6 +11,7 @@ import { AccountCreatePinComponent } from './account/create/pin/pin.component';
 import { AccountCreateRecordComponent } from './account/create/record/record.component';
 import { AccountCreateSeedComponent } from './account/create/seed/seed.component';
 
+import { SetupService } from './setup.service';
 import { CreateService } from './account/create/create.service';
 
 import { MatButtonModule } from '@angular/material/button';
@@ -54,7 +55,8 @@ import { MatStepperModule } from '@angular/material/stepper';
         AccountNewComponent
     ],
     providers: [
-        CreateService
+        CreateService,
+        SetupService
     ]
 })
 export class SetupModule { }

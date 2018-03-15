@@ -15,12 +15,12 @@
             </div>
             <hr>
             <small>
-                Enter a pin to secure your account. The pin is used to verify actions made with yur account.
+                Enter a pin to secure your account. The pin is used to verify actions made with your account.
             </small>
         </mat-expansion-panel>
         <div class="text-center navigation">
-            <button mat-raised-button>Back</button>
-            <button mat-raised-button>Next</button>
+            <button mat-raised-button (click)="back()">Back</button>
+            <button mat-raised-button (click)="finish()">Finish</button>
         </div>
     </div>
     <div class="col-sm-2">

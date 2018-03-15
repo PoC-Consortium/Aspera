@@ -32,6 +32,9 @@
                     <td class="unselectable">
                         {{ this.createService.getCompletePassphrase() }}
                     </td>
+                    <td>
+                        <button class="copy-button" mat-raised-button (click)="copy()"><i class="material-icons copy-icon">content_copy</i></button>
+                    </td>
                 </tr>
             </table>
             <hr>
@@ -40,8 +43,8 @@
             </small>
         </mat-expansion-panel>
         <div class="text-center navigation">
-            <button mat-raised-button>Back</button>
-            <button mat-raised-button>Next</button>
+            <button mat-raised-button (click)="reset()">Back</button>
+            <button mat-raised-button (click)="next()">Next</button>
         </div>
     </div>
     <div class="col-sm-2">
