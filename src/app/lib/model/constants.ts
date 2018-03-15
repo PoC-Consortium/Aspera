@@ -63,6 +63,50 @@ export const constants = {
         { name: "中文", code: "zh" }
     ],
     marketUrl: "https://api.coinmarketcap.com/v1/ticker/burst",
+    nodes: [
+        {
+            "region": "Global",
+            "nodes": [
+                {"name": "CryptoGuru", "location": "Munich", "address": "https://wallet.burst.cryptoguru", "port": 8125},
+            ]
+        },
+        {
+            "region": "Africa",
+            "nodes": [
+                {"name": "CryptoGuru", "location": "Munich", "address": "https://wallet.burst.cryptoguru", "port": 8125},
+            ]
+        },
+        {
+            "region": "Asia",
+            "nodes": [
+                {"name": "CryptoGuru", "location": "Munich", "address": "https://wallet.burst.cryptoguru", "port": 8125},
+            ]
+        },
+        {
+            "region": "Europe",
+            "nodes": [
+                {"name": "CryptoGuru", "location": "Munich", "address": "https://wallet.burst.cryptoguru", "port": 8125},
+            ]
+        },
+        {
+            "region": "North America",
+            "nodes": [
+                {"name": "CryptoGuru", "location": "Munich", "address": "https://wallet.burst.cryptoguru", "port": 8125},
+            ]
+        },
+        {
+            "region": "Oceania",
+            "nodes": [
+                {"name": "CryptoGuru", "location": "Munich", "address": "https://wallet.burst.cryptoguru", "port": 8125},
+            ]
+        },
+        {
+            "region": "South America",
+            "nodes": [
+                {"name": "CryptoGuru", "location": "Munich", "address": "https://wallet.burst.cryptoguru", "port": 8125},
+            ]
+        }
+    ],
     supportUrl: "https://github.com/poc-consortium/burstcoin-mobile-doc/issues",
     transactionCount: "100",
     transactionUrl: "https://explore.burst.cryptoguru.org/transaction/",
