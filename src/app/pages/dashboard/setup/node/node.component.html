@@ -3,9 +3,7 @@
         <mat-icon>dns</mat-icon>
     </ng-template>
     <mat-step [completed]="true" label="Node">
-        <div class="step-container">
-            <app-node-setup-address></app-node-setup-address>
-        </div>
+        <app-node-setup-address></app-node-setup-address>
     </mat-step>
     <mat-step [completed]="this.nodeService.getAddress() != undefined" label="Test">
         <ng-template matStepLabel>Test</ng-template>

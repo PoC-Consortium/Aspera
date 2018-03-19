@@ -4,7 +4,7 @@ import { NodeService } from './node.service';
 
 @Component({
     selector: 'app-node-setup',
-    styleUrls: ['./node.component.css'],
+    styleUrls: ['./node.component.scss'],
     templateUrl: './node.component.html'
 })
 export class NodeSetupComponent implements OnInit {

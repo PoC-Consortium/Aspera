@@ -29,6 +29,7 @@ import { MatInputModule } from '@angular/material';
 import { MatListModule } from '@angular/material/list';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatStepperModule } from '@angular/material/stepper';
 
 @NgModule({
@@ -46,6 +47,7 @@ import { MatStepperModule } from '@angular/material/stepper';
         MatListModule,
         MatProgressBarModule,
         MatProgressSpinnerModule,
+        MatSlideToggleModule,
         MatStepperModule,
         ReactiveFormsModule,
         SetupRouting,

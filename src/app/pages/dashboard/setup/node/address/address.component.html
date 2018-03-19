@@ -1,30 +1,41 @@
-<div class="row">
-    <div class="col-sm-2">
-    </div>
-    <div class="col-sm-8">
-        <mat-expansion-panel expanded="true" disabled="true" hideToggle="true">
-            <mat-expansion-panel-header>
-                <mat-panel-title>
-                    Choose a Burst node!
-                </mat-panel-title>
-            </mat-expansion-panel-header>
-            <mat-list>
-                <div *ngFor="let region of this.regions; let i = index">
-                    <h3 mat-subheader>{{region.region}}</h3>
-                    <mat-list-item *ngFor="let node of region.nodes">
-                        <mat-icon mat-list-icon>dns</mat-icon>
-                        <h4 mat-line>{{node.name}}</h4>
-                        <p mat-line>Address: {{node.address}} | Location: {{node.location}}</p>
-                    </mat-list-item>
-                    <hr *ngIf="i < this.regions.length - 1">
-                </div>
-            </mat-list>
-            <hr>
-            <small>
-                The Burst node is used to communicate with the Burst network. You can also choose a custom node.
-            </small>
-        </mat-expansion-panel>
-    </div>
-    <div class="col-sm-2">
-    </div>
+<div class="step-container">
+    <mat-grid-list class="step" cols="10" rowHeight="fit">
+        <mat-grid-tile>
+            <button mat-fab>
+                <mat-icon>navigate_before</mat-icon>
+            </button>
+        </mat-grid-tile>
+        <mat-grid-tile [colspan]="8">
+            <mat-card class="node-selection-container">
+                <mat-card-header>
+                    <mat-card-title>
+                        Choose a Burst node!
+                    </mat-card-title>
+                </mat-card-header>
+                <mat-card-content style="height: 100%">
+                    <mat-list class="address-container">
+                        <div *ngFor="let region of this.regions; let i = index">
+                            <h3 mat-subheader>{{region.region}}</h3>
+                            <mat-list-item *ngFor="let node of region.nodes">
+                                <mat-icon mat-list-icon>dns</mat-icon>
+                                <h4 mat-line>{{node.name}}</h4>
+                                <p mat-line>Address: {{node.address}} | Location: {{node.location}}</p>
+                                <mat-slide-toggle [checked]="node.selected"></mat-slide-toggle>
+                            </mat-list-item>
+                            <hr *ngIf="i < this.regions.length - 1">
+                        </div>
+                    </mat-list>
+                    <hr>
+                    <small>
+                      The Burst node is used to communicate with the Burst network. You can also choose a custom node.
+                    </small>
+                </mat-card-content>
+            </mat-card>
+        </mat-grid-tile>
+        <mat-grid-tile>
+            <button mat-fab>
+                <mat-icon>navigate_next</mat-icon>
+            </button>
+        </mat-grid-tile>
+    </mat-grid-list>
 </div>

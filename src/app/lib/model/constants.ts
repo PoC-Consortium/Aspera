@@ -67,43 +67,43 @@ export const constants = {
         {
             "region": "Global",
             "nodes": [
-                {"name": "CryptoGuru", "location": "Munich", "address": "https://wallet.burst.cryptoguru", "port": 8125},
+                {"name": "CryptoGuru", "location": "Munich", "address": "https://wallet.burst.cryptoguru", "port": 8125, "selected": true},
             ]
         },
         {
             "region": "Africa",
             "nodes": [
-                {"name": "CryptoGuru", "location": "Munich", "address": "https://wallet.burst.cryptoguru", "port": 8125},
+                {"name": "CryptoGuru", "location": "Munich", "address": "https://wallet.burst.cryptoguru", "port": 8125, "selected": false},
             ]
         },
         {
             "region": "Asia",
             "nodes": [
-                {"name": "CryptoGuru", "location": "Munich", "address": "https://wallet.burst.cryptoguru", "port": 8125},
+                {"name": "CryptoGuru", "location": "Munich", "address": "https://wallet.burst.cryptoguru", "port": 8125, "selected": false},
             ]
         },
         {
             "region": "Europe",
             "nodes": [
-                {"name": "CryptoGuru", "location": "Munich", "address": "https://wallet.burst.cryptoguru", "port": 8125},
+                {"name": "CryptoGuru", "location": "Munich", "address": "https://wallet.burst.cryptoguru", "port": 8125, "selected": false},
             ]
         },
         {
             "region": "North America",
             "nodes": [
-                {"name": "CryptoGuru", "location": "Munich", "address": "https://wallet.burst.cryptoguru", "port": 8125},
+                {"name": "CryptoGuru", "location": "Munich", "address": "https://wallet.burst.cryptoguru", "port": 8125, "selected": false},
             ]
         },
         {
             "region": "Oceania",
             "nodes": [
-                {"name": "CryptoGuru", "location": "Munich", "address": "https://wallet.burst.cryptoguru", "port": 8125},
+                {"name": "CryptoGuru", "location": "Munich", "address": "https://wallet.burst.cryptoguru", "port": 8125, "selected": false},
             ]
         },
         {
             "region": "South America",
             "nodes": [
-                {"name": "CryptoGuru", "location": "Munich", "address": "https://wallet.burst.cryptoguru", "port": 8125},
+                {"name": "CryptoGuru", "location": "Munich", "address": "https://wallet.burst.cryptoguru", "port": 8125, "selected": false},
             ]
         }
     ],
