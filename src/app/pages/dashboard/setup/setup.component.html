@@ -1,4 +1,4 @@
-<mat-card>
+<mat-card class="content">
     <mat-card-header>
         <mat-card-title>Setup</mat-card-title>
         <mat-card-subtitle>Node & Account</mat-card-subtitle>
@@ -12,13 +12,6 @@
         </mat-step>
         <mat-step [completed]="this.setupService.getAccount() != undefined" label="Account">
             <app-account-new></app-account-new>
-        </mat-step>
-        <mat-step [completed]="this.setupService.getNode() != undefined && this.setupService.getAccount() != undefined" label="Done">
-            You are now done
-            <div>
-                <button mat-button matStepperPrevious>Back</button>
-                <button mat-button (click)="stepper.reset()">Reset</button>
-            </div>
         </mat-step>
     </mat-vertical-stepper>
 </mat-card>

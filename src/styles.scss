@@ -47,6 +47,10 @@
     border-right-color: rgba(0,0,0,.12);
 }
 
+.content {
+    height: calc(100vh - 100px);
+}
+
 // Loading page with cubes
 .loading {
     opacity: 0;

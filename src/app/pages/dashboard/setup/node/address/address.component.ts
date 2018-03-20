@@ -11,7 +11,7 @@ import { SetupService } from '../../setup.service';
     templateUrl: './address.component.html'
 })
 export class NodeSetupAddressComponent implements OnInit {
-    private regions: any;
+    private nodes: any;
 
     constructor(
         private router: Router,
@@ -19,7 +19,7 @@ export class NodeSetupAddressComponent implements OnInit {
     ) { }
 
     public ngOnInit() {
-        this.regions = constants.nodes;
+        this.nodes = constants.nodes;
     }
 
     public ngOnDestroy() {
