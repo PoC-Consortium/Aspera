@@ -28,6 +28,7 @@ import {
     LoggerService,
     MarketService,
     NotificationService,
+    NetworkService,
     StoreService
 } from './services';
 
@@ -57,6 +58,7 @@ const NGA_SERVICES = [
     LoggerService,
     MarketService,
     NotificationService,
+    NetworkService,
     StoreService,
     TranslateService
 ];

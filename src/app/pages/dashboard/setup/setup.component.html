@@ -7,7 +7,7 @@
         <ng-template matStepperIcon="edit">
             <mat-icon>build</mat-icon>
         </ng-template>
-        <mat-step [completed]="this.setupService.getNode() != undefined" label="Node">
+        <mat-step [completed]="this.setupService.getBurstNode() != undefined" label="Node">
             <app-node-setup></app-node-setup>
         </mat-step>
         <mat-step [completed]="this.setupService.getAccount() != undefined" label="Account">

@@ -2,24 +2,24 @@ import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
-import { Account, Node } from '../../../lib/model';
+import { Account, BurstNode } from '../../../lib/model';
 
 @Injectable()
 export class SetupService {
     private account: Account;
-    private node: Node;
+    private BurstNode: BurstNode;
     private stepIndex: number;
 
     constructor() {
         this.reset();
     }
 
-    public setNode(node: Node) {
-        this.node = node;
+    public setBurstNode(BurstNode: BurstNode) {
+        this.BurstNode = BurstNode;
     }
 
-    public getNode(): Node {
-        return this.node;
+    public getBurstNode(): BurstNode {
+        return this.BurstNode;
     }
 
     public setAccount(account: Account) {
@@ -40,7 +40,7 @@ export class SetupService {
 
     public reset() {
         this.account = undefined;
-        this.node = undefined;
+        this.BurstNode = undefined;
         this.stepIndex = 0;
     }
 }

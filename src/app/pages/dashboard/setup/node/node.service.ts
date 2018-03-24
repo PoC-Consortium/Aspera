@@ -1,34 +1,35 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import { BurstNode } from '../../../../lib/model';
 
 @Injectable()
 export class NodeService {
-    private address: string;
-    private port: number;
+    private nodes: BurstNode[];
+    private stepIndex: number;
 
     constructor() {
         this.reset();
     }
 
-    public setAddress(address: string) {
-        this.address = address;
+    public setNodes(nodes: BurstNode[]) {
+        this.nodes = nodes;
     }
 
-    public getAddress() : string {
-        return this.address;
+    public getNodes() {
+        return this.nodes;
     }
 
-    public setPort(port: number) {
-        this.port = port;
+    public setStepIndex(index: number) {
+        this.stepIndex = index;
     }
 
-    public getPort() : number {
-        return this.port;
+    public getStepIndex() : number {
+        return this.stepIndex;
     }
 
     public reset() {
-        this.address = undefined;
-        this.port = 0;
+        this.stepIndex = 0;
+        this.nodes = [];
     }
 }
