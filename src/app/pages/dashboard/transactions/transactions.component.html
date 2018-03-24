@@ -63,14 +63,14 @@
                 <ng-container matColumnDef="amount">
                     <mat-header-cell *matHeaderCellDef mat-sort-header>
                         <mat-icon>local_atm</mat-icon>&nbsp;Amount</mat-header-cell>
-                    <mat-cell *matCellDef="let transaction"> {{transaction.amountNQT}} BURST</mat-cell>
+                    <mat-cell *matCellDef="let transaction"> {{transaction.amountNQT| number : '1.0-8'}}</mat-cell>
                 </ng-container>
 
                 <!-- Color Column -->
                 <ng-container matColumnDef="fee">
                     <mat-header-cell *matHeaderCellDef mat-sort-header>
                         <mat-icon>compare_arrows</mat-icon>&nbsp;Fee</mat-header-cell>
-                    <mat-cell *matCellDef="let transaction"> {{transaction.feeNQT}} BURST</mat-cell>
+                    <mat-cell *matCellDef="let transaction"> {{transaction.feeNQT | number : '1.0-8'}}</mat-cell>
                 </ng-container>
 
                 <!-- Color Column -->

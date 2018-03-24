@@ -1,5 +1,7 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { LoggerService } from '../../lib/services';
+import { Observable, Subject } from 'rxjs/Rx';
+import { MarketService } from '../../lib/services';
 
 @Component({
     selector: 'particle-dashboard',
@@ -10,6 +12,7 @@ export class DashboardComponent implements OnInit {
     private mylinks: Array<any> = [];
 
     constructor(
+        private marketService: MarketService
     ) {
 
     }
@@ -43,6 +46,11 @@ export class DashboardComponent implements OnInit {
                 'link': ['/transactions']
             }
         ];
+
+        let timer = Observable.timer(2000, 1000);
+        timer.subscribe(t =>
+            this.marketService.updateCurrency()
+        );
     }
 
     protected detectIE(): any {
