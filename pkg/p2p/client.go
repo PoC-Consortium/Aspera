@@ -1,8 +1,15 @@
 package p2p
 
 import (
+<<<<<<< HEAD
 	"bytes"
 	"errors"
+=======
+	"encoding/json"
+	//"fmt"
+	pb "github.com/ac0v/aspera/internal/api/protobuf-spec"
+	"github.com/fatih/structs"
+>>>>>>> ab02223... fixed namespace
 	"gopkg.in/resty.v1"
 
 	api "github.com/ac0v/aspera/pkg/api/p2p"
