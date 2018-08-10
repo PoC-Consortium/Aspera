@@ -3,7 +3,7 @@ package p2p
 import (
 	"encoding/json"
 	//"fmt"
-	pb "github.com/ac0v/brsx/internal/api/protobuf-spec"
+	pb "github.com/ac0v/aspera/internal/api/protobuf-spec"
 	"github.com/fatih/structs"
 	"gopkg.in/resty.v1"
 	"log"
