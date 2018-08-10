@@ -1,0 +1,58 @@
+syntax = "proto3";
+
+package p2p;
+
+//service OrderBook {
+//   rpc Fetch (FetchRequest) returns (FetchReply) {}
+//}
+
+message GetCumulativeDifficultyResponse {
+  int32 blockchainHeight = 1;
+  string cumulativeDifficulty = 2;
+}
+
+message GetNextBlocksResponse {
+  repeated Block nextBlocks = 1;
+  //  [json_name="nextBlocksFoo"];
+}
+
+message Block {
+  int64 payloadLength = 1;
+  int64 totalAmountNQT = 2;
+  string generationSignature = 3;
+  string generatorPublicKey = 4;
+  string payloadHash = 5;
+  string BlockSignature = 6;
+  repeated Transaction Transactions = 7;
+  int32 Version = 8;
+  string Nonce = 9;
+  int64 TotalFeeNQT = 10;
+// BlockATs = 11;
+  string PreviousBlock = 12;
+  int64 Timestamp = 13;
+  int64 Block = 14;
+}
+
+message Transaction {
+  string senderPublicKey = 1;
+  string signature = 2;
+  int64 feeNQT = 3;
+  int32 type = 4;
+  int32 confirmations = 5;
+  string fullHash = 6;
+  int32 version = 7;
+  string ecBlockId = 8;
+  string signatureHash = 9;
+  // attachment = 10;
+  string senderRS = 11;
+  int32 subtype = 12;
+  int64 amountNQT = 13;
+  int64 sender = 14;
+  int32 ecBlockHeight = 15;
+  int64 block = 16;
+  int64 blockTimestamp = 17;
+  int32 deadline = 18;
+  int64 transaction = 19;
+  int64 timestamp = 20;
+  int32 height = 21;
+}
