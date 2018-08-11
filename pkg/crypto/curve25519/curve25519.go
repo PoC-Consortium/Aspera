@@ -483,8 +483,8 @@ func core(Px, s, k, Gx []byte) {
 
 		/* take reciprocal of s mod q */
 		tmp1 := make([]byte, 32)
-		tmp2 := make([]byte, 32)
-		tmp3 := make([]byte, 32)
+		tmp2 := make([]byte, 64)
+		tmp3 := make([]byte, 64)
 		copy(tmp1, order)
 		copy(s, egcd32(tmp2, tmp3, s, tmp1))
 		if (s[31] & 0x80) != 0 {
