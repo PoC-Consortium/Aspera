@@ -38,7 +38,7 @@ func clamp(k []byte) {
 	k[0] &= 0xF8
 }
 
-func keygen(P, s, k []byte) {
+func Keygen(P, s, k []byte) {
 	clamp(k)
 	core(P, s, k, nil)
 }
@@ -311,7 +311,7 @@ func recip(y *long10, x *long10, sqrtassist int) {
 	mul(&t2, &t1, &t3) /* 2^10  - 2^0  */
 	sqr(&t1, &t2)      /* 2^11  - 2^1  */
 	sqr(&t3, &t1)      /* 2^12  - 2^2  */
-	for i := 0; i < 5; i++ {
+	for i := 1; i < 5; i++ {
 		sqr(&t1, &t3)
 		sqr(&t3, &t1)
 	} /* &t3 */ /* 2^20  - 2^10 */
@@ -437,7 +437,7 @@ func core(Px, s, k, Gx []byte) {
 
 	// TODO: check those loops
 	for i := 31; i >= 0; i-- {
-		for j := 8; j >= 0; j-- {
+		for j := 7; j >= 0; j-- {
 			bit1 := uint(k[i]) >> uint(j) & 1
 			bit0 := ^uint(k[i]) >> uint(j) & 1
 			ax := x[bit0]

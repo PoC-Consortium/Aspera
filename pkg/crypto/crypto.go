@@ -2,6 +2,8 @@ package crypto
 
 import (
 	"crypto/sha256"
+
+	"github.com/ac0v/aspera/pkg/crypto/curve25519"
 )
 
 func secretPhraseToPrivateKey(secretPhrase string) *[32]byte {
@@ -10,4 +12,11 @@ func secretPhraseToPrivateKey(secretPhrase string) *[32]byte {
 	bs[31] |= 0x40
 	bs[0] &= 0xF8
 	return &bs
+}
+
+func secretPhraseToPublicKey(secretPhrase string) *[32]byte {
+	pubKey := sha256.Sum256([]byte(secretPhrase))
+	encryptedSecretPhrase := sha256.Sum256([]byte(secretPhrase))
+	curve25519.Keygen(pubKey[:], nil, encryptedSecretPhrase[:])
+	return &pubKey
 }
