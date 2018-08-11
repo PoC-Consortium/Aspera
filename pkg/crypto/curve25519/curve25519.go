@@ -5,6 +5,8 @@ var order = []byte{
 	0, 0, 0, 0, 0, 0, 0, 0, 16,
 }
 
+type long10 [10]int64
+
 func clamp(k *[32]byte) {
 	k[31] &= 0x7F
 	k[31] |= 0x40
@@ -55,7 +57,7 @@ func divmod(q, r []byte, n int, d []byte, t int) {
 	r[t-1] = byte(rn)
 }
 
-func unpack(x *[10]int64, m []byte) {
+func unpack(x *long10, m []byte) {
 	x[0] = int64(m[0]) | (int64(m[1]) << 8) | (int64(m[2]) << 16) | ((int64(m[3]) & 3) << 24)
 	x[1] = ((int64(m[3]) & ^3) >> 2) | (int64(m[4]) << 6) | (int64(m[5]) << 14) | (((int64(m[6]) & 0xFF) & 7) << 22)
 	x[2] = ((int64(m[6]) & ^7) >> 3) | (int64(m[7]) << 5) | (int64(m[8]) << 13) | ((int64(m[9]) & 31) << 21)
@@ -66,6 +68,10 @@ func unpack(x *[10]int64, m []byte) {
 	x[7] = ((int64(m[22]) & ^7) >> 3) | (int64(m[23]) << 5) | (int64(m[24]) << 13) | ((int64(m[25]) & 15) << 21)
 	x[8] = ((int64(m[25]) & ^15) >> 4) | (int64(m[26]) << 4) | (int64(m[27]) << 12) | ((int64(m[28]) & 63) << 20)
 	x[9] = ((int64(m[28]) & ^63) >> 6) | (int64(m[29]) << 2) | (int64(m[30]) << 10) | (int64(m[31]) << 18)
+}
+
+func pack(x *long10, m []byte) {
+
 }
 
 func sign(v, h, x, s []byte) bool {

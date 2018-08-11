@@ -81,7 +81,7 @@ func TestUnpack(t *testing.T) {
 	for i := range m {
 		m[i] = byte(i)
 	}
-	var x [10]int64
+	var x long10
 	unpack(&x, m)
 	assert.Equal(t, int64(50462976), x[0])
 	assert.Equal(t, int64(25248000), x[1])
