@@ -109,3 +109,33 @@ func TestSign(t *testing.T) {
 	}
 	assert.Equal(t, vExp, v)
 }
+
+func TestNumsize(t *testing.T) {
+	x := make([]byte, 32)
+	x[13] = 1
+	assert.Equal(t, 0, numsize(x, 12))
+	assert.Equal(t, 0, numsize(x, 13))
+	assert.Equal(t, 14, numsize(x, 14))
+
+	x = make([]byte, 32)
+	x[0] = 32
+	assert.Equal(t, 1, numsize(x, 32))
+}
+
+func TestEgcd32(t *testing.T) {
+	x := initByteSlice(64, 0)
+	y := initByteSlice(64, 32)
+	a := initByteSlice(32, 64)
+	b := initByteSlice(32, 96)
+	gcdExp := []byte{
+		244, 3, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0,
+		249, 33, 34, 35, 36, 37, 38, 39,
+		40, 41, 42, 43, 44, 45, 46, 47,
+		48, 49, 50, 51, 52, 53, 54, 55,
+		56, 57, 58, 59, 60, 61, 62, 63,
+	}
+	assert.Equal(t, gcdExp, egcd32(x, y, a, b))
+}

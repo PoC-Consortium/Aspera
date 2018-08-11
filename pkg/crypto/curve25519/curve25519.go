@@ -50,9 +50,6 @@ func divmod(q, r []byte, n int, d []byte, t int) {
 		q[n-t+1] = byte(z + rn)
 		mulaSmall(r, r, n-t+1, d, t, -rn)
 		rn = int(r[n])
-		// if n == 15 {
-		// 	log.Fatal(r)
-		// }
 		r[n] = 0
 	}
 	r[t-1] = byte(rn)
@@ -96,4 +93,48 @@ func sign(v, h, x, s []byte) bool {
 		w |= int(tmp1[i])
 	}
 	return w != 0
+}
+
+func numsize(x []byte, n int) int {
+	for i := n - 1; i != -1; i-- {
+		if x[i] != 0 {
+			return i + 1
+		}
+	}
+	return 0
+}
+
+func egcd32(x, y, a, b []byte) []byte {
+	var an, qn int
+	bn := 32
+
+	for i := 0; i < 32; i++ {
+		x[i] = 0
+		y[i] = 0
+	}
+
+	x[0] = 1
+	an = numsize(a, 32)
+	if an == 0 {
+		return y
+	}
+
+	tmp := make([]byte, 32)
+	for {
+		qn = bn - an + 1
+		divmod(tmp, b, bn, a, an)
+		bn = numsize(b, bn)
+		if bn == 0 {
+			return x
+		}
+		mula32(y, x, tmp, qn, -1)
+
+		qn = an - bn + 1
+		divmod(tmp, a, an, b, bn)
+		an = numsize(a, an)
+		if an == 0 {
+			return y
+		}
+		mula32(x, y, tmp, qn, -1)
+	}
 }
