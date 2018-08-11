@@ -439,7 +439,7 @@ func core(Px, s, k, Gx []byte) {
 	for i := 31; i >= 0; i-- {
 		for j := 7; j >= 0; j-- {
 			bit1 := uint(k[i]) >> uint(j) & 1
-			bit0 := ^uint(k[i]) >> uint(j) & 1
+			bit0 := ^bit1
 			ax := x[bit0]
 			az := z[bit0]
 			bx := x[bit1]
