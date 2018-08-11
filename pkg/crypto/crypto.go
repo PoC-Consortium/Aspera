@@ -14,9 +14,9 @@ func secretPhraseToPrivateKey(secretPhrase string) *[32]byte {
 	return &bs
 }
 
-func secretPhraseToPublicKey(secretPhrase string) *[32]byte {
-	pubKey := sha256.Sum256([]byte(secretPhrase))
+func secretPhraseToPublicKey(secretPhrase string) []byte {
+	pubKey := make([]byte, 32)
 	encryptedSecretPhrase := sha256.Sum256([]byte(secretPhrase))
 	curve25519.Keygen(pubKey[:], nil, encryptedSecretPhrase[:])
-	return &pubKey
+	return pubKey
 }
