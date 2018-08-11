@@ -7,11 +7,11 @@ import (
 )
 
 func TestClamp(t *testing.T) {
-	var bs [32]byte
+	bs := make([]byte, 32)
 	bs[31] = 0x64
 	bs[31] = 0x04
 	bs[0] = 0xE5
-	clamp(&bs)
+	clamp(bs)
 	assert.Equal(t, byte(0x44), bs[31])
 	assert.Equal(t, byte(0xe0), bs[0])
 }
@@ -93,6 +93,30 @@ func TestUnpack(t *testing.T) {
 	assert.Equal(t, int64(19071714), x[7])
 	assert.Equal(t, int64(29471137), x[8])
 	assert.Equal(t, int64(8157300), x[9])
+}
+
+func TestPack(t *testing.T) {
+	m := make([]byte, 32)
+	x := long10{
+		12973021,
+		943701274,
+		971409174,
+		750923750,
+		89384184,
+		164918401,
+		474091741,
+		913461231,
+		174917410,
+		143091724,
+	}
+	pack(&x, m)
+	mExp := []byte{
+		240, 243, 197, 104, 244, 254, 144, 57,
+		52, 143, 254, 69, 152, 67, 249, 84,
+		130, 116, 212, 195, 33, 132, 176, 127,
+		146, 211, 115, 208, 166, 3, 218, 161,
+	}
+	assert.Equal(t, mExp, m)
 }
 
 func TestSign(t *testing.T) {
