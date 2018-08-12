@@ -359,7 +359,6 @@ func recip(y *long10, x *long10, sqrtassist int) {
 	}
 }
 
-// TODO: test!!!
 func isNegative(x *long10) int {
 	var tmp int64
 	if isOverflow(x) || x[9] < 0 {
@@ -435,7 +434,6 @@ func core(Px, s, k, Gx []byte) {
 	cpy(x[1], &dx)
 	set(z[1], 1)
 
-	// TODO: check those loops
 	for i := 31; i >= 0; i-- {
 		for j := 7; j >= 0; j-- {
 			bit1 := uint(k[i]) >> uint(j) & 1
