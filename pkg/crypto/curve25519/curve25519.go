@@ -520,7 +520,7 @@ func Sign(v, h, x, s []byte) bool {
 	return w != 0
 }
 
-func verify(Y, v, h, P []byte) {
+func Verify(Y, v, h, P []byte) {
 	/* Y = v abs(P) + h G  */
 	d := make([]byte, 32)
 	p := [2]*long10{
@@ -588,16 +588,15 @@ func verify(Y, v, h, P []byte) {
 		vi = (vi >> 8) ^ int(v[i]) ^ (int(v[i]) << 1)
 		hi = (hi >> 8) ^ int(h[i]) ^ (int(h[i]) << 1)
 		nvh = ^(vi ^ hi)
-		di = (nvh & (di & 0x80) >> 7) ^ vi
-		di ^= nvh & (di & 0x01) << 1
-		di ^= nvh & (di & 0x02) << 1
-		di ^= nvh & (di & 0x04) << 1
-		di ^= nvh & (di & 0x08) << 1
-		di ^= nvh & (di & 0x10) << 1
-		di ^= nvh & (di & 0x20) << 1
-		di ^= nvh & (di & 0x40) << 1
+		di = (nvh & ((di & 0x80) >> 7)) ^ vi
+		di ^= nvh & ((di & 0x01) << 1)
+		di ^= nvh & ((di & 0x02) << 1)
+		di ^= nvh & ((di & 0x04) << 1)
+		di ^= nvh & ((di & 0x08) << 1)
+		di ^= nvh & ((di & 0x10) << 1)
+		di ^= nvh & ((di & 0x20) << 1)
+		di ^= nvh & ((di & 0x40) << 1)
 		d[i] = byte(di)
-
 	}
 
 	di = ((nvh & (di & 0x80) << 1) ^ vi) >> 8
@@ -625,7 +624,7 @@ func verify(Y, v, h, P []byte) {
 		hi = (hi << 8) | int(h[i])
 		di = (di << 8) | int(d[i])
 
-		for j := 8; j >= 0; j++ {
+		for j := 7; j >= 0; j-- {
 			montPrep(t1[0], t2[0], yx[0], yz[0])
 			montPrep(t1[1], t2[1], yx[1], yz[1])
 			montPrep(t1[2], t2[2], yx[2], yz[2])
@@ -647,7 +646,7 @@ func verify(Y, v, h, P []byte) {
 	pack(t1[1], Y)
 }
 
-func isCanonicalSignature(v []byte) bool {
+func IsCanonicalSignature(v []byte) bool {
 	vCopy := make([]byte, 32)
 	copy(vCopy, v)
 	tmp := make([]byte, 32)
@@ -660,7 +659,7 @@ func isCanonicalSignature(v []byte) bool {
 	return true
 }
 
-func isCanonicalPublicKey(publicKey []byte) bool {
+func IsCanonicalPublicKey(publicKey []byte) bool {
 	if len(publicKey) != 32 {
 		return false
 	}
