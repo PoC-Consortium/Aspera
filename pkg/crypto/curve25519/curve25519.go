@@ -53,7 +53,7 @@ func mulaSmall(p, q []byte, m int, x []byte, n, z int) int {
 	return v
 }
 
-func mula32(p, x, y []byte, t, z int) int {
+func mula32(p, x, y []byte, t, z int) {
 	n := 31
 	var w, i int
 	for ; i < t; i++ {
@@ -63,7 +63,6 @@ func mula32(p, x, y []byte, t, z int) int {
 		w >>= 8
 	}
 	p[i+n] = byte(w + int(p[i+n]))
-	return w >> 8
 }
 
 func divmod(q, r []byte, n int, d []byte, t int) {
@@ -211,7 +210,7 @@ func sub(xy *long10, x *long10, y *long10) {
 	xy[9] = x[9] - y[9]
 }
 
-func mulSmall(xy *long10, x *long10, y int64) *long10 {
+func mulSmall(xy *long10, x *long10, y int64) {
 	t := (x[8] * y)
 	xy[8] = (t & ((1 << 26) - 1))
 	t = (t >> 26) + (x[9] * y)
@@ -235,10 +234,9 @@ func mulSmall(xy *long10, x *long10, y int64) *long10 {
 	t = (t >> 25) + xy[8]
 	xy[8] = (t & ((1 << 26) - 1))
 	xy[9] += (t >> 26)
-	return xy
 }
 
-func mul(xy *long10, x *long10, y *long10) *long10 {
+func mul(xy *long10, x *long10, y *long10) {
 	t := (x[0] * y[8]) + (x[2] * y[6]) + (x[4] * y[4]) + (x[6] * y[2]) + (x[8] * y[0]) + 2*((x[1]*y[7])+(x[3]*y[5])+(x[5]*y[3])+(x[7]*y[1])) + 38*(x[9]*y[9])
 	xy[8] = (t & ((1 << 26) - 1))
 	t = (t >> 26) + (x[0] * y[9]) + (x[1] * y[8]) + (x[2] * y[7]) + (x[3] * y[6]) + (x[4] * y[5]) + (x[5] * y[4]) + (x[6] * y[3]) + (x[7] * y[2]) + (x[8] * y[1]) + (x[9] * y[0])
@@ -262,10 +260,9 @@ func mul(xy *long10, x *long10, y *long10) *long10 {
 	t = (t >> 25) + xy[8]
 	xy[8] = (t & ((1 << 26) - 1))
 	xy[9] += (t >> 26)
-	return xy
 }
 
-func sqr(x2 *long10, x *long10) *long10 {
+func sqr(x2 *long10, x *long10) {
 	t := (x[4] * x[4]) + 2*((x[0]*x[8])+(x[2]*x[6])) + 38*(x[9]*x[9]) + 4*((x[1]*x[7])+(x[3]*x[5]))
 	x2[8] = (t & ((1 << 26) - 1))
 	t = (t >> 26) + 2*((x[0]*x[9])+(x[1]*x[8])+(x[2]*x[7])+(x[3]*x[6])+(x[4]*x[5]))
@@ -289,7 +286,6 @@ func sqr(x2 *long10, x *long10) *long10 {
 	t = (t >> 25) + x2[8]
 	x2[8] = (t & ((1 << 26) - 1))
 	x2[9] += (t >> 26)
-	return x2
 }
 
 func recip(y *long10, x *long10, sqrtassist int) {
