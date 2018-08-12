@@ -493,7 +493,7 @@ func core(Px, s, k, Gx []byte) {
 	}
 }
 
-func sign(v, h, x, s []byte) bool {
+func Sign(v, h, x, s []byte) bool {
 	var w int
 	h1 := make([]byte, 32)
 	x1 := make([]byte, 32)
