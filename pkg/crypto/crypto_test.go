@@ -29,3 +29,16 @@ func TestSign(t *testing.T) {
 	sig := sign(msg, secretPhrase)
 	assert.Equal(t, "cea74dd7177ddd8bd88e4a0d8807da533e95195d97cc4bcb0f946f355a8c85035ebe57fe9628f93405cf9f7e83bfc64968bc992d3508434a3023fba6b6cab491", (hex.EncodeToString(sig)))
 }
+
+func BenchmarkSign(b *testing.B) {
+	msg := make([]byte, 128)
+	for i := 0; i < 128; i++ {
+		msg[i] = byte(i)
+	}
+	for i := 0; i < b.N; i++ {
+		sign(msg, secretPhrase)
+		for j := 0; j < 128; j++ {
+			msg[j] = byte(i + j)
+		}
+	}
+}
