@@ -31,6 +31,7 @@ message Block {
   string PreviousBlock = 12;
   int64 Timestamp = 13;
   int64 Block = 14;
+  int32 Height = 15;
 }
 
 message Transaction {
