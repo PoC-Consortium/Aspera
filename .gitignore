@@ -1,3 +1,6 @@
 vendor
 main
 var/*
+
+*.o
+*.a
