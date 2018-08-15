@@ -10,7 +10,7 @@ typedef struct {
     uint64_t deadline;
 } CalcDeadlineRequest;
 
-uint32_t calculate_scoop(uint64_t height, uint8_t *gensig);
+uint32_t calculate_scoop(int32_t height, uint8_t *gensig);
 
 void calculate_deadline(CalcDeadlineRequest *req);
 

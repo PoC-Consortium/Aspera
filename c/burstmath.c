@@ -31,7 +31,7 @@
     gendata[NONCE_SIZE + offset + 6] = xv[1]; \
     gendata[NONCE_SIZE + offset + 7] = xv[0]
 
-uint32_t calculate_scoop(uint64_t height, uint8_t *gensig) {
+uint32_t calculate_scoop(int32_t height, uint8_t *gensig) {
     shabal_context sc;
     uint8_t new_gensig[32];
 

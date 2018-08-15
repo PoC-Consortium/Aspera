@@ -60,8 +60,8 @@ func newCalcDeadlineRequests() []*C.CalcDeadlineRequest {
 }
 
 // CalcScoop calculated the scoop for a given height and generation signature
-func CalcScoop(height uint64, genSig []byte) uint32 {
-	return uint32(C.calculate_scoop(C.uint64_t(height), (*C.uint8_t)(&genSig[0])))
+func CalcScoop(height int32, genSig []byte) uint32 {
+	return uint32(C.calculate_scoop(C.int32_t(height), (*C.uint8_t)(&genSig[0])))
 }
 
 // CalculateDeadline calculates a single deadline
