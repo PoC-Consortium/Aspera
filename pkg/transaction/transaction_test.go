@@ -4824,10 +4824,3 @@ func TestHeaderFromBytes(t *testing.T) {
 		}
 	}
 }
-
-func TestSendMoneyTransacitonFromBytes(t *testing.T) {
-	tx, err := SendMoneyTransactionFromBytes([]byte{})
-	if assert.Nil(t, err) {
-		assert.NotNil(t, tx)
-	}
-}
