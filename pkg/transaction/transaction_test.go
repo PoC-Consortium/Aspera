@@ -4824,3 +4824,10 @@ func TestHeaderFromBytes(t *testing.T) {
 		}
 	}
 }
+
+func BenchmarkHeaderFromBytes(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		bs, _ := hex.DecodeString(parseTests[i%len(parseTests)].txByteStr)
+		_, _ = headerFromBytes(bs)
+	}
+}
