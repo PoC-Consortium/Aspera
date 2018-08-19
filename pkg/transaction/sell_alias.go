@@ -12,8 +12,8 @@ type SellAliasTransaction struct {
 	PriceNQT int64
 }
 
-func SellAliasTransactionFromBytes(bs []byte) (Transaction, error) {
+func SellAliasTransactionFromBytes(bs []byte) (Attachment, int, error) {
 	var tx SellAliasTransaction
 	err := restruct.Unpack(bs, binary.LittleEndian, &tx)
-	return &tx, err
+	return &tx, 1 + len(tx.Alias) + 8, err
 }

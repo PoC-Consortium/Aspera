@@ -11,8 +11,8 @@ type EscrowResultTransaction struct {
 	Decision uint8
 }
 
-func EscrowResultTransactionFromBytes(bs []byte) (Transaction, error) {
+func EscrowResultTransactionFromBytes(bs []byte) (Attachment, int, error) {
 	var tx EscrowResultTransaction
 	err := restruct.Unpack(bs, binary.LittleEndian, &tx)
-	return &tx, err
+	return &tx, 8 + 1, err
 }

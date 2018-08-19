@@ -10,8 +10,8 @@ type SubscriptionCancelTransaction struct {
 	Subscription uint64
 }
 
-func SubscriptionCancelTransactionFromBytes(bs []byte) (Transaction, error) {
+func SubscriptionCancelTransactionFromBytes(bs []byte) (Attachment, int, error) {
 	var tx SubscriptionCancelTransaction
 	err := restruct.Unpack(bs, binary.LittleEndian, &tx)
-	return &tx, err
+	return &tx, 8, err
 }

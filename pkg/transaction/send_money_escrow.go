@@ -15,8 +15,8 @@ type SendMoneyEscrowTransaction struct {
 	Signees        []uint64
 }
 
-func SendMoneyEscrowTransactionFromBytes(bs []byte) (Transaction, error) {
+func SendMoneyEscrowTransactionFromBytes(bs []byte) (Attachment, int, error) {
 	var tx SendMoneyEscrowTransaction
 	err := restruct.Unpack(bs, binary.LittleEndian, &tx)
-	return &tx, err
+	return &tx, 8 + 4 + 1 + 1 + 1 + len(tx.Signees)*8, err
 }

@@ -10,8 +10,8 @@ type CancelAskOrderTransaction struct {
 	Order uint64
 }
 
-func CancelAskOrderTransactionFromBytes(bs []byte) (Transaction, error) {
+func CancelAskOrderTransactionFromBytes(bs []byte) (Attachment, int, error) {
 	var tx CancelAskOrderTransaction
 	err := restruct.Unpack(bs, binary.LittleEndian, &tx)
-	return &tx, err
+	return &tx, 8, err
 }

@@ -7,11 +7,12 @@ import (
 )
 
 type DgsRefundTransaction struct {
-	Purchase uint64
+	Purchase  uint64
+	RefundNQT uint64
 }
 
-func DgsRefundTransactionFromBytes(bs []byte) (Transaction, error) {
+func DgsRefundTransactionFromBytes(bs []byte) (Attachment, int, error) {
 	var tx DgsRefundTransaction
 	err := restruct.Unpack(bs, binary.LittleEndian, &tx)
-	return &tx, err
+	return &tx, 8 + 8, err
 }

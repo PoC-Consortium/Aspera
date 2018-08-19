@@ -14,10 +14,10 @@ type DgsDeliveryTransaction struct {
 	DiscountNQT uint64
 }
 
-func DgsDeliveryTransactionFromBytes(bs []byte) (Transaction, error) {
+func DgsDeliveryTransactionFromBytes(bs []byte) (Attachment, int, error) {
 	var tx DgsDeliveryTransaction
 	if len(bs) < 16 {
-		return nil, io.ErrUnexpectedEOF
+		return nil, 0, io.ErrUnexpectedEOF
 	}
 
 	encryptedGoodsLenth := binary.LittleEndian.Uint16(bs[8:10])
@@ -25,28 +25,28 @@ func DgsDeliveryTransactionFromBytes(bs []byte) (Transaction, error) {
 	r := bytes.NewReader(bs)
 
 	if err := binary.Read(r, binary.LittleEndian, &tx.Purchase); err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 
 	if err := binary.Read(r, binary.LittleEndian, &tx.GoodsLength); err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 
 	goodsData := make([]byte, encryptedGoodsLenth)
 	if err := binary.Read(r, binary.LittleEndian, &goodsData); err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 	tx.GoodsData = goodsData
 
 	goodsNonce := make([]byte, 32)
 	if err := binary.Read(r, binary.LittleEndian, &goodsNonce); err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 	tx.GoodsNonce = goodsNonce
 
 	if err := binary.Read(r, binary.LittleEndian, &tx.DiscountNQT); err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 
-	return &tx, nil
+	return &tx, int(r.Size()) - r.Len(), nil
 }

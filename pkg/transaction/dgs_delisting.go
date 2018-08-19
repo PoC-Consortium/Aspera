@@ -10,8 +10,8 @@ type DgsDelistingTransaction struct {
 	Goods uint64
 }
 
-func DgsDelistingTransactionFromBytes(bs []byte) (Transaction, error) {
+func DgsDelistingTransactionFromBytes(bs []byte) (Attachment, int, error) {
 	var tx DgsDelistingTransaction
 	err := restruct.Unpack(bs, binary.LittleEndian, &tx)
-	return &tx, err
+	return &tx, 8, err
 }

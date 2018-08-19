@@ -17,8 +17,8 @@ type DgsListingTransaction struct {
 	PriceNQT       uint64
 }
 
-func DgsListingTransactionFromBytes(bs []byte) (Transaction, error) {
+func DgsListingTransactionFromBytes(bs []byte) (Attachment, int, error) {
 	var tx DgsListingTransaction
 	err := restruct.Unpack(bs, binary.LittleEndian, &tx)
-	return &tx, err
+	return &tx, 2 + len(tx.Name) + 2 + len(tx.Description) + 2 + len(tx.Tags) + 4 + 8, err
 }

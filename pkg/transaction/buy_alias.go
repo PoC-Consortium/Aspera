@@ -11,8 +11,8 @@ type BuyAliasTransaction struct {
 	Alias    []byte
 }
 
-func BuyAliasTransactionFromBytes(bs []byte) (Transaction, error) {
+func BuyAliasTransactionFromBytes(bs []byte) (Attachment, int, error) {
 	var tx BuyAliasTransaction
 	err := restruct.Unpack(bs, binary.LittleEndian, &tx)
-	return &tx, err
+	return &tx, 1 + len(tx.Alias), err
 }

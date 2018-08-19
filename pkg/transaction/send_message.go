@@ -1,7 +1,8 @@
 package transaction
 
-type sendMessageTransaction struct{}
+type SendMessageTransaction struct{}
 
-func SendMessageTransactionFromBytes(bs []byte) (Transaction, error) {
-	return &sendMessageTransaction{}, nil
+func SendMessageTransactionFromBytes(bs []byte) (Attachment, int, error) {
+	var tx SendMessageTransaction
+	return &tx, 0, nil
 }

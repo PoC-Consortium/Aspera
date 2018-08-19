@@ -15,8 +15,8 @@ type IssueAssetTransaction struct {
 	Decimals       uint8
 }
 
-func IssueAssetTransactionFromBytes(bs []byte) (Transaction, error) {
+func IssueAssetTransactionFromBytes(bs []byte) (Attachment, int, error) {
 	var tx IssueAssetTransaction
 	err := restruct.Unpack(bs, binary.LittleEndian, &tx)
-	return &tx, err
+	return &tx, 1 + len(tx.Name) + 2 + len(tx.Description) + 8 + 1, err
 }

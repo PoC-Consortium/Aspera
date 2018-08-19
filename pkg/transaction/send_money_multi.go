@@ -16,8 +16,8 @@ type SendMoneyMultiTransaction struct {
 	RecipsAndAmounts    []Payment
 }
 
-func SendMoneyMultiTransactionFromBytes(bs []byte) (Transaction, error) {
+func SendMoneyMultiTransactionFromBytes(bs []byte) (Attachment, int, error) {
 	var tx SendMoneyMultiTransaction
 	err := restruct.Unpack(bs, binary.LittleEndian, &tx)
-	return &tx, err
+	return &tx, 1 + len(tx.RecipsAndAmounts)*(8+8), err
 }

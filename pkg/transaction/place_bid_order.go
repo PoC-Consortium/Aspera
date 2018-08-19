@@ -12,8 +12,8 @@ type PlaceBidOrderTransaction struct {
 	PriceNQT    uint64
 }
 
-func PlaceBidOrderTransactionFromBytes(bs []byte) (Transaction, error) {
+func PlaceBidOrderTransactionFromBytes(bs []byte) (Attachment, int, error) {
 	var tx PlaceBidOrderTransaction
 	err := restruct.Unpack(bs, binary.LittleEndian, &tx)
-	return &tx, err
+	return &tx, 8 + 8 + 8, err
 }

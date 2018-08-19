@@ -13,8 +13,8 @@ type SetAccountInfoTransaction struct {
 	Description    []byte
 }
 
-func SetAccountInfoTransactionFromBytes(bs []byte) (Transaction, error) {
+func SetAccountInfoTransactionFromBytes(bs []byte) (Attachment, int, error) {
 	var tx SetAccountInfoTransaction
 	err := restruct.Unpack(bs, binary.LittleEndian, &tx)
-	return &tx, err
+	return &tx, 1 + len(tx.Name) + 1 + len(tx.Description), err
 }

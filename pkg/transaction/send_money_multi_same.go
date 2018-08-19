@@ -11,8 +11,8 @@ type SendMoneyMultiSameTransaction struct {
 	Recips     []uint64
 }
 
-func SendMoneyMultiSameTransactionFromBytes(bs []byte) (Transaction, error) {
+func SendMoneyMultiSameTransactionFromBytes(bs []byte) (Attachment, int, error) {
 	var tx SendMoneyMultiSameTransaction
 	err := restruct.Unpack(bs, binary.LittleEndian, &tx)
-	return &tx, err
+	return &tx, 1 + len(tx.Recips)*8, err
 }

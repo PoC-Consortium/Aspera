@@ -11,8 +11,8 @@ type TransferAssetTransaction struct {
 	QuantityQNT uint64
 }
 
-func TransferAssetTransactionFromBytes(bs []byte) (Transaction, error) {
+func TransferAssetTransactionFromBytes(bs []byte) (Attachment, int, error) {
 	var tx TransferAssetTransaction
 	err := restruct.Unpack(bs, binary.LittleEndian, &tx)
-	return &tx, err
+	return &tx, 8 + 8, err
 }

@@ -10,8 +10,8 @@ type DgsFeedbackTransaction struct {
 	Purchase uint64
 }
 
-func DgsFeedbackTransactionFromBytes(bs []byte) (Transaction, error) {
+func DgsFeedbackTransactionFromBytes(bs []byte) (Attachment, int, error) {
 	var tx DgsFeedbackTransaction
 	err := restruct.Unpack(bs, binary.LittleEndian, &tx)
-	return &tx, err
+	return &tx, 8, err
 }

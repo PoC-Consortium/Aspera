@@ -13,8 +13,8 @@ type SetAliasTransaction struct {
 	AliasURI     []byte
 }
 
-func SetAliasTransactionFromBytes(bs []byte) (Transaction, error) {
+func SetAliasTransactionFromBytes(bs []byte) (Attachment, int, error) {
 	var tx SetAliasTransaction
 	err := restruct.Unpack(bs, binary.LittleEndian, &tx)
-	return &tx, err
+	return &tx, 1 + len(tx.AliasName) + 2 + len(tx.AliasURI), err
 }

@@ -13,8 +13,8 @@ type DgsPurchaseTransaction struct {
 	DeliveryDeadlineTimestamp uint32
 }
 
-func DgsPurchaseTransactionFromBytes(bs []byte) (Transaction, error) {
+func DgsPurchaseTransactionFromBytes(bs []byte) (Attachment, int, error) {
 	var tx DgsPurchaseTransaction
 	err := restruct.Unpack(bs, binary.LittleEndian, &tx)
-	return &tx, err
+	return &tx, 8 + 4 + 8 + 4, err
 }

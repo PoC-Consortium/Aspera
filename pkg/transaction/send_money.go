@@ -2,6 +2,6 @@ package transaction
 
 type SendMoneyTransaction struct{}
 
-func SendMoneyTransactionFromBytes(bs []byte) (Transaction, error) {
-	return &SendMoneyTransaction{}, nil
+func SendMoneyTransactionFromBytes(bs []byte) (Attachment, int, error) {
+	return &SendMoneyTransaction{}, 0, nil
 }

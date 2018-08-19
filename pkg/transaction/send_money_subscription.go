@@ -10,8 +10,8 @@ type SendMoneySubscriptionTransaction struct {
 	Frequency uint32
 }
 
-func SendMoneySubscriptionTransactionFromBytes(bs []byte) (Transaction, error) {
+func SendMoneySubscriptionTransactionFromBytes(bs []byte) (Attachment, int, error) {
 	var tx SendMoneySubscriptionTransaction
 	err := restruct.Unpack(bs, binary.LittleEndian, &tx)
-	return &tx, err
+	return &tx, 4, err
 }
