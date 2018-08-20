@@ -69,6 +69,28 @@ func FromBytes(bs []byte) (*Transaction, error) {
 	return &tx, nil
 }
 
+func (tx *Transaction) ToBytes() ([]byte, error) {
+	headerBs, err := tx.Header.ToBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	attachmentBs, err := tx.Attachment.ToBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	appendiciesBs, err := tx.Appendices.ToBytes(tx.Header.GetVersion())
+	if err != nil {
+		return nil, err
+	}
+
+	bs := append(headerBs, attachmentBs...)
+	bs = append(bs, appendiciesBs...)
+
+	return bs, nil
+}
+
 func headerFromBytes(bs []byte) (*Header, error) {
 	var header Header
 	if err := restruct.Unpack(bs, binary.LittleEndian, &header); err != nil {

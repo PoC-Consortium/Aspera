@@ -7,6 +7,7 @@ import (
 	"io"
 
 	"github.com/ac0v/aspera/pkg/parsing"
+	"gopkg.in/restruct.v1"
 )
 
 const (
@@ -17,16 +18,20 @@ const (
 var errMessageTooLong = errors.New("message too long")
 
 type Message struct {
-	IsText  bool
-	Len     int32
-	Content []byte
+	IsText bool `struct:"-"`
+
+	// IsText is encoded as a single bit
+	IsTextAndLen int32
+	Content      []byte
 }
 
 type EncryptedMessage struct {
-	IsText bool
-	Len    int32
-	Data   []byte
-	Nonce  []byte
+	IsText bool `struct:"-"`
+
+	// IsText is encoded as a signle bit
+	IsTextAndLen int32
+	Data         []byte
+	Nonce        []byte
 }
 
 type PublicKeyAnnouncement struct {
@@ -34,10 +39,12 @@ type PublicKeyAnnouncement struct {
 }
 
 type EncryptedToSelfMessage struct {
-	IsText bool
-	Len    int32
-	Data   []byte
-	Nonce  []byte
+	IsText bool `struct:"-"`
+
+	// IsText is encoded as a signle bit
+	IsTextAndLen int32
+	Data         []byte
+	Nonce        []byte
 }
 
 type Appendices struct {
@@ -47,35 +54,37 @@ type Appendices struct {
 	EncryptedToSelfMessage *EncryptedMessage
 }
 
-func getMessageLengthAndType(r io.Reader) (int32, bool, error) {
-	var len int32
+func getMessageLengthAndType(r io.Reader) (int32, int32, bool, error) {
+	var len, isTextAndLen int32
 	var isText bool
 
-	if err := binary.Read(r, binary.LittleEndian, &len); err != nil {
-		return len, isText, err
+	if err := binary.Read(r, binary.LittleEndian, &isTextAndLen); err != nil {
+		return 0, 0, isText, err
 	}
 
-	isText = len < 0
+	isText = isTextAndLen < 0
 	if isText {
-		len &= maxInt32
+		len = isTextAndLen & maxInt32
+	} else {
+		len = isTextAndLen
 	}
 
 	if len > maxMessageLen {
-		return len, isText, errMessageTooLong
+		return 0, 0, isText, errMessageTooLong
 	}
 
-	return len, isText, nil
+	return len, isTextAndLen, isText, nil
 }
 
-func messageFromBytes(r io.Reader) (*Message, error) {
+func MessageFromBytes(r io.Reader) (*Message, error) {
 	var message Message
 
-	len, isText, err := getMessageLengthAndType(r)
+	len, isTextAndLen, isText, err := getMessageLengthAndType(r)
 	if err != nil {
 		return nil, err
 	}
 
-	message.Len = len
+	message.IsTextAndLen = isTextAndLen
 	message.IsText = isText
 
 	message.Content = make([]byte, len)
@@ -89,12 +98,12 @@ func messageFromBytes(r io.Reader) (*Message, error) {
 func encryptedMessageFromBytes(r io.Reader) (*EncryptedMessage, error) {
 	var message EncryptedMessage
 
-	len, isText, err := getMessageLengthAndType(r)
+	len, isTextAndLen, isText, err := getMessageLengthAndType(r)
 	if err != nil {
 		return nil, err
 	}
 
-	message.Len = len
+	message.IsTextAndLen = isTextAndLen
 	message.IsText = isText
 
 	message.Data = make([]byte, len)
@@ -121,13 +130,14 @@ func FromBytes(bs []byte, flags uint32, version uint8) (*Appendices, error) {
 	var appendicies Appendices
 
 	r := bytes.NewReader(bs)
+
 	if flags&(1<<0) != 0 {
 		if version > 0 {
 			if err := parsing.SkipByte(r); err != nil {
 				return nil, err
 			}
 		}
-		m, err := messageFromBytes(r)
+		m, err := MessageFromBytes(r)
 		if err != nil {
 			return nil, err
 		}
@@ -174,4 +184,78 @@ func FromBytes(bs []byte, flags uint32, version uint8) (*Appendices, error) {
 	}
 
 	return &appendicies, nil
+}
+
+func (appendicies *Appendices) ToBytes(version uint8) ([]byte, error) {
+	buf := bytes.NewBuffer([]byte{})
+
+	if appendicies.Message != nil {
+		if version > 0 {
+			if err := binary.Write(buf, binary.LittleEndian, version); err != nil {
+				return nil, err
+			}
+		}
+
+		bs, err := restruct.Pack(binary.LittleEndian, appendicies.Message)
+		if err != nil {
+			return nil, err
+		}
+
+		if _, err = buf.Write(bs); err != nil {
+			return nil, err
+		}
+	}
+
+	if appendicies.EncryptedMessage != nil {
+		if version > 0 {
+			if err := binary.Write(buf, binary.LittleEndian, version); err != nil {
+				return nil, err
+			}
+		}
+
+		bs, err := restruct.Pack(binary.LittleEndian, appendicies.EncryptedMessage)
+		if err != nil {
+			return nil, err
+		}
+
+		if _, err = buf.Write(bs); err != nil {
+			return nil, err
+		}
+	}
+
+	if appendicies.PublicKeyAnnouncement != nil {
+		if version > 0 {
+			if err := binary.Write(buf, binary.LittleEndian, version); err != nil {
+				return nil, err
+			}
+		}
+
+		bs, err := restruct.Pack(binary.LittleEndian, appendicies.PublicKeyAnnouncement)
+		if err != nil {
+			return nil, err
+		}
+
+		if _, err = buf.Write(bs); err != nil {
+			return nil, err
+		}
+	}
+
+	if appendicies.EncryptedToSelfMessage != nil {
+		if version > 0 {
+			if err := binary.Write(buf, binary.LittleEndian, version); err != nil {
+				return nil, err
+			}
+		}
+
+		bs, err := restruct.Pack(binary.LittleEndian, appendicies.EncryptedToSelfMessage)
+		if err != nil {
+			return nil, err
+		}
+
+		if _, err = buf.Write(bs); err != nil {
+			return nil, err
+		}
+	}
+
+	return buf.Bytes(), nil
 }

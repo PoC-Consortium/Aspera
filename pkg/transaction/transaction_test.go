@@ -35,11 +35,15 @@ func BenchmarkHeaderFromBytes(b *testing.B) {
 	}
 }
 
-func TestTransactionFromBytes(t *testing.T) {
+func TestTransactionFromAndToBytes(t *testing.T) {
 	for _, parseTest := range ParseTransactionTests {
-		bs, _ := hex.DecodeString(parseTest.txByteStr)
-		tx, err := FromBytes(bs)
-		assert.Nil(t, err)
-		assert.NotNil(t, tx)
+		bsExp, _ := hex.DecodeString(parseTest.txByteStr)
+		tx, err := FromBytes(bsExp)
+		if assert.Nil(t, err) && assert.NotNil(t, tx) {
+			bs, err := tx.ToBytes()
+			if assert.Nil(t, err) {
+				assert.Equal(t, bsExp, bs)
+			}
+		}
 	}
 }
