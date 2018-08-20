@@ -3,10 +3,12 @@ package transaction
 import (
 	"bytes"
 	"encoding/binary"
+	"io"
 
 	"github.com/ac0v/aspera/pkg/parsing"
 	"github.com/ac0v/aspera/pkg/transaction/appendicies"
 	"github.com/ac0v/aspera/pkg/transaction/attachment"
+	"gopkg.in/restruct.v1"
 )
 
 type Transaction struct {
@@ -17,25 +19,33 @@ type Transaction struct {
 
 type Header struct {
 	Type                          uint8
-	Subtype                       uint8
+	SubtypeAndVersion             uint8
 	Timestamp                     uint32
 	Deadline                      uint16
-	SenderPublicKey               []byte
+	SenderPublicKey               []byte `struct:"[32]uint8"`
 	RecipientID                   uint64
 	AmountNQT                     uint64
 	FeeNQT                        uint64
-	ReferencedTransactionFullHash []byte
-	Signature                     []byte
-	Version                       uint8
-	Flags                         uint32
-	EcBlockHeight                 uint32
-	EcBlockID                     uint64
+	ReferencedTransactionFullHash []byte `struct:"[32]uint8"`
+	Signature                     []byte `struct:"[64]uint8"`
+
+	Flags         uint32 `struct:"-"`
+	EcBlockHeight uint32 `struct:"-"`
+	EcBlockID     uint64 `struct:"-"`
 
 	// size of bytes of header
-	size int
+	size int `struct:"-"`
 }
 
-func TransactionFromBytes(bs []byte) (*Transaction, error) {
+func (h *Header) GetVersion() uint8 {
+	return (h.SubtypeAndVersion & 0xF0) >> 4
+}
+
+func (h *Header) GetSubtype() uint8 {
+	return h.SubtypeAndVersion & 0x0F
+}
+
+func FromBytes(bs []byte) (*Transaction, error) {
 	var tx Transaction
 
 	header, err := headerFromBytes(bs)
@@ -44,13 +54,13 @@ func TransactionFromBytes(bs []byte) (*Transaction, error) {
 	}
 	tx.Header = header
 
-	attachment, attachmentLen, err := attachment.FromBytes(bs[header.size:], header.Type, header.Subtype)
+	attachment, attachmentLen, err := attachment.FromBytes(bs[header.size:], header.Type, header.GetSubtype())
 	if err != nil {
 		return nil, err
 	}
 	tx.Attachment = attachment
 
-	appendencies, err := appendicies.FromBytes(bs[header.size+attachmentLen:], header.Flags, header.Version)
+	appendencies, err := appendicies.FromBytes(bs[header.size+attachmentLen:], header.Flags, header.GetVersion())
 	if err != nil {
 		return nil, err
 	}
@@ -61,57 +71,19 @@ func TransactionFromBytes(bs []byte) (*Transaction, error) {
 
 func headerFromBytes(bs []byte) (*Header, error) {
 	var header Header
-
-	r := bytes.NewReader(bs)
-
-	if err := binary.Read(r, binary.LittleEndian, &header.Type); err != nil {
+	if err := restruct.Unpack(bs, binary.LittleEndian, &header); err != nil {
 		return nil, err
 	}
 
-	if err := binary.Read(r, binary.LittleEndian, &header.Subtype); err != nil {
-		return nil, err
-	}
+	header.size = 1 + 1 + 4 + 2 + 32 + 8 + 8 + 8 + 32 + 64
 
-	header.Version = (header.Subtype & 0xF0) >> 4
-	header.Subtype = header.Subtype & 0x0F
+	if header.GetVersion() > 0 {
+		additionalSize := 4 + 4 + 8 + 1
+		if len(bs) < header.size+additionalSize {
+			return nil, io.ErrUnexpectedEOF
+		}
 
-	if err := binary.Read(r, binary.LittleEndian, &header.Timestamp); err != nil {
-		return nil, err
-	}
-
-	if err := binary.Read(r, binary.LittleEndian, &header.Deadline); err != nil {
-		return nil, err
-	}
-
-	// TODO: for some transactions the buffer containts sender id instead of sender public key
-	header.SenderPublicKey = make([]byte, 32)
-	if err := binary.Read(r, binary.LittleEndian, &header.SenderPublicKey); err != nil {
-		return nil, err
-	}
-
-	if err := binary.Read(r, binary.LittleEndian, &header.RecipientID); err != nil {
-		return nil, err
-	}
-
-	if err := binary.Read(r, binary.LittleEndian, &header.AmountNQT); err != nil {
-		return nil, err
-	}
-
-	if err := binary.Read(r, binary.LittleEndian, &header.FeeNQT); err != nil {
-		return nil, err
-	}
-
-	header.ReferencedTransactionFullHash = make([]byte, 32)
-	if err := binary.Read(r, binary.LittleEndian, &header.ReferencedTransactionFullHash); err != nil {
-		return nil, err
-	}
-
-	header.Signature = make([]byte, 64)
-	if err := binary.Read(r, binary.LittleEndian, &header.Signature); err != nil {
-		return nil, err
-	}
-
-	if header.Version > 0 {
+		r := bytes.NewReader(bs[header.size:])
 		if err := binary.Read(r, binary.LittleEndian, &header.Flags); err != nil {
 			return nil, err
 		}
@@ -127,9 +99,36 @@ func headerFromBytes(bs []byte) (*Header, error) {
 		if err := parsing.SkipByte(r); err != nil {
 			return nil, err
 		}
+
+		header.size += additionalSize
 	}
 
-	header.size = int(r.Size()) - r.Len()
-
 	return &header, nil
+}
+
+func (h *Header) ToBytes() ([]byte, error) {
+	bs, err := restruct.Pack(binary.LittleEndian, h)
+	if err != nil {
+		return nil, err
+	}
+
+	if h.GetVersion() > 0 {
+		buf := bytes.NewBuffer(make([]byte, 4+4+8))
+
+		if err := binary.Write(buf, binary.LittleEndian, h.Flags); err != nil {
+			return nil, err
+		}
+
+		if err := binary.Write(buf, binary.LittleEndian, h.EcBlockHeight); err != nil {
+			return nil, err
+		}
+
+		if err := binary.Write(buf, binary.LittleEndian, h.EcBlockID); err != nil {
+			return nil, err
+		}
+
+		return append(bs, buf.Bytes()...), nil
+	}
+
+	return bs, nil
 }
