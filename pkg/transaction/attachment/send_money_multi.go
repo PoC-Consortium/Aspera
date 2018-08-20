@@ -11,13 +11,17 @@ type Payment struct {
 	Amount uint64
 }
 
-type SendMoneyMultiTransaction struct {
+type SendMoneyMultiAttachment struct {
 	NumRecipsAndAmounts uint8 `struct:"uint8,sizeof=RecipsAndAmounts"`
 	RecipsAndAmounts    []Payment
 }
 
-func SendMoneyMultiTransactionFromBytes(bs []byte) (Attachment, int, error) {
-	var tx SendMoneyMultiTransaction
-	err := restruct.Unpack(bs, binary.LittleEndian, &tx)
-	return &tx, 1 + len(tx.RecipsAndAmounts)*(8+8), err
+func SendMoneyMultiAttachmentFromBytes(bs []byte) (Attachment, int, error) {
+	var attachment SendMoneyMultiAttachment
+	err := restruct.Unpack(bs, binary.LittleEndian, &attachment)
+	return &attachment, 1 + len(attachment.RecipsAndAmounts)*(8+8), err
+}
+
+func (attachment *SendMoneyMultiAttachment) ToBytes() ([]byte, error) {
+	return restruct.Pack(binary.LittleEndian, attachment)
 }

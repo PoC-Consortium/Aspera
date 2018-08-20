@@ -6,13 +6,17 @@ import (
 	"gopkg.in/restruct.v1"
 )
 
-type DgsRefundTransaction struct {
+type DgsRefundAttachment struct {
 	Purchase  uint64
 	RefundNQT uint64
 }
 
-func DgsRefundTransactionFromBytes(bs []byte) (Attachment, int, error) {
-	var tx DgsRefundTransaction
-	err := restruct.Unpack(bs, binary.LittleEndian, &tx)
-	return &tx, 8 + 8, err
+func DgsRefundAttachmentFromBytes(bs []byte) (Attachment, int, error) {
+	var attachment DgsRefundAttachment
+	err := restruct.Unpack(bs, binary.LittleEndian, &attachment)
+	return &attachment, 8 + 8, err
+}
+
+func (attachment *DgsRefundAttachment) ToBytes() ([]byte, error) {
+	return restruct.Pack(binary.LittleEndian, attachment)
 }

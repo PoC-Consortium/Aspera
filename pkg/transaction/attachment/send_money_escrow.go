@@ -6,7 +6,7 @@ import (
 	"gopkg.in/restruct.v1"
 )
 
-type SendMoneyEscrowTransaction struct {
+type SendMoneyEscrowAttachment struct {
 	AmountNQT      uint64
 	EscrowDeadline uint32
 	DeadlineAction uint8
@@ -15,8 +15,12 @@ type SendMoneyEscrowTransaction struct {
 	Signees        []uint64
 }
 
-func SendMoneyEscrowTransactionFromBytes(bs []byte) (Attachment, int, error) {
-	var tx SendMoneyEscrowTransaction
-	err := restruct.Unpack(bs, binary.LittleEndian, &tx)
-	return &tx, 8 + 4 + 1 + 1 + 1 + len(tx.Signees)*8, err
+func SendMoneyEscrowAttachmentFromBytes(bs []byte) (Attachment, int, error) {
+	var attachment SendMoneyEscrowAttachment
+	err := restruct.Unpack(bs, binary.LittleEndian, &attachment)
+	return &attachment, 8 + 4 + 1 + 1 + 1 + len(attachment.Signees)*8, err
+}
+
+func (attachment *SendMoneyEscrowAttachment) ToBytes() ([]byte, error) {
+	return restruct.Pack(binary.LittleEndian, attachment)
 }

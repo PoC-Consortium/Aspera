@@ -6,14 +6,18 @@ import (
 	"gopkg.in/restruct.v1"
 )
 
-type PlaceBidOrderTransaction struct {
+type PlaceBidOrderAttachment struct {
 	Asset       uint64
 	QuantityQNT uint64
 	PriceNQT    uint64
 }
 
-func PlaceBidOrderTransactionFromBytes(bs []byte) (Attachment, int, error) {
-	var tx PlaceBidOrderTransaction
-	err := restruct.Unpack(bs, binary.LittleEndian, &tx)
-	return &tx, 8 + 8 + 8, err
+func PlaceBidOrderAttachmentFromBytes(bs []byte) (Attachment, int, error) {
+	var attachment PlaceBidOrderAttachment
+	err := restruct.Unpack(bs, binary.LittleEndian, &attachment)
+	return &attachment, 8 + 8 + 8, err
+}
+
+func (attachment *PlaceBidOrderAttachment) ToBytes() ([]byte, error) {
+	return restruct.Pack(binary.LittleEndian, attachment)
 }

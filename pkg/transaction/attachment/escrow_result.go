@@ -6,13 +6,17 @@ import (
 	"gopkg.in/restruct.v1"
 )
 
-type EscrowResultTransaction struct {
+type EscrowResultAttachment struct {
 	EscrowID uint64
 	Decision uint8
 }
 
-func EscrowResultTransactionFromBytes(bs []byte) (Attachment, int, error) {
-	var tx EscrowResultTransaction
-	err := restruct.Unpack(bs, binary.LittleEndian, &tx)
-	return &tx, 8 + 1, err
+func EscrowResultAttachmentFromBytes(bs []byte) (Attachment, int, error) {
+	var attachment EscrowResultAttachment
+	err := restruct.Unpack(bs, binary.LittleEndian, &attachment)
+	return &attachment, 8 + 1, err
+}
+
+func (attachment *EscrowResultAttachment) ToBytes() ([]byte, error) {
+	return restruct.Pack(binary.LittleEndian, attachment)
 }

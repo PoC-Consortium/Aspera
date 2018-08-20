@@ -6,12 +6,16 @@ import (
 	"gopkg.in/restruct.v1"
 )
 
-type LeaseBalanceTransaction struct {
+type LeaseBalanceAttachment struct {
 	Period uint16
 }
 
-func LeaseBalanceTransactionFromBytes(bs []byte) (Attachment, int, error) {
-	var tx LeaseBalanceTransaction
-	err := restruct.Unpack(bs, binary.LittleEndian, &tx)
-	return &tx, 2, err
+func LeaseBalanceAttachmentFromBytes(bs []byte) (Attachment, int, error) {
+	var attachment LeaseBalanceAttachment
+	err := restruct.Unpack(bs, binary.LittleEndian, &attachment)
+	return &attachment, 2, err
+}
+
+func (attachment *LeaseBalanceAttachment) ToBytes() ([]byte, error) {
+	return restruct.Pack(binary.LittleEndian, attachment)
 }

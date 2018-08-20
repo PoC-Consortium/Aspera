@@ -6,12 +6,16 @@ import (
 	"gopkg.in/restruct.v1"
 )
 
-type SendMoneySubscriptionTransaction struct {
+type SendMoneySubscriptionAttachment struct {
 	Frequency uint32
 }
 
-func SendMoneySubscriptionTransactionFromBytes(bs []byte) (Attachment, int, error) {
-	var tx SendMoneySubscriptionTransaction
-	err := restruct.Unpack(bs, binary.LittleEndian, &tx)
-	return &tx, 4, err
+func SendMoneySubscriptionAttachmentFromBytes(bs []byte) (Attachment, int, error) {
+	var attachment SendMoneySubscriptionAttachment
+	err := restruct.Unpack(bs, binary.LittleEndian, &attachment)
+	return &attachment, 4, err
+}
+
+func (attachment *SendMoneySubscriptionAttachment) ToBytes() ([]byte, error) {
+	return restruct.Pack(binary.LittleEndian, attachment)
 }

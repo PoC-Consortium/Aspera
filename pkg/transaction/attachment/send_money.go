@@ -1,7 +1,11 @@
 package attachment
 
-type SendMoneyTransaction struct{}
+type SendMoneyAttachment struct{}
 
-func SendMoneyTransactionFromBytes(bs []byte) (Attachment, int, error) {
-	return &SendMoneyTransaction{}, 0, nil
+func SendMoneyAttachmentFromBytes(bs []byte) (Attachment, int, error) {
+	return &SendMoneyAttachment{}, 0, nil
+}
+
+func (attachment *SendMoneyAttachment) ToBytes() ([]byte, error) {
+	return []byte{}, nil
 }

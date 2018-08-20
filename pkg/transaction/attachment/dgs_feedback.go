@@ -6,12 +6,16 @@ import (
 	"gopkg.in/restruct.v1"
 )
 
-type DgsFeedbackTransaction struct {
+type DgsFeedbackAttachment struct {
 	Purchase uint64
 }
 
-func DgsFeedbackTransactionFromBytes(bs []byte) (Attachment, int, error) {
-	var tx DgsFeedbackTransaction
-	err := restruct.Unpack(bs, binary.LittleEndian, &tx)
-	return &tx, 8, err
+func DgsFeedbackAttachmentFromBytes(bs []byte) (Attachment, int, error) {
+	var attachment DgsFeedbackAttachment
+	err := restruct.Unpack(bs, binary.LittleEndian, &attachment)
+	return &attachment, 8, err
+}
+
+func (attachment *DgsFeedbackAttachment) ToBytes() ([]byte, error) {
+	return restruct.Pack(binary.LittleEndian, attachment)
 }

@@ -6,12 +6,16 @@ import (
 	"gopkg.in/restruct.v1"
 )
 
-type CancelBidOrderTransaction struct {
+type CancelBidOrderAttachment struct {
 	Order uint64
 }
 
-func CancelBidOrderTransactionFromBytes(bs []byte) (Attachment, int, error) {
-	var tx CancelBidOrderTransaction
-	err := restruct.Unpack(bs, binary.LittleEndian, &tx)
-	return &tx, 8, err
+func CancelBidOrderAttachmentFromBytes(bs []byte) (Attachment, int, error) {
+	var attachment CancelBidOrderAttachment
+	err := restruct.Unpack(bs, binary.LittleEndian, &attachment)
+	return &attachment, 8, err
+}
+
+func (attachment *CancelBidOrderAttachment) ToBytes() ([]byte, error) {
+	return restruct.Pack(binary.LittleEndian, attachment)
 }

@@ -6,15 +6,19 @@ import (
 	"gopkg.in/restruct.v1"
 )
 
-type SetAliasTransaction struct {
+type SetAliasAttachment struct {
 	NumAliasName uint8 `struct:"uint8,sizeof=AliasName"`
 	AliasName    []byte
 	NumAliasURI  uint16 `struct:"uint16,sizeof=AliasURI"`
 	AliasURI     []byte
 }
 
-func SetAliasTransactionFromBytes(bs []byte) (Attachment, int, error) {
-	var tx SetAliasTransaction
-	err := restruct.Unpack(bs, binary.LittleEndian, &tx)
-	return &tx, 1 + len(tx.AliasName) + 2 + len(tx.AliasURI), err
+func SetAliasAttachmentFromBytes(bs []byte) (Attachment, int, error) {
+	var attachment SetAliasAttachment
+	err := restruct.Unpack(bs, binary.LittleEndian, &attachment)
+	return &attachment, 1 + len(attachment.AliasName) + 2 + len(attachment.AliasURI), err
+}
+
+func (attachment *SetAliasAttachment) ToBytes() ([]byte, error) {
+	return restruct.Pack(binary.LittleEndian, attachment)
 }

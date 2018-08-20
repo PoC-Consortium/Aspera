@@ -6,12 +6,16 @@ import (
 	"gopkg.in/restruct.v1"
 )
 
-type DgsDelistingTransaction struct {
+type DgsDelistingAttachment struct {
 	Goods uint64
 }
 
-func DgsDelistingTransactionFromBytes(bs []byte) (Attachment, int, error) {
-	var tx DgsDelistingTransaction
-	err := restruct.Unpack(bs, binary.LittleEndian, &tx)
-	return &tx, 8, err
+func DgsDelistingAttachmentFromBytes(bs []byte) (Attachment, int, error) {
+	var attachment DgsDelistingAttachment
+	err := restruct.Unpack(bs, binary.LittleEndian, &attachment)
+	return &attachment, 8, err
+}
+
+func (attachment *DgsDelistingAttachment) ToBytes() ([]byte, error) {
+	return restruct.Pack(binary.LittleEndian, attachment)
 }

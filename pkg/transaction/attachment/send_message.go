@@ -1,8 +1,12 @@
 package attachment
 
-type SendMessageTransaction struct{}
+type SendMessageAttachment struct{}
 
-func SendMessageTransactionFromBytes(bs []byte) (Attachment, int, error) {
-	var tx SendMessageTransaction
-	return &tx, 0, nil
+func SendMessageAttachmentFromBytes(bs []byte) (Attachment, int, error) {
+	var attachment SendMessageAttachment
+	return &attachment, 0, nil
+}
+
+func (attachment *SendMessageAttachment) ToBytes() ([]byte, error) {
+	return []byte{}, nil
 }

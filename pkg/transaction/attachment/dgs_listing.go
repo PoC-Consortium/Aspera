@@ -6,7 +6,7 @@ import (
 	"gopkg.in/restruct.v1"
 )
 
-type DgsListingTransaction struct {
+type DgsListingAttachment struct {
 	NumName        uint16 `struct:"uint16,sizeof=Name"`
 	Name           []byte
 	NumDescription uint16 `struct:"uint16,sizeof=Description"`
@@ -17,8 +17,12 @@ type DgsListingTransaction struct {
 	PriceNQT       uint64
 }
 
-func DgsListingTransactionFromBytes(bs []byte) (Attachment, int, error) {
-	var tx DgsListingTransaction
-	err := restruct.Unpack(bs, binary.LittleEndian, &tx)
-	return &tx, 2 + len(tx.Name) + 2 + len(tx.Description) + 2 + len(tx.Tags) + 4 + 8, err
+func DgsListingAttachmentFromBytes(bs []byte) (Attachment, int, error) {
+	var attachment DgsListingAttachment
+	err := restruct.Unpack(bs, binary.LittleEndian, &attachment)
+	return &attachment, 2 + len(attachment.Name) + 2 + len(attachment.Description) + 2 + len(attachment.Tags) + 4 + 8, err
+}
+
+func (attachment *DgsListingAttachment) ToBytes() ([]byte, error) {
+	return restruct.Pack(binary.LittleEndian, attachment)
 }

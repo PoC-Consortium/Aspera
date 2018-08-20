@@ -6,7 +6,7 @@ import (
 	"gopkg.in/restruct.v1"
 )
 
-type IssueAssetTransaction struct {
+type IssueAssetAttachment struct {
 	NumName        uint8 `struct:"uint8,sizeof=Name"`
 	Name           []byte
 	NumDescription uint16 `struct:"uint16,sizeof=Description"`
@@ -15,8 +15,12 @@ type IssueAssetTransaction struct {
 	Decimals       uint8
 }
 
-func IssueAssetTransactionFromBytes(bs []byte) (Attachment, int, error) {
-	var tx IssueAssetTransaction
-	err := restruct.Unpack(bs, binary.LittleEndian, &tx)
-	return &tx, 1 + len(tx.Name) + 2 + len(tx.Description) + 8 + 1, err
+func IssueAssetAttachmentFromBytes(bs []byte) (Attachment, int, error) {
+	var attachment IssueAssetAttachment
+	err := restruct.Unpack(bs, binary.LittleEndian, &attachment)
+	return &attachment, 1 + len(attachment.Name) + 2 + len(attachment.Description) + 8 + 1, err
+}
+
+func (attachment *IssueAssetAttachment) ToBytes() ([]byte, error) {
+	return restruct.Pack(binary.LittleEndian, attachment)
 }

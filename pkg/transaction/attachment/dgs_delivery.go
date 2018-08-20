@@ -4,9 +4,11 @@ import (
 	"bytes"
 	"encoding/binary"
 	"io"
+
+	"gopkg.in/restruct.v1"
 )
 
-type DgsDeliveryTransaction struct {
+type DgsDeliveryAttachment struct {
 	Purchase    uint64
 	GoodsLength uint32
 	GoodsData   []byte
@@ -14,8 +16,8 @@ type DgsDeliveryTransaction struct {
 	DiscountNQT uint64
 }
 
-func DgsDeliveryTransactionFromBytes(bs []byte) (Attachment, int, error) {
-	var tx DgsDeliveryTransaction
+func DgsDeliveryAttachmentFromBytes(bs []byte) (Attachment, int, error) {
+	var attachment DgsDeliveryAttachment
 	if len(bs) < 16 {
 		return nil, 0, io.ErrUnexpectedEOF
 	}
@@ -24,11 +26,11 @@ func DgsDeliveryTransactionFromBytes(bs []byte) (Attachment, int, error) {
 
 	r := bytes.NewReader(bs)
 
-	if err := binary.Read(r, binary.LittleEndian, &tx.Purchase); err != nil {
+	if err := binary.Read(r, binary.LittleEndian, &attachment.Purchase); err != nil {
 		return nil, 0, err
 	}
 
-	if err := binary.Read(r, binary.LittleEndian, &tx.GoodsLength); err != nil {
+	if err := binary.Read(r, binary.LittleEndian, &attachment.GoodsLength); err != nil {
 		return nil, 0, err
 	}
 
@@ -36,17 +38,21 @@ func DgsDeliveryTransactionFromBytes(bs []byte) (Attachment, int, error) {
 	if err := binary.Read(r, binary.LittleEndian, &goodsData); err != nil {
 		return nil, 0, err
 	}
-	tx.GoodsData = goodsData
+	attachment.GoodsData = goodsData
 
 	goodsNonce := make([]byte, 32)
 	if err := binary.Read(r, binary.LittleEndian, &goodsNonce); err != nil {
 		return nil, 0, err
 	}
-	tx.GoodsNonce = goodsNonce
+	attachment.GoodsNonce = goodsNonce
 
-	if err := binary.Read(r, binary.LittleEndian, &tx.DiscountNQT); err != nil {
+	if err := binary.Read(r, binary.LittleEndian, &attachment.DiscountNQT); err != nil {
 		return nil, 0, err
 	}
 
-	return &tx, int(r.Size()) - r.Len(), nil
+	return &attachment, int(r.Size()) - r.Len(), nil
+}
+
+func (attachment *DgsDeliveryAttachment) ToBytes() ([]byte, error) {
+	return restruct.Pack(binary.LittleEndian, attachment)
 }

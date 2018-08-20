@@ -2,9 +2,13 @@ package attachment
 
 import ()
 
-type AtPaymentTransaction struct{}
+type AtPaymentAttachment struct{}
 
-func AtPaymentTransactionFromBytes(bs []byte) (Attachment, int, error) {
-	var tx AtPaymentTransaction
-	return &tx, 0, nil
+func AtPaymentAttachmentFromBytes(bs []byte) (Attachment, int, error) {
+	var attachment AtPaymentAttachment
+	return &attachment, 0, nil
+}
+
+func (attachment *AtPaymentAttachment) ToBytes() ([]byte, error) {
+	return []byte{}, nil
 }

@@ -6,14 +6,18 @@ import (
 	"gopkg.in/restruct.v1"
 )
 
-type SellAliasTransaction struct {
+type SellAliasAttachment struct {
 	NumAlias uint8 `struct:"uint8,sizeof=Alias"`
 	Alias    []byte
 	PriceNQT int64
 }
 
-func SellAliasTransactionFromBytes(bs []byte) (Attachment, int, error) {
-	var tx SellAliasTransaction
-	err := restruct.Unpack(bs, binary.LittleEndian, &tx)
-	return &tx, 1 + len(tx.Alias) + 8, err
+func SellAliasAttachmentFromBytes(bs []byte) (Attachment, int, error) {
+	var attachment SellAliasAttachment
+	err := restruct.Unpack(bs, binary.LittleEndian, &attachment)
+	return &attachment, 1 + len(attachment.Alias) + 8, err
+}
+
+func (attachment *SellAliasAttachment) ToBytes() ([]byte, error) {
+	return restruct.Pack(binary.LittleEndian, attachment)
 }

@@ -1,8 +1,12 @@
 package attachment
 
-type SetRewardRecipientTransaction struct{}
+type SetRewardRecipientAttachment struct{}
 
-func SetRewardRecipientTransactionFromBytes(bs []byte) (Attachment, int, error) {
-	var tx SetRewardRecipientTransaction
-	return &tx, 0, nil
+func SetRewardRecipientAttachmentFromBytes(bs []byte) (Attachment, int, error) {
+	var attachment SetRewardRecipientAttachment
+	return &attachment, 0, nil
+}
+
+func (attachment *SetRewardRecipientAttachment) ToBytes() ([]byte, error) {
+	return []byte{}, nil
 }
