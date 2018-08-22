@@ -1,1 +1,11 @@
 storagePath: ./var
+peers:
+  - http://wallet.burst.cryptoguru.org:8123/burst
+  - http://195.201.124.43:8123/burst
+  - http://138.201.159.96:8123/burst
+  - http://195.201.116.237:8123/burst
+  - http://138.201.159.82:8123/burst
+  - http://50-50-pool.burst.cryptoguru.org:8123/burst
+  - http://0-100-pool.burst.cryptoguru.org:8123/burst
+  - http://100-0-pool.burst.cryptoguru.org:8123/burst
+  - http://burst-a.bayernport.com:8123/burst

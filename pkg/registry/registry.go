@@ -7,7 +7,8 @@ import (
 )
 
 type Config struct {
-	StoragePath string `yaml:"storagePath"`
+	StoragePath string   `yaml:"storagePath"`
+	Peers       []string `yaml:"peers"`
 }
 
 type Registry struct {
