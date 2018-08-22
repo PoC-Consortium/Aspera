@@ -134,8 +134,9 @@ func (h *Header) ToBytes() ([]byte, error) {
 		return nil, err
 	}
 
-	if h.GetVersion() > 0 {
-		buf := bytes.NewBuffer(make([]byte, 4+4+8))
+	version := h.GetVersion()
+	if version > 0 {
+		buf := bytes.NewBuffer(nil)
 
 		if err := binary.Write(buf, binary.LittleEndian, h.Flags); err != nil {
 			return nil, err
@@ -146,6 +147,10 @@ func (h *Header) ToBytes() ([]byte, error) {
 		}
 
 		if err := binary.Write(buf, binary.LittleEndian, h.EcBlockID); err != nil {
+			return nil, err
+		}
+
+		if err := binary.Write(buf, binary.LittleEndian, version); err != nil {
 			return nil, err
 		}
 
