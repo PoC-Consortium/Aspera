@@ -9,7 +9,7 @@ import (
 type SetAccountInfoAttachment struct {
 	NumName        uint8 `struct:"uint8,sizeof=Name"`
 	Name           []byte
-	NumDescription uint8 `struct:"uint8,sizeof=Description"`
+	NumDescription uint16 `struct:"uint16,sizeof=Description"`
 	Description    []byte
 }
 
