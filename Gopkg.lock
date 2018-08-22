@@ -45,6 +45,18 @@
   version = "v1.1.0"
 
 [[projects]]
+  name = "github.com/imroc/req"
+  packages = ["."]
+  revision = "2a9647f3b8f6648ebb7ab1f1786f8a9d6b90de84"
+  version = "v0.1.9"
+
+[[projects]]
+  name = "github.com/klauspost/cpuid"
+  packages = ["."]
+  revision = "ae7887de9fa5d2db4eaa8174a7eff2c1ac00f2da"
+  version = "v1.1"
+
+[[projects]]
   name = "github.com/nats-io/go-nats"
   packages = [
     ".",
@@ -143,6 +155,12 @@
   version = "v0.3.0"
 
 [[projects]]
+  name = "gopkg.in/restruct.v1"
+  packages = ["."]
+  revision = "80ede2e57cc280052ab88753387703aa62475571"
+  version = "v1.0"
+
+[[projects]]
   name = "gopkg.in/resty.v1"
   packages = ["."]
   revision = "fccc498aed22c31ff3768bcac00795f94149a21d"
@@ -157,6 +175,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "cbdd879eed4a8ce799645fd834474a499c1f417d3b9a570e8b7e27d99de147eb"
+  inputs-digest = "4a755559b108c059a6ac72dca48f849df99ecdbbcc2430ee55fabc08e92e898f"
   solver-name = "gps-cdcl"
   solver-version = 1
