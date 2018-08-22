@@ -10,12 +10,12 @@ type CancelAskOrderAttachment struct {
 	Order uint64
 }
 
-func CancelAskOrderAttachmentFromBytes(bs []byte) (Attachment, int, error) {
+func CancelAskOrderAttachmentFromBytes(bs []byte, version uint8) (Attachment, int, error) {
 	var attachment CancelAskOrderAttachment
 	err := restruct.Unpack(bs, binary.LittleEndian, &attachment)
 	return &attachment, 8, err
 }
 
-func (attachment *CancelAskOrderAttachment) ToBytes() ([]byte, error) {
+func (attachment *CancelAskOrderAttachment) ToBytes(version uint8) ([]byte, error) {
 	return restruct.Pack(binary.LittleEndian, attachment)
 }

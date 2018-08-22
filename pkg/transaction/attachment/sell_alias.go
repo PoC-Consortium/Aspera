@@ -12,12 +12,12 @@ type SellAliasAttachment struct {
 	PriceNQT int64
 }
 
-func SellAliasAttachmentFromBytes(bs []byte) (Attachment, int, error) {
+func SellAliasAttachmentFromBytes(bs []byte, version uint8) (Attachment, int, error) {
 	var attachment SellAliasAttachment
 	err := restruct.Unpack(bs, binary.LittleEndian, &attachment)
 	return &attachment, 1 + len(attachment.Alias) + 8, err
 }
 
-func (attachment *SellAliasAttachment) ToBytes() ([]byte, error) {
+func (attachment *SellAliasAttachment) ToBytes(version uint8) ([]byte, error) {
 	return restruct.Pack(binary.LittleEndian, attachment)
 }

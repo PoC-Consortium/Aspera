@@ -11,12 +11,12 @@ type DgsQuantityChangeAttachment struct {
 	DeltaQuantity uint32
 }
 
-func DgsQuantityChangeAttachmentFromBytes(bs []byte) (Attachment, int, error) {
+func DgsQuantityChangeAttachmentFromBytes(bs []byte, version uint8) (Attachment, int, error) {
 	var attachment DgsQuantityChangeAttachment
 	err := restruct.Unpack(bs, binary.LittleEndian, &attachment)
 	return &attachment, 8 + 4, err
 }
 
-func (attachment *DgsQuantityChangeAttachment) ToBytes() ([]byte, error) {
+func (attachment *DgsQuantityChangeAttachment) ToBytes(version uint8) ([]byte, error) {
 	return restruct.Pack(binary.LittleEndian, attachment)
 }

@@ -10,12 +10,12 @@ type SendMoneySubscriptionAttachment struct {
 	Frequency uint32
 }
 
-func SendMoneySubscriptionAttachmentFromBytes(bs []byte) (Attachment, int, error) {
+func SendMoneySubscriptionAttachmentFromBytes(bs []byte, version uint8) (Attachment, int, error) {
 	var attachment SendMoneySubscriptionAttachment
 	err := restruct.Unpack(bs, binary.LittleEndian, &attachment)
 	return &attachment, 4, err
 }
 
-func (attachment *SendMoneySubscriptionAttachment) ToBytes() ([]byte, error) {
+func (attachment *SendMoneySubscriptionAttachment) ToBytes(version uint8) ([]byte, error) {
 	return restruct.Pack(binary.LittleEndian, attachment)
 }

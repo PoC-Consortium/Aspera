@@ -13,12 +13,12 @@ type SetAliasAttachment struct {
 	AliasURI     []byte
 }
 
-func SetAliasAttachmentFromBytes(bs []byte) (Attachment, int, error) {
+func SetAliasAttachmentFromBytes(bs []byte, version uint8) (Attachment, int, error) {
 	var attachment SetAliasAttachment
 	err := restruct.Unpack(bs, binary.LittleEndian, &attachment)
 	return &attachment, 1 + len(attachment.AliasName) + 2 + len(attachment.AliasURI), err
 }
 
-func (attachment *SetAliasAttachment) ToBytes() ([]byte, error) {
+func (attachment *SetAliasAttachment) ToBytes(version uint8) ([]byte, error) {
 	return restruct.Pack(binary.LittleEndian, attachment)
 }

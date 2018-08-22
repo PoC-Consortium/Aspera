@@ -11,12 +11,12 @@ type DgsPriceChangeAttachment struct {
 	PriceNQT uint64
 }
 
-func DgsPriceChangeAttachmentFromBytes(bs []byte) (Attachment, int, error) {
+func DgsPriceChangeAttachmentFromBytes(bs []byte, version uint8) (Attachment, int, error) {
 	var attachment DgsPriceChangeAttachment
 	err := restruct.Unpack(bs, binary.LittleEndian, &attachment)
 	return &attachment, 8 + 8, err
 }
 
-func (attachment *DgsPriceChangeAttachment) ToBytes() ([]byte, error) {
+func (attachment *DgsPriceChangeAttachment) ToBytes(version uint8) ([]byte, error) {
 	return restruct.Pack(binary.LittleEndian, attachment)
 }

@@ -16,7 +16,7 @@ type DgsDeliveryAttachment struct {
 	DiscountNQT uint64
 }
 
-func DgsDeliveryAttachmentFromBytes(bs []byte) (Attachment, int, error) {
+func DgsDeliveryAttachmentFromBytes(bs []byte, version uint8) (Attachment, int, error) {
 	var attachment DgsDeliveryAttachment
 	if len(bs) < 16 {
 		return nil, 0, io.ErrUnexpectedEOF
@@ -53,6 +53,6 @@ func DgsDeliveryAttachmentFromBytes(bs []byte) (Attachment, int, error) {
 	return &attachment, int(r.Size()) - r.Len(), nil
 }
 
-func (attachment *DgsDeliveryAttachment) ToBytes() ([]byte, error) {
+func (attachment *DgsDeliveryAttachment) ToBytes(version uint8) ([]byte, error) {
 	return restruct.Pack(binary.LittleEndian, attachment)
 }

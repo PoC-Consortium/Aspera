@@ -54,7 +54,8 @@ func FromBytes(bs []byte) (*Transaction, error) {
 	}
 	tx.Header = header
 
-	attachment, attachmentLen, err := attachment.FromBytes(bs[header.size:], header.Type, header.GetSubtype())
+	attachment, attachmentLen, err := attachment.FromBytes(bs[header.size:],
+		header.Type, header.GetSubtype(), header.GetVersion())
 	if err != nil {
 		return nil, err
 	}
@@ -75,7 +76,7 @@ func (tx *Transaction) ToBytes() ([]byte, error) {
 		return nil, err
 	}
 
-	attachmentBs, err := tx.Attachment.ToBytes()
+	attachmentBs, err := tx.Attachment.ToBytes(tx.Header.GetVersion())
 	if err != nil {
 		return nil, err
 	}

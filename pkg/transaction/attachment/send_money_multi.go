@@ -16,12 +16,12 @@ type SendMoneyMultiAttachment struct {
 	RecipsAndAmounts    []Payment
 }
 
-func SendMoneyMultiAttachmentFromBytes(bs []byte) (Attachment, int, error) {
+func SendMoneyMultiAttachmentFromBytes(bs []byte, version uint8) (Attachment, int, error) {
 	var attachment SendMoneyMultiAttachment
 	err := restruct.Unpack(bs, binary.LittleEndian, &attachment)
 	return &attachment, 1 + len(attachment.RecipsAndAmounts)*(8+8), err
 }
 
-func (attachment *SendMoneyMultiAttachment) ToBytes() ([]byte, error) {
+func (attachment *SendMoneyMultiAttachment) ToBytes(version uint8) ([]byte, error) {
 	return restruct.Pack(binary.LittleEndian, attachment)
 }

@@ -12,7 +12,7 @@ type SendMessageAttachment struct {
 	*appendicies.Message
 }
 
-func SendMessageAttachmentFromBytes(bs []byte) (Attachment, int, error) {
+func SendMessageAttachmentFromBytes(bs []byte, version uint8) (Attachment, int, error) {
 	var attachment SendMessageAttachment
 	r := bytes.NewReader(bs)
 
@@ -26,6 +26,6 @@ func SendMessageAttachmentFromBytes(bs []byte) (Attachment, int, error) {
 	return &attachment, int(r.Size()) - r.Len(), nil
 }
 
-func (attachment *SendMessageAttachment) ToBytes() ([]byte, error) {
+func (attachment *SendMessageAttachment) ToBytes(version uint8) ([]byte, error) {
 	return restruct.Pack(binary.LittleEndian, attachment.Message)
 }

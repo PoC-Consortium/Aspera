@@ -11,12 +11,12 @@ type DgsRefundAttachment struct {
 	RefundNQT uint64
 }
 
-func DgsRefundAttachmentFromBytes(bs []byte) (Attachment, int, error) {
+func DgsRefundAttachmentFromBytes(bs []byte, version uint8) (Attachment, int, error) {
 	var attachment DgsRefundAttachment
 	err := restruct.Unpack(bs, binary.LittleEndian, &attachment)
 	return &attachment, 8 + 8, err
 }
 
-func (attachment *DgsRefundAttachment) ToBytes() ([]byte, error) {
+func (attachment *DgsRefundAttachment) ToBytes(version uint8) ([]byte, error) {
 	return restruct.Pack(binary.LittleEndian, attachment)
 }

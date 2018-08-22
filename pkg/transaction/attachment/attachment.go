@@ -5,10 +5,10 @@ import (
 )
 
 type Attachment interface {
-	ToBytes() ([]byte, error)
+	ToBytes(uint8) ([]byte, error)
 }
 
-var attachmentParserOf = map[uint16]func([]byte) (Attachment, int, error){
+var attachmentParserOf = map[uint16]func([]byte, uint8) (Attachment, int, error){
 	0:   SendMoneyAttachmentFromBytes,
 	1:   SendMoneyMultiAttachmentFromBytes,
 	2:   SendMoneyMultiSameAttachmentFromBytes,
@@ -41,11 +41,11 @@ var attachmentParserOf = map[uint16]func([]byte) (Attachment, int, error){
 	352: AtPaymentAttachmentFromBytes,
 }
 
-func FromBytes(bs []byte, surType, subType uint8) (Attachment, int, error) {
-	parse, exists := attachmentParserOf[uint16(surType)<<4|uint16(subType)]
+func FromBytes(bs []byte, surtype, subtype, version uint8) (Attachment, int, error) {
+	parse, exists := attachmentParserOf[uint16(surtype)<<4|uint16(subtype)]
 	if !exists {
 		return nil, 0, fmt.Errorf("no parse function for transaction with type %d and subtype %d",
-			subType, subType)
+			surtype, subtype)
 	}
-	return parse(bs)
+	return parse(bs, version)
 }

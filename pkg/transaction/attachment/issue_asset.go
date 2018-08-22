@@ -15,12 +15,12 @@ type IssueAssetAttachment struct {
 	Decimals       uint8
 }
 
-func IssueAssetAttachmentFromBytes(bs []byte) (Attachment, int, error) {
+func IssueAssetAttachmentFromBytes(bs []byte, version uint8) (Attachment, int, error) {
 	var attachment IssueAssetAttachment
 	err := restruct.Unpack(bs, binary.LittleEndian, &attachment)
 	return &attachment, 1 + len(attachment.Name) + 2 + len(attachment.Description) + 8 + 1, err
 }
 
-func (attachment *IssueAssetAttachment) ToBytes() ([]byte, error) {
+func (attachment *IssueAssetAttachment) ToBytes(version uint8) ([]byte, error) {
 	return restruct.Pack(binary.LittleEndian, attachment)
 }

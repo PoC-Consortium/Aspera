@@ -17,12 +17,12 @@ type DgsListingAttachment struct {
 	PriceNQT       uint64
 }
 
-func DgsListingAttachmentFromBytes(bs []byte) (Attachment, int, error) {
+func DgsListingAttachmentFromBytes(bs []byte, version uint8) (Attachment, int, error) {
 	var attachment DgsListingAttachment
 	err := restruct.Unpack(bs, binary.LittleEndian, &attachment)
 	return &attachment, 2 + len(attachment.Name) + 2 + len(attachment.Description) + 2 + len(attachment.Tags) + 4 + 8, err
 }
 
-func (attachment *DgsListingAttachment) ToBytes() ([]byte, error) {
+func (attachment *DgsListingAttachment) ToBytes(version uint8) ([]byte, error) {
 	return restruct.Pack(binary.LittleEndian, attachment)
 }

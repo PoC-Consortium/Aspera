@@ -13,12 +13,12 @@ type DgsPurchaseAttachment struct {
 	DeliveryDeadlineTimestamp uint32
 }
 
-func DgsPurchaseAttachmentFromBytes(bs []byte) (Attachment, int, error) {
+func DgsPurchaseAttachmentFromBytes(bs []byte, version uint8) (Attachment, int, error) {
 	var attachment DgsPurchaseAttachment
 	err := restruct.Unpack(bs, binary.LittleEndian, &attachment)
 	return &attachment, 8 + 4 + 8 + 4, err
 }
 
-func (attachment *DgsPurchaseAttachment) ToBytes() ([]byte, error) {
+func (attachment *DgsPurchaseAttachment) ToBytes(version uint8) ([]byte, error) {
 	return restruct.Pack(binary.LittleEndian, attachment)
 }
