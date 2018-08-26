@@ -82,8 +82,6 @@ var dataPages = 1
 var callStackPages = 1
 var userStackPages = 1
 
-var val int64 = 0
-
 var balance int64 = defaultBalance
 
 var firstCall = true
@@ -124,28 +122,28 @@ type stateMachine struct {
 
 	sleepUntil int32
 
-	// set
-	jumps map[int32]struct{}
+	val int64
 }
 
 func newStateMachine(code []byte) *stateMachine {
 	codeBuf := make([]byte, codePages*codePageBytes)
-	data := make([]byte, dataPages*dataPageBytes)
-
 	copy(codeBuf, code)
+
+	dsize := dataPages * dataPageBytes
+	data := make([]byte, dsize+
+		callStackPages*callStackePageBytes+
+		userStackPages*userStackPageBytes)
 
 	return &stateMachine{
 		code:  codeBuf,
 		data:  data,
 		csize: int32(len(codeBuf)),
-		dsize: int32(len(data)),
-		jumps: make(map[int32]struct{}),
+		dsize: int32(dsize),
 	}
 }
 
-func (s *stateMachine) validJump(addr int32) bool {
-	_, exists := s.jumps[addr]
-	return exists
+func (s *stateMachine) getData() []byte {
+	return s.data[:s.dsize]
 }
 
 type functionData struct {
@@ -183,14 +181,14 @@ func (s *stateMachine) fun(funNum int32) int64 {
 
 	switch {
 	case funNum == 1:
-		rc = val
+		rc = s.val
 	case funNum == 2:
-		if val == 9 {
+		if s.val == 9 {
 			rc = 0
-			val = 0
+			s.val = 0
 		} else {
-			val++
-			rc = val
+			s.val++
+			rc = s.val
 		}
 	case funNum == 3: // get size
 		rc = 10
@@ -406,9 +404,7 @@ func (s *stateMachine) getAddr(addr *int32) int32 {
 
 	*addr = *(*int32)(unsafe.Pointer(&s.code[s.pc+1]))
 
-	if *addr < 0 || *addr > maxToMultiply {
-		return errCodeOverflow
-	} else if (*addr*8)+8 > s.dsize {
+	if s.invalidAddr(addr) {
 		return errCodeOverflow
 	}
 
@@ -422,9 +418,7 @@ func (s *stateMachine) getAddrWithOffset(off int32, addr *int32) int32 {
 
 	*addr = *(*int32)(unsafe.Pointer(&s.code[s.pc+1+off]))
 
-	if *addr < 0 || *addr > maxToMultiply {
-		return errCodeOverflow
-	} else if (*addr*8)+8 > s.dsize {
+	if s.invalidAddr(addr) {
 		return errCodeOverflow
 	}
 
@@ -526,8 +520,12 @@ func (s *stateMachine) getAddrVal(addr *int32, val *int64) int32 {
 func (s *stateMachine) processOp(cssize, ussize int32) int32 {
 	var rc int32
 
-	if s.csize < 0 || s.pc >= s.csize {
+	if s.csize < 1 || s.pc >= s.csize {
 		return ok
+	}
+
+	if s.pc < 0 {
+		return errCodeInvalidCode
 	}
 
 	op := s.code[s.pc]
@@ -549,6 +547,14 @@ func (s *stateMachine) processOp(cssize, ussize int32) int32 {
 			rc = 1 + 4 + 8
 			s.pc += rc
 			*(*int64)(unsafe.Pointer(&s.data[addr*8])) = val
+		}
+	case opCodeSetDat:
+		var addr1, addr2 int32
+		rc = s.getAddrs(&addr1, &addr2)
+		if rc == ok {
+			rc = 1 + 4 + 4
+			s.pc += rc
+			*(*int64)(unsafe.Pointer(&s.data[addr1*8])) += *(*int64)(unsafe.Pointer(&s.data[addr2*8]))
 		}
 	case opCodeClrDat:
 		var addr int32
@@ -715,13 +721,10 @@ func (s *stateMachine) processOp(cssize, ussize int32) int32 {
 			rc = 1 + 4
 			if s.cs == cssize/8 {
 				rc = errCodeOverflow
-			} else if s.validJump(addr) {
-				s.cs++
-				*(*int64)(unsafe.Pointer(&s.data[s.dsize+cssize-s.cs*8])) = int64(s.pc) + int64(rc)
-				s.pc = addr
-			} else {
-				rc = errCodeInvalidCode
 			}
+			s.cs++
+			*(*int64)(unsafe.Pointer(&s.data[s.dsize+cssize-s.cs*8])) = int64(s.pc) + int64(rc)
+			s.pc = addr
 		}
 	case opCodeRetSub:
 		if s.cs == 0 {
@@ -732,11 +735,7 @@ func (s *stateMachine) processOp(cssize, ussize int32) int32 {
 			val := *(*int64)(unsafe.Pointer(&s.data[s.dsize+cssize-s.cs*8]))
 			addr := int32(val)
 			s.cs--
-			if s.validJump(addr) {
-				s.pc = addr
-			} else {
-				rc = errCodeInvalidCode
-			}
+			s.pc = addr
 		}
 	case opCodeIndDat:
 		var addr1, addr2 int32
@@ -806,11 +805,7 @@ func (s *stateMachine) processOp(cssize, ussize int32) int32 {
 		rc = s.getAddr(&addr)
 		if rc == ok {
 			rc = 1 + 4
-			if s.validJump(addr) {
-				s.pc = addr
-			} else {
-				rc = errCodeInvalidCode
-			}
+			s.pc = addr
 		}
 	case opCodeBzrDat:
 		var off int8
@@ -820,11 +815,7 @@ func (s *stateMachine) processOp(cssize, ussize int32) int32 {
 			rc = 1 + 4 + 1
 			val := *(*int64)(unsafe.Pointer(&s.data[addr*8]))
 			if val == 0 {
-				if s.validJump(s.pc + int32(off)) {
-					s.pc += int32(off)
-				} else {
-					rc = errCodeInvalidCode
-				}
+				s.pc += int32(off)
 			} else {
 				s.pc += rc
 			}
@@ -837,11 +828,7 @@ func (s *stateMachine) processOp(cssize, ussize int32) int32 {
 			rc = 1 + 4 + 1
 			val := *(*int64)(unsafe.Pointer(&s.data[addr*8]))
 			if val != 0 {
-				if s.validJump(s.pc + int32(off)) {
-					s.pc += int32(off)
-				} else {
-					rc = errCodeInvalidCode
-				}
+				s.pc += int32(off)
 			} else {
 				s.pc += rc
 			}
@@ -857,11 +844,7 @@ func (s *stateMachine) processOp(cssize, ussize int32) int32 {
 			val2 := *(*int64)(unsafe.Pointer(&s.data[addr2*8]))
 
 			if val1 > val2 {
-				if s.validJump(s.pc + int32(off)) {
-					s.pc += int32(off)
-				} else {
-					rc = errCodeInvalidCode
-				}
+				s.pc += int32(off)
 			} else {
 				s.pc += rc
 			}
@@ -877,11 +860,7 @@ func (s *stateMachine) processOp(cssize, ussize int32) int32 {
 			val2 := *(*int64)(unsafe.Pointer(&s.data[addr2*8]))
 
 			if val1 < val2 {
-				if s.validJump(s.pc + int32(off)) {
-					s.pc += int32(off)
-				} else {
-					rc = errCodeInvalidCode
-				}
+				s.pc += int32(off)
 			} else {
 				s.pc += rc
 			}
@@ -897,11 +876,7 @@ func (s *stateMachine) processOp(cssize, ussize int32) int32 {
 			val2 := *(*int64)(unsafe.Pointer(&s.data[addr2*8]))
 
 			if val1 >= val2 {
-				if s.validJump(s.pc + int32(off)) {
-					s.pc += int32(off)
-				} else {
-					rc = errCodeInvalidCode
-				}
+				s.pc += int32(off)
 			} else {
 				s.pc += rc
 			}
@@ -917,11 +892,7 @@ func (s *stateMachine) processOp(cssize, ussize int32) int32 {
 			val2 := *(*int64)(unsafe.Pointer(&s.data[addr2*8]))
 
 			if val1 <= val2 {
-				if s.validJump(s.pc + int32(off)) {
-					s.pc += int32(off)
-				} else {
-					rc = errCodeInvalidCode
-				}
+				s.pc += int32(off)
 			} else {
 				s.pc += rc
 			}
@@ -937,11 +908,7 @@ func (s *stateMachine) processOp(cssize, ussize int32) int32 {
 			val2 := *(*int64)(unsafe.Pointer(&s.data[addr2*8]))
 
 			if val1 == val2 {
-				if s.validJump(s.pc + int32(off)) {
-					s.pc += int32(off)
-				} else {
-					rc = errCodeInvalidCode
-				}
+				s.pc += int32(off)
 			} else {
 				s.pc += rc
 			}
@@ -957,11 +924,7 @@ func (s *stateMachine) processOp(cssize, ussize int32) int32 {
 			val2 := *(*int64)(unsafe.Pointer(&s.data[addr2*8]))
 
 			if val1 != val2 {
-				if s.validJump(s.pc + int32(off)) {
-					s.pc += int32(off)
-				} else {
-					rc = errCodeInvalidCode
-				}
+				s.pc += int32(off)
 			} else {
 				s.pc += rc
 			}
@@ -993,7 +956,7 @@ func (s *stateMachine) processOp(cssize, ussize int32) int32 {
 		if rc == ok {
 			val := *(*int64)(unsafe.Pointer(&s.data[addr*8]))
 			if val == 0 {
-				s.pc = s.pcs
+				s.pc += rc
 				s.stopped = true
 			} else {
 				rc = 1 + 4
@@ -1016,11 +979,8 @@ func (s *stateMachine) processOp(cssize, ussize int32) int32 {
 		rc = s.getAddr(&addr)
 		if rc == ok {
 			rc = 1 + 4
-			if s.validJump(addr) {
-				s.pce = addr
-			} else {
-				rc = errCodeUnexpectedError
-			}
+			s.pce = addr
+			rc = errCodeUnexpectedError
 		}
 	case opCodeSetPcs:
 		rc = 1
@@ -1081,7 +1041,7 @@ func (s *stateMachine) processOp(cssize, ussize int32) int32 {
 		var addr1, addr2, addr3 int32
 		rc = s.getFunAddrs(&funNum, &addr1, &addr2)
 		if rc == ok {
-			rc = s.getAddr(&addr3)
+			rc = s.getAddrWithOffset(2+4+4, &addr3)
 		}
 		if rc == ok {
 			rc = 1 + 2 + 4 + 4 + 4
