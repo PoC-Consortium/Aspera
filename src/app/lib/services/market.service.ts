@@ -3,7 +3,8 @@
 */
 
 import { Injectable } from "@angular/core";
-import { Http, Headers, RequestOptions, Response, URLSearchParams } from "@angular/http";
+import { Headers, RequestOptions, Response, URLSearchParams } from "@angular/http";
+import { HttpClient, HttpHeaders } from "@angular/common/http";
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import 'rxjs/add/operator/timeout'
 
@@ -22,7 +23,7 @@ export class MarketService {
 
     constructor(
         private storeService: StoreService,
-        private http: Http
+        private http: HttpClient
     ) {
         this.updateCurrency().catch(error => {});
     }
@@ -56,7 +57,7 @@ export class MarketService {
                         let c = new Currency(r[0]);
                         this.setCurrency(c);
                         resolve(c);
-                    }
+                    } 
                 })
                 .catch(error => {
                     reject(new NoConnectionError("Could not reach market for currency updates. Check your internet connection!"))
@@ -145,9 +146,9 @@ export class MarketService {
     /*
     * Helper Method to generate Request options
     */
-    public getRequestOptions() {
-        let headers = new Headers({ 'Content-Type': 'application/json' });
-        let options = new RequestOptions({ headers: headers });
+    public getRequestOptions(): any {
+        let headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+        let options = { headers: headers };
         return options;
     }
 

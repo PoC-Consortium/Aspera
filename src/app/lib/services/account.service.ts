@@ -3,7 +3,7 @@
 */
 
 import { Injectable } from "@angular/core";
-import { Http, Headers, RequestOptions, Response, URLSearchParams } from "@angular/http";
+import { RequestOptions, Response, URLSearchParams } from "@angular/http";
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import 'rxjs/add/operator/toPromise';
 import 'rxjs/add/operator/timeout'
@@ -14,6 +14,7 @@ import { BurstUtil } from "../util"
 import { CryptoService } from "./crypto.service";
 import { NotificationService} from "./notification.service";
 import { StoreService } from "./store.service";
+import { HttpClient, HttpHeaders } from "@angular/common/http";
 
 /*
 * AccountService class
@@ -30,7 +31,7 @@ export class AccountService {
     public currentAccount: BehaviorSubject<any> = new BehaviorSubject(undefined);
 
     constructor(
-        private http: Http,
+        private http: HttpClient,
         private cryptoService: CryptoService,
         private storeService: StoreService,
         private notificationService: NotificationService
@@ -438,10 +439,9 @@ export class AccountService {
     /*
     * Helper method to construct request options
     */
-    public getRequestOptions(fields = {}) {
-        let headers = new Headers(fields);
-        let options = new RequestOptions({ headers: headers });
-        return options;
+    public getRequestOptions(fields = {}): any {
+        let headers = new HttpHeaders(fields);
+        return { headers: headers };
     }
 
     /*

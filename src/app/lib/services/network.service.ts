@@ -3,7 +3,7 @@
 */
 
 import { Injectable } from "@angular/core";
-import { Http, Headers, RequestOptions, Response, URLSearchParams } from "@angular/http";
+import { HttpClient } from "@angular/common/http";
 import 'rxjs/add/operator/timeout'
 
 import { BurstNode, constants } from "../model";
@@ -18,7 +18,7 @@ import { NoConnectionError } from "../model/error";
 export class NetworkService {
 
     constructor(
-        private http: Http
+        private http: HttpClient
     ) {}
 
     public latency(node: BurstNode) : Promise<number> {
