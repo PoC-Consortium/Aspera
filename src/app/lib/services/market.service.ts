@@ -4,7 +4,7 @@
 
 import { Injectable } from "@angular/core";
 import { Headers, RequestOptions, Response, URLSearchParams } from "@angular/http";
-import { HttpClient, HttpHeaders } from "@angular/common/http";
+import { HttpClient, HttpHeaders, HttpParams } from "@angular/common/http";
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import 'rxjs/add/operator/timeout'
 
@@ -38,7 +38,7 @@ export class MarketService {
     */
     public updateCurrency(): Promise<Currency> {
         return new Promise((resolve, reject) => {
-            let params: URLSearchParams = new URLSearchParams();
+            let params: HttpParams = new HttpParams();
             let requestOptions = this.getRequestOptions();
             let currency: string;
             if (this.storeService.settings.value.currency != undefined) {
@@ -48,9 +48,9 @@ export class MarketService {
             }
             return this.http.get(constants.marketUrl, requestOptions)
                 .timeout(constants.connectionTimeout)
-                .toPromise()
+                .toPromise<any>() // todo
                 .then(response => {
-                    let r = response.json() || [];
+                    let r = response || [];
                     if (r.length > 0) {
                         // set currency for currency object
                         r[0]["currency"] = currency;
