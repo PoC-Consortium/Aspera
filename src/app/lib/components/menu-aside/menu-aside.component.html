@@ -1,28 +1,146 @@
-<!-- Left side column. contains the logo and sidebar -->
-<aside class="main-sidebar">
-    <!-- sidebar: style can be found in sidebar.less -->
-    <section class="sidebar">
-        <div>
-            <img class="logo" src="public/assets/img/logo_dark.png">
-        </div>
-        <!-- Sidebar Menu -->
-        <ul class="sidebar-menu">
-            <ng-template ngFor let-item [ngForOf]="links">
-                <ng-template [ngIf]="!item.sublinks">
-                    <li [class.active]="item.link[0] === current_url">
-                        <a *ngIf="!item.external" [routerLink]="item.link">
-                            <button mat-button>
-                              <mat-icon>{{item.icon}}</mat-icon>
-                            </button>
-			            </a>
-                        <a *ngIf="item.external" [href]="item.link" [target]="item.target">
-					        <i class="fa fa-{{item.icon}}"></i>
-			            </a>
-                    </li>
-                </ng-template>
-            </ng-template>
-        </ul>
-        <!-- /.sidebar-menu -->
-    </section>
-    <!-- /.sidebar -->
-</aside>
+<mat-nav-list>
+    <mat-list-item>
+        <a title="Dashboard"><i class="fa fa-lg fa-fw fa-tachometer"></i>
+            <span class="menu-item">{{'Dashboard' | i18n}}</span></a>
+    </mat-list-item>
+
+    <mat-list-item class="top-menu-invisible">
+        <a routerLink="/transactions/"><i class="fa fa-lg fa-fw fa-briefcase"></i> <span class="menu-item-parent">{{'Transactions'
+                | i18n}}</span></a>
+        <mat-nav-list>
+            <mat-list-item routerLinkActive="active">
+                <a routerLink="/transactions/"><i class="fa fa-exchange"></i>
+                    {{'Transactions' | i18n}}</a>
+            </mat-list-item>
+            <mat-list-item routerLinkActive="active">
+                <a routerLink="/transactions/escrow"><i class="fa fa-check-circle"></i>
+                    {{'Escrow' | i18n}}</a>
+            </mat-list-item>
+            <mat-list-item routerLinkActive="active">
+                <a routerLink="/transactions/subscriptions"><i class="fa fa-recycle"></i>
+                    {{'Subscriptions' | i18n}}</a>
+            </mat-list-item>
+            <mat-list-item routerLinkActive="active">
+                <a routerLink="/transactions/ats"><i class="fa fa-laptop"></i>
+                    {{'ATs (Smart Contracts)' | i18n}}</a>
+            </mat-list-item>
+        </mat-nav-list>
+    </mat-list-item>
+
+    <mat-list-item class="top-menu-invisible">
+        <a routerLink="/exchange/"><i class="fa fa-lg fa-fw fa-bar-chart-o"></i> <span class="menu-item-parent">{{'Asset
+                Exchange' | i18n}}</span></a>
+        <mat-nav-list>
+            <mat-list-item routerLinkActive="active">
+                <a routerLink="/exchange/"><i class="fa fa-bar-chart-o"></i>
+                    {{'Asset Exchange' | i18n}}</a>
+            </mat-list-item>
+            <mat-list-item routerLinkActive="active">
+                <a routerLink="/exchange/history"><i class="fa fa-history"></i>
+                    {{'Transfer History' | i18n}}</a>
+            </mat-list-item>
+            <mat-list-item routerLinkActive="active">
+                <a routerLink="/exchange/assets"><i class="fa fa-trophy"></i>
+                    {{'My Assets' | i18n}}</a>
+            </mat-list-item>
+            <mat-list-item routerLinkActive="active">
+                <a routerLink="/exchange/orders"><i class="fa fa-pause"></i>
+                    {{'Open Orders' | i18n}}</a>
+            </mat-list-item>
+            <mat-list-item routerLinkActive="active">
+                <a routerLink="/exchange/issue"><i class="fa fa-file-text"></i>
+                    {{'Issue Asset' | i18n}}</a>
+            </mat-list-item>
+            <mat-list-item routerLinkActive="active">
+                <a routerLink="/exchange/dividends"><i class="fa fa-users"></i>
+                    {{'Payout Dividends' | i18n}}</a>
+            </mat-list-item>
+        </mat-nav-list>
+    </mat-list-item>
+
+
+    <mat-list-item class="top-menu-invisible">
+        <a routerLink="/crowdfunding/"><i class="fa fa-lg fa-fw fa-money"></i> <span class="menu-item-parent">{{'Crowdfunding'
+                | i18n}}</span></a>
+        <mat-nav-list>
+            <mat-list-item routerLinkActive="active">
+                <a routerLink="/crowdfunding/"><i class="fa fa-toggle-on"></i>
+                    {{'Active' | i18n}}</a>
+            </mat-list-item>
+            <mat-list-item routerLinkActive="active">
+                <a routerLink="/crowdfunding/funded"><i class="fa fa-thumbs-up"></i>
+                    {{'Funded' | i18n}}</a>
+            </mat-list-item>
+            <mat-list-item routerLinkActive="active">
+                <a routerLink="/crowdfunding/assets"><i class="fa fa-thumbs-down"></i>
+                    {{'Not Funded' | i18n}}</a>
+            </mat-list-item>
+            <mat-list-item routerLinkActive="active">
+                <a routerLink="/crowdfunding/orders"><i class="fa fa-eye-slash"></i>
+                    {{'Hidden CFs' | i18n}}</a>
+            </mat-list-item>
+        </mat-nav-list>
+    </mat-list-item>
+
+    <mat-list-item class="top-menu-invisible">
+        <a routerLink="/marketplace/"><i class="fa fa-lg fa-fw fa-institution"></i> <span class="menu-item-parent">{{'Marketplace'
+                | i18n}}</span></a>
+        <mat-nav-list>
+            <mat-list-item routerLinkActive="active">
+                <a routerLink="/crowdfunding/"><i class="fa fa-search"></i>
+                    {{'Search Marketplace' | i18n}}</a>
+            </mat-list-item>
+            <mat-list-item routerLinkActive="active">
+                <a routerLink="/crowdfunding/purchased"><i class="fa fa-inbox"></i>
+                    {{'Purchased Products' | i18n}}</a>
+            </mat-list-item>
+        </mat-nav-list>
+    </mat-list-item>
+
+    <mat-list-item class="top-menu-invisible">
+        <a routerLink="/store/"><i class="fa fa-lg fa-fw fa-dropbox"></i> <span class="menu-item-parent">{{'My Store' | i18n}}</span></a>
+        <mat-nav-list>
+            <mat-list-item routerLinkActive="active">
+                <a routerLink="/store/active"><i class="fa fa-cubes"></i>
+                    {{'My Products For Sale' | i18n}}</a>
+            </mat-list-item>
+            <mat-list-item routerLinkActive="active">
+                <a routerLink="/store/pending"><i class="fa fa-pause"></i>
+                    {{'My Pending Orders' | i18n}}</a>
+            </mat-list-item>
+            <mat-list-item routerLinkActive="active">
+                <a routerLink="/store/orders"><i class="fa fa-check-circle"></i>
+                    {{'My Completed Orders' | i18n}}</a>
+            </mat-list-item>
+            <mat-list-item routerLinkActive="active">
+                <a routerLink="/store/list"><i class="fa fa-shopping-cart"></i>
+                    {{'List Product For Sale' | i18n}}</a>
+            </mat-list-item>
+        </mat-nav-list>
+    </mat-list-item>
+
+    <mat-list-item routerLinkActive="active">
+        <a routerLink="/contacts" title="Contacts"><i class="fa fa-lg fa-fw fa-book"></i> <span class="menu-item-parent">{{'Contacts'
+                | i18n}}</span></a>
+    </mat-list-item>
+
+    <mat-list-item routerLinkActive="active">
+        <a routerLink="/messages" title="Messages"><i class="fa fa-lg fa-fw fa-envelope"></i> <span class="menu-item-parent">{{'Messages'
+                | i18n}}</span></a>
+    </mat-list-item>
+
+    <mat-list-item routerLinkActive="active">
+        <a routerLink="/aliases" title="Aliases"><i class="fa fa-lg fa-fw fa-users"></i> <span class="menu-item-parent">{{'Aliases'
+                | i18n}}</span></a>
+    </mat-list-item>
+
+    <mat-list-item routerLinkActive="active">
+        <a routerLink="/blocks" title="Blocks"><i class="fa fa-lg fa-fw fa-th-list"></i> <span class="menu-item-parent">{{'Blocks'
+                | i18n}}</span></a>
+    </mat-list-item>
+
+    <mat-list-item routerLinkActive="active">
+        <a routerLink="/peers" title="Peers"><i class="fa fa-lg fa-fw fa-sitemap"></i> <span class="menu-item-parent">{{'Peers'
+                | i18n}}</span></a>
+    </mat-list-item>
+</mat-nav-list>

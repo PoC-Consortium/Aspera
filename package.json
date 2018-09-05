@@ -32,6 +32,7 @@
     "ionicons": "^3.0.0",
     "jquery": ">=2.2.1",
     "lokijs": "^1.5.1",
+    "ngx-bootstrap": "^3.0.1",
     "rxjs": "6.3.1",
     "rxjs-compat": "^6.0.0-rc.0",
     "seedrandom": "^2.4.3",

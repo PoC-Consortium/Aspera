@@ -3,7 +3,7 @@ import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-menu-aside',
-  styleUrls: ['./menu-aside.component.css'],
+  styleUrls: ['./menu-aside.component.scss'],
   templateUrl: './menu-aside.component.html'
 })
 export class MenuAsideComponent implements OnInit {
