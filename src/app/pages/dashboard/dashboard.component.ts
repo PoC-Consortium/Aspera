@@ -47,7 +47,7 @@ export class DashboardComponent implements OnInit {
             }
         ];
 
-        let timer = Observable.timer(2000, 1000);
+        let timer = Observable.timer(2000, 10000);
         timer.subscribe(t =>
             this.marketService.updateCurrency()
         );

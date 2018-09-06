@@ -19,10 +19,6 @@ import {
 } from './components';
 
 import {
-
-} from './pipes';
-
-import {
     AccountService,
     CryptoService,
     LoggerService,
@@ -31,10 +27,6 @@ import {
     NetworkService,
     StoreService
 } from './services';
-
-import {
-
-} from './validators';
 
 const NGA_COMPONENTS = [
     AppFooterComponent,
