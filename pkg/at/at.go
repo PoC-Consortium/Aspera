@@ -66,6 +66,31 @@ const (
 	opCodeExtFunRetDat  = 0x36
 	opCodeExtFunRetDat2 = 0x37
 
+	funGetSize      = 0x0003
+	funGetA1        = 0x0100
+	funGetA2        = 0x0101
+	funGetA3        = 0x0102
+	funGetA4        = 0x0103
+	funGetB1        = 0x0104
+	funGetB2        = 0x0105
+	funGetB3        = 0x0106
+	funGetB4        = 0x0107
+	funClearA       = 0x0120
+	funClearB       = 0x0121
+	funClearAB      = 0x0122
+	funSetAToB      = 0x0123
+	funSetBToA      = 0x0124
+	funCheckAIsZero = 0x0125
+	funCheckBIsZero = 0x0126
+	funCheckAIsB    = 0x0127
+	funSwapAB       = 0x0128
+	funAOrWithB     = 0x0129
+	funBOrWithA     = 0x012A
+	funAAndWithB    = 0x012b
+	funBAndWithA    = 0x012c
+	funAXorWithB    = 0x012d
+	funBXorWithA    = 0x012e
+
 	ok                     = 0
 	errCodeOverflow        = -1
 	errCodeInvalidCode     = -2
@@ -179,10 +204,10 @@ func getFunctionData(funNum int32) int64 {
 func (s *stateMachine) fun(funNum int32) int64 {
 	var rc int64
 
-	switch {
-	case funNum == 1:
+	switch funNum {
+	case 1:
 		rc = s.val
-	case funNum == 2:
+	case 2:
 		if s.val == 9 {
 			rc = 0
 			s.val = 0
@@ -190,44 +215,51 @@ func (s *stateMachine) fun(funNum int32) int64 {
 			s.val++
 			rc = s.val
 		}
-	case funNum == 3: // get size
+	case funGetSize:
 		rc = 10
-	case funNum == 4:
+	case 4:
 		rc = int64(funNum)
-	case funNum == 25 || funNum == 32:
+	case 25:
 		rc = balance
 		if _, exists := funData[funNum]; exists {
 			for _, f := range funData {
 				f.offset = 0
 			}
 		}
-	case funNum == 0x0100:
+	case 32:
+		rc = balance
+		if _, exists := funData[funNum]; exists {
+			for _, f := range funData {
+				f.offset = 0
+			}
+		}
+	case funGetA1:
 		rc = s.a1
-	case funNum == 0x0101:
+	case funGetA2:
 		rc = s.a2
-	case funNum == 0x0102:
+	case funGetA3:
 		rc = s.a3
-	case funNum == 0x0103:
+	case funGetA4:
 		rc = s.a4
-	case funNum == 0x0104:
+	case funGetB1:
 		rc = s.b1
-	case funNum == 0x0105:
+	case funGetB2:
 		rc = s.b2
-	case funNum == 0x0106:
+	case funGetB3:
 		rc = s.b3
-	case funNum == 0x0107:
+	case funGetB4:
 		rc = s.b4
-	case funNum == 0x0120:
+	case funClearA:
 		s.a1 = 0
 		s.a2 = 0
 		s.a3 = 0
 		s.a4 = 0
-	case funNum == 0x0121:
+	case funClearB:
 		s.b1 = 0
 		s.b2 = 0
 		s.b3 = 0
 		s.b4 = 0
-	case funNum == 0x0122:
+	case funClearAB:
 		s.a1 = 0
 		s.a2 = 0
 		s.a3 = 0
@@ -237,59 +269,59 @@ func (s *stateMachine) fun(funNum int32) int64 {
 		s.b2 = 0
 		s.b3 = 0
 		s.b4 = 0
-	case funNum == 0x0123:
+	case funSetAToB:
 		s.a1 = s.b1
 		s.a2 = s.b2
 		s.a3 = s.b3
 		s.a4 = s.b4
-	case funNum == 0x0124:
+	case funSetBToA:
 		s.b1 = s.a1
 		s.b2 = s.a2
 		s.b3 = s.a3
 		s.b4 = s.a4
-	case funNum == 0x0125: // Check_A_Is_Zero
+	case funCheckAIsZero:
 		if s.a1 == 0 && s.a2 == 0 && s.a3 == 0 && s.a4 == 0 {
 			rc = 1
 		}
-	case funNum == 0x0126: // Check_B_Is_Zero
+	case funCheckBIsZero:
 		if s.b1 == 0 && s.b2 == 0 && s.b3 == 0 && s.b4 == 0 {
 			rc = 1
 		}
-	case funNum == 0x0127: // Check_A_Equals_B
+	case funCheckAIsB:
 		if s.a1 == s.b1 && s.a2 == s.b2 && s.a3 == s.b3 && s.a4 == s.b4 {
 			rc = 1
 		}
-	case funNum == 0x0128: // Swap_A_and_B
+	case funSwapAB:
 		s.a1, s.b1 = s.b1, s.a1
 		s.a2, s.b2 = s.b2, s.a2
 		s.a3, s.b3 = s.b3, s.a3
 		s.a4, s.b4 = s.b4, s.a4
-	case funNum == 0x0129: // OR_A_with_B
+	case funAOrWithB:
 		s.a1 = s.a1 | s.b1
 		s.a2 = s.a2 | s.b2
 		s.a3 = s.a3 | s.b3
 		s.a4 = s.a4 | s.b4
-	case funNum == 0x012a: // OR_B_with_A
+	case funBOrWithA:
 		s.b1 = s.a1 | s.b1
 		s.b2 = s.a2 | s.b2
 		s.b3 = s.a3 | s.b3
 		s.b4 = s.a4 | s.b4
-	case funNum == 0x012b: // AND_A_with_B
+	case funAAndWithB:
 		s.a1 = s.a1 & s.b1
 		s.a2 = s.a2 & s.b2
 		s.a3 = s.a3 & s.b3
 		s.a4 = s.a4 & s.b4
-	case funNum == 0x012c: // AND_B_with_A
+	case funBAndWithA:
 		s.b1 = s.a1 & s.b1
 		s.b2 = s.a2 & s.b2
 		s.b3 = s.a3 & s.b3
 		s.b4 = s.a4 & s.b4
-	case funNum == 0x012d: // XOR_A_with_B
+	case funAXorWithB:
 		s.a1 = s.a1 ^ s.b1
 		s.a2 = s.a2 ^ s.b2
 		s.a3 = s.a3 ^ s.b3
 		s.a4 = s.a4 ^ s.b4
-	case funNum == 0x012e: // XOR_B_with_A
+	case funBXorWithA:
 		s.b1 = s.a1 ^ s.b1
 		s.b2 = s.a2 ^ s.b2
 		s.b3 = s.a3 ^ s.b3
