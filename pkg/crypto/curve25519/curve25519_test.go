@@ -43,8 +43,7 @@ func TestMula32(t *testing.T) {
 	p := initByteSlice(48, 0)
 	x := initByteSlice(32, 32)
 	y := initByteSlice(16, 64)
-	w := mula32(p, x, y, 16, 237)
-	assert.Equal(t, 18, w)
+	mula32(p, x, y, 16, 237)
 	pExp := []byte{
 		0, 73, 191, 73, 214, 82, 173, 211,
 		179, 59, 89, 250, 12, 127, 62, 57,
@@ -124,7 +123,7 @@ func TestSign(t *testing.T) {
 	h := initByteSlice(32, 32)
 	x := initByteSlice(32, 64)
 	s := initByteSlice(32, 96)
-	assert.True(t, sign(v, h, x, s))
+	assert.True(t, Sign(v, h, x, s))
 	vExp := []byte{
 		81, 116, 125, 136, 11, 176, 40, 13,
 		125, 197, 85, 64, 246, 64, 162, 63,
