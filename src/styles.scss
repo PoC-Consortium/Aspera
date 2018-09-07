@@ -1,54 +1,65 @@
 /* You can add global styles to this file, and also import other style files */
-@import '/public/assets/scss/variables/light';
-@import '/public/assets/scss/index';
+// @import '/public/assets/scss/variables/light';
+// @import '/public/assets/scss/index';
 
-@import "~bootstrap/dist/css/bootstrap.css";
+// @import "~bootstrap/dist/css/bootstrap.css";
 @import "~font-awesome/css/font-awesome.css";
-@import "~ionicons/dist/css/ionicons.css";
+// @import "~ionicons/dist/css/ionicons.css";
 
 @import "~@angular/material/prebuilt-themes/indigo-pink.css";
 
-@import "/public/assets/css/particle.css";
+// @import "/public/assets/css/particle.css";
 @import "/public/fonts/material/material-icons.css";
 
-.danger {
-    color: $red;
+// .danger {
+//     color: $red;
+// }
+
+// .success {
+//     color: $lime;
+// }
+
+// .danger-bg {
+//     background-color: $red;
+// }
+
+// .success-bg {
+//     background-color: $lime;
+// }
+
+html, body {
+    margin:0;
 }
 
-.success {
-    color: $lime;
+.mat-nav-list {
+  padding-top:0 !important;
 }
 
-.danger-bg {
-    background-color: $red;
+.mat-nav-list .mat-list-item .mat-list-item-content {
+  display:block !important;
+  padding:0 !important;
 }
 
-.success-bg {
-    background-color: $lime;
+.mat-nav-list .mat-list-item:hover {
+  background:none;
 }
 
-.border-divide-top {
-    border-top: solid 1px;
-    border-top-color: rgba(0,0,0,.12);
+.mat-nav-list .mat-list-item a { 
+  display: block;
+  margin:10px 0;
+  padding:10px;
 }
 
-.border-divide-bottom {
-    border-bottom: solid 1px;
-    border-bottom-color: rgba(0,0,0,.12);
+.mat-nav-list .mat-nav-list a {
+  padding:5px;
 }
 
-.border-divide-left {
-    border-left: solid 1px;
-    border-left-color: rgba(0,0,0,.12);
+.mat-nav-list .mat-list-item a:hover {
+  background:darken($color: #efefef, $amount: 15);
 }
 
-.border-divide-right {
-    border-right: solid 1px;
-    border-right-color: rgba(0,0,0,.12);
-}
-
-.content {
-    height: calc(100vh - 100px);
+.mat-nav-list .mat-list-item {
+  padding:0 20px;
 }
 
 // Loading page with cubes

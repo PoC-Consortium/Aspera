@@ -17,6 +17,7 @@ export class StoreService extends Store {
 
     constructor() {
         super();
+        // todo: refactor to ngrx
         this.store = new Loki(constants.database, {
             autoload: true,
             autoloadCallback: this.init.bind(this),
