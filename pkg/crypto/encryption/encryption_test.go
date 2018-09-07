@@ -58,7 +58,7 @@ func TestEncryption(t *testing.T) {
 	}
 }
 
-func BenchmarkEncrypt(b *testing.B) {
+func BenchmarkEncryption(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		test := encryptionTests[i%len(encryptionTests)]
 
