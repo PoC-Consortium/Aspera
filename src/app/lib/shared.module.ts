@@ -7,6 +7,8 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
+import { MatSidenavModule } from '@angular/material/sidenav';
+import { MatListModule } from '@angular/material/list';
 
 import { TimeAgoPipe } from 'time-ago-pipe';
 
@@ -27,6 +29,7 @@ import {
     NetworkService,
     StoreService
 } from './services';
+import { I18nModule } from './i18n/i18n.module';
 
 const NGA_COMPONENTS = [
     AppFooterComponent,
@@ -73,7 +76,10 @@ const NGA_VALIDATORS = [
         TranslateModule.forRoot(),
         MatButtonModule,
         MatIconModule,
-        MatMenuModule
+        MatMenuModule,
+        MatListModule,
+        MatSidenavModule,
+        I18nModule
     ],
     exports: [
         ...NGA_PIPES,
