@@ -712,3 +712,7 @@ func egcd32(x, y, a, b []byte) []byte {
 		mula32(x, y, tmp, qn, -1)
 	}
 }
+
+func Curve(Z, k, P []byte) {
+	core(Z, nil, k, P)
+}
