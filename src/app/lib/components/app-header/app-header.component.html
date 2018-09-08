@@ -1,108 +1,115 @@
 <!-- Main Header -->
 <header class="main-header">
-    <!-- Header Navbar -->
-    <nav class="navbar navbar-static-top" role="navigation">
-        <button mat-button [matMenuTriggerFor]="accounts">
-          <mat-icon>account_box</mat-icon>
-          <span>BURST-RFR4-DQ4V-XF3Q-9FD3E</span>
-        </button>
-        <mat-menu #accounts="matMenu" class="account-menu-panel" [overlapTrigger]="false">
-          <button mat-menu-item>
-            <mat-icon>account_box</mat-icon>
-            <span>BURST-K7VD-ZDYE-NAAJ-BJN53</span>
-          </button>
-          <button mat-menu-item>
-            <mat-icon>account_box</mat-icon>
-            <span>BURST-LPHZ-QA3F-4RDF-CXC65</span>
-          </button>
-          <button mat-menu-item>
-            <mat-icon>add_box</mat-icon>
-            <span>New Account</span>
-          </button>
-        </mat-menu>
 
-        <button mat-button [matMenuTriggerFor]="balance">
-          <mat-icon>local_atm</mat-icon>
-          <span>564.44528081 BURST | 25605.30911631 BURST</span>
-        </button>
-        <mat-menu #balance="matMenu" class="account-menu-panel" [overlapTrigger]="false">
-          <button mat-menu-item>
-            <mat-icon>play_arrow</mat-icon>
-            <span>Send BURST</span>
-          </button>
-        </mat-menu>
+  <div>
+    <img class="logo" src="public/assets/img/logo_dark.png">
+  </div>
 
-        <button mat-button [matMenuTriggerFor]="price">
-          <mat-icon>trending_up</mat-icon>
-          <span>$ | 0.00000305 BTC</span>
-        </button>
-        <mat-menu #price="matMenu" class="account-menu-panel" [overlapTrigger]="false">
-          <button mat-menu-item>
-            <mat-icon>account_box</mat-icon>
-            <span>Check</span>
-          </button>
-        </mat-menu>
+  <!-- Header Navbar -->
+  <nav class="navbar navbar-static-top" role="navigation">
+    <!-- <burst-language-selector></burst-language-selector> -->
 
-        <button mat-button [matMenuTriggerFor]="connectivity">
-          <mat-icon>dns</mat-icon>
-          <span>Local | 97 Peers | Valid</span>
-        </button>
-        <mat-menu #connectivity="matMenu" class="account-menu-panel" [overlapTrigger]="false">
-          <button mat-menu-item>
-            <mat-icon>account_box</mat-icon>
-            <span>Check</span>
-          </button>
-        </mat-menu>
+    <button mat-button [matMenuTriggerFor]="accounts">
+      <mat-icon>account_box</mat-icon>
+      <span>BURST-RFR4-DQ4V-XF3Q-9FD3E</span>
+    </button>
+    <mat-menu #accounts="matMenu" class="account-menu-panel" [overlapTrigger]="false">
+      <button mat-menu-item>
+        <mat-icon>account_box</mat-icon>
+        <span>BURST-K7VD-ZDYE-NAAJ-BJN53</span>
+      </button>
+      <button mat-menu-item>
+        <mat-icon>account_box</mat-icon>
+        <span>BURST-LPHZ-QA3F-4RDF-CXC65</span>
+      </button>
+      <button mat-menu-item>
+        <mat-icon>add_box</mat-icon>
+        <span>New Account</span>
+      </button>
+    </mat-menu>
 
-        <!-- Navbar Right Menu -->
-        <div class="navbar-custom-menu">
-            <ul class="nav navbar-nav">
-                <li>
-                    <button mat-icon-button [matMenuTriggerFor]="contacts">
-                      <mat-icon>contacts</mat-icon>
-                    </button>
-                    <mat-menu #contacts="matMenu" [overlapTrigger]="false">
-                      <button mat-menu-item>
-                        <mat-icon>dialpad</mat-icon>
-                        <span>Redial</span>
-                      </button>
-                      <button mat-menu-item>
-                        <mat-icon>notifications_off</mat-icon>
-                        <span>Disable alerts</span>
-                      </button>
-                    </mat-menu>
-                </li>
-                <li>
-                    <button mat-icon-button [matMenuTriggerFor]="message">
-                      <mat-icon>message</mat-icon>
-                    </button>
-                    <mat-menu #message="matMenu" [overlapTrigger]="false">
-                      <button mat-menu-item>
-                        <mat-icon>dialpad</mat-icon>
-                        <span>Redial</span>
-                      </button>
-                      <button mat-menu-item>
-                        <mat-icon>notifications_off</mat-icon>
-                        <span>Disable alerts</span>
-                      </button>
-                    </mat-menu>
-                </li>
-                <li>
-                    <button mat-icon-button [matMenuTriggerFor]="settings">
-                      <mat-icon>more_vert</mat-icon>
-                    </button>
-                    <mat-menu #settings="matMenu" [overlapTrigger]="false">
-                      <button mat-menu-item>
-                        <mat-icon>dialpad</mat-icon>
-                        <span>Redial</span>
-                      </button>
-                      <button mat-menu-item>
-                        <mat-icon>notifications_off</mat-icon>
-                        <span>Disable alerts</span>
-                      </button>
-                    </mat-menu>
-                </li>
-            </ul>
-        </div>
-    </nav>
+    <button mat-button [matMenuTriggerFor]="balance">
+      <mat-icon>local_atm</mat-icon>
+      <span>564.44528081 BURST | 25605.30911631 BURST</span>
+    </button>
+    <mat-menu #balance="matMenu" class="account-menu-panel" [overlapTrigger]="false">
+      <button mat-menu-item>
+        <mat-icon>play_arrow</mat-icon>
+        <span>Send BURST</span>
+      </button>
+    </mat-menu>
+
+    <button mat-button [matMenuTriggerFor]="price">
+      <mat-icon>trending_up</mat-icon>
+      <span>$ | 0.00000305 BTC</span>
+    </button>
+    <mat-menu #price="matMenu" class="account-menu-panel" [overlapTrigger]="false">
+      <button mat-menu-item>
+        <mat-icon>account_box</mat-icon>
+        <span>Check</span>
+      </button>
+    </mat-menu>
+
+    <button mat-button [matMenuTriggerFor]="connectivity">
+      <mat-icon>dns</mat-icon>
+      <span>Local | 97 Peers | Valid</span>
+    </button>
+    <mat-menu #connectivity="matMenu" class="account-menu-panel" [overlapTrigger]="false">
+      <button mat-menu-item>
+        <mat-icon>account_box</mat-icon>
+        <span>Check</span>
+      </button>
+    </mat-menu>
+
+    <!-- Navbar Right Menu -->
+    <div class="navbar-custom-menu">
+      <ul class="nav navbar-nav">
+        <li>
+          <button mat-icon-button [matMenuTriggerFor]="contacts">
+            <mat-icon>contacts</mat-icon>
+          </button>
+          <mat-menu #contacts="matMenu" [overlapTrigger]="false">
+            <button mat-menu-item>
+              <mat-icon>dialpad</mat-icon>
+              <span>Redial</span>
+            </button>
+            <button mat-menu-item>
+              <mat-icon>notifications_off</mat-icon>
+              <span>Disable alerts</span>
+            </button>
+          </mat-menu>
+        </li>
+        <li>
+          <button mat-icon-button [matMenuTriggerFor]="message">
+            <mat-icon>message</mat-icon>
+          </button>
+          <mat-menu #message="matMenu" [overlapTrigger]="false">
+            <button mat-menu-item>
+              <mat-icon>dialpad</mat-icon>
+              <span>Redial</span>
+            </button>
+            <button mat-menu-item>
+              <mat-icon>notifications_off</mat-icon>
+              <span>Disable alerts</span>
+            </button>
+          </mat-menu>
+        </li>
+        <li>
+          <button mat-icon-button [matMenuTriggerFor]="settings">
+            <mat-icon>more_vert</mat-icon>
+          </button>
+          <mat-menu #settings="matMenu" [overlapTrigger]="false">
+            <button mat-menu-item>
+              <mat-icon>dialpad</mat-icon>
+              <span>Redial</span>
+            </button>
+            <button mat-menu-item>
+              <mat-icon>notifications_off</mat-icon>
+              <span>Disable alerts</span>
+            </button>
+          </mat-menu>
+        </li>
+      </ul>
+    </div>
+  </nav>
 </header>

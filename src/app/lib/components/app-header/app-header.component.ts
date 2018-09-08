@@ -5,7 +5,7 @@ import { MarketService } from '../../services';
 
 @Component({
     selector: 'app-header',
-    styleUrls: ['./app-header.component.css'],
+    styleUrls: ['./app-header.component.scss'],
     templateUrl: './app-header.component.html'
 })
 export class AppHeaderComponent {
