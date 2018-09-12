@@ -1,5 +1,3 @@
-export * from './auth.service';
-export * from './auth-guard.service';
 export * from './account.service';
 export * from './crypto.service';
 export * from './logger.service';
