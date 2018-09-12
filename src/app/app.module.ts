@@ -6,10 +6,10 @@ import { HttpClientModule } from '@angular/common/http';
 import { RouterModule } from '@angular/router';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
-
 // our lib
 import { SharedModule } from './lib/shared.module';
 import { DashboardModule } from './pages/dashboard/dashboard.module';
+import { LoginModule } from './pages/login/login.module';
 
 import { environment } from '../environments/environment';
 import { TranslateModule } from '@ngx-translate/core';
@@ -22,7 +22,8 @@ let modules = [
     RouterModule,
     SharedModule.forRoot(),
     TranslateModule,
-    DashboardModule
+    DashboardModule,
+    LoginModule
 ];
 
 // Main App
@@ -34,7 +35,7 @@ import { routing } from './app.routing';
 @NgModule({
     bootstrap: [App],
     declarations: [
-        App
+        App,
     ],
     imports: [
         ...modules,

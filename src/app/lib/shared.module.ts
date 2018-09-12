@@ -27,7 +27,9 @@ import {
     MarketService,
     NotificationService,
     NetworkService,
-    StoreService
+    StoreService,
+    AuthService,
+    AuthGuardService
 } from './services';
 import { I18nModule } from './i18n/i18n.module';
 
@@ -48,6 +50,8 @@ const NGA_PIPES = [
 ];
 
 const NGA_SERVICES = [
+    AuthGuardService,
+    AuthService,
     AccountService,
     CryptoService,
     LoggerService,

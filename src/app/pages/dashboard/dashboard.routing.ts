@@ -1,14 +1,16 @@
 import { Routes, RouterModule }  from '@angular/router';
 import { DashboardComponent } from './dashboard.component';
 import { ModuleWithProviders } from '@angular/core';
-
-import { HomeComponent } from './home';
+import { 
+    AuthGuardService as AuthGuard 
+  } from '../../lib/services/auth-guard.service';
 
 // noinspection TypeScriptValidateTypes
 const routes: Routes = [
     {
         path: 'dashboard',
         component: DashboardComponent,
+        canActivate: [AuthGuard],
         children: [
             { path: '', redirectTo: 'home', pathMatch: 'full' },
             { path: 'accounts', loadChildren: './accounts/accounts.module#AccountsModule' },
