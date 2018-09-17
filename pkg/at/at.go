@@ -651,7 +651,7 @@ func (s *stateMachine) processOp(cssize, ussize int32) int32 {
 			rc = 1 + 4 + 4
 			val := *(*int64)(unsafe.Pointer(&s.data[addr2*8]))
 			if val == 0 {
-				return -2
+				return errCodeInvalidCode
 			}
 			s.pc += rc
 			*(*int64)(unsafe.Pointer(&s.data[addr1*8])) /= val
