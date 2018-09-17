@@ -1,8 +1,10 @@
 package at
 
 import (
+	"encoding/binary"
 	"errors"
 	"fmt"
+	"math/big"
 	"unsafe"
 )
 
@@ -90,6 +92,14 @@ const (
 	funBAndWithA    = 0x012c
 	funAXorWithB    = 0x012d
 	funBXorWithA    = 0x012e
+	funAddAToB      = 0x0140
+	funAddBToA      = 0x0141
+	funSubAFromB    = 0x0142
+	funSubBFromA    = 0x0143
+	funMulAByB      = 0x0144
+	funMulBByA      = 0x0145
+	funDivAByB      = 0x0146
+	funDivBByA      = 0x0147
 
 	ok                     = 0
 	errCodeOverflow        = -1
@@ -133,6 +143,7 @@ type stateMachine struct {
 	cs int32
 	us int32
 
+	// might better to have byte buffers instead of int64s for a and b
 	a1 int64
 	a2 int64
 	a3 int64
@@ -326,6 +337,60 @@ func (s *stateMachine) fun(funNum int32) int64 {
 		s.b2 = s.a2 ^ s.b2
 		s.b3 = s.a3 ^ s.b3
 		s.b4 = s.a4 ^ s.b4
+	case funAddAToB:
+		var i big.Int
+		bigA := int64sToBigInt(s.a1, s.a2, s.a3, s.a4)
+		bigB := int64sToBigInt(s.b1, s.b2, s.b3, s.b4)
+		i.Add(bigA, bigB)
+		s.b1, s.b2, s.b3, s.b4 = bigIntToInt64s(&i)
+	case funAddBToA:
+		var i big.Int
+		bigA := int64sToBigInt(s.a1, s.a2, s.a3, s.a4)
+		bigB := int64sToBigInt(s.b1, s.b2, s.b3, s.b4)
+		i.Add(bigA, bigB)
+		s.a1, s.a2, s.a3, s.a4 = bigIntToInt64s(&i)
+	case funSubAFromB:
+		var i big.Int
+		bigA := int64sToBigInt(s.a1, s.a2, s.a3, s.a4)
+		bigB := int64sToBigInt(s.b1, s.b2, s.b3, s.b4)
+		i.Sub(bigB, bigA)
+		s.b1, s.b2, s.b3, s.b4 = bigIntToInt64s(&i)
+	case funSubBFromA:
+		var i big.Int
+		bigA := int64sToBigInt(s.a1, s.a2, s.a3, s.a4)
+		bigB := int64sToBigInt(s.b1, s.b2, s.b3, s.b4)
+		i.Sub(bigA, bigB)
+		s.a1, s.a2, s.a3, s.a4 = bigIntToInt64s(&i)
+	case funMulAByB:
+		var i big.Int
+		bigA := int64sToBigInt(s.a1, s.a2, s.a3, s.a4)
+		bigB := int64sToBigInt(s.b1, s.b2, s.b3, s.b4)
+		i.Mul(bigA, bigB)
+		s.a1, s.a2, s.a3, s.a4 = bigIntToInt64s(&i)
+	case funMulBByA:
+		var i big.Int
+		bigA := int64sToBigInt(s.a1, s.a2, s.a3, s.a4)
+		bigB := int64sToBigInt(s.b1, s.b2, s.b3, s.b4)
+		i.Mul(bigA, bigB)
+		s.b1, s.b2, s.b3, s.b4 = bigIntToInt64s(&i)
+	case funDivAByB:
+		var i big.Int
+		if s.b1 == 0 && s.b2 == 0 && s.b3 == 0 && s.b4 == 0 {
+			return errCodeInvalidCode
+		}
+		bigA := int64sToBigInt(s.a1, s.a2, s.a3, s.a4)
+		bigB := int64sToBigInt(s.b1, s.b2, s.b3, s.b4)
+		i.Div(bigA, bigB)
+		s.a1, s.a2, s.a3, s.a4 = bigIntToInt64s(&i)
+	case funDivBByA:
+		var i big.Int
+		if s.a1 == 0 && s.a2 == 0 && s.a3 == 0 && s.a4 == 0 {
+			return errCodeInvalidCode
+		}
+		bigA := int64sToBigInt(s.a1, s.a2, s.a3, s.a4)
+		bigB := int64sToBigInt(s.b1, s.b2, s.b3, s.b4)
+		i.Div(bigB, bigA)
+		s.b1, s.b2, s.b3, s.b4 = bigIntToInt64s(&i)
 	default:
 		if _, exists := funData[funNum]; exists {
 			rc = getFunctionData(funNum)
@@ -333,6 +398,49 @@ func (s *stateMachine) fun(funNum int32) int64 {
 	}
 
 	return rc
+}
+
+func int64sToBigInt(a, b, c, d int64) *big.Int {
+	var i big.Int
+	var bs [4 * 8]byte
+	binary.LittleEndian.PutUint64(bs[0:8], uint64(a))
+	binary.LittleEndian.PutUint64(bs[8:16], uint64(b))
+	binary.LittleEndian.PutUint64(bs[16:24], uint64(c))
+	binary.LittleEndian.PutUint64(bs[24:32], uint64(d))
+	i.SetBytes(bs[:])
+	return &i
+}
+
+func bigIntToInt64s(i *big.Int) (int64, int64, int64, int64) {
+	// Bytes() returns a big endian byte slice.
+	// If we want to optimize that, we could rebuild
+	// the Bytes() function to return little endian.
+	bs := i.Bytes()
+	for i := 0; i < len(bs)/2; i++ {
+		bs[i], bs[len(bs)-i-1] = bs[len(bs)-i-1], bs[i]
+	}
+
+	if len(bs) > 32 {
+		bs = bs[:32]
+	}
+	bytesToPad := 8*4 - len(bs)
+	if bytesToPad > 0 {
+		var padding byte
+		if len(bs) > 0 {
+			padding = (bs[0] & 0x80) >> 7
+		}
+		paddingBytes := make([]byte, bytesToPad)
+		for i := 0; i < bytesToPad; i++ {
+			paddingBytes[i] = padding
+		}
+		bs = append(bs, paddingBytes...)
+	}
+	fmt.Println(bs)
+	a := int64(binary.BigEndian.Uint64(bs[0:8]))
+	b := int64(binary.BigEndian.Uint64(bs[8:16]))
+	c := int64(binary.BigEndian.Uint64(bs[16:24]))
+	d := int64(binary.BigEndian.Uint64(bs[24:32]))
+	return a, b, c, d
 }
 
 func (s *stateMachine) fun1(funNum int32, value int64) int64 {
