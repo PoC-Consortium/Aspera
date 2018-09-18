@@ -2,7 +2,6 @@ package at
 
 import (
 	"encoding/hex"
-	"math"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
