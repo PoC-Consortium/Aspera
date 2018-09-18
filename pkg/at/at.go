@@ -107,6 +107,8 @@ const (
 	errCodeUnexpectedError = -3
 )
 
+var bigZero = big.NewInt(0)
+
 var ErrOverflow = errors.New("overflow")
 var ErrInvalidCode = errors.New("invalid code")
 var ErrUnexpectedError = errors.New("unexpected error")
@@ -143,16 +145,8 @@ type stateMachine struct {
 	cs int32
 	us int32
 
-	// might better to have byte buffers instead of int64s for a and b
-	a1 int64
-	a2 int64
-	a3 int64
-	a4 int64
-
-	b1 int64
-	b2 int64
-	b3 int64
-	b4 int64
+	as [32]byte
+	bs [32]byte
 
 	steps int32
 
@@ -212,6 +206,68 @@ func getFunctionData(funNum int32) int64 {
 	return funData[funNum].data[funData[funNum].offset]
 }
 
+func (s *stateMachine) getA(i int) int64 {
+	i *= 8
+	return int64(binary.LittleEndian.Uint64(s.as[i : i+8]))
+}
+
+func (s *stateMachine) getB(i int) int64 {
+	i *= 8
+	return int64(binary.LittleEndian.Uint64(s.bs[i : i+8]))
+}
+
+func (s *stateMachine) setA(i int, val int64) {
+	i *= 8
+	binary.LittleEndian.PutUint64(s.as[i:i+8], uint64(val))
+}
+
+func (s *stateMachine) setB(i int, val int64) {
+	i *= 8
+	binary.LittleEndian.PutUint64(s.bs[i:i+8], uint64(val))
+}
+
+func (s *stateMachine) getBigAB() (*big.Int, *big.Int) {
+	var a, b big.Int
+	a.SetBytes(s.as[:])
+	b.SetBytes(s.bs[:])
+	return &a, &b
+}
+
+func bigIntToPaddedBuffer(i *big.Int) []byte {
+	// Bytes() returns a big endian byte slice.
+	// If we want to optimize that, we could rebuild
+	// the Bytes() function to return little endian.
+	bs := i.Bytes()
+	for i := 0; i < len(bs)/2; i++ {
+		bs[i], bs[len(bs)-i-1] = bs[len(bs)-i-1], bs[i]
+	}
+
+	if len(bs) > 32 {
+		bs = bs[:32]
+	}
+	bytesToPad := 8*4 - len(bs)
+	if bytesToPad > 0 {
+		var padding byte
+		if len(bs) > 0 {
+			padding = (bs[0] & 0x80) >> 7
+		}
+		paddingBytes := make([]byte, bytesToPad)
+		for i := 0; i < bytesToPad; i++ {
+			paddingBytes[i] = padding
+		}
+		bs = append(bs, paddingBytes...)
+	}
+	return bs
+}
+
+func (s *stateMachine) setAs(bs []byte) {
+	copy(s.as[:], bs)
+}
+
+func (s *stateMachine) setBs(bs []byte) {
+	copy(s.bs[:], bs)
+}
+
 func (s *stateMachine) fun(funNum int32) int64 {
 	var rc int64
 
@@ -245,152 +301,140 @@ func (s *stateMachine) fun(funNum int32) int64 {
 			}
 		}
 	case funGetA1:
-		rc = s.a1
+		rc = s.getA(0)
 	case funGetA2:
-		rc = s.a2
+		rc = s.getA(1)
 	case funGetA3:
-		rc = s.a3
+		rc = s.getA(2)
 	case funGetA4:
-		rc = s.a4
+		rc = s.getA(3)
 	case funGetB1:
-		rc = s.b1
+		rc = s.getB(0)
 	case funGetB2:
-		rc = s.b2
+		rc = s.getB(1)
 	case funGetB3:
-		rc = s.b3
+		rc = s.getB(2)
 	case funGetB4:
-		rc = s.b4
+		rc = s.getB(3)
 	case funClearA:
-		s.a1 = 0
-		s.a2 = 0
-		s.a3 = 0
-		s.a4 = 0
+		for i := range s.as {
+			s.as[i] = 0
+		}
 	case funClearB:
-		s.b1 = 0
-		s.b2 = 0
-		s.b3 = 0
-		s.b4 = 0
+		for i := range s.bs {
+			s.bs[i] = 0
+		}
 	case funClearAB:
-		s.a1 = 0
-		s.a2 = 0
-		s.a3 = 0
-		s.a4 = 0
-
-		s.b1 = 0
-		s.b2 = 0
-		s.b3 = 0
-		s.b4 = 0
+		for i := range s.as {
+			s.as[i] = 0
+			s.bs[i] = 0
+		}
 	case funSetAToB:
-		s.a1 = s.b1
-		s.a2 = s.b2
-		s.a3 = s.b3
-		s.a4 = s.b4
+		for i, b := range s.bs {
+			s.as[i] = b
+		}
 	case funSetBToA:
-		s.b1 = s.a1
-		s.b2 = s.a2
-		s.b3 = s.a3
-		s.b4 = s.a4
+		for i, a := range s.as {
+			s.bs[i] = a
+		}
 	case funCheckAIsZero:
-		if s.a1 == 0 && s.a2 == 0 && s.a3 == 0 && s.a4 == 0 {
-			rc = 1
+		rc = 1
+		for _, a := range s.as {
+			if a != 0 {
+				rc = 0
+				break
+			}
 		}
 	case funCheckBIsZero:
-		if s.b1 == 0 && s.b2 == 0 && s.b3 == 0 && s.b4 == 0 {
-			rc = 1
+		rc = 1
+		for _, b := range s.bs {
+			if b != 0 {
+				rc = 0
+				break
+			}
 		}
 	case funCheckAIsB:
-		if s.a1 == s.b1 && s.a2 == s.b2 && s.a3 == s.b3 && s.a4 == s.b4 {
-			rc = 1
+		rc = 1
+		for i := range s.as {
+			if s.as[i] != s.bs[i] {
+				rc = 0
+				break
+			}
 		}
 	case funSwapAB:
-		s.a1, s.b1 = s.b1, s.a1
-		s.a2, s.b2 = s.b2, s.a2
-		s.a3, s.b3 = s.b3, s.a3
-		s.a4, s.b4 = s.b4, s.a4
+		for i := range s.as {
+			s.as[i], s.bs[i] = s.bs[i], s.as[i]
+		}
 	case funAOrWithB:
-		s.a1 = s.a1 | s.b1
-		s.a2 = s.a2 | s.b2
-		s.a3 = s.a3 | s.b3
-		s.a4 = s.a4 | s.b4
+		for i := range s.as {
+			s.as[i] |= s.bs[i]
+		}
 	case funBOrWithA:
-		s.b1 = s.a1 | s.b1
-		s.b2 = s.a2 | s.b2
-		s.b3 = s.a3 | s.b3
-		s.b4 = s.a4 | s.b4
+		for i := range s.as {
+			s.bs[i] |= s.as[i]
+		}
 	case funAAndWithB:
-		s.a1 = s.a1 & s.b1
-		s.a2 = s.a2 & s.b2
-		s.a3 = s.a3 & s.b3
-		s.a4 = s.a4 & s.b4
+		for i := range s.as {
+			s.as[i] &= s.bs[i]
+		}
 	case funBAndWithA:
-		s.b1 = s.a1 & s.b1
-		s.b2 = s.a2 & s.b2
-		s.b3 = s.a3 & s.b3
-		s.b4 = s.a4 & s.b4
+		for i := range s.as {
+			s.bs[i] &= s.as[i]
+		}
 	case funAXorWithB:
-		s.a1 = s.a1 ^ s.b1
-		s.a2 = s.a2 ^ s.b2
-		s.a3 = s.a3 ^ s.b3
-		s.a4 = s.a4 ^ s.b4
+		for i := range s.as {
+			s.as[i] ^= s.bs[i]
+		}
 	case funBXorWithA:
-		s.b1 = s.a1 ^ s.b1
-		s.b2 = s.a2 ^ s.b2
-		s.b3 = s.a3 ^ s.b3
-		s.b4 = s.a4 ^ s.b4
+		for i := range s.as {
+			s.bs[i] ^= s.as[i]
+		}
 	case funAddAToB:
 		var i big.Int
-		bigA := int64sToBigInt(s.a1, s.a2, s.a3, s.a4)
-		bigB := int64sToBigInt(s.b1, s.b2, s.b3, s.b4)
+		bigA, bigB := s.getBigAB()
 		i.Add(bigA, bigB)
-		s.b1, s.b2, s.b3, s.b4 = bigIntToInt64s(&i)
+		s.setBs(bigIntToPaddedBuffer(&i))
 	case funAddBToA:
 		var i big.Int
-		bigA := int64sToBigInt(s.a1, s.a2, s.a3, s.a4)
-		bigB := int64sToBigInt(s.b1, s.b2, s.b3, s.b4)
+		bigA, bigB := s.getBigAB()
 		i.Add(bigA, bigB)
-		s.a1, s.a2, s.a3, s.a4 = bigIntToInt64s(&i)
+		s.setAs(bigIntToPaddedBuffer(&i))
 	case funSubAFromB:
 		var i big.Int
-		bigA := int64sToBigInt(s.a1, s.a2, s.a3, s.a4)
-		bigB := int64sToBigInt(s.b1, s.b2, s.b3, s.b4)
+		bigA, bigB := s.getBigAB()
 		i.Sub(bigB, bigA)
-		s.b1, s.b2, s.b3, s.b4 = bigIntToInt64s(&i)
+		s.setBs(bigIntToPaddedBuffer(&i))
 	case funSubBFromA:
 		var i big.Int
-		bigA := int64sToBigInt(s.a1, s.a2, s.a3, s.a4)
-		bigB := int64sToBigInt(s.b1, s.b2, s.b3, s.b4)
+		bigA, bigB := s.getBigAB()
 		i.Sub(bigA, bigB)
-		s.a1, s.a2, s.a3, s.a4 = bigIntToInt64s(&i)
+		s.setAs(bigIntToPaddedBuffer(&i))
 	case funMulAByB:
 		var i big.Int
-		bigA := int64sToBigInt(s.a1, s.a2, s.a3, s.a4)
-		bigB := int64sToBigInt(s.b1, s.b2, s.b3, s.b4)
+		bigA, bigB := s.getBigAB()
 		i.Mul(bigA, bigB)
-		s.a1, s.a2, s.a3, s.a4 = bigIntToInt64s(&i)
+		s.setAs(bigIntToPaddedBuffer(&i))
 	case funMulBByA:
 		var i big.Int
-		bigA := int64sToBigInt(s.a1, s.a2, s.a3, s.a4)
-		bigB := int64sToBigInt(s.b1, s.b2, s.b3, s.b4)
+		bigA, bigB := s.getBigAB()
 		i.Mul(bigA, bigB)
-		s.b1, s.b2, s.b3, s.b4 = bigIntToInt64s(&i)
+		s.setBs(bigIntToPaddedBuffer(&i))
 	case funDivAByB:
 		var i big.Int
-		if s.b1 == 0 && s.b2 == 0 && s.b3 == 0 && s.b4 == 0 {
+		bigA, bigB := s.getBigAB()
+		if bigB.Cmp(bigZero) == 0 {
 			return errCodeInvalidCode
 		}
-		bigA := int64sToBigInt(s.a1, s.a2, s.a3, s.a4)
-		bigB := int64sToBigInt(s.b1, s.b2, s.b3, s.b4)
 		i.Div(bigA, bigB)
-		s.a1, s.a2, s.a3, s.a4 = bigIntToInt64s(&i)
+		s.setAs(bigIntToPaddedBuffer(&i))
 	case funDivBByA:
 		var i big.Int
-		if s.a1 == 0 && s.a2 == 0 && s.a3 == 0 && s.a4 == 0 {
+		bigA, bigB := s.getBigAB()
+		if bigA.Cmp(bigZero) == 0 {
 			return errCodeInvalidCode
 		}
-		bigA := int64sToBigInt(s.a1, s.a2, s.a3, s.a4)
-		bigB := int64sToBigInt(s.b1, s.b2, s.b3, s.b4)
 		i.Div(bigB, bigA)
-		s.b1, s.b2, s.b3, s.b4 = bigIntToInt64s(&i)
+		s.setBs(bigIntToPaddedBuffer(&i))
 	default:
 		if _, exists := funData[funNum]; exists {
 			rc = getFunctionData(funNum)
@@ -398,49 +442,6 @@ func (s *stateMachine) fun(funNum int32) int64 {
 	}
 
 	return rc
-}
-
-func int64sToBigInt(a, b, c, d int64) *big.Int {
-	var i big.Int
-	var bs [4 * 8]byte
-	binary.LittleEndian.PutUint64(bs[0:8], uint64(a))
-	binary.LittleEndian.PutUint64(bs[8:16], uint64(b))
-	binary.LittleEndian.PutUint64(bs[16:24], uint64(c))
-	binary.LittleEndian.PutUint64(bs[24:32], uint64(d))
-	i.SetBytes(bs[:])
-	return &i
-}
-
-func bigIntToInt64s(i *big.Int) (int64, int64, int64, int64) {
-	// Bytes() returns a big endian byte slice.
-	// If we want to optimize that, we could rebuild
-	// the Bytes() function to return little endian.
-	bs := i.Bytes()
-	for i := 0; i < len(bs)/2; i++ {
-		bs[i], bs[len(bs)-i-1] = bs[len(bs)-i-1], bs[i]
-	}
-
-	if len(bs) > 32 {
-		bs = bs[:32]
-	}
-	bytesToPad := 8*4 - len(bs)
-	if bytesToPad > 0 {
-		var padding byte
-		if len(bs) > 0 {
-			padding = (bs[0] & 0x80) >> 7
-		}
-		paddingBytes := make([]byte, bytesToPad)
-		for i := 0; i < bytesToPad; i++ {
-			paddingBytes[i] = padding
-		}
-		bs = append(bs, paddingBytes...)
-	}
-	fmt.Println(bs)
-	a := int64(binary.BigEndian.Uint64(bs[0:8]))
-	b := int64(binary.BigEndian.Uint64(bs[8:16]))
-	c := int64(binary.BigEndian.Uint64(bs[16:24]))
-	d := int64(binary.BigEndian.Uint64(bs[24:32]))
-	return a, b, c, d
 }
 
 func (s *stateMachine) fun1(funNum int32, value int64) int64 {
@@ -457,21 +458,21 @@ func (s *stateMachine) fun1(funNum int32, value int64) int64 {
 		fmt.Printf("payout %d to account: %d", balance, value)
 		balance = 0
 	case funNum == 0x0110:
-		s.a1 = value
+		s.setA(0, value)
 	case funNum == 0x0111:
-		s.a2 = value
+		s.setA(1, value)
 	case funNum == 0x0112:
-		s.a3 = value
+		s.setA(2, value)
 	case funNum == 0x0113:
-		s.a4 = value
+		s.setA(3, value)
 	case funNum == 0x0116:
-		s.b1 = value
+		s.setB(0, value)
 	case funNum == 0x0117:
-		s.b2 = value
+		s.setB(1, value)
 	case funNum == 0x0118:
-		s.b3 = value
+		s.setB(2, value)
 	case funNum == 0x0119:
-		s.b4 = value
+		s.setB(3, value)
 	default:
 		if _, exists := funData[funNum]; exists {
 			rc = getFunctionData(funNum)
@@ -498,17 +499,17 @@ func (s *stateMachine) fun2(funNum int32, value1, value2 int64) int64 {
 		fmt.Printf("payout %d to account: %d", value1, value2)
 		balance -= value1
 	case funNum == 0x0114: // Set_A1_A2
-		s.a1 = value1
-		s.a2 = value2
+		s.setA(0, value1)
+		s.setA(1, value2)
 	case funNum == 0x0115: // Set_A3_A4
-		s.a3 = value1
-		s.a4 = value2
+		s.setA(2, value1)
+		s.setA(3, value2)
 	case funNum == 0x011a: // Set_B1_B2
-		s.b1 = value1
-		s.b2 = value2
+		s.setB(0, value1)
+		s.setB(1, value2)
 	case funNum == 0x011b: // Set_B3_B4
-		s.b3 = value1
-		s.b4 = value2
+		s.setB(2, value1)
+		s.setB(3, value2)
 	default:
 		if _, exists := funData[funNum]; exists {
 			rc = getFunctionData(funNum)

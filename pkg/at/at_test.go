@@ -813,14 +813,14 @@ func TestAts(t *testing.T) {
 
 func TestABFuns(t *testing.T) {
 	type expected struct {
-		as [4]int64
-		bs [4]int64
-		rc int64
+		asHex string
+		bsHex string
+		rc    int64
 	}
 
 	type abTest struct {
-		as [4]int64
-		bs [4]int64
+		asHex string
+		bsHex string
 
 		addAToB   *expected
 		addBToA   *expected
@@ -834,200 +834,93 @@ func TestABFuns(t *testing.T) {
 
 	tests := []abTest{
 		abTest{
-			as: [4]int64{0, 0, 0, 0},
-			bs: [4]int64{0, 0, 0, 0},
-			addBToA: &expected{
-				as: [4]int64{0, 0, 0, 0},
-				bs: [4]int64{0, 0, 0, 0},
-				rc: 0,
-			},
-			addAToB: &expected{
-				as: [4]int64{0, 0, 0, 0},
-				bs: [4]int64{0, 0, 0, 0},
-				rc: 0,
-			},
-			subAFromB: &expected{
-				as: [4]int64{0, 0, 0, 0},
-				bs: [4]int64{0, 0, 0, 0},
-				rc: 0,
-			},
-			subBFromA: &expected{
-				as: [4]int64{0, 0, 0, 0},
-				bs: [4]int64{0, 0, 0, 0},
-				rc: 0,
-			},
-			mulAByB: &expected{
-				as: [4]int64{0, 0, 0, 0},
-				bs: [4]int64{0, 0, 0, 0},
-				rc: 0,
-			},
-			mulBByA: &expected{
-				as: [4]int64{0, 0, 0, 0},
-				bs: [4]int64{0, 0, 0, 0},
-				rc: 0,
-			},
+			addBToA:   &expected{},
+			addAToB:   &expected{},
+			subAFromB: &expected{},
+			subBFromA: &expected{},
+			mulAByB:   &expected{},
+			mulBByA:   &expected{},
 			divAByB: &expected{
-				as: [4]int64{0, 0, 0, 0},
-				bs: [4]int64{0, 0, 0, 0},
 				rc: -2,
 			},
 			divBByA: &expected{
-				as: [4]int64{0, 0, 0, 0},
-				bs: [4]int64{0, 0, 0, 0},
 				rc: -2,
 			},
 		},
 		abTest{
-			as: [4]int64{1, 1, 1, 1},
-			bs: [4]int64{1, 1, 1, 1},
+			asHex: "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF",
+			bsHex: "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF",
 			addBToA: &expected{
-				as: [4]int64{2, 2, 2, 2},
-				bs: [4]int64{1, 1, 1, 1},
-				rc: 0,
+				asHex: "FEFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF",
+				bsHex: "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF",
+				rc:    0,
 			},
 			addAToB: &expected{
-				as: [4]int64{1, 1, 1, 1},
-				bs: [4]int64{2, 2, 2, 2},
-				rc: 0,
+				asHex: "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF",
+				bsHex: "FEFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF",
+				rc:    0,
 			},
 			subAFromB: &expected{
-				as: [4]int64{1, 1, 1, 1},
-				bs: [4]int64{0, 0, 0, 0},
-				rc: 0,
+				asHex: "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF",
+				rc:    0,
 			},
 			subBFromA: &expected{
-				as: [4]int64{0, 0, 0, 0},
-				bs: [4]int64{1, 1, 1, 1},
-				rc: 0,
+				bsHex: "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF",
+				rc:    0,
 			},
 			mulAByB: &expected{
-				as: [4]int64{0, 256, 512, 768},
-				bs: [4]int64{1, 1, 1, 1},
-				rc: 0,
+				asHex: "0100000000000000000000000000000000000000000000000000000000000000",
+				bsHex: "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF",
+				rc:    0,
 			},
 			mulBByA: &expected{
-				as: [4]int64{1, 1, 1, 1},
-				bs: [4]int64{0, 256, 512, 768},
-				rc: 0,
+				asHex: "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF",
+				bsHex: "0100000000000000000000000000000000000000000000000000000000000000",
+				rc:    0,
 			},
 			divBByA: &expected{
-				as: [4]int64{1, 1, 1, 1},
-				bs: [4]int64{72057594037927936, 0, 0, 0},
-				rc: 0,
+				asHex: "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF",
+				bsHex: "0100000000000000000000000000000000000000000000000000000000000000",
+				rc:    0,
 			},
 			divAByB: &expected{
-				as: [4]int64{72057594037927936, 0, 0, 0},
-				bs: [4]int64{1, 1, 1, 1},
-				rc: 0,
-			},
-		},
-		abTest{
-			as: [4]int64{-1, -1, -1, -1},
-			bs: [4]int64{-1, -1, -1, -1},
-			addBToA: &expected{
-				as: [4]int64{-72057594037927937, -1, -1, -1},
-				bs: [4]int64{-1, -1, -1, -1},
-				rc: 0,
-			},
-			addAToB: &expected{
-				as: [4]int64{-1, -1, -1, -1},
-				bs: [4]int64{-72057594037927937, -1, -1, -1},
-				rc: 0,
-			},
-			subAFromB: &expected{
-				as: [4]int64{-1, -1, -1, -1},
-				bs: [4]int64{0, 0, 0, 0},
-				rc: 0,
-			},
-			subBFromA: &expected{
-				as: [4]int64{0, 0, 0, 0},
-				bs: [4]int64{-1, -1, -1, -1},
-				rc: 0,
-			},
-			mulAByB: &expected{
-				as: [4]int64{72057594037927936, 0, 0, 0},
-				bs: [4]int64{-1, -1, -1, -1},
-				rc: 0,
-			},
-			mulBByA: &expected{
-				as: [4]int64{-1, -1, -1, -1},
-				bs: [4]int64{72057594037927936, 0, 0, 0},
-				rc: 0,
-			},
-			divAByB: &expected{
-				as: [4]int64{72057594037927936, 0, 0, 0},
-				bs: [4]int64{-1, -1, -1, -1},
-				rc: 0,
-			},
-			divBByA: &expected{
-				as: [4]int64{-1, -1, -1, -1},
-				bs: [4]int64{72057594037927936, 0, 0, 0},
-				rc: 0,
-			},
-		},
-		abTest{
-			as: [4]int64{math.MaxInt64, math.MaxInt64, math.MaxInt64, math.MaxInt64},
-			bs: [4]int64{math.MaxInt64, math.MaxInt64, math.MaxInt64, math.MaxInt64},
-			addBToA: &expected{
-				as: [4]int64{-72339069014638593, -281474976710657, -281474976710657, -281474976710657},
-				bs: [4]int64{math.MaxInt64, math.MaxInt64, math.MaxInt64, math.MaxInt64},
-				rc: 0,
-			},
-			addAToB: &expected{
-				as: [4]int64{math.MaxInt64, math.MaxInt64, math.MaxInt64, math.MaxInt64},
-				bs: [4]int64{-72339069014638593, -281474976710657, -281474976710657, -281474976710657},
-				rc: 0,
-			},
-			subAFromB: &expected{
-				as: [4]int64{math.MaxInt64, math.MaxInt64, math.MaxInt64, math.MaxInt64},
-				bs: [4]int64{0, 0, 0, 0},
-				rc: 0,
-			},
-			subBFromA: &expected{
-				as: [4]int64{0, 0, 0, 0},
-				bs: [4]int64{math.MaxInt64, math.MaxInt64, math.MaxInt64, math.MaxInt64},
-				rc: 0,
-			},
-			mulAByB: &expected{
-				as: [4]int64{90353467524120576, 36310271995674624, 54324670505156608, 282574488338432},
-				bs: [4]int64{math.MaxInt64, math.MaxInt64, math.MaxInt64, math.MaxInt64},
-				rc: 0,
-			},
-			mulBByA: &expected{
-				as: [4]int64{math.MaxInt64, math.MaxInt64, math.MaxInt64, math.MaxInt64},
-				bs: [4]int64{90353467524120576, 36310271995674624, 54324670505156608, 282574488338432},
-				rc: 0,
-			},
-			divAByB: &expected{
-				as: [4]int64{72057594037927936, 0, 0, 0},
-				bs: [4]int64{math.MaxInt64, math.MaxInt64, math.MaxInt64, math.MaxInt64},
-				rc: 0,
-			},
-			divBByA: &expected{
-				as: [4]int64{math.MaxInt64, math.MaxInt64, math.MaxInt64, math.MaxInt64},
-				bs: [4]int64{72057594037927936, 0, 0, 0},
-				rc: 0,
+				asHex: "0100000000000000000000000000000000000000000000000000000000000000",
+				bsHex: "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF",
+				rc:    0,
 			},
 		},
 	}
+	toPaddedBytes := func(s string) []byte {
+		bs, err := hex.DecodeString(s)
+		if err != nil {
+			panic(err)
+		}
+		if len(bs) > 32 {
+			panic("bs stores more than 32 bytes")
+		}
+		if len(bs) < 32 {
+			padding := make([]byte, 32-len(bs))
+			bs = append(padding, bs...)
+		}
+		return bs
+	}
 	for _, test := range tests {
+		asInit := toPaddedBytes(test.asHex)
+		bsInit := toPaddedBytes(test.bsHex)
+
 		s := &stateMachine{}
 		initRegisters := func(s *stateMachine) {
-			s.a1, s.a2, s.a3, s.a4 = test.as[0], test.as[1], test.as[2], test.as[3]
-			s.b1, s.b2, s.b3, s.b4 = test.bs[0], test.bs[1], test.bs[2], test.bs[3]
+			copy(s.as[:], asInit)
+			copy(s.bs[:], bsInit)
 		}
 		runTest := func(e *expected, s *stateMachine, funNum int32) {
+			asExp := toPaddedBytes(e.asHex)
+			bsExp := toPaddedBytes(e.bsHex)
 			initRegisters(s)
 			rc := s.fun(funNum)
 			assert.Equal(t, e.rc, rc)
-			assert.Equal(t, e.as[0], s.a1)
-			assert.Equal(t, e.as[1], s.a2)
-			assert.Equal(t, e.as[2], s.a3)
-			assert.Equal(t, e.as[3], s.a4)
-			assert.Equal(t, e.bs[0], s.b1)
-			assert.Equal(t, e.bs[1], s.b2)
-			assert.Equal(t, e.bs[2], s.b3)
-			assert.Equal(t, e.bs[3], s.b4)
+			assert.Equal(t, asExp, s.as[:])
+			assert.Equal(t, bsExp, s.bs[:])
 		}
 
 		initRegisters(s)
