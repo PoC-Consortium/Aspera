@@ -6,14 +6,15 @@
     background: #3c8dbc;
     position: relative;
     z-index: 1;
+    color:#fff;
     > div {
         width:220px;
         height:50px;
         text-align: center;
-        background: #367fa9;
         img {
-            height:100%;
+            height:60%;
             width:auto;
+            margin:10px;
         }
     }
     .navbar {

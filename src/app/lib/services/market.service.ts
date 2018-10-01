@@ -25,7 +25,7 @@ export class MarketService {
         private storeService: StoreService,
         private http: HttpClient
     ) {
-        this.updateCurrency().catch(error => {});
+        // this.updateCurrency().catch(error => {}); //disabled for now, spammy
     }
 
     public setCurrency(currency: Currency) {
