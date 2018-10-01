@@ -11,9 +11,10 @@ import {
   AuthApiActions,
 } from '../actions';
 
-import { Credentials, User } from '../models/user';
+import { Credentials } from '../models/credentials';
 import { AuthService } from '../services/auth.service';
 import { AuthEffects } from '../effects/auth.effects';
+import { Account } from '../../lib/model';
 
 describe('AuthEffects', () => {
   let effects: AuthEffects;
@@ -55,13 +56,13 @@ describe('AuthEffects', () => {
 
   describe('login$', () => {
     it('should return an auth.LoginSuccess action, with user information if login succeeds', () => {
-      const credentials: Credentials = { username: 'test', password: '' };
-      const user = { name: 'User' } as User;
+      const credentials: Credentials = { passphrase: '' };
+      const account = new Account();
       const action = new LoginPageActions.Login({ credentials });
-      const completion = new AuthApiActions.LoginSuccess({ user });
+      const completion = new AuthApiActions.LoginSuccess({ account });
 
       actions$ = hot('-a---', { a: action });
-      const response = cold('-a|', { a: user });
+      const response = cold('-a|', { a: account });
       const expected = cold('--b', { b: completion });
       authService.login = jest.fn(() => response);
 
@@ -69,7 +70,7 @@ describe('AuthEffects', () => {
     });
 
     it('should return a new auth.LoginFailure if the login service throws', () => {
-      const credentials: Credentials = { username: 'someOne', password: '' };
+      const credentials: Credentials = { passphrase: '' };
       const action = new LoginPageActions.Login({ credentials });
       const completion = new AuthApiActions.LoginFailure({
         error: 'Invalid username or password',
@@ -87,8 +88,8 @@ describe('AuthEffects', () => {
 
   describe('loginSuccess$', () => {
     it('should dispatch a RouterNavigation action', (done: any) => {
-      const user = { name: 'User' } as User;
-      const action = new AuthApiActions.LoginSuccess({ user });
+      const account = new Account();
+      const action = new AuthApiActions.LoginSuccess({ account });
 
       actions$ = of(action);
 

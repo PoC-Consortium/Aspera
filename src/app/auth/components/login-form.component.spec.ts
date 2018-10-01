@@ -53,16 +53,4 @@ describe('Login Page', () => {
     expect(fixture).toMatchSnapshot();
   });
 
-  it('should emit an event if the form is valid when submitted', () => {
-    const credentials = {
-      username: 'user',
-      password: 'pass',
-    };
-    instance.form.setValue(credentials);
-
-    spyOn(instance.submitted, 'emit');
-    instance.submit();
-
-    expect(instance.submitted.emit).toHaveBeenCalledWith(credentials);
-  });
 });

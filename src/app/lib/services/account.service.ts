@@ -199,11 +199,12 @@ export class AccountService {
     */
     public getTransactions(id: string): Promise<Transaction[]> {
         return new Promise((resolve, reject) => {
-            let params: HttpParams = new HttpParams();
-            params.set("requestType", "getAccountTransactions");
-            params.set("firstIndex", "0");
-            params.set("lastIndex", constants.transactionCount);
-            params.set("account", id);
+            let params: HttpParams = new HttpParams()
+                .set("requestType", "getAccountTransactions")
+                .set("firstIndex", "0")
+                .set("lastIndex", constants.transactionCount)
+                .set("account", id);
+
             let requestOptions = this.getRequestOptions();
             requestOptions.params = params;
             console.log(this.nodeUrl)
@@ -228,9 +229,9 @@ export class AccountService {
     */
     public getUnconfirmedTransactions(id: string): Promise<Transaction[]> {
         return new Promise((resolve, reject) => {
-            let params: HttpParams = new HttpParams();
-            params.set("requestType", "getUnconfirmedTransactions");
-            params.set("account", id);
+            let params: HttpParams = new HttpParams()
+                .set("requestType", "getUnconfirmedTransactions")
+                .set("account", id);
             let requestOptions = this.getRequestOptions();
             requestOptions.params = params;
             return this.http.get(this.nodeUrl, requestOptions)
@@ -255,9 +256,9 @@ export class AccountService {
     */
     public getTransaction(id: string): Promise<Transaction> {
         return new Promise((resolve, reject) => {
-            let params: HttpParams = new HttpParams();
-            params.set("requestType", "getTransaction");
-            params.set("transaction", id);
+            let params: HttpParams = new HttpParams()
+                .set("requestType", "getTransaction")
+                .set("transaction", id);
             let requestOptions = this.getRequestOptions();
             requestOptions.params = params;
             return this.http.get(this.nodeUrl, requestOptions)
@@ -275,9 +276,9 @@ export class AccountService {
     */
     public getBalance(id: string): Promise<any> {
         return new Promise((resolve, reject) => {
-            let params: HttpParams = new HttpParams();
-            params.set("requestType", "getBalance");
-            params.set("account", id);
+            let params: HttpParams = new HttpParams()
+                .set("requestType", "getBalance")
+                .set("account", id);
             let requestOptions = this.getRequestOptions();
             requestOptions.params = params;
             return this.http.get(this.nodeUrl, requestOptions)
@@ -307,9 +308,9 @@ export class AccountService {
     */
     public getAccountPublicKey(id: string): Promise<string> {
         return new Promise((resolve, reject) => {
-            let params: HttpParams = new HttpParams();
-            params.set("requestType", "getAccountPublicKey");
-            params.set("account", id);
+            let params: HttpParams = new HttpParams()
+                .set("requestType", "getAccountPublicKey")
+                .set("account", id);
             let requestOptions = this.getRequestOptions();
             requestOptions.params = params;
             return this.http.get(this.nodeUrl, requestOptions)
@@ -334,23 +335,23 @@ export class AccountService {
     public doTransaction(transaction: Transaction, encryptedPrivateKey: string, pin: string): Promise<Transaction> {
         return new Promise((resolve, reject) => {
             let unsignedTransactionHex, sendFields, broadcastFields, transactionFields;
-            let params: HttpParams = new HttpParams();
-            params.set("requestType", "sendMoney");
-            params.set("amountNQT", this.convertNumberToString(transaction.amountNQT));
-            params.set("deadline", "1440");
-            params.set("feeNQT", this.convertNumberToString(transaction.feeNQT));
-            params.set("publicKey", transaction.senderPublicKey);
-            params.set("recipient", transaction.recipientAddress);
+            let params: HttpParams = new HttpParams()
+                .set("requestType", "sendMoney")
+                .set("amountNQT", this.convertNumberToString(transaction.amountNQT))
+                .set("deadline", "1440")
+                .set("feeNQT", this.convertNumberToString(transaction.feeNQT))
+                .set("publicKey", transaction.senderPublicKey)
+                .set("recipient", transaction.recipientAddress);
             if (transaction.attachment != undefined) {
                 if (transaction.attachment.type == "encrypted_message") {
                     let em: EncryptedMessage = <EncryptedMessage>transaction.attachment;
-                    params.set("encryptedMessageData", em.data);
-                    params.set("encryptedMessageNonce", em.nonce);
-                    params.set("messageToEncryptIsText", String(em.isText));
+                    params = params.set("encryptedMessageData", em.data)
+                        .set("encryptedMessageNonce", em.nonce)
+                        .set("messageToEncryptIsText", String(em.isText));
                 } else if (transaction.attachment.type == "message") {
                     let m: Message = <Message>transaction.attachment;
-                    params.set("message", m.message)
-                    params.set("messageIsText", String(m.messageIsText))
+                    params = params.set("message", m.message)
+                        .set("messageIsText", String(m.messageIsText))
                 }
             }
             let requestOptions = this.getRequestOptions();
@@ -371,9 +372,9 @@ export class AccountService {
                                         if (verified) {
                                             return this.cryptoService.generateSignedTransactionBytes(unsignedTransactionHex, signature)
                                                 .then(signedTransactionBytes => {
-                                                    params = new HttpParams();
-                                                    params.set("requestType", "broadcastTransaction");
-                                                    params.set("transactionBytes", signedTransactionBytes);
+                                                    params = new HttpParams()
+                                                        .set("requestType", "broadcastTransaction")
+                                                        .set("transactionBytes", signedTransactionBytes);
                                                     requestOptions = this.getRequestOptions();
                                                     requestOptions.params = params;
                                                     // request 'broadcastTransaction' to burst node
@@ -421,7 +422,10 @@ export class AccountService {
     * Method responsible for hashing the PIN to carry out an ecryption.
     */
     public hashPinEncryption(pin: string): string {
-        return this.cryptoService.hashSHA256(pin + this.currentAccount.value.id);
+        if (this.currentAccount.value) {
+            pin = pin + this.currentAccount.value.id;
+        }
+        return this.cryptoService.hashSHA256(pin);
     }
 
     /*
