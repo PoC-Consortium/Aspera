@@ -4,7 +4,7 @@
 // The list of which env maps to which file can be found in `angular-cli.json`.
 
 export const environment = {
-    api: "http://localhost:8080",
+    defaultNode: "http://localhost:4200/burst",
     production: false,
     silent: false
 };

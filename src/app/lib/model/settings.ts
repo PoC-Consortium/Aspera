@@ -3,6 +3,7 @@
 */
 
 import { constants } from "./constants";
+import { environment } from "../../../environments/environment";
 
 /*
 * Settings class
@@ -27,7 +28,7 @@ export class Settings {
         }
         this.currency = data.currency || constants.defaultCurrency;
         this.language = data.language || constants.defaultLanguage;
-        this.node = data.node || constants.defaultNode;
+        this.node = data.node || environment.defaultNode;
         this.theme = data.theme || constants.defaultTheme;
         this.version = data.version || constants.version;
     }

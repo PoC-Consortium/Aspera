@@ -9,7 +9,7 @@ import { routing } from './home.routing';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatGridListModule } from '@angular/material/grid-list';
-import { MatInputModule, MatSortModule } from '@angular/material';
+import { MatInputModule, MatSortModule, MatIconModule } from '@angular/material';
 import { MatTableModule } from '@angular/material/table';
 
 @NgModule({
@@ -22,6 +22,7 @@ import { MatTableModule } from '@angular/material/table';
         MatFormFieldModule,
         MatGridListModule,
         MatInputModule,
+        MatIconModule,
         MatSortModule,
         MatTableModule
     ],
