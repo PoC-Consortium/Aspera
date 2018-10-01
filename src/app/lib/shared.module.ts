@@ -27,7 +27,7 @@ import {
     MarketService,
     NotificationService,
     NetworkService,
-    StoreService
+    StoreService,
 } from './services';
 import { I18nModule } from './i18n/i18n.module';
 

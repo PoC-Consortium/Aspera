@@ -40,7 +40,6 @@ export const constants = {
     database: "loki.db",
     defaultCurrency: "USD",
     defaultLanguage: "en",
-    defaultNode: "https://wallet.burst.cryptoguru.org:8125/burst",
     defaultTheme: "light",
     documentationUrl: "https://poc-consortium.github.io/burstcoin-mobile-doc/",
     donate: "BURST-RTEY-HUSA-BJG4-EZW9E",
@@ -62,7 +61,7 @@ export const constants = {
         { name: "தமிழ", code: "ta" },
         { name: "中文", code: "zh" }
     ],
-    marketUrl: "https://api.coinmarketcap.com/v1/ticker/burst",
+    marketUrl: "https://api.coinmarketcap.com/v1/ticker/burst/",
     nodes: [
         { "name": "CryptoGuru", "region": "Global", "location": "Munich", "address": "https://wallet.burst.cryptoguru.org", "port": 8125, "selected": true, "ping": -1 },
         { "name": "CryptoGuru", "region": "Africa", "location": "Munich", "address": "https://wallet.burst.cryptoguru.org", "port": 8125, "selected": false, "ping": -1 },
