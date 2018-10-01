@@ -1,12 +1,13 @@
 import { TestBed, ComponentFixture } from '@angular/core/testing';
-import { MatInputModule, MatCardModule } from '@angular/material';
-import { ReactiveFormsModule } from '@angular/forms';
+import { MatInputModule, MatCardModule, MatIconModule } from '@angular/material';
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { StoreModule, Store, combineReducers } from '@ngrx/store';
 import { LoginPageComponent } from '../containers/login-page.component';
 import { LoginFormComponent } from '../components/login-form.component';
 import * as fromAuth from '../reducers';
 import { LoginPageActions } from '../actions';
+import { AuthModule } from '../../auth/auth.module';
 
 describe('Login Page', () => {
   let fixture: ComponentFixture<LoginPageComponent>;
@@ -22,7 +23,9 @@ describe('Login Page', () => {
         }),
         MatInputModule,
         MatCardModule,
+        MatIconModule,
         ReactiveFormsModule,
+        FormsModule
       ],
       declarations: [LoginPageComponent, LoginFormComponent],
     });

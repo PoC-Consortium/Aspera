@@ -34,10 +34,6 @@ export class AuthService {
       })
     );  
 
-
-    // getPublicKeyFromPassphrase
-    // getAccountIdFromPublicKey
-    // set account and accountRS
     // test account (main net): misery accept snow brave crazy avoid thank dwell itself still magic stretch
     // return of(new Account({
     //     id :"9137890273881363297",
