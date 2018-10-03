@@ -447,7 +447,7 @@ func (s *stateMachine) fun(funNum int32) int64 {
 		if bigB.Cmp(math.BigZero) == 0 {
 			return errCodeInvalidCode
 		}
-		i.Div(bigA, bigB)
+		i.Quo(bigA, bigB)
 		s.setAs(bigIntToPaddedBuffer(&i))
 	case funDivBByA:
 		var i big.Int
@@ -455,7 +455,7 @@ func (s *stateMachine) fun(funNum int32) int64 {
 		if bigA.Cmp(math.BigZero) == 0 {
 			return errCodeInvalidCode
 		}
-		i.Div(bigB, bigA)
+		i.Quo(bigB, bigA)
 		s.setBs(bigIntToPaddedBuffer(&i))
 	default:
 		if _, exists := funData[funNum]; exists {
