@@ -1,6 +1,8 @@
 package at
 
 import (
+	"crypto/md5"
+	"crypto/sha256"
 	"encoding/binary"
 	"errors"
 	"fmt"
@@ -8,6 +10,7 @@ import (
 	"unsafe"
 
 	"github.com/ac0v/aspera/pkg/common/math"
+	"golang.org/x/crypto/ripemd160"
 )
 
 const (
@@ -103,10 +106,17 @@ const (
 	funDivAByB      = 0x0146
 	funDivBByA      = 0x0147
 
-	ok                     = 0
-	errCodeOverflow        = -1
-	errCodeInvalidCode     = -2
 	errCodeUnexpectedError = -3
+	funMD5AtoB             = 0x200
+	funCheckMD5AWithB      = 0x201
+	funHash160AToB         = 0x202
+	funCheckHash160AWithB  = 0x203
+	funSHA256AtoB          = 0x204
+	funCheckSHA256AWithB   = 0x205
+
+	ok                 = 0
+	errCodeOverflow    = -1
+	errCodeInvalidCode = -2
 )
 
 var ErrOverflow = errors.New("overflow")
@@ -457,6 +467,42 @@ func (s *stateMachine) fun(funNum int32) int64 {
 		}
 		i.Quo(bigB, bigA)
 		s.setBs(bigIntToPaddedBuffer(&i))
+	case funMD5AtoB:
+		bs := md5.Sum(s.as[:md5.Size])
+		copy(s.bs[:md5.Size], bs[:])
+	case funCheckMD5AWithB:
+		bs := md5.Sum(s.as[:md5.Size])
+		for i := 0; i < md5.Size; i++ {
+			if bs[i] != s.bs[i] {
+				return 0
+			}
+		}
+		return 1
+	case funHash160AToB:
+		h := ripemd160.New()
+		h.Write(s.as[:])
+		copy(s.bs[:ripemd160.Size], h.Sum(nil))
+	case funCheckHash160AWithB:
+		h := ripemd160.New()
+		h.Write(s.as[:])
+		bs := h.Sum(nil)
+		for i := 0; i < ripemd160.Size; i++ {
+			if bs[i] != s.bs[i] {
+				return 0
+			}
+		}
+		return 1
+	case funSHA256AtoB:
+		bs := sha256.Sum256(s.as[:])
+		copy(s.bs[:], bs[:])
+	case funCheckSHA256AWithB:
+		bs := sha256.Sum256(s.as[:])
+		for i := 0; i < sha256.Size; i++ {
+			if bs[i] != s.bs[i] {
+				return 0
+			}
+		}
+		return 1
 	default:
 		if _, exists := funData[funNum]; exists {
 			rc = getFunctionData(funNum)

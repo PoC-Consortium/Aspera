@@ -821,14 +821,20 @@ func TestABFuns(t *testing.T) {
 		asHex string
 		bsHex string
 
-		addAToB   *expected
-		addBToA   *expected
-		subAFromB *expected
-		subBFromA *expected
-		mulAByB   *expected
-		mulBByA   *expected
-		divAByB   *expected
-		divBByA   *expected
+		addAToB            *expected
+		addBToA            *expected
+		subAFromB          *expected
+		subBFromA          *expected
+		mulAByB            *expected
+		mulBByA            *expected
+		divAByB            *expected
+		divBByA            *expected
+		MD5AtoB            *expected
+		CheckMD5AWithB     *expected
+		Hash160AToB        *expected
+		CheckHash160AWithB *expected
+		SHA256AtoB         *expected
+		CheckSHA256AWithB  *expected
 	}
 
 	tests := []abTest{
@@ -976,6 +982,63 @@ func TestABFuns(t *testing.T) {
 				rc:    0,
 			},
 		},
+		abTest{
+			asHex: "1234567890123456789012345678901234567890123456789012345678901234",
+			bsHex: "0987654321098765432109876543210987654321098765432109876543210987",
+			MD5AtoB: &expected{
+				asHex: "1234567890123456789012345678901234567890123456789012345678901234",
+				bsHex: "2FBFBCEC3FAF7CC9F43B45EC82D4EC6087654321098765432109876543210987",
+				rc:    0,
+			},
+			CheckMD5AWithB: &expected{
+				asHex: "1234567890123456789012345678901234567890123456789012345678901234",
+				bsHex: "0987654321098765432109876543210987654321098765432109876543210987",
+				rc:    0,
+			},
+			SHA256AtoB: &expected{
+				asHex: "1234567890123456789012345678901234567890123456789012345678901234",
+				bsHex: "CA1194A558362B5FA6E7887DA7B41EC6FAEB01C9477A0AFD46DFC0692BE33482",
+				rc:    0,
+			},
+			CheckSHA256AWithB: &expected{
+				asHex: "1234567890123456789012345678901234567890123456789012345678901234",
+				bsHex: "0987654321098765432109876543210987654321098765432109876543210987",
+				rc:    0,
+			},
+			Hash160AToB: &expected{
+				asHex: "1234567890123456789012345678901234567890123456789012345678901234",
+				bsHex: "A5B1C86F10C81C3C543304E9891815D8DE036296098765432109876543210987",
+				rc:    0,
+			},
+			// CheckHash160AWithB *expected
+		},
+		abTest{
+			asHex: "1234567890123456789012345678901234567890123456789012345678901234",
+			bsHex: "2FBFBCEC3FAF7CC9F43B45EC82D4EC6087654321098765432109876543210987",
+			CheckMD5AWithB: &expected{
+				asHex: "1234567890123456789012345678901234567890123456789012345678901234",
+				bsHex: "2FBFBCEC3FAF7CC9F43B45EC82D4EC6087654321098765432109876543210987",
+				rc:    1,
+			},
+		},
+		abTest{
+			asHex: "1234567890123456789012345678901234567890123456789012345678901234",
+			bsHex: "CA1194A558362B5FA6E7887DA7B41EC6FAEB01C9477A0AFD46DFC0692BE33482",
+			CheckSHA256AWithB: &expected{
+				asHex: "1234567890123456789012345678901234567890123456789012345678901234",
+				bsHex: "CA1194A558362B5FA6E7887DA7B41EC6FAEB01C9477A0AFD46DFC0692BE33482",
+				rc:    1,
+			},
+		},
+		abTest{
+			asHex: "1234567890123456789012345678901234567890123456789012345678901234",
+			bsHex: "A5B1C86F10C81C3C543304E9891815D8DE036296098765432109876543210987",
+			CheckHash160AWithB: &expected{
+				asHex: "1234567890123456789012345678901234567890123456789012345678901234",
+				bsHex: "A5B1C86F10C81C3C543304E9891815D8DE036296098765432109876543210987",
+				rc:    1,
+			},
+		},
 	}
 	toPaddedBytes := func(s string) []byte {
 		bs, err := hex.DecodeString(s)
@@ -1034,6 +1097,24 @@ func TestABFuns(t *testing.T) {
 		}
 		if expected := test.divBByA; expected != nil {
 			runTest(expected, s, funDivBByA)
+		}
+		if expected := test.MD5AtoB; expected != nil {
+			runTest(expected, s, funMD5AtoB)
+		}
+		if expected := test.CheckMD5AWithB; expected != nil {
+			runTest(expected, s, funCheckMD5AWithB)
+		}
+		if expected := test.SHA256AtoB; expected != nil {
+			runTest(expected, s, funSHA256AtoB)
+		}
+		if expected := test.CheckSHA256AWithB; expected != nil {
+			runTest(expected, s, funCheckSHA256AWithB)
+		}
+		if expected := test.Hash160AToB; expected != nil {
+			runTest(expected, s, funHash160AToB)
+		}
+		if expected := test.CheckHash160AWithB; expected != nil {
+			runTest(expected, s, funCheckHash160AWithB)
 		}
 	}
 }
