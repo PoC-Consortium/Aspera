@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"math/big"
 	"unsafe"
+
+	"github.com/ac0v/aspera/pkg/common/math"
 )
 
 const (
@@ -106,8 +108,6 @@ const (
 	errCodeInvalidCode     = -2
 	errCodeUnexpectedError = -3
 )
-
-var bigZero = big.NewInt(0)
 
 var ErrOverflow = errors.New("overflow")
 var ErrInvalidCode = errors.New("invalid code")
@@ -226,20 +226,42 @@ func (s *stateMachine) setB(i int, val int64) {
 	binary.LittleEndian.PutUint64(s.bs[i:i+8], uint64(val))
 }
 
+func bytesToSignedBigInt(bs []byte) *big.Int {
+	var i big.Int
+	i.SetBytes(bs)
+	return math.S256(&i)
+}
+
+func signedBigIntToBytes(i *big.Int) []byte {
+	bs := math.U256(i).Bytes()
+	swapEndianInline(bs)
+	return bs
+}
+
 func (s *stateMachine) getBigAB() (*big.Int, *big.Int) {
-	var a, b big.Int
-	a.SetBytes(s.as[:])
-	b.SetBytes(s.bs[:])
-	return &a, &b
+	a := bytesToSignedBigInt(swapEndian(s.as[:]))
+	b := bytesToSignedBigInt(swapEndian(s.bs[:]))
+	return a, b
+}
+
+func swapEndian(bs []byte) []byte {
+	swapped := make([]byte, len(bs))
+	for i := 0; i < len(bs)/2; i++ {
+		swapped[i], swapped[len(bs)-i-1] = bs[len(bs)-i-1], bs[i]
+	}
+	return swapped
+}
+
+func swapEndianInline(bs []byte) {
+	for i := 0; i < len(bs)/2; i++ {
+		bs[i], bs[len(bs)-i-1] = bs[len(bs)-i-1], bs[i]
+	}
 }
 
 func bigIntToPaddedBuffer(i *big.Int) []byte {
-	// Bytes() returns a big endian byte slice.
-	// If we want to optimize that, we could rebuild
-	// the Bytes() function to return little endian.
-	bs := i.Bytes()
-	for i := 0; i < len(bs)/2; i++ {
-		bs[i], bs[len(bs)-i-1] = bs[len(bs)-i-1], bs[i]
+	bs := signedBigIntToBytes(i)
+	if i.Sign() == -1 {
+		bs[len(bs)-1] |= 0x80
 	}
 
 	if len(bs) > 32 {
@@ -422,7 +444,7 @@ func (s *stateMachine) fun(funNum int32) int64 {
 	case funDivAByB:
 		var i big.Int
 		bigA, bigB := s.getBigAB()
-		if bigB.Cmp(bigZero) == 0 {
+		if bigB.Cmp(math.BigZero) == 0 {
 			return errCodeInvalidCode
 		}
 		i.Div(bigA, bigB)
@@ -430,7 +452,7 @@ func (s *stateMachine) fun(funNum int32) int64 {
 	case funDivBByA:
 		var i big.Int
 		bigA, bigB := s.getBigAB()
-		if bigA.Cmp(bigZero) == 0 {
+		if bigA.Cmp(math.BigZero) == 0 {
 			return errCodeInvalidCode
 		}
 		i.Div(bigB, bigA)
