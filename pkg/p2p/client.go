@@ -29,7 +29,7 @@ func NewClient(registry *r.Registry) *Client {
 	// TODO: timeout should be config option
 	resty.SetTimeout(2 * time.Second)
 
-	pm := NewPeerManager()
+	pm := NewPeerManager(time.Minute)
 
 	client := &Client{
 		registry:    registry,
