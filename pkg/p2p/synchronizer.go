@@ -1,10 +1,12 @@
 package p2p
 
 import (
+	pb "github.com/ac0v/aspera/internal/api/protobuf-spec"
 	r "github.com/ac0v/aspera/pkg/registry"
 	s "github.com/ac0v/aspera/pkg/store"
 	"go.uber.org/zap"
 	"sync"
+	"time"
 )
 
 type Synchronizer struct {
@@ -43,8 +45,17 @@ func (synchronizer *Synchronizer) fetchBlockIds(fetchBlocksChannel chan *blockMe
 		synchronizer.registry.Logger.Info("syncing block meta", zap.Uint64("id", previousBlockId), zap.Int("height", int(height)))
 		fetchBlocksChannel <- &blockMeta{id: previousBlockId, height: height}
 
-		res, _ := synchronizer.client.GetNextBlockIds(previousBlockId)
-		if len(res.NextBlockIds) == 0 {
+		var res *pb.GetNextBlockIdsResponse
+		for {
+			var err error
+			res, err = synchronizer.client.GetNextBlockIds(previousBlockId)
+			if err != nil {
+				continue
+			} else if len(res.NextBlockIds) == 0 {
+				// wait before asking for fresh blocks - looks like there are no blocks atm around
+				time.Sleep(time.Second * 10)
+			}
+
 			break
 		}
 
