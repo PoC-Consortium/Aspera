@@ -50,6 +50,7 @@ func (synchronizer *Synchronizer) fetchBlockIds(fetchBlocksChannel chan *blockMe
 			var err error
 			res, err = synchronizer.client.GetNextBlockIds(previousBlockId)
 			if err != nil {
+				synchronizer.registry.Logger.Error("getNextBlocks", zap.Error(err))
 				continue
 			} else if len(res.NextBlockIds) == 0 {
 				// wait before asking for fresh blocks - looks like there are no blocks atm around
@@ -83,7 +84,7 @@ func (synchronizer *Synchronizer) fetchBlocks(fetchBlocksChannel chan *blockMeta
 			res, err := synchronizer.client.GetNextBlocks(blockMeta.id)
 			// redo on exceptions; may another per has better data
 			if err != nil || len(res.NextBlocks) == 0 {
-				//synchronizer.registry.Logger.Info("err:", zap.Error(err))
+				synchronizer.registry.Logger.Error("getNextBlocks", zap.Error(err))
 				continue
 			}
 
