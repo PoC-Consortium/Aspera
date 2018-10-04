@@ -1,19 +1,23 @@
 package p2p
 
 import (
-	pb "github.com/ac0v/aspera/internal/api/protobuf-spec"
-	r "github.com/ac0v/aspera/pkg/registry"
-	"github.com/fatih/structs"
-	"github.com/golang/protobuf/jsonpb"
-	//	"go.uber.org/zap"
 	"bytes"
+	"errors"
 	"gopkg.in/resty.v1"
 	"log"
+	"net/http"
 	"runtime"
 	"strconv"
 	"strings"
 	"time"
+
+	pb "github.com/ac0v/aspera/internal/api/protobuf-spec"
+	r "github.com/ac0v/aspera/pkg/registry"
+	"github.com/fatih/structs"
+	"github.com/golang/protobuf/jsonpb"
 )
+
+const majority = 3
 
 type Client struct {
 	registry     *r.Registry
@@ -22,17 +26,25 @@ type Client struct {
 }
 
 func NewClient(registry *r.Registry) *Client {
-	// client := &Client{peerIterator: NewPeerIterator(registry.Config.Peers), registry: registry, unmarshaler: &jsonpb.Unmarshaler{AllowUnknownFields: false}}
-	client := &Client{peerIterator: NewPeerIterator(registry.Config.Peers), registry: registry, unmarshaler: &jsonpb.Unmarshaler{AllowUnknownFields: true}}
+	// TODO: timeout should be config option
+	resty.SetTimeout(2 * time.Second)
+
+	client := &Client{
+		peerIterator: NewPeerIterator(registry.Config.Peers),
+		registry:     registry,
+		unmarshaler:  &jsonpb.Unmarshaler{AllowUnknownFields: true},
+	}
 
 	for range registry.Config.Peers {
 		var s = new(pb.GetPeers)
 
-		res := client.request(client.peerIterator.Next(), "getPeers")
-		client.unmarshaler.Unmarshal(bytes.NewReader(res.Body()), s)
-
-		client.peerIterator.Add(s.Peers)
+		res, err := client.buildRequest("getPeers").Post(client.peerIterator.Next())
+		if err != nil {
+			client.unmarshaler.Unmarshal(bytes.NewReader(res.Body()), s)
+			client.peerIterator.Add(s.Peers)
+		}
 	}
+
 	return client
 }
 
@@ -46,7 +58,7 @@ func mergeMaps(maps ...map[string]interface{}) map[string]interface{} {
 	return result
 }
 
-func (client *Client) autoRequest(byMajority bool, params ...map[string]interface{}) *resty.Response {
+func (client *Client) autoRequest(byMajority bool, params ...map[string]interface{}) ([]byte, error) {
 	// we get the callers as uintptrs - but we just need 1
 	fpcs := make([]uintptr, 1)
 
@@ -64,49 +76,68 @@ func (client *Client) autoRequest(byMajority bool, params ...map[string]interfac
 	requestType = requestType[strings.LastIndex(requestType, ".")+1 : len(requestType)]
 	requestType = strings.Replace(requestType, requestType[0:1], strings.ToLower(requestType[0:1]), 1)
 
-	if byMajority {
-		seenCount := map[string]int8{}
-		seenData := map[string]*resty.Response{}
+	req := client.buildRequest(requestType, params...)
 
+	if !byMajority {
+		res, err := req.Post(client.peerIterator.Next())
+		if err != nil {
+			return nil, err
+		}
+		return res.Body(), nil
+	}
+
+	seenCounts := make(map[string]int)
+	bodies := make(chan string)
+	stop := make(chan struct{})
+
+	// sem will ensure that there are only majority + n parallel requests
+	// 2 is arbitrary
+	sem := make(chan struct{}, majority+2)
+	for i := 0; i < majority; i++ {
+		sem <- struct{}{}
+	}
+
+	go func() {
 		for {
-			res := client.request(client.peerIterator.Next(), requestType, params...)
-			seenCount[string(res.Body()[:])]++
-			seenData[string(res.Body()[:])] = res
-
-			var major string
-			majorCount := int8(0)
-
-			for value, count := range seenCount {
-				if count > majorCount && count > 2 {
-					major = value
-				}
+			select {
+			case <-stop:
+				return
+			case <-sem:
+				go func() {
+					res, err := req.Post(client.peerIterator.Next())
+					if err == nil && res.StatusCode() == http.StatusOK {
+						bodies <- string(res.Body())
+					}
+					sem <- struct{}{}
+				}()
 			}
-			if len(major) > 0 {
-				return seenData[major]
-			}
+		}
+	}()
+
+	for body := range bodies {
+		seenCount := seenCounts[body] + 1
+		seenCounts[body] = seenCount
+
+		if seenCount >= majority {
+			stop <- struct{}{}
+			return []byte(body), nil
 		}
 	}
 
-	return client.request(client.peerIterator.Next(), requestType, params...)
+	return nil, errors.New("unexpected error")
 }
 
-func (client *Client) request(peer string, requestType string, params ...map[string]interface{}) *resty.Response {
+func (client *Client) buildRequest(requestType string, params ...map[string]interface{}) *resty.Request {
 	param := map[string]interface{}{
 		"protocol":    "B1",
 		"requestType": requestType,
 	}
+
 	for _, m := range params {
 		param = mergeMaps(param, m)
 	}
 
-	//resty.SetDebug(true)
-	//resty.SetDebugBodyLimit(1)
-	resty.SetTimeout(1 * time.Second)
-
-	//client.registry.Logger.Info("requesting", zap.String("peer", peer))
-	res, _ := resty.R().SetBody(param).Post(peer)
-
-	return res
+	return resty.R().SetBody(param)
 }
 
 type Transaction struct {
@@ -120,13 +151,17 @@ func (client *Client) AddPeers(peers ...string) {
 	client.autoRequest(false, map[string]interface{}{"peers": peers})
 }
 func (client *Client) GetCumulativeDifficulty() (*pb.GetCumulativeDifficultyResponse, error) {
-	res := client.autoRequest(false)
+	body, err := client.autoRequest(false)
+	if err != nil {
+		return nil, err
+	}
+
 	var s = new(pb.GetCumulativeDifficultyResponse)
-	err := client.unmarshaler.Unmarshal(bytes.NewReader(res.Body()), s)
+	err = client.unmarshaler.Unmarshal(bytes.NewReader(body), s)
 	if err != nil {
 		log.Fatal(err)
 	}
-	//fmt.Printf("%v\n", s)
+
 	return s, err
 
 }
@@ -150,19 +185,25 @@ func (client *Client) GetMilestoneBlockIds(lastBlockId uint64, lastMilestoneBloc
 }
 
 func (client *Client) GetNextBlockIds(blockId uint64) (*pb.GetNextBlockIdsResponse, error) {
-	res := client.autoRequest(true, map[string]interface{}{"blockId": strconv.FormatUint(blockId, 10)})
+	body, err := client.autoRequest(true, map[string]interface{}{"blockId": strconv.FormatUint(blockId, 10)})
+	if err != nil {
+		return nil, err
+	}
 
 	var s = new(pb.GetNextBlockIdsResponse)
-	err := client.unmarshaler.Unmarshal(bytes.NewReader(res.Body()), s)
+	err = client.unmarshaler.Unmarshal(bytes.NewReader(body), s)
 
 	return s, err
 }
 
 func (client *Client) GetNextBlocks(blockId uint64) (*pb.GetNextBlocksResponse, error) {
-	res := client.autoRequest(false, map[string]interface{}{"blockId": strconv.FormatUint(blockId, 10)})
+	body, err := client.autoRequest(false, map[string]interface{}{"blockId": strconv.FormatUint(blockId, 10)})
+	if err != nil {
+		return nil, err
+	}
 
 	var s = new(pb.GetNextBlocksResponse)
-	err := client.unmarshaler.Unmarshal(bytes.NewReader(res.Body()), s)
+	err = client.unmarshaler.Unmarshal(bytes.NewReader(body), s)
 
 	return s, err
 }
