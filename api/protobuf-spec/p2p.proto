@@ -51,13 +51,13 @@ message Transaction {
   int32 confirmations = 5;
   string fullHash = 6;
   int32 version = 7;
-  int64 ecBlockId = 8;
+  uint64 ecBlockId = 8;
   string signatureHash = 9;
   // string attachment = 10; // ToDo
   string senderRS = 11;
   int32 subtype = 12;
   int64 amountNQT = 13;
-  int64 sender = 14;
+  uint64 sender = 14;
   int32 ecBlockHeight = 15;
   uint64 block = 16;
   int64 blockTimestamp = 17;
