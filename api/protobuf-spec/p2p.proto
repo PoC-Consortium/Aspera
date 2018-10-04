@@ -16,22 +16,31 @@ message GetNextBlocksResponse {
   //  [json_name="nextBlocksFoo"];
 }
 
+message GetNextBlockIdsResponse {
+  repeated uint64 nextBlockIds = 1;
+}
+
+message GetPeers {
+  repeated string peers = 1;
+}
+
 message Block {
   int64 payloadLength = 1;
   int64 totalAmountNQT = 2;
   string generationSignature = 3;
   string generatorPublicKey = 4;
   string payloadHash = 5;
-  string BlockSignature = 6;
-  repeated Transaction Transactions = 7;
-  int32 Version = 8;
-  string Nonce = 9;
-  int64 TotalFeeNQT = 10;
-// BlockATs = 11;
-  string PreviousBlock = 12;
-  int64 Timestamp = 13;
-  int64 Block = 14;
-  int32 Height = 15;
+  string blockSignature = 6;
+  repeated Transaction transactions = 7;
+  int32 version = 8;
+  string nonce = 9;
+  int64 totalFeeNQT = 10;
+  repeated string blockATs = 11; // ToDo
+  uint64 previousBlock = 12;
+  int64 timestamp = 13;
+  uint64 block = 14;
+  int32 height = 15;
+  string previousBlockHash = 16;
 }
 
 message Transaction {
@@ -42,18 +51,18 @@ message Transaction {
   int32 confirmations = 5;
   string fullHash = 6;
   int32 version = 7;
-  string ecBlockId = 8;
+  int64 ecBlockId = 8;
   string signatureHash = 9;
-  // attachment = 10;
+  // string attachment = 10; // ToDo
   string senderRS = 11;
   int32 subtype = 12;
   int64 amountNQT = 13;
   int64 sender = 14;
   int32 ecBlockHeight = 15;
-  int64 block = 16;
+  uint64 block = 16;
   int64 blockTimestamp = 17;
   int32 deadline = 18;
-  int64 transaction = 19;
+  uint64 transaction = 19;
   int64 timestamp = 20;
   int32 height = 21;
 }

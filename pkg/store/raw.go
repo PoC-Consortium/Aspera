@@ -71,7 +71,7 @@ func NewRawStore(registry *r.Registry) *RawStore {
 
 	if heightString == "0" {
 		block := &pb.Block{Block: 3444294670862540038}
-		rawStore.store(block, 0)
+		rawStore.Store(block, 0)
 	} else {
 		rawStore.Current.Block = rawStore.load(rawStore.Current.Height)
 	}
@@ -81,7 +81,7 @@ func NewRawStore(registry *r.Registry) *RawStore {
 }
 
 func (rawStore *RawStore) Push(block *pb.Block) {
-	rawStore.store(block, rawStore.Current.Height+1)
+	rawStore.Store(block, rawStore.Current.Height+1)
 }
 
 func (rawStore *RawStore) convertHeightToPathInfo(height int32) string {
@@ -93,7 +93,7 @@ func (rawStore *RawStore) convertHeightToPathInfo(height int32) string {
 	return filepath.Join(rawStore.BasePath, path+".bin")
 }
 
-func (rawStore *RawStore) store(block *pb.Block, height int32) {
+func (rawStore *RawStore) Store(block *pb.Block, height int32) {
 	path := rawStore.convertHeightToPathInfo(height)
 	if _, err := os.Stat(filepath.Dir(path)); os.IsNotExist(err) {
 		os.MkdirAll(filepath.Dir(path), os.ModePerm)
