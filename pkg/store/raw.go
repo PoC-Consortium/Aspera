@@ -4,14 +4,16 @@ import (
 	"fmt"
 	pb "github.com/ac0v/aspera/internal/api/protobuf-spec"
 	r "github.com/ac0v/aspera/pkg/registry"
+	"github.com/dixonwille/skywalker"
 	"github.com/golang/protobuf/proto"
 	"go.uber.org/zap"
 	"io/ioutil"
 	"os"
 	"path/filepath"
-	"regexp"
+	"sort"
 	"strconv"
 	"strings"
+	"sync"
 )
 
 type RawStore struct {
@@ -25,6 +27,17 @@ type RawCurrent struct {
 	Block  *pb.Block
 }
 
+type LookupWorker struct {
+	*sync.Mutex
+	found []string
+}
+
+func (lookupWorker *LookupWorker) Work(path string) {
+	lookupWorker.Lock()
+	defer lookupWorker.Unlock()
+	lookupWorker.found = append(lookupWorker.found, path)
+}
+
 func NewRawStore(registry *r.Registry) *RawStore {
 	var rawStore RawStore
 	rawStore.registry = registry
@@ -34,48 +47,39 @@ func NewRawStore(registry *r.Registry) *RawStore {
 		os.MkdirAll(rawStore.BasePath, os.ModePerm)
 	}
 
-	// get most recent block
-	heightString := "0"
-	numericRegexp := regexp.MustCompile("^[0-9]+")
+	lookupWorker := new(LookupWorker)
+	lookupWorker.Mutex = new(sync.Mutex)
 
-	currentPath := rawStore.BasePath
-	for {
-		items, err := ioutil.ReadDir(currentPath)
-		if err != nil {
-			rawStore.registry.Logger.Fatal("Fatal", zap.Error(err))
-		}
-		if len(items) == 0 {
-			break
-		}
-
-		currentItem := items[len(items)-1]
-		for _, item := range items {
-			if item.IsDir() {
-				currentItem = item
-			}
-		}
-
-		currentPath = filepath.Join(currentPath, currentItem.Name())
-		heightString += strings.Join(numericRegexp.FindAllString(currentItem.Name(), -1), "")
-		if !currentItem.IsDir() {
-			break
-		}
-	}
-
-	// update current; create genesis or load most recent block
-	height, err := strconv.ParseInt(heightString, 10, 32)
+	sw := skywalker.New(rawStore.BasePath, lookupWorker)
+	err := sw.Walk()
 	if err != nil {
 		rawStore.registry.Logger.Fatal("Fatal", zap.Error(err))
 	}
+	sort.Sort(sort.StringSlice(lookupWorker.found))
+
+	// update current; create genesis or load most recent block
+	height := int64(-1)
+	for _, f := range lookupWorker.found {
+		filePath := strings.Replace(f, sw.Root, "", 1)
+		currentHeight, err := strconv.ParseInt(strings.Replace(filePath, string(os.PathSeparator), "", 10)[0:10], 10, 32)
+		if err == nil && currentHeight == height+1 {
+			height++
+		} else {
+			// looks like we found some non- raw storage stuff / out of order blocks which
+			// could be the result of a interupted async blockchain sync
+			rawStore.registry.Logger.Info("removing orphaned file from raw storage", zap.String("path", filePath))
+			os.Remove(rawStore.BasePath + string(os.PathSeparator) + filePath)
+		}
+	}
 	rawStore.Current = &RawCurrent{Height: int32(height)}
 
-	if heightString == "0" {
+	if height == -1 {
 		block := &pb.Block{Block: 3444294670862540038}
 		rawStore.Store(block, 0)
 	} else {
 		rawStore.Current.Block = rawStore.load(rawStore.Current.Height)
 	}
-	rawStore.registry.Logger.Info("loaded Raw Storage", zap.Int("height", int(height)))
+	rawStore.registry.Logger.Info("loaded Raw Storage", zap.Int("height", int(rawStore.Current.Height)))
 
 	return &rawStore
 }

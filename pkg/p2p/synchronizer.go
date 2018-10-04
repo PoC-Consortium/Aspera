@@ -1,7 +1,6 @@
 package p2p
 
 import (
-	"fmt"
 	r "github.com/ac0v/aspera/pkg/registry"
 	s "github.com/ac0v/aspera/pkg/store"
 	"go.uber.org/zap"
@@ -56,7 +55,7 @@ func (synchronizer *Synchronizer) fetchBlockIds(fetchBlocksChannel chan *blockMe
 			takeIndex--
 		}
 
-		height += int32(takeIndex)
+		height += int32(takeIndex + 1)
 		previousBlockId = res.NextBlockIds[takeIndex]
 	}
 
@@ -64,27 +63,26 @@ func (synchronizer *Synchronizer) fetchBlockIds(fetchBlocksChannel chan *blockMe
 }
 
 func (synchronizer *Synchronizer) fetchBlocks(fetchBlocksChannel chan *blockMeta) {
-	// blockMeta := <-fetchBlocksChannel
-	// synchronizer.registry.Logger.Info("syncing blocks after", zap.Uint64("id", blockMeta.id), zap.Int("height", int(blockMeta.height)))
-
 	for blockMeta := range fetchBlocksChannel {
-		// for {
-		height := blockMeta.height
+		// try to get the block data - till we have them!
+		for {
+			height := blockMeta.height
 
-		res, err := synchronizer.client.GetNextBlocks(blockMeta.id)
-		// redo on exceptions; may another per has better data
-		if err != nil || len(res.NextBlocks) == 0 {
-			//synchronizer.registry.Logger.Info("err:", zap.Error(err))
-			continue
-		}
+			synchronizer.registry.Logger.Info("syncing block", zap.Uint64("id", blockMeta.id), zap.Int("height", int(blockMeta.height)))
+			res, err := synchronizer.client.GetNextBlocks(blockMeta.id)
+			// redo on exceptions; may another per has better data
+			if err != nil || len(res.NextBlocks) == 0 {
+				//synchronizer.registry.Logger.Info("err:", zap.Error(err))
+				continue
+			}
 
-		for _, block := range res.NextBlocks {
-			height++
-			fmt.Printf("%v", block.PreviousBlock)
-			synchronizer.registry.Logger.Info("syncing block", zap.Uint64("previousBlockId", block.PreviousBlock), zap.Int("height", int(height)))
-			synchronizer.store.RawStore.Store(block, height)
+			for _, block := range res.NextBlocks {
+				height++
+				//	synchronizer.registry.Logger.Info("syncing block", zap.Uint64("id", block.Block), zap.Uint64("previousBlockId", block.PreviousBlock), zap.Int("height", int(height)))
+				synchronizer.store.RawStore.Store(block, height)
+			}
+			break
 		}
-		// break
 	}
 	synchronizer.wg.Done()
 }
