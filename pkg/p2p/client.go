@@ -20,30 +20,25 @@ import (
 const majority = 3
 
 type Client struct {
-	registry     *r.Registry
-	peerIterator *peerIterator
-	unmarshaler  *jsonpb.Unmarshaler
+	registry    *r.Registry
+	peerManager PeerManager
+	unmarshaler *jsonpb.Unmarshaler
 }
 
 func NewClient(registry *r.Registry) *Client {
 	// TODO: timeout should be config option
 	resty.SetTimeout(2 * time.Second)
 
+	pm := NewPeerManager()
+
 	client := &Client{
-		peerIterator: NewPeerIterator(registry.Config.Peers),
-		registry:     registry,
-		unmarshaler:  &jsonpb.Unmarshaler{AllowUnknownFields: true},
+		registry:    registry,
+		unmarshaler: &jsonpb.Unmarshaler{AllowUnknownFields: true},
 	}
 
-	for range registry.Config.Peers {
-		var s = new(pb.GetPeers)
+	pm.InitPeers(client, registry.Config.Peers)
 
-		res, err := client.buildRequest("getPeers").Post(client.peerIterator.Next())
-		if err != nil {
-			client.unmarshaler.Unmarshal(bytes.NewReader(res.Body()), s)
-			client.peerIterator.Add(s.Peers)
-		}
-	}
+	client.peerManager = pm
 
 	return client
 }
@@ -79,7 +74,7 @@ func (client *Client) autoRequest(byMajority bool, params ...map[string]interfac
 	req := client.buildRequest(requestType, params...)
 
 	if !byMajority {
-		res, err := req.Post(client.peerIterator.Next())
+		res, err := req.Post(client.peerManager.RandomPeerURL())
 		if err != nil {
 			return nil, err
 		}
@@ -104,7 +99,7 @@ func (client *Client) autoRequest(byMajority bool, params ...map[string]interfac
 				return
 			case <-sem:
 				go func() {
-					res, err := req.Post(client.peerIterator.Next())
+					res, err := req.Post(client.peerManager.RandomPeerURL())
 					if err == nil && res.StatusCode() == http.StatusOK {
 						bodies <- string(res.Body())
 					}
