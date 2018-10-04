@@ -71,9 +71,8 @@ func (client *Client) autoRequest(byMajority bool, params ...map[string]interfac
 	requestType = requestType[strings.LastIndex(requestType, ".")+1 : len(requestType)]
 	requestType = strings.Replace(requestType, requestType[0:1], strings.ToLower(requestType[0:1]), 1)
 
-	req := client.buildRequest(requestType, params...)
-
 	if !byMajority {
+		req := client.buildRequest(requestType, params...)
 		res, err := req.Post(client.peerManager.RandomPeerURL())
 		if err != nil {
 			return nil, err
@@ -99,6 +98,7 @@ func (client *Client) autoRequest(byMajority bool, params ...map[string]interfac
 				return
 			case <-sem:
 				go func() {
+					req := client.buildRequest(requestType, params...)
 					res, err := req.Post(client.peerManager.RandomPeerURL())
 					if err == nil && res.StatusCode() == http.StatusOK {
 						bodies <- string(res.Body())
