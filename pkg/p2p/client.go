@@ -21,7 +21,7 @@ const majority = 3
 
 type Client struct {
 	registry    *r.Registry
-	peerManager PeerManager
+	manager     Manager
 	unmarshaler *jsonpb.Unmarshaler
 }
 
@@ -34,9 +34,9 @@ func NewClient(registry *r.Registry) *Client {
 		registry:    registry,
 		unmarshaler: &jsonpb.Unmarshaler{AllowUnknownFields: true},
 	}
-	pm := NewPeerManager(client, registry, time.Minute)
+	pm := NewManager(client, registry, time.Minute)
 
-	client.peerManager = pm
+	client.manager = pm
 
 	return client
 }
@@ -71,7 +71,7 @@ func (client *Client) autoRequest(byMajority bool, params ...map[string]interfac
 
 	if !byMajority {
 		req := client.buildRequest(requestType, params...)
-		res, err := req.Post(client.peerManager.RandomPeer().apiURL)
+		res, err := req.Post(client.manager.RandomPeer().apiURL)
 		if err != nil {
 			return nil, err
 		}
@@ -103,7 +103,7 @@ func (client *Client) autoRequest(byMajority bool, params ...map[string]interfac
 			case <-sem:
 				go func() {
 					req := client.buildRequest(requestType, params...)
-					peer := client.peerManager.RandomPeer()
+					peer := client.manager.RandomPeer()
 
 					peer.StartRequest()
 					res, err := req.Post(peer.apiURL)
@@ -130,7 +130,7 @@ func (client *Client) autoRequest(byMajority bool, params ...map[string]interfac
 	seens := make(map[string]*seen)
 	for peerResponse := range peerResponses {
 		if peerResponse.err != nil || peerResponse.statusCode != http.StatusOK {
-			client.peerManager.BlockPeer(peerResponse.of)
+			client.manager.BlockPeer(peerResponse.of)
 			continue
 		}
 
@@ -153,7 +153,7 @@ func (client *Client) autoRequest(byMajority bool, params ...map[string]interfac
 				for otherBody, seen := range seens {
 					if otherBody != peerResponse.body {
 						for p := range seen.peers {
-							client.peerManager.BlockPeer(p)
+							client.manager.BlockPeer(p)
 						}
 					}
 				}
