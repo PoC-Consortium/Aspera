@@ -2,8 +2,6 @@ package p2p
 
 import (
 	"bytes"
-	"net/url"
-	"regexp"
 	"sync"
 	"time"
 
@@ -11,80 +9,96 @@ import (
 	"github.com/lukechampine/randmap/safe"
 )
 
-var hasPortRegexp = regexp.MustCompile(":([1-9]|[1-8][0-9]|9[0-9]|[1-8][0-9]{2}|9[0-8][0-9]|99[0-9]|[1-8][0-9]{3}|9[0-8][0-9]{2}|99[0-8][0-9]|999[0-9]|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])$")
+var (
+	syncPeerCount = 10
+)
 
 type PeerManager interface {
-	RandomPeerURL() string
-	InitPeers(client *Client, initialPeers []string)
+	BlockPeer(p *Peer)
+	RandomPeer() *Peer
 }
 
 type peerManager struct {
-	peerURLs                map[string]struct{}
-	peerURLsMu              sync.RWMutex
+	allPeers   map[string]*Peer
+	allPeersMu sync.RWMutex
+
+	blockedPeers   map[string]*Peer
+	blockedPeersMu sync.Mutex
+
 	scanForNewPeersInterval time.Duration
+
+	blacklisted time.Time
 }
 
-func NewPeerManager(scanForNewPeersInterval time.Duration) PeerManager {
-	return &peerManager{
+func NewPeerManager(client *Client, peersBaseURLs []string, scanForNewPeersInterval time.Duration) PeerManager {
+	pm := &peerManager{
 		scanForNewPeersInterval: scanForNewPeersInterval,
-		peerURLs:                make(map[string]struct{}),
+		allPeers:                make(map[string]*Peer),
+		blockedPeers:            make(map[string]*Peer),
 	}
+
+	pm.initPeers(client, peersBaseURLs)
+
+	go pm.scanForNewPeers(client)
+
+	return pm
+}
+
+func (pm *peerManager) initPeers(client *Client, peerBaseURLs []string) {
+	for _, url := range peerBaseURLs {
+		peer, err := NewPeer(url)
+		if err != nil {
+			continue
+		}
+		pm.addPeersOf(client, peer)
+	}
+}
+
+func (pm *peerManager) addPeersOf(client *Client, peer *Peer) {
+	getPeersMsg := new(pb.GetPeers)
+	res, err := client.buildRequest("getPeers").Post(peer.apiURL)
+	if err != nil {
+		return
+	}
+
+	client.unmarshaler.Unmarshal(bytes.NewReader(res.Body()), getPeersMsg)
+
+	pm.allPeersMu.Lock()
+	pm.allPeers[peer.baseURL] = peer
+	for _, baseURL := range getPeersMsg.Peers {
+		p, err := NewPeer(baseURL)
+		if err != nil {
+			continue
+		}
+		pm.allPeers[baseURL] = p
+	}
+	pm.allPeersMu.Unlock()
+}
+
+func (pm *peerManager) RandomPeer() *Peer {
+	pm.allPeersMu.RLock()
+	p := randmap.Val(pm.allPeers).(*Peer)
+	pm.allPeersMu.RUnlock()
+	return p
+}
+
+func (pm *peerManager) BlockPeer(pToBlock *Peer) {
+	pm.blockedPeersMu.Lock()
+	_, blocked := pm.blockedPeers[pToBlock.baseURL]
+	if blocked {
+		pm.blockedPeersMu.Unlock()
+		return
+	}
+	pm.blockedPeers[pToBlock.baseURL] = pToBlock
+	pm.blockedPeersMu.Unlock()
+
+	pm.allPeersMu.Lock()
+	delete(pm.allPeers, pToBlock.baseURL)
+	pm.allPeersMu.Unlock()
 }
 
 func (pm *peerManager) scanForNewPeers(client *Client) {
 	for range time.NewTicker(pm.scanForNewPeersInterval).C {
-		pm.addPeersOf(client, pm.RandomPeerURL())
+		pm.addPeersOf(client, pm.RandomPeer())
 	}
-}
-
-func (pm *peerManager) addPeersOf(client *Client, peerURL string) {
-	getPeersMsg := new(pb.GetPeers)
-	if res, err := client.buildRequest("getPeers").Post(peerURL); err == nil {
-		client.unmarshaler.Unmarshal(bytes.NewReader(res.Body()), getPeersMsg)
-	}
-
-	pm.peerURLsMu.Lock()
-	pm.peerURLs[peerURL] = struct{}{}
-	for _, peer := range getPeersMsg.Peers {
-		u, err := peerToURL(peer)
-		if err != nil {
-			continue
-		}
-
-		pm.peerURLs[u] = struct{}{}
-	}
-	pm.peerURLsMu.Unlock()
-}
-
-func (pm *peerManager) InitPeers(client *Client, initialPeers []string) {
-	for _, peer := range initialPeers {
-		u, err := peerToURL(peer)
-		if err != nil {
-			continue
-		}
-
-		pm.addPeersOf(client, u)
-	}
-	go pm.scanForNewPeers(client)
-}
-
-func (pm *peerManager) RandomPeerURL() string {
-	pm.peerURLsMu.RLock()
-	u := randmap.Key(pm.peerURLs).(string)
-	pm.peerURLsMu.RUnlock()
-	return u
-}
-
-func peerToURL(peer string) (string, error) {
-	hasSchemaRegexp, _ := regexp.Compile("^[^:]+://")
-	if !hasSchemaRegexp.MatchString(peer) {
-		peer = "http://" + peer
-	}
-
-	if !hasPortRegexp.MatchString(peer) {
-		peer = peer + ":8123"
-	}
-	u, err := url.Parse(peer + "/burst")
-
-	return u.String(), err
 }

@@ -27,16 +27,14 @@ type Client struct {
 
 func NewClient(registry *r.Registry) *Client {
 	// TODO: timeout should be config option
-	resty.SetTimeout(2 * time.Second)
-
-	pm := NewPeerManager(time.Minute)
+	resty.SetTimeout(1 * time.Second)
 
 	client := &Client{
 		registry:    registry,
 		unmarshaler: &jsonpb.Unmarshaler{AllowUnknownFields: true},
 	}
 
-	pm.InitPeers(client, registry.Config.Peers)
+	pm := NewPeerManager(client, registry.Config.Peers, time.Minute)
 
 	client.peerManager = pm
 
@@ -73,15 +71,13 @@ func (client *Client) autoRequest(byMajority bool, params ...map[string]interfac
 
 	if !byMajority {
 		req := client.buildRequest(requestType, params...)
-		res, err := req.Post(client.peerManager.RandomPeerURL())
+		res, err := req.Post(client.peerManager.RandomPeer().apiURL)
 		if err != nil {
 			return nil, err
 		}
 		return res.Body(), nil
 	}
 
-	seenCounts := make(map[string]int)
-	bodies := make(chan string)
 	stop := make(chan struct{})
 
 	// sem will ensure that there are only majority + n parallel requests
@@ -91,6 +87,14 @@ func (client *Client) autoRequest(byMajority bool, params ...map[string]interfac
 		sem <- struct{}{}
 	}
 
+	type PeerResponse struct {
+		of         *Peer
+		err        error
+		statusCode int
+		body       string
+	}
+	peerResponses := make(chan *PeerResponse)
+
 	go func() {
 		for {
 			select {
@@ -99,24 +103,64 @@ func (client *Client) autoRequest(byMajority bool, params ...map[string]interfac
 			case <-sem:
 				go func() {
 					req := client.buildRequest(requestType, params...)
-					res, err := req.Post(client.peerManager.RandomPeerURL())
-					if err == nil && res.StatusCode() == http.StatusOK {
-						bodies <- string(res.Body())
+					peer := client.peerManager.RandomPeer()
+
+					peer.StartRequest()
+					res, err := req.Post(peer.apiURL)
+					peer.FinishRequest()
+
+					peerResponses <- &PeerResponse{
+						of:         peer,
+						body:       string(res.Body()),
+						err:        err,
+						statusCode: res.StatusCode(),
 					}
+
 					sem <- struct{}{}
 				}()
 			}
 		}
 	}()
 
-	for body := range bodies {
-		seenCount := seenCounts[body] + 1
-		seenCounts[body] = seenCount
+	type seen struct {
+		count int
+		peers map[*Peer]struct{}
+	}
 
-		if seenCount >= majority {
-			stop <- struct{}{}
-			return []byte(body), nil
+	seens := make(map[string]*seen)
+	for peerResponse := range peerResponses {
+		if peerResponse.err != nil || peerResponse.statusCode != http.StatusOK {
+			client.peerManager.BlockPeer(peerResponse.of)
+			continue
 		}
+
+		if _, knownResponse := seens[peerResponse.body]; !knownResponse {
+			seens[peerResponse.body] = &seen{
+				count: 1,
+				peers: map[*Peer]struct{}{peerResponse.of: struct{}{}},
+			}
+		} else {
+			seen := seens[peerResponse.body]
+			if _, processedPeer := seen.peers[peerResponse.of]; processedPeer {
+				continue
+			}
+
+			seen.count++
+			seen.peers[peerResponse.of] = struct{}{}
+
+			if seen.count >= majority {
+				stop <- struct{}{}
+				for otherBody, seen := range seens {
+					if otherBody != peerResponse.body {
+						for p := range seen.peers {
+							client.peerManager.BlockPeer(p)
+						}
+					}
+				}
+				return []byte(peerResponse.body), nil
+			}
+		}
+
 	}
 
 	return nil, errors.New("unexpected error")
@@ -142,9 +186,6 @@ type Transaction struct {
 
 // ToDo: transactions: theType byte, subtype byte, timestamp int, deadline uint16, senderPublicKey hex, amountNQT uint64, feeNQT uint64, referencedTransactionFullHash string, signature string, version byte, attachment object, recipient string, ecBlockHeight int, ecBlockId long) + attachment
 
-func (client *Client) AddPeers(peers ...string) {
-	client.autoRequest(false, map[string]interface{}{"peers": peers})
-}
 func (client *Client) GetCumulativeDifficulty() (*pb.GetCumulativeDifficultyResponse, error) {
 	body, err := client.autoRequest(false)
 	if err != nil {
