@@ -9,3 +9,5 @@ peers:
   - 0-100-pool.burst.cryptoguru.org
   - 100-0-pool.burst.cryptoguru.org
   - burst-a.bayernport.com
+internetProtocols:
+  - v4

@@ -7,8 +7,9 @@ import (
 )
 
 type Config struct {
-	StoragePath string   `yaml:"storagePath"`
-	Peers       []string `yaml:"peers"`
+	StoragePath       string   `yaml:"storagePath"`
+	Peers             []string `yaml:"peers"`
+	InternetProtocols []string `yaml:"internetProtocols"`
 }
 
 type Registry struct {
@@ -30,5 +31,17 @@ func Init() {
 	err = yaml.Unmarshal(raw, &Context.Config)
 	if err != nil {
 		logger.Fatal("unpacking config failed", zap.Error(err))
+	}
+
+	if len(Context.Config.InternetProtocols) > 2 {
+		logger.Fatal("invalid amount of internetProtocols")
+	} else if len(Context.Config.InternetProtocols) > 0 {
+		for _, protocol := range Context.Config.InternetProtocols {
+			if protocol != "v4" && protocol != "v6" {
+				logger.Fatal("invalid internetProtocol", zap.String("protocol", protocol))
+			}
+		}
+	} else {
+		Context.Config.InternetProtocols = []string{"v4", "v6"}
 	}
 }
