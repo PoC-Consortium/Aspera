@@ -29,6 +29,8 @@ type manager struct {
 	scanForNewPeersInterval time.Duration
 
 	blacklisted time.Time
+
+	registry *r.Registry
 }
 
 func NewManager(client *Client, registry *r.Registry, scanForNewPeersInterval time.Duration) Manager {
@@ -36,18 +38,19 @@ func NewManager(client *Client, registry *r.Registry, scanForNewPeersInterval ti
 		scanForNewPeersInterval: scanForNewPeersInterval,
 		allPeers:                make(map[string]*Peer),
 		blockedPeers:            make(map[string]*Peer),
+		registry:                registry,
 	}
 
-	m.initPeers(client, registry.Config.Peers)
+	m.initPeers(client, registry.Config.Network.P2P.Peers)
 
 	go m.scanForNewPeers(client)
 
 	return m
 }
 
-func (m *manager) initPeers(client *Client, peerBaseURLs []string) {
-	for _, url := range peerBaseURLs {
-		peer, err := NewPeer(url)
+func (m *manager) initPeers(client *Client, peerBaseUrls []string) {
+	for _, url := range peerBaseUrls {
+		peer, err := NewPeer(m.registry, url)
 		if err != nil {
 			continue
 		}
@@ -57,7 +60,7 @@ func (m *manager) initPeers(client *Client, peerBaseURLs []string) {
 
 func (m *manager) addPeersOf(client *Client, peer *Peer) {
 	getPeersMsg := new(pb.GetPeers)
-	res, err := client.buildRequest("getPeers").Post(peer.apiURL)
+	res, err := client.buildRequest("getPeers").Post(peer.apiUrl)
 	if err != nil {
 		return
 	}
@@ -65,13 +68,13 @@ func (m *manager) addPeersOf(client *Client, peer *Peer) {
 	client.unmarshaler.Unmarshal(bytes.NewReader(res.Body()), getPeersMsg)
 
 	m.allPeersMu.Lock()
-	m.allPeers[peer.baseURL] = peer
-	for _, baseURL := range getPeersMsg.Peers {
-		p, err := NewPeer(baseURL)
+	m.allPeers[peer.baseUrl] = peer
+	for _, baseUrl := range getPeersMsg.Peers {
+		p, err := NewPeer(m.registry, baseUrl)
 		if err != nil {
 			continue
 		}
-		m.allPeers[baseURL] = p
+		m.allPeers[baseUrl] = p
 	}
 	m.allPeersMu.Unlock()
 }
@@ -85,16 +88,16 @@ func (m *manager) RandomPeer() *Peer {
 
 func (m *manager) BlockPeer(pToBlock *Peer) {
 	m.blockedPeersMu.Lock()
-	_, blocked := m.blockedPeers[pToBlock.baseURL]
+	_, blocked := m.blockedPeers[pToBlock.baseUrl]
 	if blocked {
 		m.blockedPeersMu.Unlock()
 		return
 	}
-	m.blockedPeers[pToBlock.baseURL] = pToBlock
+	m.blockedPeers[pToBlock.baseUrl] = pToBlock
 	m.blockedPeersMu.Unlock()
 
 	m.allPeersMu.Lock()
-	delete(m.allPeers, pToBlock.baseURL)
+	delete(m.allPeers, pToBlock.baseUrl)
 	m.allPeersMu.Unlock()
 }
 

@@ -42,7 +42,7 @@ func NewRawStore(registry *r.Registry) *RawStore {
 	var rawStore RawStore
 	rawStore.registry = registry
 
-	rawStore.BasePath = filepath.Join(registry.Config.StoragePath, "raw")
+	rawStore.BasePath = filepath.Join(registry.Config.Storage.Path, "raw")
 	if _, err := os.Stat(rawStore.BasePath); os.IsNotExist(err) {
 		os.MkdirAll(rawStore.BasePath, os.ModePerm)
 	}

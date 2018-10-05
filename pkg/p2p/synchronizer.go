@@ -42,7 +42,7 @@ func (synchronizer *Synchronizer) fetchBlockIds(fetchBlocksChannel chan *blockMe
 	}
 	height := latestBlock.Height
 	for {
-		synchronizer.registry.Logger.Info("syncing block meta", zap.Uint64("id", previousBlockId), zap.Int("height", int(height)))
+		synchronizer.registry.Logger.Info("syncing block meta", zap.Uint64("id", previousBlockId), zap.Int("height", int(height)), zap.Int("pending", len(fetchBlocksChannel)))
 		fetchBlocksChannel <- &blockMeta{id: previousBlockId, height: height}
 
 		var res *pb.GetNextBlockIdsResponse

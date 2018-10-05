@@ -1,13 +1,29 @@
-storagePath: ./var
-peers:
-  - wallet.burst.cryptoguru.org
-  - 195.201.124.43
-  - 138.201.159.96
-  - 195.201.116.237
-  - 138.201.159.82
-  - 50-50-pool.burst.cryptoguru.org
-  - 0-100-pool.burst.cryptoguru.org
-  - 100-0-pool.burst.cryptoguru.org
-  - burst-a.bayernport.com
-internetProtocols:
-  - v4
+storage:
+  path: ./var
+network:
+  internetProtocols:
+    - v4
+  p2p:
+    peers:
+      - wallet.burst.cryptoguru.org
+      - 195.201.124.43
+      - 138.201.159.96
+      - 195.201.116.237
+      - 138.201.159.82
+      - 50-50-pool.burst.cryptoguru.org
+      - 0-100-pool.burst.cryptoguru.org
+      - 100-0-pool.burst.cryptoguru.org
+      - burst-a.bayernport.com      
+    milestones:
+      - 3444294670862540038
+      - 17169998969130562818
+      - 10851012679396814781
+      - 8868708821622932189
+      - 9278508053345228779
+      - 4947518625215221655
+      - 13789368535761104494
+      - 7396048386025791037
+      - 8038733917809622647
+      - 16219776992541504875
+      - 3013573467081493371
+

@@ -71,7 +71,7 @@ func (client *Client) autoRequest(byMajority bool, params ...map[string]interfac
 
 	if !byMajority {
 		req := client.buildRequest(requestType, params...)
-		res, err := req.Post(client.manager.RandomPeer().apiURL)
+		res, err := req.Post(client.manager.RandomPeer().apiUrl)
 		if err != nil {
 			return nil, err
 		}
@@ -106,7 +106,7 @@ func (client *Client) autoRequest(byMajority bool, params ...map[string]interfac
 					peer := client.manager.RandomPeer()
 
 					peer.StartRequest()
-					res, err := req.Post(peer.apiURL)
+					res, err := req.Post(peer.apiUrl)
 					peer.FinishRequest()
 
 					peerResponses <- &PeerResponse{
