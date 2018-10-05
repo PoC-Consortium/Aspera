@@ -6,6 +6,7 @@ import (
 	"time"
 
 	pb "github.com/ac0v/aspera/internal/api/protobuf-spec"
+	r "github.com/ac0v/aspera/pkg/registry"
 	"github.com/lukechampine/randmap/safe"
 )
 
@@ -30,14 +31,14 @@ type peerManager struct {
 	blacklisted time.Time
 }
 
-func NewPeerManager(client *Client, peersBaseURLs []string, scanForNewPeersInterval time.Duration) PeerManager {
+func NewPeerManager(client *Client, registry *r.Registry, scanForNewPeersInterval time.Duration) PeerManager {
 	pm := &peerManager{
 		scanForNewPeersInterval: scanForNewPeersInterval,
 		allPeers:                make(map[string]*Peer),
 		blockedPeers:            make(map[string]*Peer),
 	}
 
-	pm.initPeers(client, peersBaseURLs)
+	pm.initPeers(client, registry.Config.Peers)
 
 	go pm.scanForNewPeers(client)
 
