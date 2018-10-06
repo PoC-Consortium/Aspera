@@ -29,7 +29,7 @@ func NewSynchronizer(client *Client, store *s.Store, registry *r.Registry) *Sync
 
 	synchronizer.wg.Add(len(registry.Config.Network.P2P.Milestones) + 1)
 
-	// fetch block Ids after each milestone - in parallel 
+	// fetch block Ids after each milestone - in parallel
 	for milestoneIndex, milestone := range registry.Config.Network.P2P.Milestones {
 		var stopAt r.Milestone
 		if len(registry.Config.Network.P2P.Milestones) > milestoneIndex+1 {
@@ -63,8 +63,14 @@ func (synchronizer *Synchronizer) fetchBlockIds(fetchBlocksChannel chan *blockMe
 				synchronizer.registry.Logger.Error("getNextBlocks", zap.Error(err))
 				continue
 			} else if len(res.NextBlockIds) == 0 {
-				// wait before asking for fresh blocks - looks like there are no blocks atm around
-				time.Sleep(time.Second * 10)
+				if height < synchronizer.registry.Config.Network.P2P.Milestones[len(synchronizer.registry.Config.Network.P2P.Milestones)-1].Height {
+					// did not reach the height of the last milestone block
+					// - so it looks like a temporary network or peer issue
+					continue
+				} else {
+					// wait before asking for fresh blocks - looks like there are no blocks atm around
+					time.Sleep(time.Second * 10)
+				}
 			}
 
 			break
