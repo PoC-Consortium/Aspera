@@ -26,9 +26,9 @@ type Client struct {
 }
 
 func NewClient(registry *r.Registry) *Client {
-	// TODO: timeout should be config option
-	resty.SetTimeout(5 * time.Second)
-	// resty.SetDebug(true)
+	timeout, _ := time.ParseDuration(strconv.Itoa(registry.Config.Network.P2P.Timeout) + "s")
+	resty.SetTimeout(timeout)
+	resty.SetDebug(registry.Config.Network.P2P.Debug)
 
 	client := &Client{
 		registry:    registry,

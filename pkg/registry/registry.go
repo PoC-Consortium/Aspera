@@ -17,6 +17,8 @@ type Network struct {
 }
 
 type P2P struct {
+	Timeout    int         `yaml:"timeout"`
+	Debug      bool        `yaml:"debug"`
 	Peers      []string    `yaml:"peers"`
 	Milestones []Milestone `yaml:"milestones"`
 }
@@ -76,5 +78,9 @@ func Init() {
 			Context.Config.Network.P2P.Milestones...,
 		)
 		// ToDo: sort milestones by height !!
+	}
+
+	if Context.Config.Network.P2P.Timeout == 0 {
+		Context.Config.Network.P2P.Timeout = 5
 	}
 }
