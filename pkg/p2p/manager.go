@@ -10,12 +10,8 @@ import (
 	"github.com/lukechampine/randmap/safe"
 )
 
-var (
-	syncPeerCount = 10
-)
-
 type Manager interface {
-	BlockPeer(p *Peer)
+	BlockPeer(p *Peer, reason int)
 	RandomPeer() *Peer
 }
 
@@ -43,9 +39,45 @@ func NewManager(client *Client, registry *r.Registry, scanForNewPeersInterval ti
 
 	m.initPeers(client, registry.Config.Network.P2P.Peers)
 
-	go m.scanForNewPeers(client)
+	go m.jobs(client)
 
 	return m
+}
+
+func (m *manager) jobs(client *Client) {
+	unblockTicker := time.NewTicker(5 * time.Minute)
+	scanForPeersTicker := time.NewTicker(m.scanForNewPeersInterval)
+	for {
+		select {
+		case <-unblockTicker.C:
+			m.unblockPeers()
+		case <-scanForPeersTicker.C:
+			m.addPeersOf(client, m.RandomPeer())
+		}
+	}
+}
+
+func (m *manager) unblockPeers() {
+	var unblockedPeers []*Peer
+
+	m.blockedPeersMu.Lock()
+	for _, p := range m.blockedPeers {
+		unblocked := p.TryUnblock()
+		if unblocked {
+			unblockedPeers = append(unblockedPeers, p)
+		}
+	}
+	m.blockedPeersMu.Unlock()
+
+	if len(unblockedPeers) == 0 {
+		return
+	}
+
+	m.allPeersMu.Lock()
+	for _, p := range unblockedPeers {
+		m.allPeers[p.baseUrl] = p
+	}
+	m.allPeersMu.Unlock()
 }
 
 func (m *manager) initPeers(client *Client, peerBaseUrls []string) {
@@ -86,7 +118,9 @@ func (m *manager) RandomPeer() *Peer {
 	return p
 }
 
-func (m *manager) BlockPeer(pToBlock *Peer) {
+func (m *manager) BlockPeer(pToBlock *Peer, reason int) {
+	pToBlock.Block(reason)
+
 	m.blockedPeersMu.Lock()
 	_, blocked := m.blockedPeers[pToBlock.baseUrl]
 	if blocked {
@@ -99,10 +133,4 @@ func (m *manager) BlockPeer(pToBlock *Peer) {
 	m.allPeersMu.Lock()
 	delete(m.allPeers, pToBlock.baseUrl)
 	m.allPeersMu.Unlock()
-}
-
-func (m *manager) scanForNewPeers(client *Client) {
-	for range time.NewTicker(m.scanForNewPeersInterval).C {
-		m.addPeersOf(client, m.RandomPeer())
-	}
 }

@@ -130,7 +130,7 @@ func (client *Client) autoRequest(byMajority bool, params ...map[string]interfac
 	seens := make(map[string]*seen)
 	for peerResponse := range peerResponses {
 		if peerResponse.err != nil || peerResponse.statusCode != http.StatusOK {
-			client.manager.BlockPeer(peerResponse.of)
+			client.manager.BlockPeer(peerResponse.of, PeerTimeout)
 			continue
 		}
 
@@ -153,7 +153,7 @@ func (client *Client) autoRequest(byMajority bool, params ...map[string]interfac
 				for otherBody, seen := range seens {
 					if otherBody != peerResponse.body {
 						for p := range seen.peers {
-							client.manager.BlockPeer(p)
+							client.manager.BlockPeer(p, PeerDataIntegrity)
 						}
 					}
 				}

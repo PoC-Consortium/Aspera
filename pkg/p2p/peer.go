@@ -11,12 +11,27 @@ import (
 	"time"
 )
 
-var hasPortRegexp = regexp.MustCompile(":([1-9]|[1-8][0-9]|9[0-9]|[1-8][0-9]{2}|9[0-8][0-9]|99[0-9]|[1-8][0-9]{3}|9[0-8][0-9]{2}|99[0-8][0-9]|999[0-9]|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])$")
+const (
+	PeerTimeout       = 1
+	PeerDataIntegrity = 2
+)
+
+var (
+	hasPortRegexp = regexp.MustCompile(":([1-9]|[1-8][0-9]|9[0-9]|[1-8][0-9]{2}|9[0-8][0-9]|99[0-9]|[1-8][0-9]{3}|9[0-8][0-9]{2}|99[0-8][0-9]|999[0-9]|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])$")
+)
+
+type blacklisting struct {
+	when   time.Time
+	due    time.Time
+	reason int
+}
 
 type Peer struct {
 	baseUrl          string
 	apiUrl           string
 	startLastRequest time.Time
+
+	blacklisting *blacklisting
 
 	rtt              time.Duration
 	answeredRequests int
@@ -69,6 +84,48 @@ func (p *Peer) FinishRequest() {
 	p.answeredRequests++
 	p.rtt = time.Now().Sub(p.startLastRequest)
 	p.mu.Unlock()
+}
+
+func (p *Peer) Block(reason int) {
+	p.mu.Lock()
+	if p.blacklisting != nil {
+		p.mu.Unlock()
+		return
+	}
+
+	now := time.Now()
+	var due time.Time
+	switch reason {
+	case PeerTimeout:
+		due = now.Add(10 * time.Minute)
+	case PeerDataIntegrity:
+		due = now.Add(1 * time.Hour)
+	}
+
+	p.blacklisting = &blacklisting{
+		reason: reason,
+		when:   now,
+		due:    due,
+	}
+	p.mu.Unlock()
+}
+
+func (p *Peer) Unblock() {
+	p.mu.Lock()
+	p.blacklisting = nil
+	p.mu.Unlock()
+}
+
+func (p *Peer) TryUnblock() (unblocked bool) {
+	now := time.Now()
+	p.mu.Lock()
+	if p.blacklisting.due.After(now) {
+		p.blacklisting = nil
+		p.mu.Unlock()
+		return true
+	}
+	p.mu.Unlock()
+	return false
 }
 
 func peerToUrl(peer string) (*url.URL, error) {
