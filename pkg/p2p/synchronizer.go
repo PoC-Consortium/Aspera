@@ -16,54 +16,66 @@ type Synchronizer struct {
 	wg       *sync.WaitGroup
 }
 
+type blockRange struct {
+	from blockMeta
+	to   blockMeta
+	ids  []uint64
+}
+
 type blockMeta struct {
 	id     uint64
 	height int32
-	stopAt r.Milestone
 }
 
 func NewSynchronizer(client *Client, store *s.Store, registry *r.Registry) *Synchronizer {
 	synchronizer := &Synchronizer{client: client, registry: registry, store: store, wg: new(sync.WaitGroup)}
 
-	fetchBlocksChannel := make(chan *blockMeta)
-
-	synchronizer.wg.Add(len(registry.Config.Network.P2P.Milestones) + 1)
+	blockRanges := []blockRange{}
 
 	// fetch block Ids after each milestone - in parallel
 	for milestoneIndex, milestone := range registry.Config.Network.P2P.Milestones {
-		var stopAt r.Milestone
-		if len(registry.Config.Network.P2P.Milestones) > milestoneIndex+1 {
-			stopAt = registry.Config.Network.P2P.Milestones[milestoneIndex+1]
+		if store.RawStore.Current.Block.Height <= milestone.Height {
+			var toBlockMeta blockMeta
+			if len(registry.Config.Network.P2P.Milestones) > milestoneIndex+1 {
+				toBlockMeta = blockMeta{
+					id:     registry.Config.Network.P2P.Milestones[milestoneIndex+1].Id,
+					height: registry.Config.Network.P2P.Milestones[milestoneIndex+1].Height,
+				}
+			}
+			blockRanges = append(
+				blockRanges,
+				blockRange{
+					from: blockMeta{id: milestone.Id, height: milestone.Height},
+					to:   toBlockMeta,
+				},
+			)
 		}
-		go synchronizer.fetchBlockIds(fetchBlocksChannel, milestone, stopAt)
 	}
-	go synchronizer.fetchBlocks(fetchBlocksChannel)
+
+	fetchBlocksChannel := make(chan *blockRange)
+	synchronizer.wg.Add(len(blockRanges) * 2)
+	for _, blockRange := range blockRanges {
+		go synchronizer.fetchBlockIds(fetchBlocksChannel, blockRange)
+		//go synchronizer.fetchBlocks(fetchBlocksChannel)
+		go synchronizer.fetchBlocks(fetchBlocksChannel)
+	}
 	synchronizer.wg.Wait()
 
 	return synchronizer
 }
 
-func (synchronizer *Synchronizer) fetchBlockIds(fetchBlocksChannel chan *blockMeta, milestone r.Milestone, stopAt r.Milestone) {
-	previousBlockId := milestone.Id
-	height := milestone.Height
+func (synchronizer *Synchronizer) fetchBlockIds(fetchBlocksChannel chan *blockRange, blockRange blockRange) {
+	currentHeight := blockRange.from.height
 	for {
-		synchronizer.registry.Logger.Info("syncing block meta", zap.Uint64("id", previousBlockId), zap.Int("height", int(height)), zap.Int("pending", len(fetchBlocksChannel)))
-		fetchBlocksChannel <- &blockMeta{id: previousBlockId, height: height, stopAt: stopAt}
-
-		// if we got IDs after the next milestone - end this block ID fetcher
-		if &stopAt != nil && height > stopAt.Height {
-			break
-		}
-
 		var res *pb.GetNextBlockIdsResponse
 		for {
 			var err error
-			res, err = synchronizer.client.GetNextBlockIds(previousBlockId)
+			res, err = synchronizer.client.GetNextBlockIds(blockRange.from.id)
 			if err != nil {
-				synchronizer.registry.Logger.Error("getNextBlocks", zap.Error(err))
+				synchronizer.registry.Logger.Error("getNextBlockIds", zap.Error(err))
 				continue
 			} else if len(res.NextBlockIds) == 0 {
-				if height < synchronizer.registry.Config.Network.P2P.Milestones[len(synchronizer.registry.Config.Network.P2P.Milestones)-1].Height {
+				if currentHeight < synchronizer.registry.Config.Network.P2P.Milestones[len(synchronizer.registry.Config.Network.P2P.Milestones)-1].Height {
 					// did not reach the height of the last milestone block
 					// - so it looks like a temporary network or peer issue
 					continue
@@ -76,46 +88,63 @@ func (synchronizer *Synchronizer) fetchBlockIds(fetchBlocksChannel chan *blockMe
 			break
 		}
 
-		takeIndex := len(res.NextBlockIds) - 1
-		if height != milestone.Height {
-			// atm we do not know the blockId, but it's previous
-			// - so we ignore the double returned block
-			takeIndex--
+		if (blockRange.to.id == 0 && blockRange.to.height == 0) || ((currentHeight + int32(len(res.NextBlockIds))) < blockRange.to.height) {
+			blockRange.ids = res.NextBlockIds
+			fetchBlocksChannel <- &blockRange
+			currentHeight += int32(len(res.NextBlockIds))
+			blockRange.from.id = res.NextBlockIds[len(res.NextBlockIds)-1]
+			blockRange.from.height = currentHeight
+		} else if (currentHeight + int32(len(res.NextBlockIds))) >= blockRange.to.height {
+			// take only all elements before and the to-element itself
+			blockRange.ids = res.NextBlockIds[0 : 1+(int32(len(res.NextBlockIds))-blockRange.to.height-currentHeight)]
+			fetchBlocksChannel <- &blockRange
+			break
 		}
-
-		height += int32(takeIndex + 1)
-		previousBlockId = res.NextBlockIds[takeIndex]
 	}
 
 	synchronizer.wg.Done()
 }
 
-func (synchronizer *Synchronizer) fetchBlocks(fetchBlocksChannel chan *blockMeta) {
-	for blockMeta := range fetchBlocksChannel {
+func (synchronizer *Synchronizer) fetchBlocks(fetchBlocksChannel chan *blockRange) {
+	for blockRange := range fetchBlocksChannel {
+		currentHeight := blockRange.from.height
+		ids := blockRange.ids
+
 		// try to get the block data - till we have them!
 		for {
-			height := blockMeta.height
-
-			synchronizer.registry.Logger.Info("syncing block", zap.Uint64("id", blockMeta.id), zap.Int("height", int(blockMeta.height)))
-			res, err := synchronizer.client.GetNextBlocks(blockMeta.id)
-			// redo on exceptions; may another per has better data
+			res, err := synchronizer.client.GetNextBlocks(ids[0])
+			// redo on exceptions; may another peer has better data
 			if err != nil || len(res.NextBlocks) == 0 {
 				synchronizer.registry.Logger.Error("getNextBlocks", zap.Error(err))
 				continue
 			}
+			synchronizer.registry.Logger.Info("syncing block", zap.Uint64("id", ids[0]), zap.Int("height", int(currentHeight)))
 
-			for _, block := range res.NextBlocks {
-				height++
-				//	synchronizer.registry.Logger.Info("syncing block", zap.Uint64("id", block.Block), zap.Uint64("previousBlockId", block.PreviousBlock), zap.Int("height", int(height)))
-				synchronizer.store.RawStore.Store(block, height)
+			handledIds := ids[0:len(res.NextBlocks)]
 
-				// if there is a further milestone, we stop this processing
-				if &blockMeta.stopAt != nil && height >= blockMeta.stopAt.Height {
-					break
+			for idx, _ := range handledIds {
+				// ToDo: add BlockID calc here
+				// if calculatedBlockId of res.NextBlocks[idx] != id {
+				//         continue
+				// }
+				currentHeight++
+				// handled the requested range - return
+				if blockRange.to.height != 0 && blockRange.to.id != 0 && currentHeight > blockRange.to.height {
+					goto DONE
 				}
+				synchronizer.store.RawStore.Store(res.NextBlocks[idx], currentHeight)
 			}
+			// looks like we did not get data for all blocks we wanted to get
+			// this could happen to a response size limit in the old java wallet
+			if len(handledIds) != len(ids) {
+				ids = ids[len(res.NextBlocks)-1 : len(ids)]
+				continue
+			}
+
 			break
 		}
+	DONE:
 	}
+
 	synchronizer.wg.Done()
 }
