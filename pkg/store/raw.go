@@ -74,8 +74,8 @@ func NewRawStore(registry *r.Registry) *RawStore {
 	rawStore.Current = &RawCurrent{Height: int32(height)}
 
 	if height == -1 {
-		block := &pb.Block{Block: 3444294670862540038}
-		rawStore.Store(block, 0)
+		block := &pb.Block{Block: registry.Config.Network.P2P.Milestones[0].Id}
+		rawStore.Store(block, registry.Config.Network.P2P.Milestones[0].Height)
 	} else {
 		rawStore.Current.Block = rawStore.load(rawStore.Current.Height)
 	}

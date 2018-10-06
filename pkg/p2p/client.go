@@ -27,7 +27,7 @@ type Client struct {
 
 func NewClient(registry *r.Registry) *Client {
 	// TODO: timeout should be config option
-	resty.SetTimeout(2 * time.Second)
+	resty.SetTimeout(5 * time.Second)
 	// resty.SetDebug(true)
 
 	client := &Client{

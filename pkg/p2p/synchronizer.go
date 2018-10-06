@@ -19,6 +19,7 @@ type Synchronizer struct {
 type blockMeta struct {
 	id     uint64
 	height int32
+	stopAt r.Milestone
 }
 
 func NewSynchronizer(client *Client, store *s.Store, registry *r.Registry) *Synchronizer {
@@ -26,24 +27,33 @@ func NewSynchronizer(client *Client, store *s.Store, registry *r.Registry) *Sync
 
 	fetchBlocksChannel := make(chan *blockMeta)
 
-	synchronizer.wg.Add(2)
-	go synchronizer.fetchBlockIds(fetchBlocksChannel)
+	synchronizer.wg.Add(len(registry.Config.Network.P2P.Milestones) + 1)
+
+	// fetch block Ids after each milestone - in parallel 
+	for milestoneIndex, milestone := range registry.Config.Network.P2P.Milestones {
+		var stopAt r.Milestone
+		if len(registry.Config.Network.P2P.Milestones) > milestoneIndex+1 {
+			stopAt = registry.Config.Network.P2P.Milestones[milestoneIndex+1]
+		}
+		go synchronizer.fetchBlockIds(fetchBlocksChannel, milestone, stopAt)
+	}
 	go synchronizer.fetchBlocks(fetchBlocksChannel)
 	synchronizer.wg.Wait()
 
 	return synchronizer
 }
 
-func (synchronizer *Synchronizer) fetchBlockIds(fetchBlocksChannel chan *blockMeta) {
-	latestBlock := synchronizer.store.RawStore.Current.Block
-	previousBlockId := latestBlock.PreviousBlock
-	if latestBlock.Height == 0 {
-		previousBlockId = uint64(latestBlock.Block)
-	}
-	height := latestBlock.Height
+func (synchronizer *Synchronizer) fetchBlockIds(fetchBlocksChannel chan *blockMeta, milestone r.Milestone, stopAt r.Milestone) {
+	previousBlockId := milestone.Id
+	height := milestone.Height
 	for {
 		synchronizer.registry.Logger.Info("syncing block meta", zap.Uint64("id", previousBlockId), zap.Int("height", int(height)), zap.Int("pending", len(fetchBlocksChannel)))
-		fetchBlocksChannel <- &blockMeta{id: previousBlockId, height: height}
+		fetchBlocksChannel <- &blockMeta{id: previousBlockId, height: height, stopAt: stopAt}
+
+		// if we got IDs after the next milestone - end this block ID fetcher
+		if &stopAt != nil && height > stopAt.Height {
+			break
+		}
 
 		var res *pb.GetNextBlockIdsResponse
 		for {
@@ -61,7 +71,7 @@ func (synchronizer *Synchronizer) fetchBlockIds(fetchBlocksChannel chan *blockMe
 		}
 
 		takeIndex := len(res.NextBlockIds) - 1
-		if height != 0 {
+		if height != milestone.Height {
 			// atm we do not know the blockId, but it's previous
 			// - so we ignore the double returned block
 			takeIndex--
@@ -92,6 +102,11 @@ func (synchronizer *Synchronizer) fetchBlocks(fetchBlocksChannel chan *blockMeta
 				height++
 				//	synchronizer.registry.Logger.Info("syncing block", zap.Uint64("id", block.Block), zap.Uint64("previousBlockId", block.PreviousBlock), zap.Int("height", int(height)))
 				synchronizer.store.RawStore.Store(block, height)
+
+				// if there is a further milestone, we stop this processing
+				if &blockMeta.stopAt != nil && height >= blockMeta.stopAt.Height {
+					break
+				}
 			}
 			break
 		}

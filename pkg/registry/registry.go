@@ -17,8 +17,13 @@ type Network struct {
 }
 
 type P2P struct {
-	Peers      []string `yaml:"peers"`
-	Milestones []string `yaml:"milestones"`
+	Peers      []string    `yaml:"peers"`
+	Milestones []Milestone `yaml:"milestones"`
+}
+
+type Milestone struct {
+	Height int32  `yaml:"height"`
+	Id     uint64 `yaml:"id"`
 }
 
 type Storage struct {
@@ -56,5 +61,20 @@ func Init() {
 		}
 	} else {
 		Context.Config.Network.InternetProtocols = []string{"v4", "v6"}
+	}
+
+	// our genesis block should be always the first milestone
+	// - that's also important for our current raw storage implementation
+	if len(Context.Config.Network.P2P.Milestones) == 0 || Context.Config.Network.P2P.Milestones[0].Height != 0 {
+		Context.Config.Network.P2P.Milestones = append(
+			[]Milestone{
+				Milestone{
+					Height: 0,
+					Id:     3444294670862540038,
+				},
+			},
+			Context.Config.Network.P2P.Milestones...,
+		)
+		// ToDo: sort milestones by height !!
 	}
 }
