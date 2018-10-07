@@ -1,11 +1,9 @@
 package p2p
 
 import (
-	"bytes"
 	"sync"
 	"time"
 
-	pb "github.com/ac0v/aspera/internal/api/protobuf-spec"
 	r "github.com/ac0v/aspera/pkg/registry"
 	"github.com/lukechampine/randmap/safe"
 )
@@ -29,7 +27,7 @@ type manager struct {
 	registry *r.Registry
 }
 
-func NewManager(client *Client, registry *r.Registry, scanForNewPeersInterval time.Duration) Manager {
+func NewManager(c *client, registry *r.Registry, scanForNewPeersInterval time.Duration) Manager {
 	m := &manager{
 		scanForNewPeersInterval: scanForNewPeersInterval,
 		allPeers:                make(map[string]*Peer),
@@ -37,14 +35,14 @@ func NewManager(client *Client, registry *r.Registry, scanForNewPeersInterval ti
 		registry:                registry,
 	}
 
-	m.initPeers(client, registry.Config.Network.P2P.Peers)
+	m.initPeers(c, registry.Config.Network.P2P.Peers)
 
-	go m.jobs(client)
+	go m.jobs(c)
 
 	return m
 }
 
-func (m *manager) jobs(client *Client) {
+func (m *manager) jobs(c *client) {
 	unblockTicker := time.NewTicker(5 * time.Minute)
 	scanForPeersTicker := time.NewTicker(m.scanForNewPeersInterval)
 	for {
@@ -52,7 +50,7 @@ func (m *manager) jobs(client *Client) {
 		case <-unblockTicker.C:
 			m.unblockPeers()
 		case <-scanForPeersTicker.C:
-			m.addPeersOf(client, m.RandomPeer())
+			m.addPeersOf(c, m.RandomPeer())
 		}
 	}
 }
@@ -80,24 +78,21 @@ func (m *manager) unblockPeers() {
 	m.allPeersMu.Unlock()
 }
 
-func (m *manager) initPeers(client *Client, peerBaseUrls []string) {
+func (m *manager) initPeers(c *client, peerBaseUrls []string) {
 	for _, url := range peerBaseUrls {
 		peer, err := NewPeer(m.registry, url)
 		if err != nil {
 			continue
 		}
-		m.addPeersOf(client, peer)
+		m.addPeersOf(c, peer)
 	}
 }
 
-func (m *manager) addPeersOf(client *Client, peer *Peer) {
-	getPeersMsg := new(pb.GetPeers)
-	res, err := client.buildRequest("getPeers").Post(peer.apiUrl)
+func (m *manager) addPeersOf(c Client, peer *Peer) {
+	getPeersMsg, err := c.GetPeersOf(peer.apiUrl)
 	if err != nil {
 		return
 	}
-
-	client.unmarshaler.Unmarshal(bytes.NewReader(res.Body()), getPeersMsg)
 
 	m.allPeersMu.Lock()
 	m.allPeers[peer.baseUrl] = peer

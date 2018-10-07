@@ -3,120 +3,86 @@ package p2p
 import (
 	"bytes"
 	"errors"
-	"fmt"
 	"gopkg.in/resty.v1"
-	"log"
 	"net/http"
-	"runtime"
 	"strconv"
-	"strings"
 	"time"
 
 	pb "github.com/ac0v/aspera/internal/api/protobuf-spec"
 	r "github.com/ac0v/aspera/pkg/registry"
-	// "github.com/fatih/structs"
 	"github.com/golang/protobuf/jsonpb"
 )
 
-const majority = 3
+const (
+	majority    = 3
+	parallelism = 5
+)
 
-type Client struct {
+type Client interface {
+	GetNextBlockIDs(blockID uint64) (*pb.GetNextBlockIdsResponse, []*Peer, error)
+	GetNextBlocks(blockID uint64) (*pb.GetNextBlocksResponse, []*Peer, error)
+	GetPeersOf(apiUrl string) (*pb.GetPeers, error)
+}
+
+type client struct {
 	registry    *r.Registry
 	manager     Manager
 	unmarshaler *jsonpb.Unmarshaler
 }
 
-func NewClient(registry *r.Registry) *Client {
+func NewClient(registry *r.Registry) Client {
 	timeout, _ := time.ParseDuration(strconv.Itoa(registry.Config.Network.P2P.Timeout) + "s")
 	resty.SetTimeout(timeout)
 	resty.SetDebug(registry.Config.Network.P2P.Debug)
 
-	client := &Client{
+	c := &client{
 		registry:    registry,
 		unmarshaler: &jsonpb.Unmarshaler{AllowUnknownFields: true},
 	}
-	pm := NewManager(client, registry, time.Minute)
+	pm := NewManager(c, registry, time.Minute)
 
-	client.manager = pm
+	c.manager = pm
 
-	return client
+	return c
 }
 
-func mergeMaps(maps ...map[string]interface{}) map[string]interface{} {
-	result := make(map[string]interface{})
-	for _, m := range maps {
-		for k, v := range m {
-			result[k] = v
-		}
-	}
-	return result
+func (c *client) request(req *resty.Request) (*resty.Response, *Peer, error) {
+	peer := c.manager.RandomPeer()
+	res, err := req.Post(peer.apiUrl)
+	return res, peer, err
 }
 
-func (client *Client) autoRequest(byMajority bool, params ...map[string]interface{}) ([]byte, []*Peer, error) {
-	// we get the callers as uintptrs - but we just need 1
-	fpcs := make([]uintptr, 1)
+func (c *client) requestByMajority(requestType string, params map[string]interface{}) ([]byte, []*Peer, error) {
+	foundMajority := make(chan struct{})
 
-	n := runtime.Callers(2, fpcs)
-	if n == 0 {
-		log.Fatal("can't figure out who called me")
-	}
-
-	// get the info of the actual function that's in the pointer
-	fun := runtime.FuncForPC(fpcs[0] - 1)
-	if fun == nil {
-		log.Fatal("can't figure out who called me")
-	}
-	requestType := fun.Name()
-	requestType = requestType[strings.LastIndex(requestType, ".")+1 : len(requestType)]
-	requestType = strings.Replace(requestType, requestType[0:1], strings.ToLower(requestType[0:1]), 1)
-
-	if !byMajority {
-		req := client.buildRequest(requestType, params...)
-		peer := client.manager.RandomPeer()
-		fmt.Println("peer", peer.apiUrl, params)
-		res, err := req.Post(peer.apiUrl)
-		if err != nil {
-			return nil, nil, err
-		}
-		return res.Body(), []*Peer{peer}, nil
-	}
-
-	stop := make(chan struct{})
-
-	// sem will ensure that there are only majority + n parallel requests
-	// 2 is arbitrary
-	sem := make(chan struct{}, majority+2)
-	for i := 0; i < majority; i++ {
+	sem := make(chan struct{}, parallelism)
+	for i := 0; i < parallelism; i++ {
 		sem <- struct{}{}
 	}
 
-	type PeerResponse struct {
-		of         *Peer
-		err        error
-		statusCode int
-		body       string
+	type peerResponse struct {
+		of   *Peer
+		body string
 	}
-	peerResponses := make(chan *PeerResponse)
+	peerResponses := make(chan *peerResponse)
 
 	go func() {
 		for {
 			select {
-			case <-stop:
+			case <-foundMajority:
 				return
 			case <-sem:
 				go func() {
-					req := client.buildRequest(requestType, params...)
-					peer := client.manager.RandomPeer()
+					peer := c.manager.RandomPeer()
+					res, err := c.buildRequest(requestType, params).Post(peer.apiUrl)
 
-					peer.StartRequest()
-					res, err := req.Post(peer.apiUrl)
-					peer.FinishRequest()
-
-					peerResponses <- &PeerResponse{
-						of:         peer,
-						body:       string(res.Body()),
-						err:        err,
-						statusCode: res.StatusCode(),
+					if err != nil || res == nil || res.StatusCode() != http.StatusOK {
+						c.manager.BlockPeer(peer, PeerTimeout)
+					} else {
+						peerResponses <- &peerResponse{
+							of:   peer,
+							body: res.String(),
+						}
 					}
 
 					sem <- struct{}{}
@@ -125,46 +91,32 @@ func (client *Client) autoRequest(byMajority bool, params ...map[string]interfac
 		}
 	}()
 
-	type seen struct {
-		count int
-		peers map[*Peer]struct{}
-	}
-
-	seens := make(map[string]*seen)
+	seenBy := make(map[string]map[*Peer]struct{})
 	for peerResponse := range peerResponses {
-		if peerResponse.err != nil || peerResponse.statusCode != http.StatusOK {
-			client.manager.BlockPeer(peerResponse.of, PeerTimeout)
-			continue
-		}
-
-		if _, knownResponse := seens[peerResponse.body]; !knownResponse {
-			seens[peerResponse.body] = &seen{
-				count: 1,
-				peers: map[*Peer]struct{}{peerResponse.of: struct{}{}},
-			}
+		peers := seenBy[peerResponse.body]
+		if peers == nil {
+			seenBy[peerResponse.body] = map[*Peer]struct{}{peerResponse.of: struct{}{}}
 		} else {
-			seen := seens[peerResponse.body]
-			if _, processedPeer := seen.peers[peerResponse.of]; processedPeer {
+			if _, processedPeer := peers[peerResponse.of]; processedPeer {
 				continue
 			}
 
-			seen.count++
-			seen.peers[peerResponse.of] = struct{}{}
+			peers[peerResponse.of] = struct{}{}
 
-			if seen.count >= majority {
-				stop <- struct{}{}
-				for otherBody, seen := range seens {
+			if len(peers) >= majority {
+				foundMajority <- struct{}{}
+				for otherBody, peers := range seenBy {
 					if otherBody != peerResponse.body {
-						for p := range seen.peers {
-							client.manager.BlockPeer(p, PeerDataIntegrity)
+						for p := range peers {
+							c.manager.BlockPeer(p, PeerDataIntegrity)
 						}
 					}
 				}
-				var peers []*Peer
-				for peer := range seen.peers {
-					peers = append(peers, peer)
+				var peersSlice []*Peer
+				for p := range peers {
+					peersSlice = append(peersSlice, p)
 				}
-				return []byte(peerResponse.body), peers, nil
+				return []byte(peerResponse.body), peersSlice, nil
 			}
 		}
 
@@ -173,63 +125,20 @@ func (client *Client) autoRequest(byMajority bool, params ...map[string]interfac
 	return nil, nil, errors.New("unexpected error")
 }
 
-func (client *Client) buildRequest(requestType string, params ...map[string]interface{}) *resty.Request {
-	param := map[string]interface{}{
-		"protocol":    "B1",
-		"requestType": requestType,
+func (c *client) buildRequest(requestType string, params map[string]interface{}) *resty.Request {
+	paramsCopy := make(map[string]interface{}, len(params))
+	for k, v := range params {
+		paramsCopy[k] = v
 	}
 
-	for _, m := range params {
-		param = mergeMaps(param, m)
-	}
+	paramsCopy["protocol"] = "B1"
+	paramsCopy["requestType"] = requestType
 
-	return resty.R().SetBody(param)
+	return resty.R().SetBody(paramsCopy)
 }
 
-type Transaction struct {
-	Type    byte `json:"type"`
-	Subtype byte `json:"subtype"`
-}
-
-// ToDo: transactions: theType byte, subtype byte, timestamp int, deadline uint16, senderPublicKey hex, amountNQT uint64, feeNQT uint64, referencedTransactionFullHash string, signature string, version byte, attachment object, recipient string, ecBlockHeight int, ecBlockId long) + attachment
-
-// func (client *Client) GetCumulativeDifficulty() (*pb.GetCumulativeDifficultyResponse, error) {
-// 	body, err := client.autoRequest(false)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-
-// 	var s = new(pb.GetCumulativeDifficultyResponse)
-// 	err = client.unmarshaler.Unmarshal(bytes.NewReader(body), s)
-// 	if err != nil {
-// 		log.Fatal(err)
-// 	}
-
-// 	return s, err
-
-// }
-// func (client *Client) GetInfo(announcedAddress string, application string, version string, platform string, shareAddress string) {
-// 	client.autoRequest(
-// 		false,
-// 		map[string]interface{}{
-// 			"announcedAddress": announcedAddress,
-// 			"application":      application,
-// 			"version":          version,
-// 			"platform":         platform,
-// 			"shareAddress":     shareAddress,
-// 		},
-// 	)
-// }
-
-// func (client *Client) GetMilestoneBlockIds(lastBlockId uint64, lastMilestoneBlockId uint64) {
-// 	client.autoRequest(false, map[string]interface{}{
-// 		"lastBlockId":          strconv.FormatUint(lastBlockId, 10),
-// 		"lastMilestoneBlockId": strconv.FormatUint(lastMilestoneBlockId, 10),
-// 	})
-// }
-
-func (client *Client) GetNextBlockIds(blockId uint64) (*pb.GetNextBlockIdsResponse, []*Peer, error) {
-	body, peers, err := client.autoRequest(true, map[string]interface{}{
+func (c *client) GetNextBlockIDs(blockId uint64) (*pb.GetNextBlockIdsResponse, []*Peer, error) {
+	body, peers, err := c.requestByMajority("getNextBlockIds", map[string]interface{}{
 		"blockId": strconv.FormatUint(blockId, 10),
 	})
 	if err != nil {
@@ -237,32 +146,29 @@ func (client *Client) GetNextBlockIds(blockId uint64) (*pb.GetNextBlockIdsRespon
 	}
 
 	var msg = new(pb.GetNextBlockIdsResponse)
-	return msg, peers, client.unmarshaler.Unmarshal(bytes.NewReader(body), msg)
+	err = c.unmarshaler.Unmarshal(bytes.NewReader(body), msg)
+	return msg, peers, err
 }
 
-func (client *Client) GetNextBlocks(blockId uint64) (*pb.GetNextBlocksResponse, []*Peer, error) {
-	body, peers, err := client.autoRequest(false, map[string]interface{}{
+func (c *client) GetNextBlocks(blockId uint64) (*pb.GetNextBlocksResponse, []*Peer, error) {
+	req := c.buildRequest("getNextBlocks", map[string]interface{}{
 		"blockId": strconv.FormatUint(blockId, 10),
 	})
+	res, peers, err := c.request(req)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	var s = new(pb.GetNextBlocksResponse)
-	err = client.unmarshaler.Unmarshal(bytes.NewReader(body), s)
-
-	return s, peers, err
+	var msg = new(pb.GetNextBlocksResponse)
+	return msg, []*Peer{peers}, c.unmarshaler.Unmarshal(bytes.NewReader(res.Body()), msg)
 }
 
-// func (client *Client) GetPeers()                   { client.autoRequest(false) }
-// func (client *Client) GetUnconfirmedTransactions() { client.autoRequest(false) }
-// func (client *Client) ProcessBlock()               { client.autoRequest(false) }
-// func (client *Client) ProcessTransactions(transactions ...*Transaction) {
-// 	client.autoRequest(false, structs.Map(transactions[0]))
-// }
-// func (client *Client) GetAccountBalance(accountId uint64) {
-// 	client.autoRequest(false, map[string]interface{}{"account": strconv.FormatUint(accountId, 10)})
-// }
-// func (client *Client) GetAccountRecentTransactions(accountId uint64) {
-// 	client.autoRequest(false, map[string]interface{}{"account": strconv.FormatUint(accountId, 10)})
-// }
+func (c *client) GetPeersOf(apiUrl string) (*pb.GetPeers, error) {
+	res, err := c.buildRequest("getPeers", map[string]interface{}{}).Post(apiUrl)
+	if err != nil {
+		return nil, err
+	}
+
+	msg := new(pb.GetPeers)
+	return msg, c.unmarshaler.Unmarshal(bytes.NewReader(res.Body()), msg)
+}

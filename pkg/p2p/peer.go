@@ -33,9 +33,7 @@ type Peer struct {
 
 	blacklisting *blacklisting
 
-	rtt              time.Duration
-	answeredRequests int
-	mu               sync.Mutex
+	mu sync.Mutex
 }
 
 func NewPeer(registry *r.Registry, baseUrl string) (*Peer, error) {
@@ -71,19 +69,6 @@ func NewPeer(registry *r.Registry, baseUrl string) (*Peer, error) {
 	}
 
 	return nil, errors.New("internet protocol of remote peer " + apiUrl.Hostname() + " not supported by config")
-}
-
-func (p *Peer) StartRequest() {
-	p.mu.Lock()
-	p.startLastRequest = time.Now()
-	p.mu.Unlock()
-}
-
-func (p *Peer) FinishRequest() {
-	p.mu.Lock()
-	p.answeredRequests++
-	p.rtt = time.Now().Sub(p.startLastRequest)
-	p.mu.Unlock()
 }
 
 func (p *Peer) Block(reason int) {

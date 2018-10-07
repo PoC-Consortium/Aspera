@@ -12,7 +12,7 @@ import (
 type Synchronizer struct {
 	registry *r.Registry
 	store    *s.Store
-	client   *Client
+	client   Client
 
 	blockRanges        chan *blockRange
 	blockBatchesEmpty  chan *blockBatch
@@ -37,7 +37,7 @@ type blockBatch struct {
 	blocks []*pb.Block
 }
 
-func NewSynchronizer(client *Client, store *s.Store, registry *r.Registry) *Synchronizer {
+func NewSynchronizer(client Client, store *s.Store, registry *r.Registry) *Synchronizer {
 	milestones := registry.Config.Network.P2P.Milestones
 
 	s := &Synchronizer{
@@ -49,8 +49,11 @@ func NewSynchronizer(client *Client, store *s.Store, registry *r.Registry) *Sync
 		blockBatchesFilled: make(chan *blockBatch),
 	}
 
-	go s.fetchBlockIds()
-	for i := 0; i < 4; i++ {
+	for i := 0; i < 8; i++ {
+		go s.fetchBlockIds()
+	}
+
+	for i := 0; i < 8; i++ {
 		go s.fetchBlocks()
 	}
 
@@ -96,9 +99,9 @@ func (s *Synchronizer) fetchBlockIds() {
 		currentID := blockRange.from.id
 
 		for currentHeight <= blockRange.to.height {
-			res, peers, err := s.client.GetNextBlockIds(currentID)
+			res, peers, err := s.client.GetNextBlockIDs(currentID)
 			if err != nil {
-				s.registry.Logger.Error("get next blocks", zap.Error(err))
+				s.registry.Logger.Error("get next blocks ids", zap.Error(err))
 				continue
 			}
 
