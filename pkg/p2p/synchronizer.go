@@ -21,7 +21,7 @@ type Synchronizer struct {
 
 type blockRange struct {
 	from blockMeta
-	to   blockMeta
+	to   *blockMeta
 }
 
 type blockMeta struct {
@@ -58,9 +58,9 @@ func NewSynchronizer(client Client, store *s.Store, registry *r.Registry) *Synch
 			continue
 		}
 
-		var toBlockMeta blockMeta
+		var toBlockMeta *blockMeta
 		if len(milestones) > i+1 {
-			toBlockMeta = blockMeta{
+			toBlockMeta = &blockMeta{
 				id:     milestones[i+1].Id,
 				height: milestones[i+1].Height,
 			}
@@ -143,7 +143,7 @@ func (s *Synchronizer) fetchBlocks() {
 			from.id = blockBatch.ids[validBlocks-1]
 			blockBatch.blocks = blockBatch.blocks[:validBlocks]
 
-			if from.height <= to.height {
+			if to == nil || from.height <= to.height {
 				s.blockRanges <- &blockRange{
 					from: from,
 					to:   to,
