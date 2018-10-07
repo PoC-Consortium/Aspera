@@ -20,8 +20,8 @@ type Synchronizer struct {
 }
 
 type blockRange struct {
-	from *blockMeta
-	to   *blockMeta
+	from blockMeta
+	to   blockMeta
 }
 
 type blockMeta struct {
@@ -30,7 +30,7 @@ type blockMeta struct {
 }
 
 type blockBatch struct {
-	requestedID uint64
+	blockRange *blockRange
 
 	peers  []*Peer
 	ids    []uint64
@@ -45,15 +45,11 @@ func NewSynchronizer(client Client, store *s.Store, registry *r.Registry) *Synch
 		registry:           registry,
 		store:              store,
 		blockRanges:        make(chan *blockRange, len(milestones)),
-		blockBatchesEmpty:  make(chan *blockBatch),
+		blockBatchesEmpty:  make(chan *blockBatch, len(milestones)),
 		blockBatchesFilled: make(chan *blockBatch),
 	}
 
-	for i := 0; i < 8; i++ {
-		go s.fetchBlockIds()
-	}
-
-	for i := 0; i < 8; i++ {
+	for i := 0; i < 20; i++ {
 		go s.fetchBlocks()
 	}
 
@@ -62,16 +58,16 @@ func NewSynchronizer(client Client, store *s.Store, registry *r.Registry) *Synch
 			continue
 		}
 
-		var toBlockMeta *blockMeta
+		var toBlockMeta blockMeta
 		if len(milestones) > i+1 {
-			toBlockMeta = &blockMeta{
+			toBlockMeta = blockMeta{
 				id:     milestones[i+1].Id,
 				height: milestones[i+1].Height,
 			}
 		}
 
 		s.blockRanges <- &blockRange{
-			from: &blockMeta{
+			from: blockMeta{
 				id:     milestone.Id,
 				height: milestone.Height,
 			},
@@ -93,12 +89,12 @@ func NewSynchronizer(client Client, store *s.Store, registry *r.Registry) *Synch
 	return s
 }
 
-func (s *Synchronizer) fetchBlockIds() {
-	for blockRange := range s.blockRanges {
-		currentHeight := blockRange.from.height
-		currentID := blockRange.from.id
+func (s *Synchronizer) fetchBlocks() {
+	for {
+		select {
+		case blockRange := <-s.blockRanges:
+			currentID := blockRange.from.id
 
-		for currentHeight <= blockRange.to.height {
 			res, peers, err := s.client.GetNextBlockIDs(currentID)
 			if err != nil {
 				s.registry.Logger.Error("get next blocks ids", zap.Error(err))
@@ -109,59 +105,78 @@ func (s *Synchronizer) fetchBlockIds() {
 
 			idCount := len(ids)
 			if idCount == 0 {
+				time.Sleep(10 * time.Second)
+				s.blockRanges <- blockRange
 				continue
 			}
 
 			s.registry.Logger.Info("syncing block", zap.Uint64("id", currentID))
 
-			currentHeight += int32(idCount)
-			currentID = ids[idCount-1]
-
 			s.blockBatchesEmpty <- &blockBatch{
-				requestedID: currentID,
-				ids:         ids,
-				peers:       peers,
+				blockRange: blockRange,
+				ids:        ids,
+				peers:      peers,
 			}
+		case blockBatch := <-s.blockBatchesEmpty:
+			currentID := blockBatch.ids[0]
+
+		FETCH_BLOCKS_AGAIN:
+			res, peers, err := s.client.GetNextBlocks(currentID)
+			if err != nil {
+				s.registry.Logger.Error("get next blocks", zap.Error(err))
+				goto FETCH_BLOCKS_AGAIN
+			}
+
+			blockBatch.blocks = res.NextBlocks
+
+			validBlocks := countValidBlocks(blockBatch)
+
+			if validBlocks == 0 {
+				s.blockRanges <- blockBatch.blockRange
+				continue
+			}
+
+			from := blockBatch.blockRange.from
+			to := blockBatch.blockRange.to
+
+			from.height += int32(validBlocks)
+			from.id = blockBatch.ids[validBlocks-1]
+			blockBatch.blocks = blockBatch.blocks[:validBlocks]
+
+			if from.height <= to.height {
+				s.blockRanges <- &blockRange{
+					from: from,
+					to:   to,
+				}
+			}
+
+			blockBatch.peers = append(blockBatch.peers, peers...)
+
+			s.blockBatchesFilled <- blockBatch
 		}
 	}
 }
 
-func (s *Synchronizer) fetchBlocks() {
-	for blockBatch := range s.blockBatchesEmpty {
-		currentID := blockBatch.ids[0]
-
-	FETCH_BLOCKS_AGAIN:
-		res, peers, err := s.client.GetNextBlocks(currentID)
-		if err != nil {
-			s.registry.Logger.Error("get next blocks", zap.Error(err))
-			goto FETCH_BLOCKS_AGAIN
-		}
-
-		blockBatch.blocks = res.NextBlocks
-
-		if !idsMatchBlocks(blockBatch) {
-			goto FETCH_BLOCKS_AGAIN
-		}
-
-		blockBatch.peers = append(blockBatch.peers, peers...)
-
-		s.blockBatchesFilled <- blockBatch
-	}
-}
-
-func idsMatchBlocks(blockBatch *blockBatch) (valid bool) {
+func countValidBlocks(blockBatch *blockBatch) int {
 	ids := blockBatch.ids
 	blocks := blockBatch.blocks
 
-	if len(ids) != len(blocks) {
-		return false
+	idCount := len(ids)
+	blockCount := len(blocks)
+
+	var iEnd int
+	if idCount < blockCount {
+		iEnd = idCount
+	} else {
+		iEnd = blockCount
 	}
 
-	for i := 0; i < len(blocks); i++ {
-		if blocks[i].PreviousBlock != ids[i] {
-			return false
+	var validBlocks int
+	for ; validBlocks < iEnd; validBlocks++ {
+		if blocks[validBlocks].PreviousBlock != ids[validBlocks] {
+			return validBlocks
 		}
 	}
 
-	return true
+	return validBlocks
 }
