@@ -143,6 +143,7 @@ func (s *Synchronizer) fetchBlocks() {
 			from.id = blockBatch.ids[validBlocks-1]
 			blockBatch.blocks = blockBatch.blocks[:validBlocks]
 
+			// TODO: kill some sync threads when we reached end of a block range?
 			if to == nil || from.height <= to.height {
 				s.blockRanges <- &blockRange{
 					from: from,
