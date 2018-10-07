@@ -3,6 +3,7 @@ package p2p
 import (
 	"bytes"
 	"errors"
+	"fmt"
 	"gopkg.in/resty.v1"
 	"log"
 	"net/http"
@@ -13,7 +14,7 @@ import (
 
 	pb "github.com/ac0v/aspera/internal/api/protobuf-spec"
 	r "github.com/ac0v/aspera/pkg/registry"
-	"github.com/fatih/structs"
+	// "github.com/fatih/structs"
 	"github.com/golang/protobuf/jsonpb"
 )
 
@@ -51,7 +52,7 @@ func mergeMaps(maps ...map[string]interface{}) map[string]interface{} {
 	return result
 }
 
-func (client *Client) autoRequest(byMajority bool, params ...map[string]interface{}) ([]byte, error) {
+func (client *Client) autoRequest(byMajority bool, params ...map[string]interface{}) ([]byte, []*Peer, error) {
 	// we get the callers as uintptrs - but we just need 1
 	fpcs := make([]uintptr, 1)
 
@@ -71,11 +72,13 @@ func (client *Client) autoRequest(byMajority bool, params ...map[string]interfac
 
 	if !byMajority {
 		req := client.buildRequest(requestType, params...)
-		res, err := req.Post(client.manager.RandomPeer().apiUrl)
+		peer := client.manager.RandomPeer()
+		fmt.Println("peer", peer.apiUrl, params)
+		res, err := req.Post(peer.apiUrl)
 		if err != nil {
-			return nil, err
+			return nil, nil, err
 		}
-		return res.Body(), nil
+		return res.Body(), []*Peer{peer}, nil
 	}
 
 	stop := make(chan struct{})
@@ -157,13 +160,17 @@ func (client *Client) autoRequest(byMajority bool, params ...map[string]interfac
 						}
 					}
 				}
-				return []byte(peerResponse.body), nil
+				var peers []*Peer
+				for peer := range seen.peers {
+					peers = append(peers, peer)
+				}
+				return []byte(peerResponse.body), peers, nil
 			}
 		}
 
 	}
 
-	return nil, errors.New("unexpected error")
+	return nil, nil, errors.New("unexpected error")
 }
 
 func (client *Client) buildRequest(requestType string, params ...map[string]interface{}) *resty.Request {
@@ -186,73 +193,76 @@ type Transaction struct {
 
 // ToDo: transactions: theType byte, subtype byte, timestamp int, deadline uint16, senderPublicKey hex, amountNQT uint64, feeNQT uint64, referencedTransactionFullHash string, signature string, version byte, attachment object, recipient string, ecBlockHeight int, ecBlockId long) + attachment
 
-func (client *Client) GetCumulativeDifficulty() (*pb.GetCumulativeDifficultyResponse, error) {
-	body, err := client.autoRequest(false)
-	if err != nil {
-		return nil, err
-	}
+// func (client *Client) GetCumulativeDifficulty() (*pb.GetCumulativeDifficultyResponse, error) {
+// 	body, err := client.autoRequest(false)
+// 	if err != nil {
+// 		return nil, err
+// 	}
 
-	var s = new(pb.GetCumulativeDifficultyResponse)
-	err = client.unmarshaler.Unmarshal(bytes.NewReader(body), s)
-	if err != nil {
-		log.Fatal(err)
-	}
+// 	var s = new(pb.GetCumulativeDifficultyResponse)
+// 	err = client.unmarshaler.Unmarshal(bytes.NewReader(body), s)
+// 	if err != nil {
+// 		log.Fatal(err)
+// 	}
 
-	return s, err
+// 	return s, err
 
-}
-func (client *Client) GetInfo(announcedAddress string, application string, version string, platform string, shareAddress string) {
-	client.autoRequest(
-		false,
-		map[string]interface{}{
-			"announcedAddress": announcedAddress,
-			"application":      application,
-			"version":          version,
-			"platform":         platform,
-			"shareAddress":     shareAddress,
-		},
-	)
-}
-func (client *Client) GetMilestoneBlockIds(lastBlockId uint64, lastMilestoneBlockId uint64) {
-	client.autoRequest(false, map[string]interface{}{
-		"lastBlockId":          strconv.FormatUint(lastBlockId, 10),
-		"lastMilestoneBlockId": strconv.FormatUint(lastMilestoneBlockId, 10),
+// }
+// func (client *Client) GetInfo(announcedAddress string, application string, version string, platform string, shareAddress string) {
+// 	client.autoRequest(
+// 		false,
+// 		map[string]interface{}{
+// 			"announcedAddress": announcedAddress,
+// 			"application":      application,
+// 			"version":          version,
+// 			"platform":         platform,
+// 			"shareAddress":     shareAddress,
+// 		},
+// 	)
+// }
+
+// func (client *Client) GetMilestoneBlockIds(lastBlockId uint64, lastMilestoneBlockId uint64) {
+// 	client.autoRequest(false, map[string]interface{}{
+// 		"lastBlockId":          strconv.FormatUint(lastBlockId, 10),
+// 		"lastMilestoneBlockId": strconv.FormatUint(lastMilestoneBlockId, 10),
+// 	})
+// }
+
+func (client *Client) GetNextBlockIds(blockId uint64) (*pb.GetNextBlockIdsResponse, []*Peer, error) {
+	body, peers, err := client.autoRequest(true, map[string]interface{}{
+		"blockId": strconv.FormatUint(blockId, 10),
 	})
-}
-
-func (client *Client) GetNextBlockIds(blockId uint64) (*pb.GetNextBlockIdsResponse, error) {
-	body, err := client.autoRequest(true, map[string]interface{}{"blockId": strconv.FormatUint(blockId, 10)})
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
-	var s = new(pb.GetNextBlockIdsResponse)
-	err = client.unmarshaler.Unmarshal(bytes.NewReader(body), s)
-
-	return s, err
+	var msg = new(pb.GetNextBlockIdsResponse)
+	return msg, peers, client.unmarshaler.Unmarshal(bytes.NewReader(body), msg)
 }
 
-func (client *Client) GetNextBlocks(blockId uint64) (*pb.GetNextBlocksResponse, error) {
-	body, err := client.autoRequest(false, map[string]interface{}{"blockId": strconv.FormatUint(blockId, 10)})
+func (client *Client) GetNextBlocks(blockId uint64) (*pb.GetNextBlocksResponse, []*Peer, error) {
+	body, peers, err := client.autoRequest(false, map[string]interface{}{
+		"blockId": strconv.FormatUint(blockId, 10),
+	})
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	var s = new(pb.GetNextBlocksResponse)
 	err = client.unmarshaler.Unmarshal(bytes.NewReader(body), s)
 
-	return s, err
+	return s, peers, err
 }
 
-func (client *Client) GetPeers()                   { client.autoRequest(false) }
-func (client *Client) GetUnconfirmedTransactions() { client.autoRequest(false) }
-func (client *Client) ProcessBlock()               { client.autoRequest(false) }
-func (client *Client) ProcessTransactions(transactions ...*Transaction) {
-	client.autoRequest(false, structs.Map(transactions[0]))
-}
-func (client *Client) GetAccountBalance(accountId uint64) {
-	client.autoRequest(false, map[string]interface{}{"account": strconv.FormatUint(accountId, 10)})
-}
-func (client *Client) GetAccountRecentTransactions(accountId uint64) {
-	client.autoRequest(false, map[string]interface{}{"account": strconv.FormatUint(accountId, 10)})
-}
+// func (client *Client) GetPeers()                   { client.autoRequest(false) }
+// func (client *Client) GetUnconfirmedTransactions() { client.autoRequest(false) }
+// func (client *Client) ProcessBlock()               { client.autoRequest(false) }
+// func (client *Client) ProcessTransactions(transactions ...*Transaction) {
+// 	client.autoRequest(false, structs.Map(transactions[0]))
+// }
+// func (client *Client) GetAccountBalance(accountId uint64) {
+// 	client.autoRequest(false, map[string]interface{}{"account": strconv.FormatUint(accountId, 10)})
+// }
+// func (client *Client) GetAccountRecentTransactions(accountId uint64) {
+// 	client.autoRequest(false, map[string]interface{}{"account": strconv.FormatUint(accountId, 10)})
+// }
