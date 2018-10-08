@@ -44,6 +44,17 @@ export class AuthEffects {
     })
   );
 
+
+  @Effect({ dispatch: false })
+  accountsListRedirect$ = this.actions$.pipe(
+    ofType(
+      AuthApiActions.AuthApiActionTypes.AccountsListRedirect,
+    ),
+    tap(authed => {
+      this.router.navigate(['/accounts']);
+    })
+  );
+
   @Effect()
   logoutConfirmation$ = this.actions$.pipe(
     ofType(AuthActions.AuthActionTypes.LogoutConfirmation),

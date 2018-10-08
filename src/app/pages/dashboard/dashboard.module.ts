@@ -7,6 +7,8 @@ import { TranslateModule } from '@ngx-translate/core';
 
 import { DashboardComponent } from './dashboard.component';
 import { MatSidenavModule } from '@angular/material';
+import { AccountsModule } from './accounts/accounts.module';
+import { SetupModule } from './setup/setup.module';
 
 @NgModule({
     imports: [
@@ -14,6 +16,8 @@ import { MatSidenavModule } from '@angular/material';
         SharedModule,
         TranslateModule,
         MatSidenavModule,
+        AccountsModule,
+        SetupModule,
         routing
     ],
     declarations: [

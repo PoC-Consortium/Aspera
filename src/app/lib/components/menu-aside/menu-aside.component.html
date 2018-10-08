@@ -1,27 +1,27 @@
 <mat-nav-list>
     <mat-list-item>
-        <a title="Dashboard"><i class="fa fa-lg fa-fw fa-tachometer"></i>
+        <a title="Dashboard" routerLink="/dashboard/home"><i class="fa fa-lg fa-fw fa-tachometer"></i>
             <span class="menu-item">{{'Dashboard' | i18n}}</span></a>
     </mat-list-item>
 
     <mat-list-item class="top-menu-invisible">
-        <a routerLink="/transactions/"><i class="fa fa-lg fa-fw fa-briefcase"></i> <span class="menu-item-parent">{{'Transactions'
+        <a routerLink="/dashboard/transactions/"><i class="fa fa-lg fa-fw fa-briefcase"></i> <span class="menu-item-parent">{{'Transactions'
                 | i18n}}</span></a>
         <mat-nav-list>
             <mat-list-item routerLinkActive="active">
-                <a routerLink="/transactions/"><i class="fa fa-exchange"></i>
+                <a routerLink="/dashboard/transactions/"><i class="fa fa-exchange"></i>
                     {{'Transactions' | i18n}}</a>
             </mat-list-item>
             <mat-list-item routerLinkActive="active">
-                <a routerLink="/transactions/escrow"><i class="fa fa-check-circle"></i>
+                <a routerLink="/dashboard/transactions/escrow"><i class="fa fa-check-circle"></i>
                     {{'Escrow' | i18n}}</a>
             </mat-list-item>
             <mat-list-item routerLinkActive="active">
-                <a routerLink="/transactions/subscriptions"><i class="fa fa-recycle"></i>
+                <a routerLink="/dashboard/transactions/subscriptions"><i class="fa fa-recycle"></i>
                     {{'Subscriptions' | i18n}}</a>
             </mat-list-item>
             <mat-list-item routerLinkActive="active">
-                <a routerLink="/transactions/ats"><i class="fa fa-laptop"></i>
+                <a routerLink="/dashboard/transactions/ats"><i class="fa fa-laptop"></i>
                     {{'ATs (Smart Contracts)' | i18n}}</a>
             </mat-list-item>
         </mat-nav-list>
