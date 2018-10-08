@@ -20,6 +20,7 @@ export class HomeComponent {
         private storeService: StoreService,
         private accountService: AccountService
     ) {
+        console.log('home');
 
         this.storeService.getSelectedAccount()
             .then((account) => {
