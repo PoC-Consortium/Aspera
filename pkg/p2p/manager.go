@@ -4,7 +4,6 @@ import (
 	"sync"
 	"time"
 
-	r "github.com/ac0v/aspera/pkg/registry"
 	"github.com/lukechampine/randmap/safe"
 )
 
@@ -24,18 +23,18 @@ type manager struct {
 
 	blacklisted time.Time
 
-	registry *r.Registry
+	internetProtocols []string
 }
 
-func NewManager(c *client, registry *r.Registry, scanForNewPeersInterval time.Duration) Manager {
+func NewManager(c *client, peers, internetProtocols []string, scanForNewPeersInterval time.Duration) Manager {
 	m := &manager{
 		scanForNewPeersInterval: scanForNewPeersInterval,
 		allPeers:                make(map[string]*Peer),
 		blockedPeers:            make(map[string]*Peer),
-		registry:                registry,
+		internetProtocols:       internetProtocols,
 	}
 
-	m.initPeers(c, registry.Config.Network.P2P.Peers)
+	m.initPeers(c, peers)
 
 	go m.jobs(c)
 
@@ -80,7 +79,7 @@ func (m *manager) unblockPeers() {
 
 func (m *manager) initPeers(c *client, peerBaseUrls []string) {
 	for _, url := range peerBaseUrls {
-		peer, err := NewPeer(m.registry, url)
+		peer, err := NewPeer(url, m.internetProtocols)
 		if err != nil {
 			continue
 		}
@@ -97,7 +96,7 @@ func (m *manager) addPeersOf(c Client, peer *Peer) {
 	m.allPeersMu.Lock()
 	m.allPeers[peer.baseUrl] = peer
 	for _, baseUrl := range getPeersMsg.Peers {
-		p, err := NewPeer(m.registry, baseUrl)
+		p, err := NewPeer(baseUrl, m.internetProtocols)
 		if err != nil {
 			continue
 		}

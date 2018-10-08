@@ -4,16 +4,15 @@ import (
 	"time"
 
 	pb "github.com/ac0v/aspera/internal/api/protobuf-spec"
+	"github.com/ac0v/aspera/pkg/config"
 	. "github.com/ac0v/aspera/pkg/log"
-	r "github.com/ac0v/aspera/pkg/registry"
 	s "github.com/ac0v/aspera/pkg/store"
 	"go.uber.org/zap"
 )
 
 type Synchronizer struct {
-	registry *r.Registry
-	store    *s.Store
-	client   Client
+	store  *s.Store
+	client Client
 
 	blockRanges        chan *blockRange
 	blockBatchesEmpty  chan *blockBatch
@@ -38,12 +37,9 @@ type blockBatch struct {
 	blocks []*pb.Block
 }
 
-func NewSynchronizer(client Client, store *s.Store, registry *r.Registry) *Synchronizer {
-	milestones := registry.Config.Network.P2P.Milestones
-
+func NewSynchronizer(client Client, store *s.Store, milestones []config.Milestone) *Synchronizer {
 	s := &Synchronizer{
 		client:             client,
-		registry:           registry,
 		store:              store,
 		blockRanges:        make(chan *blockRange, len(milestones)),
 		blockBatchesEmpty:  make(chan *blockBatch, len(milestones)),

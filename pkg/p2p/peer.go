@@ -2,7 +2,6 @@ package p2p
 
 import (
 	"errors"
-	r "github.com/ac0v/aspera/pkg/registry"
 	"net"
 	"net/url"
 	"regexp"
@@ -36,7 +35,7 @@ type Peer struct {
 	mu sync.Mutex
 }
 
-func NewPeer(registry *r.Registry, baseUrl string) (*Peer, error) {
+func NewPeer(baseUrl string, internetProtocols []string) (*Peer, error) {
 	apiUrl, err := peerToUrl(baseUrl)
 	if err != nil {
 		return nil, err
@@ -59,7 +58,7 @@ func NewPeer(registry *r.Registry, baseUrl string) (*Peer, error) {
 		return nil, errors.New("unknown internet protocol of remote peer " + apiUrl.Hostname())
 	}
 
-	for _, protocol := range registry.Config.Network.InternetProtocols {
+	for _, protocol := range internetProtocols {
 		if peerProtocolOf[protocol] {
 			return &Peer{
 				baseUrl: baseUrl,

@@ -1,16 +1,16 @@
 package store
 
 import (
-	r "github.com/ac0v/aspera/pkg/registry"
+	"github.com/ac0v/aspera/pkg/config"
 )
 
 type Store struct {
 	RawStore *RawStore
 }
 
-func Init(registry *r.Registry) *Store {
+func Init(path string, genesisMilestone config.Milestone) *Store {
 	var store Store
-	store.RawStore = NewRawStore(registry)
+	store.RawStore = NewRawStore(path, genesisMilestone)
 	return &store
 }
 

@@ -1,27 +1,22 @@
 package main
 
 import (
-	//	pb "github.com/ac0v/ce-stock/internal/api/protobuf-spec"
+	"github.com/ac0v/aspera/pkg/config"
+	. "github.com/ac0v/aspera/pkg/log"
 	p2p "github.com/ac0v/aspera/pkg/p2p"
-	r "github.com/ac0v/aspera/pkg/registry"
 	s "github.com/ac0v/aspera/pkg/store"
-	//"go.uber.org/zap"
-	//"github.com/dgraph-io/badger"
-	//"github.com/golang/protobuf/proto"
-	// "gopkg.in/resty.v1"
-	//"encoding/binary"
-	//"log"
-	//"path/filepath"
-	//"fmt"
-	//"strconv"
+	"go.uber.org/zap"
 )
 
 func main() {
-	r.Init()
-	registry := &r.Context
-	client := p2p.NewClient(registry)
-	store := s.Init(registry)
+	c, err := config.Parse("config.yml")
+	if err != nil {
+		Log.Fatal("parse config", zap.Error(err))
+	}
+
+	client := p2p.NewClient(&c.Network.P2P, c.Network.InternetProtocols)
+	store := s.Init(c.Storage.Path, c.Network.P2P.Milestones[0])
 	defer store.Close()
 
-	p2p.NewSynchronizer(client, store, registry)
+	p2p.NewSynchronizer(client, store, c.Network.P2P.Milestones)
 }

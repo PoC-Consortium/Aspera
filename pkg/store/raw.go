@@ -12,15 +12,14 @@ import (
 	"sync"
 
 	pb "github.com/ac0v/aspera/internal/api/protobuf-spec"
+	"github.com/ac0v/aspera/pkg/config"
 	. "github.com/ac0v/aspera/pkg/log"
-	r "github.com/ac0v/aspera/pkg/registry"
 	"github.com/dixonwille/skywalker"
 	"github.com/golang/protobuf/proto"
 )
 
 type RawStore struct {
 	BasePath string
-	registry *r.Registry
 	Current  *RawCurrent
 }
 
@@ -40,11 +39,10 @@ func (lookupWorker *LookupWorker) Work(path string) {
 	lookupWorker.found = append(lookupWorker.found, path)
 }
 
-func NewRawStore(registry *r.Registry) *RawStore {
+func NewRawStore(path string, genesisMilestone config.Milestone) *RawStore {
 	var rawStore RawStore
-	rawStore.registry = registry
 
-	rawStore.BasePath = filepath.Join(registry.Config.Storage.Path, "raw")
+	rawStore.BasePath = filepath.Join(path, "raw")
 	if _, err := os.Stat(rawStore.BasePath); os.IsNotExist(err) {
 		os.MkdirAll(rawStore.BasePath, os.ModePerm)
 	}
@@ -76,8 +74,8 @@ func NewRawStore(registry *r.Registry) *RawStore {
 	rawStore.Current = &RawCurrent{Height: int32(height)}
 
 	if height == -1 {
-		block := &pb.Block{Block: registry.Config.Network.P2P.Milestones[0].Id}
-		rawStore.Store(block, registry.Config.Network.P2P.Milestones[0].Height)
+		block := &pb.Block{Block: genesisMilestone.Id}
+		rawStore.Store(block, genesisMilestone.Height)
 	} else {
 		rawStore.Current.Block = rawStore.load(rawStore.Current.Height)
 	}

@@ -9,7 +9,7 @@ import (
 	"time"
 
 	pb "github.com/ac0v/aspera/internal/api/protobuf-spec"
-	r "github.com/ac0v/aspera/pkg/registry"
+	"github.com/ac0v/aspera/pkg/config"
 	"github.com/golang/protobuf/jsonpb"
 )
 
@@ -25,21 +25,18 @@ type Client interface {
 }
 
 type client struct {
-	registry    *r.Registry
 	manager     Manager
 	unmarshaler *jsonpb.Unmarshaler
 }
 
-func NewClient(registry *r.Registry) Client {
-	timeout, _ := time.ParseDuration(strconv.Itoa(registry.Config.Network.P2P.Timeout) + "s")
-	resty.SetTimeout(timeout)
-	resty.SetDebug(registry.Config.Network.P2P.Debug)
+func NewClient(config *config.P2P, internetProtocols []string) Client {
+	resty.SetTimeout(config.Timeout)
+	resty.SetDebug(config.Debug)
 
 	c := &client{
-		registry:    registry,
 		unmarshaler: &jsonpb.Unmarshaler{AllowUnknownFields: true},
 	}
-	pm := NewManager(c, registry, time.Minute)
+	pm := NewManager(c, config.Peers, internetProtocols, time.Minute)
 
 	c.manager = pm
 
