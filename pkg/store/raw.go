@@ -2,10 +2,6 @@ package store
 
 import (
 	"fmt"
-	pb "github.com/ac0v/aspera/internal/api/protobuf-spec"
-	r "github.com/ac0v/aspera/pkg/registry"
-	"github.com/dixonwille/skywalker"
-	"github.com/golang/protobuf/proto"
 	"go.uber.org/zap"
 	"io/ioutil"
 	"os"
@@ -14,6 +10,12 @@ import (
 	"strconv"
 	"strings"
 	"sync"
+
+	pb "github.com/ac0v/aspera/internal/api/protobuf-spec"
+	. "github.com/ac0v/aspera/pkg/log"
+	r "github.com/ac0v/aspera/pkg/registry"
+	"github.com/dixonwille/skywalker"
+	"github.com/golang/protobuf/proto"
 )
 
 type RawStore struct {
@@ -53,7 +55,7 @@ func NewRawStore(registry *r.Registry) *RawStore {
 	sw := skywalker.New(rawStore.BasePath, lookupWorker)
 	err := sw.Walk()
 	if err != nil {
-		rawStore.registry.Logger.Fatal("Fatal", zap.Error(err))
+		Log.Fatal("Fatal", zap.Error(err))
 	}
 	sort.Sort(sort.StringSlice(lookupWorker.found))
 
@@ -67,7 +69,7 @@ func NewRawStore(registry *r.Registry) *RawStore {
 		} else {
 			// looks like we found some non- raw storage stuff / out of order blocks which
 			// could be the result of a interupted async blockchain sync
-			rawStore.registry.Logger.Info("removing orphaned file from raw storage", zap.String("path", filePath))
+			Log.Info("removing orphaned file from raw storage", zap.String("path", filePath))
 			os.Remove(rawStore.BasePath + string(os.PathSeparator) + filePath)
 		}
 	}
@@ -79,7 +81,7 @@ func NewRawStore(registry *r.Registry) *RawStore {
 	} else {
 		rawStore.Current.Block = rawStore.load(rawStore.Current.Height)
 	}
-	rawStore.registry.Logger.Info("loaded Raw Storage", zap.Int("height", int(rawStore.Current.Height)))
+	Log.Info("loaded Raw Storage", zap.Int("height", int(rawStore.Current.Height)))
 
 	return &rawStore
 }
@@ -133,11 +135,11 @@ func (rawStore *RawStore) load(height int32) *pb.Block {
 	}
 	in, err := ioutil.ReadFile(path)
 	if err != nil {
-		rawStore.registry.Logger.Fatal("Error reading file:", zap.Error(err))
+		Log.Fatal("Error reading file:", zap.Error(err))
 	}
 	block := &pb.Block{}
 	if err := proto.Unmarshal(in, block); err != nil {
-		rawStore.registry.Logger.Fatal("Error parse block file:", zap.Error(err))
+		Log.Fatal("Error parse block file:", zap.Error(err))
 	}
 
 	return block

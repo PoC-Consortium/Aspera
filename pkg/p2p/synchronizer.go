@@ -4,6 +4,7 @@ import (
 	"time"
 
 	pb "github.com/ac0v/aspera/internal/api/protobuf-spec"
+	. "github.com/ac0v/aspera/pkg/log"
 	r "github.com/ac0v/aspera/pkg/registry"
 	s "github.com/ac0v/aspera/pkg/store"
 	"go.uber.org/zap"
@@ -80,7 +81,7 @@ func NewSynchronizer(client Client, store *s.Store, registry *r.Registry) *Synch
 	start := time.Now()
 	for blockBatch := range s.blockBatchesFilled {
 		processed += len(blockBatch.blocks)
-		s.registry.Logger.Info(
+		Log.Info(
 			"syncing with",
 			zap.Float64("blocks/s", float64(processed)/time.Since(start).Seconds()))
 	}
@@ -97,7 +98,7 @@ func (s *Synchronizer) fetchBlocks() {
 
 			res, peers, err := s.client.GetNextBlockIDs(currentID)
 			if err != nil {
-				s.registry.Logger.Error("get next blocks ids", zap.Error(err))
+				Log.Error("get next blocks ids", zap.Error(err))
 				continue
 			}
 
@@ -110,7 +111,7 @@ func (s *Synchronizer) fetchBlocks() {
 				continue
 			}
 
-			s.registry.Logger.Info("syncing block", zap.Uint64("id", currentID))
+			Log.Info("syncing block", zap.Uint64("id", currentID))
 
 			s.blockBatchesEmpty <- &blockBatch{
 				blockRange: blockRange,
@@ -123,7 +124,7 @@ func (s *Synchronizer) fetchBlocks() {
 		FETCH_BLOCKS_AGAIN:
 			res, peers, err := s.client.GetNextBlocks(currentID)
 			if err != nil {
-				s.registry.Logger.Error("get next blocks", zap.Error(err))
+				Log.Error("get next blocks", zap.Error(err))
 				goto FETCH_BLOCKS_AGAIN
 			}
 
