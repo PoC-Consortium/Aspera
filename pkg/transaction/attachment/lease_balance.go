@@ -7,7 +7,8 @@ import (
 )
 
 type LeaseBalanceAttachment struct {
-	Period uint16
+	Period  uint16 `json:"period"`
+	Version int8   `struct:"-" json:"version.EffectiveBalanceLeasing,omitempty"`
 }
 
 func LeaseBalanceAttachmentFromBytes(bs []byte, version uint8) (Attachment, int, error) {

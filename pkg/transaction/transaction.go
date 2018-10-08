@@ -3,38 +3,102 @@ package transaction
 import (
 	"bytes"
 	"encoding/binary"
-	"io"
-
 	"github.com/ac0v/aspera/pkg/parsing"
 	"github.com/ac0v/aspera/pkg/transaction/appendicies"
 	"github.com/ac0v/aspera/pkg/transaction/attachment"
+	"github.com/json-iterator/go"
 	"gopkg.in/restruct.v1"
+	"io"
+	"reflect"
 )
 
+var json = jsoniter.ConfigCompatibleWithStandardLibrary
+
 type Transaction struct {
-	Header     *Header
+	Header     Header
 	Appendices *appendicies.Appendices
 	Attachment attachment.Attachment
 }
 
 type Header struct {
-	Type                          uint8
-	SubtypeAndVersion             uint8
-	Timestamp                     uint32
-	Deadline                      uint16
-	SenderPublicKey               []byte `struct:"[32]uint8"`
-	RecipientID                   uint64
-	AmountNQT                     uint64
-	FeeNQT                        uint64
-	ReferencedTransactionFullHash []byte `struct:"[32]uint8"`
-	Signature                     []byte `struct:"[64]uint8"`
+	Type              uint8 `json:"type"`
+	SubtypeAndVersion uint8 `json:"-"`
 
-	Flags         uint32 `struct:"-"`
-	EcBlockHeight uint32 `struct:"-"`
-	EcBlockID     uint64 `struct:"-"`
+	Subtype uint8 `struct:"-" json:"subtype"`
+	Version uint8 `struct:"-" json:"version"`
+
+	Timestamp                     uint32 `json:"timestamp,omitempty"`
+	Deadline                      uint16 `json:"deadline,omitempty"`
+	SenderPublicKey               []byte `struct:"[32]uint8" json:"senderPublicKey,omitempty"`
+	RecipientID                   uint64 `json:"recipient,string,omitempty"`
+	AmountNQT                     uint64 `json:"amountNQT"`
+	FeeNQT                        uint64 `json:"feeNQT"`
+	ReferencedTransactionFullHash []byte `struct:"[32]uint8" json:"referencedTransactionFullHash,omitempty"`
+	Signature                     []byte `struct:"[64]uint8" json:"signature,omitempty"`
+
+	Flags         uint32 `struct:"-" json:"-"`
+	EcBlockHeight uint32 `struct:"-" json:"ecBlockHeight"`
+	EcBlockID     uint64 `struct:"-" json:"ecBlockId,string"`
 
 	// size of bytes of header
 	size int `struct:"-"`
+}
+
+type TransactionJSON struct {
+	Header
+	Appendices *appendicies.Appendices `json:"-"`
+	Attachment attachment.Attachment   `json:"attachment,omitempty"`
+}
+
+func (tx *Transaction) UnmarshalJSON(bs []byte) error {
+	var txJSON TransactionJSON
+	var err error
+
+	txJSON.Attachment, err = attachment.ChooseAttachmentFromJSON(bs)
+	if err != nil {
+		return err
+	}
+	err = json.Unmarshal(bs, &txJSON)
+	if err != nil {
+		return err
+	}
+
+	src := reflect.ValueOf(&txJSON).Elem()
+	dst := reflect.ValueOf(tx).Elem()
+
+	for i := 0; i < src.NumField(); i++ {
+		srcField := src.Field(i)
+		dstField := dst.Field(i)
+		dstField.Set(reflect.Value(srcField))
+	}
+
+	tx.Header.SetSubtypeAndVersion(txJSON.Subtype, txJSON.Version)
+
+	return nil
+}
+
+func (tx *Transaction) MarshalJSON() ([]byte, error) {
+	txJSON := new(TransactionJSON)
+
+	src := reflect.ValueOf(tx).Elem()
+	dst := reflect.ValueOf(txJSON).Elem()
+
+	for i := 0; i < src.NumField(); i++ {
+		srcField := src.Field(i)
+		dstField := dst.Field(i)
+		dstField.Set(reflect.Value(srcField))
+	}
+
+	txJSON.Version = txJSON.GetVersion()
+	txJSON.Subtype = txJSON.GetSubtype()
+
+	// THX for an inconsistent interface - JAVA...
+	if tx.Header.RecipientID == 0 && txJSON.Type == 1 && txJSON.Subtype == 6 {
+		j, err := json.Marshal(txJSON)
+		return append(j[0:len(j)-1], `, "recipient": "0" }`...), err
+	}
+
+	return json.Marshal(txJSON)
 }
 
 func (h *Header) GetVersion() uint8 {
@@ -45,6 +109,10 @@ func (h *Header) GetSubtype() uint8 {
 	return h.SubtypeAndVersion & 0x0F
 }
 
+func (h *Header) SetSubtypeAndVersion(subtype uint8, version uint8) {
+	h.SubtypeAndVersion = (version << 4) | subtype
+}
+
 func FromBytes(bs []byte) (*Transaction, error) {
 	var tx Transaction
 
@@ -52,7 +120,7 @@ func FromBytes(bs []byte) (*Transaction, error) {
 	if err != nil {
 		return nil, err
 	}
-	tx.Header = header
+	tx.Header = *header
 
 	attachment, attachmentLen, err := attachment.FromBytes(bs[header.size:],
 		header.Type, header.GetSubtype(), header.GetVersion())

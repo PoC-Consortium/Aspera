@@ -7,12 +7,13 @@ import (
 )
 
 type IssueAssetAttachment struct {
-	NumName        uint8 `struct:"uint8,sizeof=Name"`
-	Name           []byte
-	NumDescription uint16 `struct:"uint16,sizeof=Description"`
-	Description    []byte
-	Quantity       uint64
-	Decimals       uint8
+	NumName        uint8  `struct:"uint8,sizeof=Name" json:"-"`
+	Name           string `json:"name"`
+	NumDescription uint16 `struct:"uint16,sizeof=Description" json:"-"`
+	Description    string `json:"description"`
+	Quantity       uint64 `json:"quantityQNT"`
+	Decimals       uint8  `json:"decimals"`
+	Comment        string `struct:"-" json:"comment,omitempty"`
 }
 
 func IssueAssetAttachmentFromBytes(bs []byte, version uint8) (Attachment, int, error) {

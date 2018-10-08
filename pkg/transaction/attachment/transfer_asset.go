@@ -8,11 +8,11 @@ import (
 )
 
 type TransferAssetAttachment struct {
-	Asset       uint64
-	QuantityQNT uint64
+	Asset       uint64 `json:"asset,omitempty,string"`
+	QuantityQNT uint64 `json:"quantityQNT,omitempty"`
 
-	NumComment uint16 `struct:"-"`
-	Comment    []byte `struct:"-"`
+	NumComment uint16 `struct:"-" json:"-"`
+	Comment    string `struct:"-" json:"comment"`
 }
 
 func TransferAssetAttachmentFromBytes(bs []byte, version uint8) (Attachment, int, error) {
@@ -26,10 +26,11 @@ func TransferAssetAttachmentFromBytes(bs []byte, version uint8) (Attachment, int
 			return nil, 0, err
 		}
 
-		attachment.Comment = make([]byte, attachment.NumComment)
-		if err := binary.Read(r, binary.LittleEndian, &attachment.Comment); err != nil {
+		comment := make([]byte, attachment.NumComment)
+		if err := binary.Read(r, binary.LittleEndian, &comment); err != nil {
 			return nil, 0, err
 		}
+		attachment.Comment = string(comment)
 
 		len += 2 + int(attachment.NumComment)
 	}

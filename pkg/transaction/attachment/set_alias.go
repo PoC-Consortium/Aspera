@@ -7,10 +7,11 @@ import (
 )
 
 type SetAliasAttachment struct {
-	NumAliasName uint8 `struct:"uint8,sizeof=AliasName"`
-	AliasName    []byte
-	NumAliasURI  uint16 `struct:"uint16,sizeof=AliasURI"`
-	AliasURI     []byte
+	NumAliasName uint8  `struct:"uint8,sizeof=AliasName" json:"-"`
+	AliasName    string `json:"alias"`
+	NumAliasURI  uint16 `struct:"uint16,sizeof=AliasURI" json:"-"`
+	AliasURI     string `json:"uri"`
+	Version      int8   `struct:"-" json:"version.AliasAssignment,omitempty"`
 }
 
 func SetAliasAttachmentFromBytes(bs []byte, version uint8) (Attachment, int, error) {

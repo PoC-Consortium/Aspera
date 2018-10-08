@@ -7,7 +7,8 @@ import (
 )
 
 type SendMoneySubscriptionAttachment struct {
-	Frequency uint32
+	Frequency uint32 `json:"frequency"`
+	Version   int8   `struct:"-" json:"version.SubscriptionSubscribe,omitempty"`
 }
 
 func SendMoneySubscriptionAttachmentFromBytes(bs []byte, version uint8) (Attachment, int, error) {

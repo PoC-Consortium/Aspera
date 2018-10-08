@@ -7,8 +7,9 @@ import (
 )
 
 type SendMoneyMultiSameAttachment struct {
-	RecipCount uint8 `struct:"uint8,sizeof=Recips"`
-	Recips     []uint64
+	RecipCount uint8             `struct:"uint8,sizeof=Recips" json:"-"`
+	Recips     UInt64StringSlice `json:"recipients"` // fix restruct
+	Version    int8              `struct:"-" json:"version.MultiSameOutCreation,omitempty"`
 }
 
 func SendMoneyMultiSameAttachmentFromBytes(bs []byte, version uint8) (Attachment, int, error) {

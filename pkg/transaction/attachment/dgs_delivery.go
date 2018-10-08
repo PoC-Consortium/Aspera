@@ -9,11 +9,13 @@ import (
 )
 
 type DgsDeliveryAttachment struct {
-	Purchase    uint64
-	GoodsLength uint32
-	GoodsData   []byte
-	GoodsNonce  []byte
-	DiscountNQT uint64
+	Purchase    uint64 `json:"purchase,omitempty,string"`
+	GoodsLength uint32 `json:"goodsLength,omitempty,string"`
+	GoodsIsText bool   `struct:"-" json:"goodsIsText"`
+	GoodsData   string `json:"goodsData,omitempty"`
+	GoodsNonce  string `json:"goodsNonce,omitempty"`
+	DiscountNQT uint64 `json:"discountNQT"`
+	Version     int8   `struct:"-" json:"version.DigitalGoodsDelivery,omitempty"`
 }
 
 func DgsDeliveryAttachmentFromBytes(bs []byte, version uint8) (Attachment, int, error) {
@@ -38,17 +40,22 @@ func DgsDeliveryAttachmentFromBytes(bs []byte, version uint8) (Attachment, int, 
 	if err := binary.Read(r, binary.LittleEndian, &goodsData); err != nil {
 		return nil, 0, err
 	}
-	attachment.GoodsData = goodsData
+	attachment.GoodsData = string(goodsData)
 
 	goodsNonce := make([]byte, 32)
 	if err := binary.Read(r, binary.LittleEndian, &goodsNonce); err != nil {
 		return nil, 0, err
 	}
-	attachment.GoodsNonce = goodsNonce
+	attachment.GoodsNonce = string(goodsNonce)
 
 	if err := binary.Read(r, binary.LittleEndian, &attachment.DiscountNQT); err != nil {
 		return nil, 0, err
 	}
+
+	// ToDo:
+	// if attachment.GoodsLength < 0 {
+	//         attachment.GoodsIsText = true
+	// }
 
 	return &attachment, int(r.Size()) - r.Len(), nil
 }

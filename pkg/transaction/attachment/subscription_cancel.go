@@ -7,7 +7,8 @@ import (
 )
 
 type SubscriptionCancelAttachment struct {
-	Subscription uint64
+	Subscription uint64 `json:"subscriptionId,string"`
+	Version      int8   `struct:"-" json:"version.SubscriptionCancel,omitempty"`
 }
 
 func SubscriptionCancelAttachmentFromBytes(bs []byte, version uint8) (Attachment, int, error) {

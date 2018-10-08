@@ -7,7 +7,8 @@ import (
 )
 
 type DgsDelistingAttachment struct {
-	Goods uint64
+	Goods   uint64 `json:"goods,string"`
+	Version int8   `struct:"-" json:"version.DigitalGoodsDelisting,omitempty"`
 }
 
 func DgsDelistingAttachmentFromBytes(bs []byte, version uint8) (Attachment, int, error) {

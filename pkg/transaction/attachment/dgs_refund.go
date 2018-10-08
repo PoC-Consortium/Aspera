@@ -7,8 +7,9 @@ import (
 )
 
 type DgsRefundAttachment struct {
-	Purchase  uint64
-	RefundNQT uint64
+	Purchase  uint64 `json:"purchase,omitempty,string"`
+	RefundNQT uint64 `json:"refundNQT,omitempty"`
+	Version   int8   `struct:"-" json:"version.DigitalGoodsRefund,omitempty"`
 }
 
 func DgsRefundAttachmentFromBytes(bs []byte, version uint8) (Attachment, int, error) {

@@ -1,6 +1,8 @@
 package attachment
 
-type SetRewardRecipientAttachment struct{}
+type SetRewardRecipientAttachment struct {
+	Version int8 `struct:"-" json:"version.RewardRecipientAssignment,omitempty"`
+}
 
 func SetRewardRecipientAttachmentFromBytes(bs []byte, version uint8) (Attachment, int, error) {
 	var attachment SetRewardRecipientAttachment

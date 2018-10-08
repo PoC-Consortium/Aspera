@@ -7,13 +7,14 @@ import (
 )
 
 type Payment struct {
-	Recip  uint64
-	Amount uint64
+	Recip  uint64 `json:",string"`
+	Amount uint64 `json:",string"`
 }
 
 type SendMoneyMultiAttachment struct {
-	NumRecipsAndAmounts uint8 `struct:"uint8,sizeof=RecipsAndAmounts"`
-	RecipsAndAmounts    []Payment
+	NumRecipsAndAmounts uint8     `struct:"uint8,sizeof=RecipsAndAmounts" json:"-"`
+	RecipsAndAmounts    []Payment `json:"recipients"` // fix restruct
+	Version             int8      `struct:"-" json:"version.MultiOutCreation,omitempty"`
 }
 
 func SendMoneyMultiAttachmentFromBytes(bs []byte, version uint8) (Attachment, int, error) {

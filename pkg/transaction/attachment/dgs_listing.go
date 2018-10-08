@@ -7,14 +7,15 @@ import (
 )
 
 type DgsListingAttachment struct {
-	NumName        uint16 `struct:"uint16,sizeof=Name"`
-	Name           []byte
-	NumDescription uint16 `struct:"uint16,sizeof=Description"`
-	Description    []byte
-	NumTags        uint16 `struct:"uint16,sizeof=Tags"`
-	Tags           []byte
-	Quantity       uint32
-	PriceNQT       uint64
+	NumName        uint16 `struct:"uint16,sizeof=Name" json:"-"`
+	Name           string `json:"name,omitempty"`
+	NumDescription uint16 `struct:"uint16,sizeof=Description" json:"-"`
+	Description    string `json:"description,omitempty"`
+	NumTags        uint16 `struct:"uint16,sizeof=Tags" json:"-"`
+	Tags           string `json:"tags"`
+	Quantity       uint32 `json:"quantity,omitempty"`
+	PriceNQT       uint64 `json:"priceNQT,omitempty"`
+	Version        int8   `struct:"-" json:"version.DigitalGoodsListing,omitempty"`
 }
 
 func DgsListingAttachmentFromBytes(bs []byte, version uint8) (Attachment, int, error) {

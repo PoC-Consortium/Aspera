@@ -7,12 +7,12 @@ import (
 )
 
 type SendMoneyEscrowAttachment struct {
-	AmountNQT      uint64
+	AmountNQT      uint64 `json:"amountNQT,omitempty,string"`
 	EscrowDeadline uint32
-	DeadlineAction uint8
+	DeadlineAction uint8 `json:"xdeadlineAction,omitempty,string"` // ToDo: map enum :-()
 	NumSignees     uint8 `struct:"uint8,sizeof=Signees"`
 	TotalSignees   uint8
-	Signees        []uint64
+	Signees        []UInt64StringSlice `json:"signees,omitempty"` // ToDo: fix restruct
 }
 
 func SendMoneyEscrowAttachmentFromBytes(bs []byte, version uint8) (Attachment, int, error) {

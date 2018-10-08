@@ -16,15 +16,16 @@ const (
 )
 
 type AtPaymentAttachment struct {
-	NumName        uint8
-	Name           []byte
-	NumDescription uint16
-	Description    []byte
-	CodePages      uint16
-	DataPages      uint16
-	Code           []byte
-	Data           []byte
-	CreationBytes  []byte
+	NumName        uint8  `json:"-"`
+	Name           string `json:"name"`
+	NumDescription uint16 `json:"-"`
+	Description    string `json:"description"`
+	CodePages      uint16 `json:"-"`
+	DataPages      uint16 `json:"-"`
+	Code           string `json:"-"`
+	Data           string `json:"-"`
+	CreationBytes  string `json:"creationBytes"`
+	Version        int8   `struct:"-" json:"version.AutomatedTransactionsCreation,omitempty"`
 }
 
 /* TODO: bullshit
@@ -50,10 +51,11 @@ func AtPaymentAttachmentFromBytes(bs []byte, version uint8) (Attachment, int, er
 		return nil, 0, fmt.Errorf("at name too long")
 	}
 
-	attachment.Name = make([]byte, attachment.NumName)
-	if err := binary.Read(r, binary.LittleEndian, &attachment.Name); err != nil {
+	attachmentName := make([]byte, attachment.NumName)
+	if err := binary.Read(r, binary.LittleEndian, &attachmentName); err != nil {
 		return nil, 0, err
 	}
+	attachment.Name = string(attachmentName)
 
 	if err := binary.Read(r, binary.LittleEndian, &attachment.NumDescription); err != nil {
 		return nil, 0, nil
@@ -62,10 +64,11 @@ func AtPaymentAttachmentFromBytes(bs []byte, version uint8) (Attachment, int, er
 		return nil, 0, fmt.Errorf("at description too long")
 	}
 
-	attachment.Description = make([]byte, attachment.NumDescription)
-	if err := binary.Read(r, binary.LittleEndian, &attachment.Description); err != nil {
+	attachmentDescription := make([]byte, attachment.NumDescription)
+	if err := binary.Read(r, binary.LittleEndian, &attachmentDescription); err != nil {
 		return nil, 0, err
 	}
+	attachment.Description = string(attachmentDescription)
 
 	startPosition := int(r.Size()) - r.Len()
 
@@ -104,10 +107,11 @@ func AtPaymentAttachmentFromBytes(bs []byte, version uint8) (Attachment, int, er
 		}
 	}
 
-	attachment.Code = make([]byte, codeLen)
-	if err := binary.Read(r, binary.LittleEndian, &attachment.Code); err != nil {
+	attachmentCode := make([]byte, codeLen)
+	if err := binary.Read(r, binary.LittleEndian, &attachmentCode); err != nil {
 		return nil, 0, nil
 	}
+	attachment.Code = string(attachmentCode)
 
 	var dataLen uint32
 	if attachment.DataPages*pageSize < 257 {
@@ -128,19 +132,21 @@ func AtPaymentAttachmentFromBytes(bs []byte, version uint8) (Attachment, int, er
 		}
 	}
 
-	attachment.Data = make([]byte, dataLen)
-	if err := binary.Read(r, binary.LittleEndian, &attachment.Data); err != nil {
+	attachmentData := make([]byte, dataLen)
+	if err := binary.Read(r, binary.LittleEndian, &attachmentData); err != nil {
 		return nil, 0, nil
 	}
+	attachment.Data = string(attachmentData)
 
 	endPosition := int(r.Size()) - r.Len()
 	if _, err := r.Seek(int64(startPosition), io.SeekStart); err != nil {
 		return nil, 0, err
 	}
-	attachment.CreationBytes = make([]byte, endPosition-startPosition)
-	if err := binary.Read(r, binary.LittleEndian, &attachment.CreationBytes); err != nil {
+	attachmentCreationBytes := make([]byte, endPosition-startPosition)
+	if err := binary.Read(r, binary.LittleEndian, &attachmentCreationBytes); err != nil {
 		return nil, 0, nil
 	}
+	attachment.CreationBytes = string(attachmentCreationBytes)
 
 	return &attachment, 0, nil
 }

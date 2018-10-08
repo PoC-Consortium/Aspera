@@ -7,10 +7,11 @@ import (
 )
 
 type SetAccountInfoAttachment struct {
-	NumName        uint8 `struct:"uint8,sizeof=Name"`
-	Name           []byte
-	NumDescription uint16 `struct:"uint16,sizeof=Description"`
-	Description    []byte
+	NumName        uint8  `struct:"uint8,sizeof=Name" json:"-"`
+	Name           string `json:"name"`
+	NumDescription uint16 `struct:"uint16,sizeof=Description" json:"-"`
+	Description    string `json:"description"`
+	Version        int8   `struct:"-" json:"version.AccountInfo,omitempty"`
 }
 
 func SetAccountInfoAttachmentFromBytes(bs []byte, version uint8) (Attachment, int, error) {

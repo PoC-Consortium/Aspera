@@ -7,10 +7,11 @@ import (
 )
 
 type DgsPurchaseAttachment struct {
-	Goods                     uint64
-	Quantity                  uint32
-	PriceNQT                  uint64
-	DeliveryDeadlineTimestamp uint32
+	Goods                     uint64 `json:"goods,omitempty,string"`
+	Quantity                  uint32 `json:"quantity,omitempty"`
+	PriceNQT                  uint64 `json:"priceNQT,omitempty"`
+	DeliveryDeadlineTimestamp uint32 `json:"deliveryDeadlineTimestamp,omitempty"`
+	Version        int8   `struct:"-" json:"version.DigitalGoodsPurchase,omitempty"`
 }
 
 func DgsPurchaseAttachmentFromBytes(bs []byte, version uint8) (Attachment, int, error) {

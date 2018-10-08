@@ -7,9 +7,10 @@ import (
 )
 
 type PlaceBidOrderAttachment struct {
-	Asset       uint64
-	QuantityQNT uint64
-	PriceNQT    uint64
+	Asset       uint64 `json:"asset,omitempty,string"`
+	QuantityQNT uint64 `json:"quantityQNT,omitempty"`
+	PriceNQT    uint64 `json:"priceNQT,omitempty"`
+	Version     int8   `struct:"-" json:"version.BidOrderPlacement,omitempty"`
 }
 
 func PlaceBidOrderAttachmentFromBytes(bs []byte, version uint8) (Attachment, int, error) {

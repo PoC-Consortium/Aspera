@@ -7,7 +7,7 @@ import (
 )
 
 type DgsFeedbackAttachment struct {
-	Purchase uint64
+	Purchase uint64 `json:"purchase,omitempty,string"`
 }
 
 func DgsFeedbackAttachmentFromBytes(bs []byte, version uint8) (Attachment, int, error) {

@@ -7,9 +7,10 @@ import (
 )
 
 type SellAliasAttachment struct {
-	NumAlias uint8 `struct:"uint8,sizeof=Alias"`
-	Alias    []byte
-	PriceNQT int64
+	NumAlias uint8  `struct:"uint8,sizeof=Alias" json:"-"`
+	Alias    string `json:"alias"`
+	PriceNQT int64  `json:"priceNQT"`
+	Version  int8   `struct:"-" json:"version.AliasSell,omitempty"`
 }
 
 func SellAliasAttachmentFromBytes(bs []byte, version uint8) (Attachment, int, error) {

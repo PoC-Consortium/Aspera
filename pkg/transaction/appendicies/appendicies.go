@@ -18,15 +18,16 @@ const (
 var errMessageTooLong = errors.New("message too long")
 
 type Message struct {
-	IsText bool `struct:"-"`
+	IsText bool `struct:"-" json:"messageIsText"`
 
 	// IsText is encoded as a single bit
-	IsTextAndLen int32
-	Content      []byte
+	IsTextAndLen int32  `json:"-"`
+	Content      string `json:"message"`
+	Version      int8   `struct:"-" json:"version.Message,omitempty"`
 }
 
 type EncryptedMessage struct {
-	IsText bool `struct:"-"`
+	IsText bool `struct:"-" json:"messageIsText"`
 
 	// IsText is encoded as a signle bit
 	IsTextAndLen int32
@@ -87,10 +88,11 @@ func MessageFromBytes(r io.Reader) (*Message, error) {
 	message.IsTextAndLen = isTextAndLen
 	message.IsText = isText
 
-	message.Content = make([]byte, len)
-	if err := binary.Read(r, binary.LittleEndian, &message.Content); err != nil {
+	content := make([]byte, len)
+	if err := binary.Read(r, binary.LittleEndian, &content); err != nil {
 		return nil, err
 	}
+	message.Content = string(content)
 
 	return &message, nil
 }

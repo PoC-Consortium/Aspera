@@ -7,7 +7,8 @@ import (
 )
 
 type CancelAskOrderAttachment struct {
-	Order uint64
+	Order   uint64 `json:"order,omitempty,string"`
+	Version int8   `struct:"-" json:"version.AskOrderCancellation,omitempty"`
 }
 
 func CancelAskOrderAttachmentFromBytes(bs []byte, version uint8) (Attachment, int, error) {

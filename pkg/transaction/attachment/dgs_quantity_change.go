@@ -7,8 +7,9 @@ import (
 )
 
 type DgsQuantityChangeAttachment struct {
-	Goods         uint64
-	DeltaQuantity uint32
+	Goods         uint64 `json:"goods,omitempty,string"`
+	DeltaQuantity uint32 `json:"deltaQuantity,omitempty"`
+	Version       int8   `struct:"-" json:"version.DigitalGoodsQuantityChange,omitempty"`
 }
 
 func DgsQuantityChangeAttachmentFromBytes(bs []byte, version uint8) (Attachment, int, error) {
