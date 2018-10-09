@@ -183,7 +183,7 @@ func GuessAttachmentsAndAppendicesFromJSON(bs []byte) ([]Attachment, error) {
 		}
 		for appendixName, f := range appendixTypeOfName {
 			appendixIdentifier := "version." + appendixName
-			if txJSON.Exists("attachment", appendixIdentifier) && attachmentType.supersedeAppendix != appendixIdentifier {
+			if txJSON.Exists("attachment", appendixIdentifier) && attachmentType.supersedeAppendix != appendixName {
 				appendix := f()
 				if err := json.Unmarshal(txJSON.S("attachment").Bytes(), appendix); err != nil {
 					return nil, err
