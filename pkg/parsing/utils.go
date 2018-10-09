@@ -14,9 +14,17 @@ const (
 
 var ErrMessageTooLong = errors.New("message too long")
 
-func SkipByte(r *bytes.Reader) error {
+func SkipByteInReader(r *bytes.Reader) error {
 	_, err := r.Seek(1, io.SeekCurrent)
 	return err
+}
+
+func SkipByteInSlice(bs *[]byte) error {
+	if len(*bs) == 0 {
+		return io.EOF
+	}
+	*bs = (*bs)[1:]
+	return nil
 }
 
 func GetMessageLengthAndType(r *bytes.Reader) (int32, int32, bool, error) {

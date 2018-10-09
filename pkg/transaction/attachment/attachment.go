@@ -1,7 +1,6 @@
 package attachment
 
 import (
-	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -17,46 +16,71 @@ type Attachment interface {
 	ToBytes(uint8) ([]byte, error)
 }
 
-type UInt64StringSlice []uint64
-
-func (slice UInt64StringSlice) MarshalJSON() ([]byte, error) {
-	values := make([]string, len(slice))
-	for i, value := range []uint64(slice) {
-		values[i] = fmt.Sprintf(`"%v"`, value)
-	}
-
-	return []byte(fmt.Sprintf("[%v]", strings.Join(values, ","))), nil
+type attachmentType struct {
+	surtype int
+	subtype int
+	new     func() Attachment
 }
 
-func (slice *UInt64StringSlice) UnmarshalJSON(b []byte) error {
-	// Try array of strings first.
-	var values []string
-	err := json.Unmarshal(b, &values)
-	if err != nil {
-		// Fall back to array of integers:
-		var values []uint64
-		if err := json.Unmarshal(b, &values); err != nil {
-			return err
-		}
-		*slice = values
-		return nil
+var appendixTypeNames = []string{"ArbitaryMessage", "EncryptedMessage", "PublicKeyAnnouncement", "EncryptToSelfMessage"}
+var typeOfName = map[string]*attachmentType{
+	"MultiOutCreation":           &attachmentType{surtype: 0, subtype: 1, new: func() Attachment { return new(SendMoneyMultiAttachment) }},
+	"MultiSameOutCreation":       &attachmentType{surtype: 0, subtype: 2, new: func() Attachment { return new(SendMoneyMultiSameAttachment) }},
+	"ArbitaryMessage":            &attachmentType{surtype: 1, subtype: 0, new: func() Attachment { return new(MessageAttachment) }},
+	"EncryptedMessage":           &attachmentType{surtype: 1, subtype: 0, new: func() Attachment { return new(EncryptedMessageAttachment) }},
+	"AliasAssignment":            &attachmentType{surtype: 1, subtype: 1, new: func() Attachment { return new(SetAliasAttachment) }},
+	"AccountInfo":                &attachmentType{surtype: 1, subtype: 5, new: func() Attachment { return new(SetAccountInfoAttachment) }},
+	"AliasSell":                  &attachmentType{surtype: 1, subtype: 6, new: func() Attachment { return new(SellAliasAttachment) }},
+	"AliasBuy":                   &attachmentType{surtype: 1, subtype: 7, new: func() Attachment { return new(BuyAliasAttachment) }},
+	"AssetIssuance":              &attachmentType{surtype: 2, subtype: 0, new: func() Attachment { return new(IssueAssetAttachment) }},
+	"AssetTransfer":              &attachmentType{surtype: 2, subtype: 1, new: func() Attachment { return new(TransferAssetAttachment) }},
+	"AskOrderPlacement":          &attachmentType{surtype: 2, subtype: 2, new: func() Attachment { return new(PlaceAskOrderAttachment) }},
+	"BidOrderPlacement":          &attachmentType{surtype: 2, subtype: 3, new: func() Attachment { return new(PlaceBidOrderAttachment) }},
+	"AskOrderCancellation":       &attachmentType{surtype: 2, subtype: 4, new: func() Attachment { return new(CancelAskOrderAttachment) }},
+	"BidOrderCancellation":       &attachmentType{surtype: 2, subtype: 5, new: func() Attachment { return new(CancelBidOrderAttachment) }},
+	"DigitalGoodsListing":        &attachmentType{surtype: 3, subtype: 0, new: func() Attachment { return new(DgsListingAttachment) }},
+	"DigitalGoodsDelisting":      &attachmentType{surtype: 3, subtype: 1, new: func() Attachment { return new(DgsDelistingAttachment) }},
+	"DigitalGoodsPriceChange":    &attachmentType{surtype: 3, subtype: 2, new: func() Attachment { return new(DgsPriceChangeAttachment) }},
+	"DigitalGoodsQuantityChange": &attachmentType{surtype: 3, subtype: 3, new: func() Attachment { return new(DgsQuantityChangeAttachment) }},
+	"DigitalGoodsPurchase":       &attachmentType{surtype: 3, subtype: 4, new: func() Attachment { return new(DgsPurchaseAttachment) }},
+	"DigitalGoodsDelivery":       &attachmentType{surtype: 3, subtype: 5, new: func() Attachment { return new(DgsDeliveryAttachment) }},
+	"DigitalGoodsFeedback":       &attachmentType{surtype: 3, subtype: 6, new: func() Attachment { return new(DgsFeedbackAttachment) }},
+	"DigitalGoodsRefund":         &attachmentType{surtype: 3, subtype: 7, new: func() Attachment { return new(DgsRefundAttachment) }},
+	"EffectiveBalanceLeasing":    &attachmentType{surtype: 4, subtype: 0, new: func() Attachment { return new(LeaseBalanceAttachment) }},
+	"RewardRecipientAssignment":  &attachmentType{surtype: 20, subtype: 0, new: func() Attachment { return new(SetRewardRecipientAttachment) }},
+	"EscrowCreation":             &attachmentType{surtype: 21, subtype: 0, new: func() Attachment { return new(SendMoneyEscrowAttachment) }},
+	"EscrowSign":                 &attachmentType{surtype: 21, subtype: 1, new: func() Attachment { return new(EscrowSignAttachment) }},
+	//"EscrowResult":                  &attachmentType{surtype: 21, subtype: 2, new: func() Attachment { return new() }},
+	"SubscriptionSubscribe": &attachmentType{surtype: 21, subtype: 3, new: func() Attachment { return new(SendMoneySubscriptionAttachment) }},
+	"SubscriptionCancel":    &attachmentType{surtype: 21, subtype: 4, new: func() Attachment { return new(SubscriptionCancelAttachment) }},
+	//"SubscriptionPayment":           &attachmentType{surtype: 21, subtype: 5, new: func() Attachment { return new() }},
+	//"AutomatedTransactionsCreation": &attachmentType{surtype: 22, subtype: 0, new: func() Attachment { return new() }},
+	//"AutomatedTransactionsPayment":  &attachmentType{surtype: 22, subtype: 1, new: func() Attachment { return new() }}, // AT Payment
+	//"OrdinaryPayment":               &attachmentType{surtype: 0, subtype: 0, new: func() Attachment { return new() }},
+	//"PublicKeyAnnouncement"
+	//"EncryptToSelfMessage"
+}
+var typeFor = make(map[uint16]*attachmentType)
+
+func init() {
+	for _, a := range typeOfName {
+		typeFor[uint16(a.surtype)<<4|uint16(a.subtype)] = a
 	}
-	*slice = make([]uint64, len(values))
-	for i, value := range values {
-		value, err := strconv.ParseUint(value, 10, 64)
-		if err != nil {
-			return err
+	// ensure, that every appendix has a related type - which is necessary for parsing
+	/*
+		for _, appendixTypeName := range appendixTypeNames {
+			if _, exists := typeOfName[appendixTypeName]; !exists {
+				panic("missing transactionTypeForName: " + appendixTypeName)
+			}
 		}
-		(*slice)[i] = value
-	}
-	return nil
+	*/
 }
 
 var attachmentParserOf = map[uint16]func([]byte, uint8) (Attachment, int, error){
 	0:   SendMoneyAttachmentFromBytes,
 	1:   SendMoneyMultiAttachmentFromBytes,
 	2:   SendMoneyMultiSameAttachmentFromBytes,
-	16:  SendMessageAttachmentFromBytes,
+	16:  MessageAttachmentFromBytes,
 	17:  SetAliasAttachmentFromBytes,
 	21:  SetAccountInfoAttachmentFromBytes,
 	22:  SellAliasAttachmentFromBytes,
@@ -103,260 +127,134 @@ func FromBytes(bs []byte, surtype, subtype, version uint8, flags uint32) ([]Atta
 		return attachments, err
 	}
 
-	r := bytes.NewReader(bs[attachmentLen:])
+	remainingBs := bs[attachmentLen:]
 	if flags&(1<<0) != 0 {
 		if version > 0 {
-			if err := parsing.SkipByte(r); err != nil {
+			if err := parsing.SkipByteInSlice(&remainingBs); err != nil {
 				return nil, err
 			}
 		}
 
-		message, err := MessageFromBytes(r, version)
+		message, len, err := MessageAttachmentFromBytes(remainingBs, version)
 		if err != nil {
 			return nil, err
 		}
 		attachments = append(attachments, message)
+
+		remainingBs = remainingBs[:len]
 	}
 
 	if flags&(1<<1) != 0 {
 		if version > 0 {
-			if err := parsing.SkipByte(r); err != nil {
+			if err := parsing.SkipByteInSlice(&remainingBs); err != nil {
 				return nil, err
 			}
 		}
 
-		encryptedMessage, err := EncryptedMessageFromBytes(r, version)
+		encryptedMessage, len, err := EncryptedMessageAttachmentFromBytes(remainingBs, version)
 		if err != nil {
 			return nil, err
 		}
 		attachments = append(attachments, encryptedMessage)
+
+		remainingBs = remainingBs[:len]
 	}
 
 	if flags&(1<<2) != 0 {
 		if version > 0 {
-			if err := parsing.SkipByte(r); err != nil {
+			if err := parsing.SkipByteInSlice(&remainingBs); err != nil {
 				return nil, err
 			}
 		}
 
-		publicKeyAnnouncement, err := PublicKeyAnnouncementFromBytes(r, version)
+		publicKeyAnnouncement, len, err := PublicKeyAnnouncementAttachmentFromBytes(remainingBs, version)
 		if err != nil {
 			return nil, err
 		}
 		attachments = append(attachments, publicKeyAnnouncement)
+
+		remainingBs = remainingBs[:len]
 	}
 
 	if flags&(1<<3) != 0 {
 		if version > 0 {
-			if err := parsing.SkipByte(r); err != nil {
+			if err := parsing.SkipByteInSlice(&remainingBs); err != nil {
 				return nil, err
 			}
 		}
-		encryptedToSelfMessage, err := EncryptedToSelfMessageFromBytes(r, version)
+
+		encryptedToSelfMessage, len, err := EncryptedToSelfMessageAttachmentFromBytes(remainingBs, version)
 		if err != nil {
 			return nil, err
 		}
 		attachments = append(attachments, encryptedToSelfMessage)
+
+		remainingBs = remainingBs[:len]
 	}
 
 	return attachments, nil
 }
 
-func ChooseAttachmentFromJSON(bs []byte) (Attachment, error) {
-	txJSON, _ := gabs.ParseJSON(bs)
-	children, _ := txJSON.S("attachment").ChildrenMap()
+func GuessAttachmentsAndAppendicesFromJSON(bs []byte) ([]Attachment, error) {
+	var err error
 
-	if len(children) == 0 {
-		return new(DummyAttachment), nil
+	var txJSON *gabs.Container
+	if txJSON, err = gabs.ParseJSON(bs); err != nil {
+		return nil, err
 	}
 
-	if txJSON.Path("version").Data().(float64) == 0 {
-		txType, _ := txJSON.Path("type").Data().(float64)
-		txSubtype, _ := txJSON.Path("subtype").Data().(float64)
-		switch txType {
-		case 0:
-			switch txSubtype {
-			case 1:
-				return new(SendMoneyMultiAttachment), nil
-			case 2:
-				return new(SendMoneyMultiSameAttachment), nil
-			default:
-				goto UNKNOWN_ATTACHMENT
-			}
-		case 1:
-			switch txSubtype {
-			case 0:
-				return new(SendMessageAttachment), nil
-			case 1:
-				return new(SetAliasAttachment), nil
-			case 5:
-				return new(SetAccountInfoAttachment), nil
-			case 6:
-				return new(SellAliasAttachment), nil
-			case 7:
-				return new(BuyAliasAttachment), nil
-			default:
-				goto UNKNOWN_ATTACHMENT
-			}
-		case 2:
-			switch txSubtype {
-			case 0:
-				return new(IssueAssetAttachment), nil
-			case 1:
-				return new(TransferAssetAttachment), nil
-			case 2:
-				return new(PlaceAskOrderAttachment), nil
-			case 3:
-				return new(PlaceBidOrderAttachment), nil
-			case 4:
-				return new(CancelAskOrderAttachment), nil
-			case 5:
-				return new(CancelBidOrderAttachment), nil
-			default:
-				goto UNKNOWN_ATTACHMENT
-			}
-		case 3:
-			switch txSubtype {
-			case 0:
-				return new(DgsListingAttachment), nil
-			case 1:
-				return new(DgsDelistingAttachment), nil
-			case 2:
-				return new(DgsPriceChangeAttachment), nil
-			case 3:
-				return new(DgsQuantityChangeAttachment), nil
-			case 4:
-				return new(DgsPurchaseAttachment), nil
-			case 5:
-				return new(DgsDeliveryAttachment), nil
-			case 6:
-				return new(DgsFeedbackAttachment), nil
-			case 7:
-				return new(DgsRefundAttachment), nil
-			default:
-				goto UNKNOWN_ATTACHMENT
-			}
-		case 4:
-			switch txSubtype {
-			case 0:
-				return new(LeaseBalanceAttachment), nil
-			default:
-				goto UNKNOWN_ATTACHMENT
-			}
-		case 20:
-			switch txSubtype {
-			case 0:
-				return new(SetRewardRecipientAttachment), nil
-			default:
-				goto UNKNOWN_ATTACHMENT
-			}
-		case 21:
-			switch txSubtype {
-			case 0:
-				return new(SendMoneyEscrowAttachment), nil
-			case 1:
-				return new(EscrowSignAttachment), nil
-			case 3:
-				return new(SendMoneySubscriptionAttachment), nil
-			case 4:
-				return new(SubscriptionCancelAttachment), nil
-			default:
-				goto UNKNOWN_ATTACHMENT
+	if children, err := txJSON.S("attachment").ChildrenMap(); err != nil {
+		return nil, err
+	} else if len(children) == 0 {
+		return []Attachment{new(DummyAttachment)}, nil
+	}
+
+	attachmentType, exists := typeFor[uint16(txJSON.Path("type").Data().(int8))<<4|uint16(txJSON.Path("subtype").Data().(int8))]
+	if exists {
+		attachments := []Attachment{attachmentType.new()}
+		for _, appendixName := range appendixTypeNames {
+			appendixIdentifier := "version." + appendixName
+			if txJSON.Exists("attachment", appendixIdentifier) {
+				attachments = append(attachments, typeOfName[appendixIdentifier].new())
 			}
 		}
-	UNKNOWN_ATTACHMENT:
-		return nil, errors.New("tx attachment is not implemented for: " + txJSON.String())
-
-		/*
-		   private static final byte TYPE_AUTOMATED_TRANSACTIONS = 22;
-
-		   private static final byte SUBTYPE_AT_CREATION = 0;
-		   private static final byte SUBTYPE_AT_NXT_PAYMENT = 1;
-
-		   private static final byte SUBTYPE_ACCOUNT_CONTROL_EFFECTIVE_BALANCE_LEASING = 0;
-
-		   private static final byte SUBTYPE_BURST_MINING_REWARD_RECIPIENT_ASSIGNMENT = 0;
-
-		   private static final byte SUBTYPE_ADVANCED_PAYMENT_ESCROW_CREATION = 0;
-		   private static final byte SUBTYPE_ADVANCED_PAYMENT_ESCROW_SIGN = 1;
-		   private static final byte SUBTYPE_ADVANCED_PAYMENT_ESCROW_RESULT = 2;
-		   private static final byte SUBTYPE_ADVANCED_PAYMENT_SUBSCRIPTION_SUBSCRIBE = 3;
-		   private static final byte SUBTYPE_ADVANCED_PAYMENT_SUBSCRIPTION_CANCEL = 4;
-		   private static final byte SUBTYPE_ADVANCED_PAYMENT_SUBSCRIPTION_PAYMENT = 5;
-		*/
+		return attachments, nil
 	}
 
-	var attachmentType string
-	for key, _ := range children {
-		if strings.HasPrefix(key, "version.") {
-			attachmentType = strings.TrimPrefix(key, "version.")
-			break
+	return nil, errors.New("tx attachment is not implemented for: " + txJSON.String())
+}
+
+type UInt64StringSlice []uint64
+
+func (slice UInt64StringSlice) MarshalJSON() ([]byte, error) {
+	values := make([]string, len(slice))
+	for i, value := range []uint64(slice) {
+		values[i] = fmt.Sprintf(`"%v"`, value)
+	}
+
+	return []byte(fmt.Sprintf("[%v]", strings.Join(values, ","))), nil
+}
+
+func (slice *UInt64StringSlice) UnmarshalJSON(b []byte) error {
+	// Try array of strings first.
+	var values []string
+	err := json.Unmarshal(b, &values)
+	if err != nil {
+		// Fall back to array of integers:
+		var values []uint64
+		if err := json.Unmarshal(b, &values); err != nil {
+			return err
 		}
+		*slice = values
+		return nil
 	}
-
-	switch attachmentType {
-	case "Message": // ArbitaryMessage ??
-		return new(SendMessageAttachment), nil
-	case "MultiOutCreation":
-		return new(SendMoneyMultiAttachment), nil
-	case "MultiSameOutCreation":
-		return new(SendMoneyMultiSameAttachment), nil
-	case "AliasAssignment":
-		return new(SetAliasAttachment), nil
-	case "AliasSell":
-		return new(SellAliasAttachment), nil
-	case "AliasBuy":
-		return new(BuyAliasAttachment), nil
-	case "AccountInfo":
-		return new(SetAccountInfoAttachment), nil
-	case "AssetIssuance":
-		return new(IssueAssetAttachment), nil
-	case "AssetTransfer":
-		return new(TransferAssetAttachment), nil
-	case "AskOrderPlacement":
-		return new(PlaceAskOrderAttachment), nil
-	case "BidOrderPlacement":
-		return new(PlaceBidOrderAttachment), nil
-	case "AskOrderCancellation":
-		return new(CancelAskOrderAttachment), nil
-	case "BidOrderCancellation":
-		return new(CancelBidOrderAttachment), nil
-	case "DigitalGoodsListing":
-		return new(DgsListingAttachment), nil
-	case "DigitalGoodsDelisting":
-		return new(DgsDelistingAttachment), nil
-	case "DigitalGoodsPriceChange":
-		return new(DgsPriceChangeAttachment), nil
-	case "DigitalGoodsQuantityChange":
-		return new(DgsQuantityChangeAttachment), nil
-	case "DigitalGoodsPurchase":
-		return new(DgsPurchaseAttachment), nil
-	case "DigitalGoodsDelivery":
-		return new(DgsDeliveryAttachment), nil
-	case "DigitalGoodsFeedback":
-		return new(DgsFeedbackAttachment), nil
-	case "DigitalGoodsRefund":
-		return new(DgsRefundAttachment), nil
-	case "RewardRecipientAssignment":
-		return new(SetRewardRecipientAttachment), nil
-	case "EscrowCreation":
-		return new(SendMoneyEscrowAttachment), nil
-	case "EscrowSign":
-		return new(EscrowSignAttachment), nil
-	case "EscrowResult":
-		return new(EscrowResultAttachment), nil
-	case "SubscriptionSubscribe":
-		return new(SendMoneySubscriptionAttachment), nil
-	case "SubscriptionCancel":
-		return new(SubscriptionCancelAttachment), nil
-	case "AutomatedTransactionsCreation":
-		return new(AtPaymentAttachment), nil
-	case "EncryptedMessage":
-		return new(DummyAttachment), nil // ToDo
-	case "EffectiveBalanceLeasing":
-		return new(LeaseBalanceAttachment), nil
-	case "SubscriptionPayment":
-	case "OrdinaryPayment":
+	*slice = make([]uint64, len(values))
+	for i, value := range values {
+		value, err := strconv.ParseUint(value, 10, 64)
+		if err != nil {
+			return err
+		}
+		(*slice)[i] = value
 	}
-	return nil, errors.New(attachmentType + " is not implemented for: " + txJSON.String())
+	return nil
 }

@@ -8,7 +8,7 @@ import (
 	"gopkg.in/restruct.v1"
 )
 
-type EncryptedMessage struct {
+type EncryptedMessageAttachment struct {
 	IsText bool `struct:"-" json:"messageIsText"`
 
 	// IsText is encoded as a signle bit
@@ -17,7 +17,7 @@ type EncryptedMessage struct {
 	Nonce        []byte
 }
 
-func (attachment *EncryptedMessage) ToBytes(version uint8) ([]byte, error) {
+func (attachment *EncryptedMessageAttachment) ToBytes(version uint8) ([]byte, error) {
 	bs, err := restruct.Pack(binary.LittleEndian, attachment)
 	if err != nil {
 		return nil, err
@@ -30,12 +30,14 @@ func (attachment *EncryptedMessage) ToBytes(version uint8) ([]byte, error) {
 	return bs, nil
 }
 
-func EncryptedMessageFromBytes(r *bytes.Reader, version uint8) (*EncryptedMessage, error) {
-	var message EncryptedMessage
+func EncryptedMessageAttachmentFromBytes(bs []byte, version uint8) (Attachment, int, error) {
+	var message EncryptedMessageAttachment
+
+	r := bytes.NewReader(bs)
 
 	len, isTextAndLen, isText, err := parsing.GetMessageLengthAndType(r)
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 
 	message.IsTextAndLen = isTextAndLen
@@ -43,11 +45,11 @@ func EncryptedMessageFromBytes(r *bytes.Reader, version uint8) (*EncryptedMessag
 
 	message.Data = make([]byte, len)
 	if err := binary.Read(r, binary.LittleEndian, &message.Data); err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 
 	message.Nonce = make([]byte, 32)
 	err = binary.Read(r, binary.LittleEndian, &message.Nonce)
 
-	return &message, err
+	return &message, 4 + int(len), err
 }

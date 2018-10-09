@@ -24,11 +24,13 @@ func (attachment *PublicKeyAnnouncement) ToBytes(version uint8) ([]byte, error) 
 	return bs, nil
 }
 
-func PublicKeyAnnouncementFromBytes(r *bytes.Reader, version uint8) (*PublicKeyAnnouncement, error) {
+func PublicKeyAnnouncementAttachmentFromBytes(bs []byte, version uint8) (Attachment, int, error) {
 	var message PublicKeyAnnouncement
+
+	r := bytes.NewReader(bs)
 
 	message.PublicKey = make([]byte, 32)
 	err := binary.Read(r, binary.LittleEndian, &message.PublicKey)
 
-	return &message, err
+	return &message, 32, err
 }

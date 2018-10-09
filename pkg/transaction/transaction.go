@@ -10,7 +10,6 @@ import (
 	"gopkg.in/restruct.v1"
 
 	"github.com/ac0v/aspera/pkg/parsing"
-	"github.com/ac0v/aspera/pkg/transaction/appendicies"
 	"github.com/ac0v/aspera/pkg/transaction/attachment"
 )
 
@@ -47,15 +46,14 @@ type Header struct {
 
 type TransactionJSON struct {
 	Header
-	Appendices *appendicies.Appendices `json:"-"`
-	Attachment attachment.Attachment   `json:"attachment,omitempty"`
+	Attachment []attachment.Attachment `json:"attachment,omitempty"`
 }
 
 func (tx *Transaction) UnmarshalJSON(bs []byte) error {
 	var txJSON TransactionJSON
 	var err error
 
-	txJSON.Attachment, err = attachment.ChooseAttachmentFromJSON(bs)
+	txJSON.Attachment, err = attachment.GuessAttachmentsAndAppendicesFromJSON(bs)
 	if err != nil {
 		return err
 	}
@@ -180,7 +178,7 @@ func headerFromBytes(bs []byte) (*Header, error) {
 			return nil, err
 		}
 
-		if err := parsing.SkipByte(r); err != nil {
+		if err := parsing.SkipByteInReader(r); err != nil {
 			return nil, err
 		}
 

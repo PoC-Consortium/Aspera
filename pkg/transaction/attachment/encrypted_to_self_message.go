@@ -31,12 +31,14 @@ func (attachment *EncryptedToSelfMessage) ToBytes(version uint8) ([]byte, error)
 	return bs, nil
 }
 
-func EncryptedToSelfMessageFromBytes(r *bytes.Reader, version uint8) (*EncryptedToSelfMessage, error) {
+func EncryptedToSelfMessageAttachmentFromBytes(bs []byte, version uint8) (Attachment, int, error) {
 	var message EncryptedToSelfMessage
+
+	r := bytes.NewReader(bs)
 
 	len, isTextAndLen, isText, err := parsing.GetMessageLengthAndType(r)
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 
 	message.IsTextAndLen = isTextAndLen
@@ -44,11 +46,11 @@ func EncryptedToSelfMessageFromBytes(r *bytes.Reader, version uint8) (*Encrypted
 
 	message.Data = make([]byte, len)
 	if err := binary.Read(r, binary.LittleEndian, &message.Data); err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 
 	message.Nonce = make([]byte, 32)
 	err = binary.Read(r, binary.LittleEndian, &message.Nonce)
 
-	return &message, err
+	return &message, 4 + int(len), err
 }
