@@ -6,17 +6,16 @@ import (
 	"gopkg.in/restruct.v1"
 )
 
-type CancelBidOrderAttachment struct {
+type CancelBidOrder struct {
 	Order   uint64 `json:"order,omitempty,string"`
 	Version int8   `struct:"-" json:"version.BidOrderCancellation,omitempty"`
 }
 
-func CancelBidOrderAttachmentFromBytes(bs []byte, version uint8) (Attachment, int, error) {
-	var attachment CancelBidOrderAttachment
-	err := restruct.Unpack(bs, binary.LittleEndian, &attachment)
-	return &attachment, 8, err
+func (attachment *CancelBidOrder) FromBytes(bs []byte, version uint8) (int, error) {
+	err := restruct.Unpack(bs, binary.LittleEndian, attachment)
+	return 8, err
 }
 
-func (attachment *CancelBidOrderAttachment) ToBytes(version uint8) ([]byte, error) {
+func (attachment *CancelBidOrder) ToBytes(version uint8) ([]byte, error) {
 	return restruct.Pack(binary.LittleEndian, attachment)
 }

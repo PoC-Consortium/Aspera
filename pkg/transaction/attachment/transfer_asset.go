@@ -7,7 +7,7 @@ import (
 	"gopkg.in/restruct.v1"
 )
 
-type TransferAssetAttachment struct {
+type TransferAsset struct {
 	Asset       uint64 `json:"asset,omitempty,string"`
 	QuantityQNT uint64 `json:"quantityQNT,omitempty"`
 
@@ -15,30 +15,29 @@ type TransferAssetAttachment struct {
 	Comment    string `struct:"-" json:"comment"`
 }
 
-func TransferAssetAttachmentFromBytes(bs []byte, version uint8) (Attachment, int, error) {
-	var attachment TransferAssetAttachment
-	err := restruct.Unpack(bs, binary.LittleEndian, &attachment)
+func (attachment *TransferAsset) FromBytes(bs []byte, version uint8) (int, error) {
+	err := restruct.Unpack(bs, binary.LittleEndian, attachment)
 
 	len := 8 + 8
 	if version == 0 {
 		r := bytes.NewReader(bs[len:])
 		if err := binary.Read(r, binary.LittleEndian, &attachment.NumComment); err != nil {
-			return nil, 0, err
+			return 0, err
 		}
 
 		comment := make([]byte, attachment.NumComment)
 		if err := binary.Read(r, binary.LittleEndian, &comment); err != nil {
-			return nil, 0, err
+			return 0, err
 		}
 		attachment.Comment = string(comment)
 
 		len += 2 + int(attachment.NumComment)
 	}
 
-	return &attachment, len, err
+	return len, err
 }
 
-func (attachment *TransferAssetAttachment) ToBytes(version uint8) ([]byte, error) {
+func (attachment *TransferAsset) ToBytes(version uint8) ([]byte, error) {
 	bs, err := restruct.Pack(binary.LittleEndian, attachment)
 	if err != nil {
 		return nil, err

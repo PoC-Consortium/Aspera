@@ -1,11 +1,11 @@
 package attachment
 
-type SendMoneyAttachment struct{}
+type SendMoney struct{}
 
-func SendMoneyAttachmentFromBytes(bs []byte, version uint8) (Attachment, int, error) {
-	return &SendMoneyAttachment{}, 0, nil
+func (attachment *SendMoney) FromBytes(bs []byte, version uint8) (int, error) {
+	return 0, nil
 }
 
-func (attachment *SendMoneyAttachment) ToBytes(version uint8) ([]byte, error) {
+func (attachment *SendMoney) ToBytes(version uint8) ([]byte, error) {
 	return []byte{}, nil
 }

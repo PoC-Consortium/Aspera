@@ -6,17 +6,16 @@ import (
 	"gopkg.in/restruct.v1"
 )
 
-type SubscriptionCancelAttachment struct {
+type SubscriptionCancel struct {
 	Subscription uint64 `json:"subscriptionId,string"`
 	Version      int8   `struct:"-" json:"version.SubscriptionCancel,omitempty"`
 }
 
-func SubscriptionCancelAttachmentFromBytes(bs []byte, version uint8) (Attachment, int, error) {
-	var attachment SubscriptionCancelAttachment
-	err := restruct.Unpack(bs, binary.LittleEndian, &attachment)
-	return &attachment, 8, err
+func (attachment *SubscriptionCancel) FromBytes(bs []byte, version uint8) (int, error) {
+	err := restruct.Unpack(bs, binary.LittleEndian, attachment)
+	return 8, err
 }
 
-func (attachment *SubscriptionCancelAttachment) ToBytes(version uint8) ([]byte, error) {
+func (attachment *SubscriptionCancel) ToBytes(version uint8) ([]byte, error) {
 	return restruct.Pack(binary.LittleEndian, attachment)
 }
