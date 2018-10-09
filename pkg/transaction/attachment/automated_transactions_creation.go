@@ -15,7 +15,7 @@ const (
 	pageSize = 256
 )
 
-type AtPaymentAttachment struct {
+type AutomatedTransactionsCreationAttachment struct {
 	NumName        uint8  `json:"-"`
 	Name           string `json:"name"`
 	NumDescription uint16 `json:"-"`
@@ -39,8 +39,8 @@ Either:
 
 This needs to be changed as soon as we know which params we need for executing the at.
 */
-func AtPaymentAttachmentFromBytes(bs []byte, version uint8) (Attachment, int, error) {
-	var attachment AtPaymentAttachment
+func AutomatedTransactionsCreationAttachmentFromBytes(bs []byte, version uint8) (Attachment, int, error) {
+	var attachment AutomatedTransactionsCreationAttachment
 
 	r := bytes.NewReader(bs)
 
@@ -151,7 +151,7 @@ func AtPaymentAttachmentFromBytes(bs []byte, version uint8) (Attachment, int, er
 	return &attachment, 0, nil
 }
 
-func (attachment *AtPaymentAttachment) ToBytes(version uint8) ([]byte, error) {
+func (attachment *AutomatedTransactionsCreationAttachment) ToBytes(version uint8) ([]byte, error) {
 	buf := bytes.NewBuffer(nil)
 
 	if err := binary.Write(buf, binary.LittleEndian, attachment.NumName); err != nil {
