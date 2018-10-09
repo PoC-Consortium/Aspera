@@ -54,7 +54,8 @@ func (tx *Transaction) UnmarshalJSON(bs []byte) error {
 	var txJSON TransactionJSON
 	var err error
 
-	txJSON.Attachment, err = attachment.ChooseAttachmentFromJSON(bs)
+	attachments, err := attachment.GuessAttachmentsAndAppendicesFromJSON(bs)
+	txJSON.Attachment = attachments[0]
 	if err != nil {
 		return err
 	}
