@@ -17,9 +17,10 @@ type Attachment interface {
 }
 
 type attachmentType struct {
-	surtype int
-	subtype int
-	new     func() Attachment
+	surtype            int
+	subtype            int
+	new                func() Attachment
+	supersedeAppendixe string
 }
 
 var appendixTypeOfName = map[string]func() Attachment{
@@ -32,8 +33,8 @@ var typeOfName = map[string]*attachmentType{
 	"OrdinaryPayment":               &attachmentType{surtype: 0, subtype: 0, new: func() Attachment { return new(DummyAttachment) }},
 	"MultiOutCreation":              &attachmentType{surtype: 0, subtype: 1, new: func() Attachment { return new(SendMoneyMultiAttachment) }},
 	"MultiSameOutCreation":          &attachmentType{surtype: 0, subtype: 2, new: func() Attachment { return new(SendMoneyMultiSameAttachment) }},
-	"ArbitaryMessage":               &attachmentType{surtype: 1, subtype: 0, new: func() Attachment { return new(MessageAttachment) }},
-	"EncryptedMessage":              &attachmentType{surtype: 1, subtype: 0, new: func() Attachment { return new(EncryptedMessageAttachment) }},
+	"ArbitaryMessage":               &attachmentType{surtype: 1, subtype: 0, new: func() Attachment { return new(MessageAttachment) }, supersedeAppendix: "Message"},
+	"EncryptedMessage":              &attachmentType{surtype: 1, subtype: 0, new: func() Attachment { return new(EncryptedMessageAttachment) }, supersedeAppendix: "EncryptedMessage"},
 	"AliasAssignment":               &attachmentType{surtype: 1, subtype: 1, new: func() Attachment { return new(SetAliasAttachment) }},
 	"AccountInfo":                   &attachmentType{surtype: 1, subtype: 5, new: func() Attachment { return new(SetAccountInfoAttachment) }},
 	"AliasSell":                     &attachmentType{surtype: 1, subtype: 6, new: func() Attachment { return new(SellAliasAttachment) }},
@@ -219,7 +220,7 @@ func GuessAttachmentsAndAppendicesFromJSON(bs []byte) ([]Attachment, error) {
 		}
 		for appendixName, f := range appendixTypeOfName {
 			appendixIdentifier := "version." + appendixName
-			if txJSON.Exists("attachment", appendixIdentifier) {
+			if txJSON.Exists("attachment", appendixIdentifier) && attachmentType.supersedeAppendix != appendixIdentifier {
 				appendix := f()
 				if err := json.Unmarshal(txJSON.S("attachment").Bytes(), appendix); err != nil {
 					return nil, err

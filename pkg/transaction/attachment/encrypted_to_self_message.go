@@ -16,6 +16,7 @@ type EncryptedToSelfMessageAttachment struct {
 	IsTextAndLen int32
 	Data         []byte
 	Nonce        []byte
+	Version      int8 `struct:"-" json:"version.EncryptToSelfMessage,omitempty"`
 }
 
 func (attachment *EncryptedToSelfMessageAttachment) ToBytes(version uint8) ([]byte, error) {
