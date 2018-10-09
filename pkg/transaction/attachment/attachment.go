@@ -1,12 +1,16 @@
 package attachment
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/Jeffail/gabs"
 	"strconv"
 	"strings"
+
+	"github.com/Jeffail/gabs"
+
+	"github.com/ac0v/aspera/pkg/parsing"
 )
 
 type Attachment interface {
@@ -81,14 +85,81 @@ var attachmentParserOf = map[uint16]func([]byte, uint8) (Attachment, int, error)
 	352: AtPaymentAttachmentFromBytes,
 }
 
-func FromBytes(bs []byte, surtype, subtype, version uint8) (Attachment, int, error) {
+func FromBytes(bs []byte, surtype, subtype, version uint8, flags uint32) ([]Attachment, error) {
 	parse, exists := attachmentParserOf[uint16(surtype)<<4|uint16(subtype)]
 
 	if !exists {
-		return nil, 0, fmt.Errorf("no parse function for transaction with type %d and subtype %d",
+		return nil, fmt.Errorf("no parse function for transaction with type %d and subtype %d",
 			surtype, subtype)
 	}
-	return parse(bs, version)
+
+	attachment, attachmentLen, err := parse(bs, version)
+	if err != nil {
+		return nil, err
+	}
+
+	attachments := []Attachment{attachment}
+	if flags == 0 {
+		return attachments, err
+	}
+
+	r := bytes.NewReader(bs[attachmentLen:])
+	if flags&(1<<0) != 0 {
+		if version > 0 {
+			if err := parsing.SkipByte(r); err != nil {
+				return nil, err
+			}
+		}
+
+		message, err := MessageFromBytes(r, version)
+		if err != nil {
+			return nil, err
+		}
+		attachments = append(attachments, message)
+	}
+
+	if flags&(1<<1) != 0 {
+		if version > 0 {
+			if err := parsing.SkipByte(r); err != nil {
+				return nil, err
+			}
+		}
+
+		encryptedMessage, err := EncryptedMessageFromBytes(r, version)
+		if err != nil {
+			return nil, err
+		}
+		attachments = append(attachments, encryptedMessage)
+	}
+
+	if flags&(1<<2) != 0 {
+		if version > 0 {
+			if err := parsing.SkipByte(r); err != nil {
+				return nil, err
+			}
+		}
+
+		publicKeyAnnouncement, err := PublicKeyAnnouncementFromBytes(r, version)
+		if err != nil {
+			return nil, err
+		}
+		attachments = append(attachments, publicKeyAnnouncement)
+	}
+
+	if flags&(1<<3) != 0 {
+		if version > 0 {
+			if err := parsing.SkipByte(r); err != nil {
+				return nil, err
+			}
+		}
+		encryptedToSelfMessage, err := EncryptedToSelfMessageFromBytes(r, version)
+		if err != nil {
+			return nil, err
+		}
+		attachments = append(attachments, encryptedToSelfMessage)
+	}
+
+	return attachments, nil
 }
 
 func ChooseAttachmentFromJSON(bs []byte) (Attachment, error) {

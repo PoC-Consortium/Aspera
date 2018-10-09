@@ -3,21 +3,22 @@ package transaction
 import (
 	"bytes"
 	"encoding/binary"
+	"io"
+	"reflect"
+
+	"github.com/json-iterator/go"
+	"gopkg.in/restruct.v1"
+
 	"github.com/ac0v/aspera/pkg/parsing"
 	"github.com/ac0v/aspera/pkg/transaction/appendicies"
 	"github.com/ac0v/aspera/pkg/transaction/attachment"
-	"github.com/json-iterator/go"
-	"gopkg.in/restruct.v1"
-	"io"
-	"reflect"
 )
 
 var json = jsoniter.ConfigCompatibleWithStandardLibrary
 
 type Transaction struct {
-	Header     Header
-	Appendices *appendicies.Appendices
-	Attachment attachment.Attachment
+	Header      Header
+	Attachments []attachment.Attachment `json:"attachment"`
 }
 
 type Header struct {
@@ -122,18 +123,12 @@ func FromBytes(bs []byte) (*Transaction, error) {
 	}
 	tx.Header = *header
 
-	attachment, attachmentLen, err := attachment.FromBytes(bs[header.size:],
-		header.Type, header.GetSubtype(), header.GetVersion())
+	attachments, err := attachment.FromBytes(
+		bs[header.size:], header.Type, header.GetSubtype(), header.GetVersion(), header.Flags)
 	if err != nil {
 		return nil, err
 	}
-	tx.Attachment = attachment
-
-	appendencies, err := appendicies.FromBytes(bs[header.size+attachmentLen:], header.Flags, header.GetVersion())
-	if err != nil {
-		return nil, err
-	}
-	tx.Appendices = appendencies
+	tx.Attachments = attachments
 
 	return &tx, nil
 }
@@ -144,18 +139,16 @@ func (tx *Transaction) ToBytes() ([]byte, error) {
 		return nil, err
 	}
 
-	attachmentBs, err := tx.Attachment.ToBytes(tx.Header.GetVersion())
-	if err != nil {
-		return nil, err
+	var attachmentsBs []byte
+	for _, attachment := range tx.Attachments {
+		bs, err := attachment.ToBytes(tx.Header.GetVersion())
+		if err != nil {
+			return nil, err
+		}
+		attachmentsBs = append(attachmentsBs, bs...)
 	}
 
-	appendiciesBs, err := tx.Appendices.ToBytes(tx.Header.GetVersion())
-	if err != nil {
-		return nil, err
-	}
-
-	bs := append(headerBs, attachmentBs...)
-	bs = append(bs, appendiciesBs...)
+	bs := append(headerBs, attachmentsBs...)
 
 	return bs, nil
 }
