@@ -9,7 +9,7 @@ import (
 	"github.com/ac0v/aspera/pkg/parsing"
 )
 
-type EncryptedToSelfMessage struct {
+type EncryptedToSelfMessageAttachment struct {
 	IsText bool `struct:"-"`
 
 	// IsText is encoded as a signle bit
@@ -18,7 +18,7 @@ type EncryptedToSelfMessage struct {
 	Nonce        []byte
 }
 
-func (attachment *EncryptedToSelfMessage) ToBytes(version uint8) ([]byte, error) {
+func (attachment *EncryptedToSelfMessageAttachment) ToBytes(version uint8) ([]byte, error) {
 	bs, err := restruct.Pack(binary.LittleEndian, attachment)
 	if err != nil {
 		return nil, err
@@ -32,7 +32,7 @@ func (attachment *EncryptedToSelfMessage) ToBytes(version uint8) ([]byte, error)
 }
 
 func EncryptedToSelfMessageAttachmentFromBytes(bs []byte, version uint8) (Attachment, int, error) {
-	var message EncryptedToSelfMessage
+	var message EncryptedToSelfMessageAttachment
 
 	r := bytes.NewReader(bs)
 

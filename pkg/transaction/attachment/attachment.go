@@ -22,8 +22,14 @@ type attachmentType struct {
 	new     func() Attachment
 }
 
-var appendixTypeNames = []string{"ArbitaryMessage", "EncryptedMessage", "PublicKeyAnnouncement", "EncryptToSelfMessage"}
+var appendixTypeOfName = map[string]func() Attachment{
+	"Message":               func() Attachment { return new(MessageAttachment) },
+	"EncryptedMessage":      func() Attachment { return new(EncryptedMessageAttachment) },
+	"PublicKeyAnnouncement": func() Attachment { return new(PublicKeyAnnouncementAttachment) },
+	"EncryptToSelfMessage":  func() Attachment { return new(EncryptedToSelfMessageAttachment) },
+}
 var typeOfName = map[string]*attachmentType{
+	"OrdinaryPayment":            &attachmentType{surtype: 0, subtype: 0, new: func() Attachment { return new(DummyAttachment) }},
 	"MultiOutCreation":           &attachmentType{surtype: 0, subtype: 1, new: func() Attachment { return new(SendMoneyMultiAttachment) }},
 	"MultiSameOutCreation":       &attachmentType{surtype: 0, subtype: 2, new: func() Attachment { return new(SendMoneyMultiSameAttachment) }},
 	"ArbitaryMessage":            &attachmentType{surtype: 1, subtype: 0, new: func() Attachment { return new(MessageAttachment) }},
@@ -56,9 +62,6 @@ var typeOfName = map[string]*attachmentType{
 	//"SubscriptionPayment":           &attachmentType{surtype: 21, subtype: 5, new: func() Attachment { return new() }},
 	//"AutomatedTransactionsCreation": &attachmentType{surtype: 22, subtype: 0, new: func() Attachment { return new() }},
 	//"AutomatedTransactionsPayment":  &attachmentType{surtype: 22, subtype: 1, new: func() Attachment { return new() }}, // AT Payment
-	//"OrdinaryPayment":               &attachmentType{surtype: 0, subtype: 0, new: func() Attachment { return new() }},
-	//"PublicKeyAnnouncement"
-	//"EncryptToSelfMessage"
 }
 var typeFor = make(map[uint16]*attachmentType)
 
@@ -208,14 +211,13 @@ func GuessAttachmentsAndAppendicesFromJSON(bs []byte) ([]Attachment, error) {
 	} else if len(children) == 0 {
 		return []Attachment{new(DummyAttachment)}, nil
 	}
-
-	attachmentType, exists := typeFor[uint16(txJSON.Path("type").Data().(int8))<<4|uint16(txJSON.Path("subtype").Data().(int8))]
+	attachmentType, exists := typeFor[uint16(txJSON.Path("type").Data().(float64))<<4|uint16(txJSON.Path("subtype").Data().(float64))]
 	if exists {
 		attachments := []Attachment{attachmentType.new()}
-		for _, appendixName := range appendixTypeNames {
+		for appendixName, f := range appendixTypeOfName {
 			appendixIdentifier := "version." + appendixName
 			if txJSON.Exists("attachment", appendixIdentifier) {
-				attachments = append(attachments, typeOfName[appendixIdentifier].new())
+				attachments = append(attachments, f())
 			}
 		}
 		return attachments, nil

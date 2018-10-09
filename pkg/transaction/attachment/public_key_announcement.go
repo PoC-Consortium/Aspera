@@ -7,11 +7,11 @@ import (
 	"gopkg.in/restruct.v1"
 )
 
-type PublicKeyAnnouncement struct {
+type PublicKeyAnnouncementAttachment struct {
 	PublicKey []byte
 }
 
-func (attachment *PublicKeyAnnouncement) ToBytes(version uint8) ([]byte, error) {
+func (attachment *PublicKeyAnnouncementAttachment) ToBytes(version uint8) ([]byte, error) {
 	bs, err := restruct.Pack(binary.LittleEndian, attachment)
 	if err != nil {
 		return nil, err
@@ -25,7 +25,7 @@ func (attachment *PublicKeyAnnouncement) ToBytes(version uint8) ([]byte, error) 
 }
 
 func PublicKeyAnnouncementAttachmentFromBytes(bs []byte, version uint8) (Attachment, int, error) {
-	var message PublicKeyAnnouncement
+	var message PublicKeyAnnouncementAttachment
 
 	r := bytes.NewReader(bs)
 
