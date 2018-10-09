@@ -1,0 +1,14 @@
+storage:
+  path: ./var
+network:
+  internetProtocols:
+    - v4
+  p2p:
+    peers:
+      - wallet.burst.cryptoguru.org
+      - burst-a.bayernport.com
+    milestones:
+      - height: 50000
+        id: 17169998969130562818
+      - height: 100000
+        id: 10851012679396814781
