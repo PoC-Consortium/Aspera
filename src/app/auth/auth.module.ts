@@ -13,6 +13,7 @@ import { reducers } from './reducers';
 import { AuthRoutingModule } from './auth-routing.module';
 import { MatCardModule, MatFormFieldModule, MatInputModule, MatButtonModule, MatDialogModule, MatIconModule } from '@angular/material';
 import { AccountsListEffects } from './effects/accounts-list.effects';
+import { SetupModule } from '../pages/dashboard/setup/setup.module';
 
 export const COMPONENTS = [
   LoginPageComponent,
@@ -36,6 +37,7 @@ export const COMPONENTS = [
     MatInputModule,
     MatButtonModule,
     MatDialogModule,
+    SetupModule,
     StoreModule.forFeature('auth', reducers),
     EffectsModule.forFeature([AuthEffects, AccountsListEffects]),
   ],
