@@ -22,6 +22,7 @@ type attachmentType struct {
 
 var appendixTypeNames = []string{"ArbitaryMessage", "EncryptedMessage", "PublicKeyAnnouncement", "EncryptToSelfMessage"}
 var typeOfName = map[string]*attachmentType{
+	"OrdinaryPayment":            &attachmentType{surtype: 0, subtype: 0, new: func() Attachment { return new(DummyAttachment) }},
 	"MultiOutCreation":           &attachmentType{surtype: 0, subtype: 1, new: func() Attachment { return new(SendMoneyMultiAttachment) }},
 	"MultiSameOutCreation":       &attachmentType{surtype: 0, subtype: 2, new: func() Attachment { return new(SendMoneyMultiSameAttachment) }},
 	"ArbitaryMessage":            &attachmentType{surtype: 1, subtype: 0, new: func() Attachment { return new(SendMessageAttachment) }},
@@ -54,7 +55,6 @@ var typeOfName = map[string]*attachmentType{
 	//"SubscriptionPayment":           &attachmentType{surtype: 21, subtype: 5, new: func() Attachment { return new() }},
 	//"AutomatedTransactionsCreation": &attachmentType{surtype: 22, subtype: 0, new: func() Attachment { return new() }},
 	//"AutomatedTransactionsPayment":  &attachmentType{surtype: 22, subtype: 1, new: func() Attachment { return new() }}, // AT Payment
-	//"OrdinaryPayment":               &attachmentType{surtype: 0, subtype: 0, new: func() Attachment { return new() }},
 	//"PublicKeyAnnouncement"
 	//"EncryptToSelfMessage"
 }
@@ -71,7 +71,7 @@ func init() {
 				panic("missing transactionTypeForName: " + appendixTypeName)
 			}
 		}
-*/
+	*/
 }
 
 var attachmentParserOf = map[uint16]func([]byte, uint8) (Attachment, int, error){
@@ -130,8 +130,7 @@ func GuessAttachmentsAndAppendicesFromJSON(bs []byte) ([]Attachment, error) {
 	} else if len(children) == 0 {
 		return []Attachment{new(DummyAttachment)}, nil
 	}
-
-	attachmentType, exists := typeFor[uint16(txJSON.Path("type").Data().(int8))<<4|uint16(txJSON.Path("subtype").Data().(int8))]
+	attachmentType, exists := typeFor[uint16(txJSON.Path("type").Data().(float64))<<4|uint16(txJSON.Path("subtype").Data().(float64))]
 	if exists {
 		attachments := []Attachment{attachmentType.new()}
 		for _, appendixName := range appendixTypeNames {
