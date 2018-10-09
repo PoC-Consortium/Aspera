@@ -6,7 +6,7 @@ import { AccountNewComponent } from './account/account.component';
 // noinspection TypeScriptValidateTypes
 const routes: Routes = [
     {
-        path: '',
+        path: 'setup',
         component: SetupComponent
     },
     {

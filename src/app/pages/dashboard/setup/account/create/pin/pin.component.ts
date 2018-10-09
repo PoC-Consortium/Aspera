@@ -29,8 +29,9 @@ export class AccountCreatePinComponent implements OnInit {
         this.createService.setStepIndex(1);
     }
 
-    public finish() {
-        this.setupService.setStepIndex(2);
+    public finish(pin: string) {
+        this.createService.setPin(pin);
+        this.createService.createAccount();
     }
 
 }

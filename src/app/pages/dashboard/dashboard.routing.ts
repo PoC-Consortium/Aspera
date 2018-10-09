@@ -10,6 +10,7 @@ const routes: Routes = [
         path: 'dashboard',
         component: DashboardComponent,
         canActivate: [AuthGuard],
+        runGuardsAndResolvers: 'always',
         children: [
             { path: '', redirectTo: 'home', pathMatch: 'full' },
             { path: 'accounts', loadChildren: './accounts/accounts.module#AccountsModule' },

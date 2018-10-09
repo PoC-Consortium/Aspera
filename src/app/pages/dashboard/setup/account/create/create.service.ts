@@ -1,15 +1,17 @@
 import { Injectable } from '@angular/core';
-import { Router } from '@angular/router';
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import { LoginPageActions } from '../../../../../auth/actions';
+import { Store } from '@ngrx/store';
+import * as fromAuth from '../../../../../auth/reducers';
 
 @Injectable()
 export class CreateService {
     private passphrase: string[];
+    private pin: string;
     private id: string;
     private address: string;
     private stepIndex: number;
 
-    constructor() {
+    constructor(private store: Store<fromAuth.State>) {
         this.stepIndex = 0;
         this.reset();
     }
@@ -20,6 +22,14 @@ export class CreateService {
 
     public getPassphrase(): string[] {
         return this.passphrase;
+    }
+
+    public setPin(pin: string) {
+        this.pin = pin;
+    }
+
+    public getPin(): string {
+        return this.pin;
     }
 
     public getPassphrasePart(index: number): string {
@@ -56,6 +66,10 @@ export class CreateService {
 
     public isPassphraseGenerated() : boolean {
         return this.passphrase.length > 0 && this.address != undefined && this.id != undefined
+    }
+
+    public createAccount() {
+        return this.store.dispatch(new LoginPageActions.Login({ credentials: { passphrase: this.getCompletePassphrase(), pin: this.pin } }));
     }
 
     public reset() {

@@ -1,0 +1,13 @@
+<div class="accounts-list">
+  <div class="accounts-list-inner">
+    <img src="../../../public/assets/img/burst_logo.png" class="logo" />
+    <span class="version">{{version}}</span>
+    Select an account: 
+    <ul *ngIf="accounts">
+      <li *ngFor="let account of accounts" (click)="selectAccount(account)">
+        {{ account.address }}
+        {{ account.balance }}
+      </li>
+    </ul>
+  </div>
+</div>
