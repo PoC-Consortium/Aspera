@@ -6,6 +6,7 @@ import (
 	"io"
 	"reflect"
 
+	"github.com/Jeffail/gabs"
 	"github.com/json-iterator/go"
 	"gopkg.in/restruct.v1"
 
@@ -46,14 +47,15 @@ type Header struct {
 
 type TransactionJSON struct {
 	Header
-	Attachment []attachment.Attachment `json:"attachment,omitempty"`
+	Attachment interface{} `json:"attachment"`
+	//[]attachment.Attachment `json:"attachment,omitempty"`
 }
 
 func (tx *Transaction) UnmarshalJSON(bs []byte) error {
 	var txJSON TransactionJSON
 	var err error
 
-	txJSON.Attachment, err = attachment.GuessAttachmentsAndAppendicesFromJSON(bs)
+	tx.Attachments, err = attachment.GuessAttachmentsAndAppendicesFromJSON(bs)
 	if err != nil {
 		return err
 	}
@@ -66,11 +68,13 @@ func (tx *Transaction) UnmarshalJSON(bs []byte) error {
 	dst := reflect.ValueOf(tx).Elem()
 
 	for i := 0; i < src.NumField(); i++ {
-		srcField := src.Field(i)
-		dstField := dst.Field(i)
-		dstField.Set(reflect.Value(srcField))
+		// copy all except of the attachment interface related stuff
+		if len(src.Field(i).Type().Name()) > 0 {
+			srcField := src.Field(i)
+			dstField := dst.Field(i)
+			dstField.Set(reflect.Value(srcField))
+		}
 	}
-
 	tx.Header.SetSubtypeAndVersion(txJSON.Subtype, txJSON.Version)
 
 	return nil
@@ -83,11 +87,31 @@ func (tx *Transaction) MarshalJSON() ([]byte, error) {
 	dst := reflect.ValueOf(txJSON).Elem()
 
 	for i := 0; i < src.NumField(); i++ {
-		srcField := src.Field(i)
-		dstField := dst.Field(i)
-		dstField.Set(reflect.Value(srcField))
+		// copy all except of the attachment interface related stuff
+		if len(dst.Field(i).Type().Name()) > 0 {
+			srcField := src.Field(i)
+			dstField := dst.Field(i)
+			dstField.Set(reflect.Value(srcField))
+		}
 	}
 
+	// merge attachment and appendixes (if there are any)
+	var gabsJSON = *gabs.New()
+	for _, attachment := range tx.Attachments {
+		var err error
+		var bs []byte
+		if bs, err = json.Marshal(attachment); err != nil {
+			return nil, err
+		}
+
+		var attachmentJSON *gabs.Container
+		if attachmentJSON, err = gabs.ParseJSON(bs); err != nil {
+			return nil, err
+		}
+		gabsJSON.Merge(attachmentJSON)
+	}
+
+	txJSON.Attachment = gabsJSON.Data()
 	txJSON.Version = txJSON.GetVersion()
 	txJSON.Subtype = txJSON.GetSubtype()
 
