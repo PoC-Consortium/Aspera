@@ -158,7 +158,7 @@ func (attachment *AtPaymentAttachment) ToBytes(version uint8) ([]byte, error) {
 		return nil, err
 	}
 
-	if err := binary.Write(buf, binary.LittleEndian, attachment.Name); err != nil {
+	if err := binary.Write(buf, binary.LittleEndian, []byte(attachment.Name)); err != nil {
 		return nil, err
 	}
 
@@ -166,11 +166,11 @@ func (attachment *AtPaymentAttachment) ToBytes(version uint8) ([]byte, error) {
 		return nil, err
 	}
 
-	if err := binary.Write(buf, binary.LittleEndian, attachment.Description); err != nil {
+	if err := binary.Write(buf, binary.LittleEndian, []byte(attachment.Description)); err != nil {
 		return nil, err
 	}
 
-	if err := binary.Write(buf, binary.LittleEndian, attachment.CreationBytes); err != nil {
+	if err := binary.Write(buf, binary.LittleEndian, []byte(attachment.CreationBytes)); err != nil {
 		return nil, err
 	}
 

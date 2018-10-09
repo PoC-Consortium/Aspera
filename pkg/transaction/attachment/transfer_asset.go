@@ -51,7 +51,7 @@ func (attachment *TransferAssetAttachment) ToBytes(version uint8) ([]byte, error
 			return nil, err
 		}
 
-		if err := binary.Write(buf, binary.LittleEndian, attachment.Comment); err != nil {
+		if err := binary.Write(buf, binary.LittleEndian, []byte(attachment.Comment)); err != nil {
 			return nil, err
 		}
 
