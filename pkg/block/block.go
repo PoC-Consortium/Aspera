@@ -7,13 +7,13 @@ import (
 )
 
 type Block struct {
-	PayloadLength       int64            `json:"payloadLength,omitempty"`
+	PayloadLength       int64            `json:"payloadLength"`
 	TotalAmountNQT      int64            `json:"totalAmountNQT"`
 	GenerationSignature string           `json:"generationSignature,omitempty"`
 	GeneratorPublicKey  string           `json:"generatorPublicKey,omitempty"`
 	PayloadHash         string           `json:"payloadHash,omitempty"`
 	BlockSignature      string           `json:"blockSignature,omitempty"`
-	Transactions        []*t.Transaction `json:"transactions,omitempty"`
+	Transactions        []*t.Transaction `json:"transactions"`
 	Version             int32            `json:"version,omitempty"`
 	Nonce               string           `json:"nonce,omitempty"`
 	TotalFeeNQT         int64            `json:"totalFeeNQT,omitempty"`

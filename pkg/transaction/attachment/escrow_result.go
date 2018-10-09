@@ -7,8 +7,8 @@ import (
 )
 
 type EscrowResult struct {
-	EscrowID uint64
-	Decision uint8
+	EscrowID uint64 `json:"escrowId,string"`
+	Decision uint8  `json:"decision"`
 }
 
 func (attachment *EscrowResult) FromBytes(bs []byte, version uint8) (int, error) {

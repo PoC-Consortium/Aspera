@@ -8,6 +8,7 @@ import (
 
 type DgsFeedback struct {
 	Purchase uint64 `json:"purchase,omitempty,string"`
+	Version  int8   `struct:"-" json:"version.DigitalGoodsFeedback,omitempty"`
 }
 
 func (attachment *DgsFeedback) FromBytes(bs []byte, version uint8) (int, error) {

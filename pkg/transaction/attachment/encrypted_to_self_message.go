@@ -10,13 +10,17 @@ import (
 )
 
 type EncryptedToSelfMessage struct {
-	IsText bool `struct:"-"`
+	IsText bool `struct:"-" json:"isText"`
 
 	// IsText is encoded as a signle bit
-	IsTextAndLen int32
-	Data         []byte
-	Nonce        []byte
-	Version      int8 `struct:"-" json:"version.EncryptToSelfMessage,omitempty"`
+	IsTextAndLen int32  `json:"-"`
+	Data         []byte `json:"data"`
+	Nonce        []byte `json:"nonce"`
+}
+
+type EncryptedToSelfMessageAttachment struct {
+	Message *EncryptedToSelfMessage `json:"encryptToSelfMessage"`
+	Version int8                    `struct:"-" json:"version.EncryptToSelfMessage,omitempty"`
 }
 
 func (attachment *EncryptedToSelfMessage) FromBytes(bs []byte, version uint8) (int, error) {

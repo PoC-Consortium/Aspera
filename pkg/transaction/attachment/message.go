@@ -9,11 +9,11 @@ import (
 )
 
 type Message struct {
-	IsText bool `struct:"-" json:"messageIsText"`
+	IsText *bool `struct:"-" json:"messageIsText,omitempty"`
 
 	// IsText is encoded as a single bit
 	IsTextAndLen int32  `json:"-"`
-	Content      string `json:"message"`
+	Content      string `json:"message,omitempty"`
 	Version      int8   `struct:"-" json:"version.Message,omitempty"`
 }
 
@@ -26,7 +26,7 @@ func (attachment *Message) FromBytes(bs []byte, version uint8) (int, error) {
 	}
 
 	attachment.IsTextAndLen = isTextAndLen
-	attachment.IsText = isText
+	attachment.IsText = &isText
 
 	content := make([]byte, len)
 	if err := binary.Read(r, binary.LittleEndian, &content); err != nil {

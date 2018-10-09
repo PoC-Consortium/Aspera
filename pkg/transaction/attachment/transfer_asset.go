@@ -13,6 +13,7 @@ type TransferAsset struct {
 
 	NumComment uint16 `struct:"-" json:"-"`
 	Comment    string `struct:"-" json:"comment,omitempty"`
+	Version    int8   `struct:"-" json:"version.AssetTransfer,omitempty"`
 }
 
 func (attachment *TransferAsset) FromBytes(bs []byte, version uint8) (int, error) {
