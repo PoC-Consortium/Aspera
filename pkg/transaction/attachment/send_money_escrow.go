@@ -31,7 +31,7 @@ type Signer struct {
 	Id uint64
 }
 
-type SendMoneyEscrowAttachment struct {
+type SendMoneyEscrow struct {
 	AmountNQT      uint64                `json:"amountNQT,omitempty,string"`
 	Deadline       uint32                `json:"deadline"`
 	EscrowDeadline *EscrowDeadlineAction `json:"deadlineAction,omitempty"`
@@ -41,13 +41,12 @@ type SendMoneyEscrowAttachment struct {
 	Version        int8                  `struct:"-" json:"version.EscrowCreation,omitempty"`
 }
 
-func SendMoneyEscrowAttachmentFromBytes(bs []byte, version uint8) (Attachment, int, error) {
-	var attachment SendMoneyEscrowAttachment
-	err := restruct.Unpack(bs, binary.LittleEndian, &attachment)
-	return &attachment, 8 + 4 + 1 + 1 + 1 + len(attachment.Signees)*8, err
+func (attachment *SendMoneyEscrow) FromBytes(bs []byte, version uint8) (int, error) {
+	err := restruct.Unpack(bs, binary.LittleEndian, attachment)
+	return 8 + 4 + 1 + 1 + 1 + len(attachment.Signees)*8, err
 }
 
-func (attachment *SendMoneyEscrowAttachment) ToBytes(version uint8) ([]byte, error) {
+func (attachment *SendMoneyEscrow) ToBytes(version uint8) ([]byte, error) {
 	return restruct.Pack(binary.LittleEndian, attachment)
 }
 
