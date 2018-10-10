@@ -9,10 +9,6 @@ import (
 	"gopkg.in/restruct.v1"
 )
 
-type EscrowDeadlineAction struct {
-	DeadlineAction uint8
-}
-
 var escrowDeadlineActionNameOf = map[uint8]string{
 	0: "undecided",
 	1: "release",
@@ -31,14 +27,18 @@ type Signer struct {
 	Id uint64
 }
 
+type EscrowDeadlineAction struct {
+	DeadlineAction uint8
+}
+
 type SendMoneyEscrow struct {
-	AmountNQT      uint64                `json:"amountNQT,omitempty,string"`
-	Deadline       uint32                `json:"deadline"`
-	EscrowDeadline *EscrowDeadlineAction `json:"deadlineAction,omitempty"`
-	NumSignees     uint8                 `struct:"uint8,sizeof=Signees" json:"-"`
-	TotalSignees   uint8                 `json:"requiredSigners"`
-	Signees        []Signer              `json:"signers"`
-	Version        int8                  `struct:"-" json:"version.EscrowCreation,omitempty"`
+	AmountNQT       uint64               `json:"amountNQT,omitempty,string"`
+	Deadline        uint32               `json:"deadline"`
+	EscrowDeadline  EscrowDeadlineAction `json:"deadlineAction,omitempty"`
+	RequiredSigners int8                 `json:"requiredSigners"`
+	NumSignees      uint8                `struct:"uint8,sizeof=Signees" json:"-"`
+	Signees         []Signer             `json:"signers"`
+	Version         int8                 `struct:"-" json:"version.EscrowCreation,omitempty"`
 }
 
 func (attachment *SendMoneyEscrow) FromBytes(bs []byte, version uint8) (int, error) {
