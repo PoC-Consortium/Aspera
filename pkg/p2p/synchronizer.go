@@ -3,11 +3,12 @@ package p2p
 import (
 	"time"
 
-	pb "github.com/ac0v/aspera/internal/api/protobuf-spec"
+	"go.uber.org/zap"
+	
+	b "github.com/ac0v/aspera/pkg/block"
 	"github.com/ac0v/aspera/pkg/config"
 	. "github.com/ac0v/aspera/pkg/log"
 	s "github.com/ac0v/aspera/pkg/store"
-	"go.uber.org/zap"
 )
 
 type Synchronizer struct {
@@ -34,7 +35,7 @@ type blockBatch struct {
 
 	peers  []*Peer
 	ids    []uint64
-	blocks []*pb.Block
+	blocks []*b.Block
 }
 
 func NewSynchronizer(client Client, store *s.Store, milestones []config.Milestone) *Synchronizer {
@@ -76,6 +77,7 @@ func NewSynchronizer(client Client, store *s.Store, milestones []config.Mileston
 	var processed int
 	start := time.Now()
 	for blockBatch := range s.blockBatchesFilled {
+		panic(blockBatch.ToBytes())
 		processed += len(blockBatch.blocks)
 		Log.Info(
 			"syncing with",

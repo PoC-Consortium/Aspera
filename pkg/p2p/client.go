@@ -7,10 +7,13 @@ import (
 	"net/http"
 	"strconv"
 	"time"
+	
 
+	b "github.com/ac0v/aspera/pkg/block"
 	pb "github.com/ac0v/aspera/internal/api/protobuf-spec"
 	"github.com/ac0v/aspera/pkg/config"
 	"github.com/golang/protobuf/jsonpb"
+	"github.com/json-iterator/go"
 )
 
 const (
@@ -18,9 +21,15 @@ const (
 	parallelism = 5
 )
 
+var json = jsoniter.ConfigCompatibleWithStandardLibrary
+
+type GetNextBlocksResponse struct {
+	NextBlocks []*b.Block `json:"nextBlocks"`
+}
+
 type Client interface {
 	GetNextBlockIDs(blockID uint64) (*pb.GetNextBlockIdsResponse, []*Peer, error)
-	GetNextBlocks(blockID uint64) (*pb.GetNextBlocksResponse, []*Peer, error)
+	GetNextBlocks(blockID uint64) (*GetNextBlocksResponse, []*Peer, error)
 	GetPeersOf(apiUrl string) (*pb.GetPeers, error)
 }
 
@@ -147,7 +156,7 @@ func (c *client) GetNextBlockIDs(blockId uint64) (*pb.GetNextBlockIdsResponse, [
 	return msg, peers, err
 }
 
-func (c *client) GetNextBlocks(blockId uint64) (*pb.GetNextBlocksResponse, []*Peer, error) {
+func (c *client) GetNextBlocks(blockId uint64) (*GetNextBlocksResponse, []*Peer, error) {
 	req := c.buildRequest("getNextBlocks", map[string]interface{}{
 		"blockId": strconv.FormatUint(blockId, 10),
 	})
@@ -156,8 +165,8 @@ func (c *client) GetNextBlocks(blockId uint64) (*pb.GetNextBlocksResponse, []*Pe
 		return nil, nil, err
 	}
 
-	var msg = new(pb.GetNextBlocksResponse)
-	return msg, []*Peer{peers}, c.unmarshaler.Unmarshal(bytes.NewReader(res.Body()), msg)
+	var msg = new(GetNextBlocksResponse)
+	return msg, []*Peer{peers}, json.Unmarshal(res.Body(), msg)
 }
 
 func (c *client) GetPeersOf(apiUrl string) (*pb.GetPeers, error) {
