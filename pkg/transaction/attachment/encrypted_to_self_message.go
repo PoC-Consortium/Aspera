@@ -9,7 +9,7 @@ import (
 	"github.com/ac0v/aspera/pkg/parsing"
 )
 
-type EncryptedToSelfMessage struct {
+type EncryptedToSelfMessageContainer struct {
 	IsText bool `struct:"-" json:"isText"`
 
 	// IsText is encoded as a signle bit
@@ -18,9 +18,9 @@ type EncryptedToSelfMessage struct {
 	Nonce        []byte `json:"nonce"`
 }
 
-type EncryptedToSelfMessageAttachment struct {
-	Message *EncryptedToSelfMessage `json:"encryptToSelfMessage"`
-	Version int8                    `struct:"-" json:"version.EncryptToSelfMessage,omitempty"`
+type EncryptedToSelfMessage struct {
+	Message EncryptedToSelfMessageContainer `json:"encryptToSelfMessage"`
+	Version int8                            `struct:"-" json:"version.EncryptToSelfMessage,omitempty"`
 }
 
 func (attachment *EncryptedToSelfMessage) FromBytes(bs []byte, version uint8) (int, error) {
@@ -31,16 +31,16 @@ func (attachment *EncryptedToSelfMessage) FromBytes(bs []byte, version uint8) (i
 		return 0, err
 	}
 
-	attachment.IsTextAndLen = isTextAndLen
-	attachment.IsText = isText
+	attachment.Message.IsTextAndLen = isTextAndLen
+	attachment.Message.IsText = isText
 
-	attachment.Data = make([]byte, len)
-	if err := binary.Read(r, binary.LittleEndian, &attachment.Data); err != nil {
+	attachment.Message.Data = make([]byte, len)
+	if err := binary.Read(r, binary.LittleEndian, &attachment.Message.Data); err != nil {
 		return 0, err
 	}
 
-	attachment.Nonce = make([]byte, 32)
-	err = binary.Read(r, binary.LittleEndian, &attachment.Nonce)
+	attachment.Message.Nonce = make([]byte, 32)
+	err = binary.Read(r, binary.LittleEndian, &attachment.Message.Nonce)
 
 	return 4 + int(len), err
 }
