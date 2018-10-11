@@ -14,6 +14,9 @@ func TestGetID(t *testing.T) {
 
 		// dummy set, because we need to hash over number of transactions
 		b.Transactions = make([]*transaction.Transaction, blockTest.TXLen)
+		if blockTest.BlockATs != nil {
+			b.BlockATs = &blockTest.BlockATs
+		}
 
 		id, err := b.CalculateID()
 		if assert.Nil(t, err) {

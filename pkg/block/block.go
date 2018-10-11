@@ -36,7 +36,7 @@ type Block struct {
 	Version             int32            `json:"version,omitempty"`
 	Nonce               uint64           `json:"nonce,omitempty,string"`
 	TotalFeeNQT         int64            `json:"totalFeeNQT,omitempty"`
-	BlockATs            jutils.HexSlice  `json:"blockATs"`
+	BlockATs            *jutils.HexSlice `json:"blockATs"`
 	PreviousBlock       uint64           `json:"previousBlock,omitempty,string"`
 	Timestamp           uint32           `json:"timestamp,omitempty"`
 	Block               uint64           `json:"block,omitempty,string"`
@@ -56,7 +56,9 @@ func (b *Block) ToBytes() ([]byte, error) {
 	} else {
 		bsCap += 8 + 8
 	}
-	bsCap += len(b.BlockATs)
+	if b.BlockATs != nil {
+		bsCap += len(*b.BlockATs)
+	}
 
 	w := bytes.NewBuffer(nil)
 
@@ -123,7 +125,7 @@ func (b *Block) ToBytes() ([]byte, error) {
 	}
 
 	if b.BlockATs != nil {
-		if err := binary.Write(w, binary.LittleEndian, b.BlockATs); err != nil {
+		if err := binary.Write(w, binary.LittleEndian, *b.BlockATs); err != nil {
 			return nil, err
 		}
 	}
