@@ -5,12 +5,12 @@ import (
 	"crypto/sha256"
 	"encoding/binary"
 	"errors"
-
 	"math/big"
 
 	"github.com/ac0v/aspera/pkg/burstmath"
-	"github.com/ac0v/aspera/pkg/json"
+	jutils "github.com/ac0v/aspera/pkg/json"
 	t "github.com/ac0v/aspera/pkg/transaction"
+
 	"github.com/json-iterator/go"
 )
 
@@ -28,20 +28,20 @@ var json = jsoniter.ConfigCompatibleWithStandardLibrary
 type Block struct {
 	PayloadLength       uint32           `json:"payloadLength"`
 	TotalAmountNQT      int64            `json:"totalAmountNQT"`
-	GenerationSignature json.HexSlice    `json:"generationSignature,omitempty"`
-	GeneratorPublicKey  json.HexSlice    `json:"generatorPublicKey,omitempty"`
-	PayloadHash         json.HexSlice    `json:"payloadHash,omitempty"`
-	BlockSignature      json.HexSlice    `json:"blockSignature,omitempty"`
+	GenerationSignature jutils.HexSlice  `json:"generationSignature,omitempty"`
+	GeneratorPublicKey  jutils.HexSlice  `json:"generatorPublicKey,omitempty"`
+	PayloadHash         jutils.HexSlice  `json:"payloadHash,omitempty"`
+	BlockSignature      jutils.HexSlice  `json:"blockSignature,omitempty"`
 	Transactions        []*t.Transaction `json:"transactions"`
 	Version             int32            `json:"version,omitempty"`
 	Nonce               uint64           `json:"nonce,omitempty,string"`
 	TotalFeeNQT         int64            `json:"totalFeeNQT,omitempty"`
-	BlockATs            json.HexSlice    `json:"blockATs"`
+	BlockATs            jutils.HexSlice  `json:"blockATs"`
 	PreviousBlock       uint64           `json:"previousBlock,omitempty,string"`
 	Timestamp           uint32           `json:"timestamp,omitempty"`
 	Block               uint64           `json:"block,omitempty,string"`
 	Height              int32            `json:"height,omitempty"`
-	PreviousBlockHash   json.HexSlice    `json:"previousBlockHash,omitempty"` // if version > 1
+	PreviousBlockHash   jutils.HexSlice  `json:"previousBlockHash,omitempty"` // if version > 1
 	isValid             bool             `struct:"-"`
 }
 
