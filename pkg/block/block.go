@@ -5,11 +5,13 @@ import (
 	"crypto/sha256"
 	"encoding/binary"
 	"errors"
+
 	"math/big"
 
 	"github.com/ac0v/aspera/pkg/burstmath"
 	"github.com/ac0v/aspera/pkg/json"
 	t "github.com/ac0v/aspera/pkg/transaction"
+	"github.com/json-iterator/go"
 )
 
 var (
@@ -20,6 +22,8 @@ const (
 	// TODO: move constants
 	oneBurst = 100000000
 )
+
+var json = jsoniter.ConfigCompatibleWithStandardLibrary
 
 type Block struct {
 	PayloadLength       uint32           `json:"payloadLength"`
@@ -38,6 +42,7 @@ type Block struct {
 	Block               uint64           `json:"block,omitempty,string"`
 	Height              int32            `json:"height,omitempty"`
 	PreviousBlockHash   json.HexSlice    `json:"previousBlockHash,omitempty"` // if version > 1
+	isValid             bool             `struct:"-"`
 }
 
 func (b *Block) CalcScoop() uint32 {
@@ -149,4 +154,25 @@ func (b *Block) CalculateID() (uint64, error) {
 	} else {
 		return 0, err
 	}
+}
+
+func (b *Block) toError(message string) error {
+	b.isValid = false
+	if v, err := json.Marshal(b); err == nil {
+		return errors.New(message + " << " + string(v))
+	} else {
+		return nil
+	}
+}
+
+func (b *Block) Validate(previous *Block) error {
+	if b.Version != 3 {
+		return b.toError("invalid block version")
+	}
+	b.isValid = true
+	return nil
+}
+
+func (b *Block) IsValid() bool {
+	return b.isValid
 }

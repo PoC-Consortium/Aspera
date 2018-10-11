@@ -13,6 +13,7 @@ import (
 const (
 	PeerTimeout       = 1
 	PeerDataIntegrity = 2
+	PeerDataIntegrityValidation = 3
 )
 
 var (
