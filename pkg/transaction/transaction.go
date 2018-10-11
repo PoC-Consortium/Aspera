@@ -10,11 +10,20 @@ import (
 	"github.com/json-iterator/go"
 	"gopkg.in/restruct.v1"
 
+	"github.com/ac0v/aspera/pkg/crypto"
+	jutils "github.com/ac0v/aspera/pkg/json"
 	"github.com/ac0v/aspera/pkg/parsing"
 	"github.com/ac0v/aspera/pkg/transaction/attachment"
 )
 
 var json = jsoniter.ConfigCompatibleWithStandardLibrary
+
+const (
+	pubKeyLen = 64
+
+	signatureLen    = 64
+	signatureOffset = 1 + 1 + 4 + 2 + 32 + 8 + 8 + 8 + 32
+)
 
 type Transaction struct {
 	Header      Header
@@ -28,14 +37,14 @@ type Header struct {
 	Subtype uint8 `struct:"-" json:"subtype"`
 	Version uint8 `struct:"-" json:"version"`
 
-	Timestamp                     uint32 `json:"timestamp,omitempty"`
-	Deadline                      uint16 `json:"deadline,omitempty"`
-	SenderPublicKey               []byte `struct:"[32]uint8" json:"senderPublicKey,omitempty"`
-	RecipientID                   uint64 `json:"recipient,string,omitempty"`
-	AmountNQT                     uint64 `json:"amountNQT"`
-	FeeNQT                        uint64 `json:"feeNQT"`
-	ReferencedTransactionFullHash []byte `struct:"[32]uint8" json:"referencedTransactionFullHash,omitempty"`
-	Signature                     []byte `struct:"[64]uint8" json:"signature,omitempty"`
+	Timestamp                     uint32          `json:"timestamp,omitempty"`
+	Deadline                      uint16          `json:"deadline,omitempty"`
+	SenderPublicKey               jutils.HexSlice `struct:"[32]uint8" json:"senderPublicKey,omitempty"`
+	RecipientID                   uint64          `json:"recipient,string,omitempty"`
+	AmountNQT                     uint64          `json:"amountNQT"`
+	FeeNQT                        uint64          `json:"feeNQT"`
+	ReferencedTransactionFullHash jutils.HexSlice `struct:"[32]uint8" json:"referencedTransactionFullHash,omitempty"`
+	Signature                     jutils.HexSlice `struct:"[64]uint8" json:"signature,omitempty"`
 
 	Flags         uint32 `struct:"-" json:"-"`
 	EcBlockHeight uint32 `struct:"-" json:"ecBlockHeight"`
@@ -242,4 +251,19 @@ func (h *Header) ToBytes() ([]byte, error) {
 	}
 
 	return bs, nil
+}
+
+func (t *Transaction) VerifySignature() (bool, error) {
+	var sig [signatureLen]byte
+	var pubKey [pubKeyLen]byte
+	if bs, err := t.ToBytes(); err == nil {
+		for i := signatureOffset; i < signatureOffset+signatureLen; i++ {
+			sig[i] = bs[i]
+			bs[i] = 0
+		}
+		return crypto.Verify(sig[:], bs, pubKey[:], true), nil
+	} else {
+		return false, err
+	}
+
 }

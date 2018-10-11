@@ -4,11 +4,11 @@ import (
 	"bytes"
 	"crypto/sha256"
 	"encoding/binary"
-	"encoding/hex"
 	"errors"
 	"math/big"
 
 	"github.com/ac0v/aspera/pkg/burstmath"
+	"github.com/ac0v/aspera/pkg/json"
 	t "github.com/ac0v/aspera/pkg/transaction"
 )
 
@@ -24,28 +24,24 @@ const (
 type Block struct {
 	PayloadLength       uint32           `json:"payloadLength"`
 	TotalAmountNQT      int64            `json:"totalAmountNQT"`
-	GenerationSignature string           `json:"generationSignature,omitempty"`
-	GeneratorPublicKey  string           `json:"generatorPublicKey,omitempty"`
-	PayloadHash         string           `json:"payloadHash,omitempty"`
-	BlockSignature      string           `json:"blockSignature,omitempty"`
+	GenerationSignature json.HexSlice    `json:"generationSignature,omitempty"`
+	GeneratorPublicKey  json.HexSlice    `json:"generatorPublicKey,omitempty"`
+	PayloadHash         json.HexSlice    `json:"payloadHash,omitempty"`
+	BlockSignature      json.HexSlice    `json:"blockSignature,omitempty"`
 	Transactions        []*t.Transaction `json:"transactions"`
 	Version             int32            `json:"version,omitempty"`
 	Nonce               uint64           `json:"nonce,omitempty,string"`
 	TotalFeeNQT         int64            `json:"totalFeeNQT,omitempty"`
-	BlockATs            *string          `json:"blockATs"`
+	BlockATs            json.HexSlice    `json:"blockATs"`
 	PreviousBlock       uint64           `json:"previousBlock,omitempty,string"`
 	Timestamp           uint32           `json:"timestamp,omitempty"`
 	Block               uint64           `json:"block,omitempty,string"`
 	Height              int32            `json:"height,omitempty"`
-	PreviousBlockHash   string           `json:"previousBlockHash,omitempty"` // if version > 1
+	PreviousBlockHash   json.HexSlice    `json:"previousBlockHash,omitempty"` // if version > 1
 }
 
-func (b *Block) CalcScoop() (uint32, error) {
-	if genSig, err := hex.DecodeString(b.GenerationSignature); err == nil {
-		return burstmath.CalcScoop(b.Height, genSig), nil
-	} else {
-		return 0, err
-	}
+func (b *Block) CalcScoop() uint32 {
+	return burstmath.CalcScoop(b.Height, b.GenerationSignature)
 }
 
 func (b *Block) ToBytes() ([]byte, error) {
@@ -55,9 +51,7 @@ func (b *Block) ToBytes() ([]byte, error) {
 	} else {
 		bsCap += 8 + 8
 	}
-	if b.BlockATs != nil {
-		bsCap += len(*b.BlockATs)
-	}
+	bsCap += len(b.BlockATs)
 
 	w := bytes.NewBuffer(nil)
 
@@ -101,36 +95,20 @@ func (b *Block) ToBytes() ([]byte, error) {
 		return nil, err
 	}
 
-	payloadHash, err := hex.DecodeString(b.PayloadHash)
-	if err != nil {
-		return nil, err
-	}
-	if err := binary.Write(w, binary.LittleEndian, payloadHash); err != nil {
+	if err := binary.Write(w, binary.LittleEndian, b.PayloadHash); err != nil {
 		return nil, err
 	}
 
-	generatorPublicKey, err := hex.DecodeString(b.GeneratorPublicKey)
-	if err != nil {
-		return nil, err
-	}
-	if err := binary.Write(w, binary.LittleEndian, generatorPublicKey); err != nil {
+	if err := binary.Write(w, binary.LittleEndian, b.GeneratorPublicKey); err != nil {
 		return nil, err
 	}
 
-	generationSignature, err := hex.DecodeString(b.GenerationSignature)
-	if err != nil {
-		return nil, err
-	}
-	if err := binary.Write(w, binary.LittleEndian, generationSignature); err != nil {
+	if err := binary.Write(w, binary.LittleEndian, b.GenerationSignature); err != nil {
 		return nil, err
 	}
 
 	if b.Version > 1 {
-		previousBlockHash, err := hex.DecodeString(b.PreviousBlockHash)
-		if err != nil {
-			return nil, err
-		}
-		if err := binary.Write(w, binary.LittleEndian, previousBlockHash); err != nil {
+		if err := binary.Write(w, binary.LittleEndian, b.PreviousBlockHash); err != nil {
 			return nil, err
 		}
 	}
@@ -140,20 +118,12 @@ func (b *Block) ToBytes() ([]byte, error) {
 	}
 
 	if b.BlockATs != nil {
-		blockATs, err := hex.DecodeString(*b.BlockATs)
-		if err != nil {
-			return nil, err
-		}
-		if err := binary.Write(w, binary.LittleEndian, blockATs); err != nil {
+		if err := binary.Write(w, binary.LittleEndian, b.BlockATs); err != nil {
 			return nil, err
 		}
 	}
 
-	blockSignature, err := hex.DecodeString(b.BlockSignature)
-	if err != nil {
-		return nil, err
-	}
-	if err := binary.Write(w, binary.LittleEndian, blockSignature); err != nil {
+	if err := binary.Write(w, binary.LittleEndian, b.BlockSignature); err != nil {
 		return nil, err
 	}
 
@@ -162,10 +132,7 @@ func (b *Block) ToBytes() ([]byte, error) {
 
 func (b *Block) CalculateHash() (*[32]byte, error) {
 	if bs, err := b.ToBytes(); err == nil {
-		// hash := sha256.New()
-		// hash.Write(bs)
 		bs := sha256.Sum256(bs)
-		// bs := hash.Sum(nil)
 		return &bs, nil
 	} else {
 		return nil, err

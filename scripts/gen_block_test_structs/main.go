@@ -2,22 +2,26 @@ package main
 
 import (
 	"bytes"
+	"fmt"
 	"log"
 	"os"
 	"strconv"
 	"text/template"
 	"time"
 
+	"github.com/json-iterator/go"
+	"gopkg.in/resty.v1"
+
 	b "github.com/ac0v/aspera/pkg/block"
 	"github.com/ac0v/aspera/pkg/config"
 	p2p "github.com/ac0v/aspera/pkg/p2p"
-	"github.com/json-iterator/go"
-	"gopkg.in/resty.v1"
 )
 
 var json = jsoniter.ConfigCompatibleWithStandardLibrary
 
 var fileHeader = `package block
+
+import "github.com/ac0v/aspera/pkg/json"
 
 type BlockTest struct {
     Block    Block
@@ -34,10 +38,10 @@ var blockTestTmpl = `BlockTest{
     Block: Block{
 	PayloadLength:        {{.Block.PayloadLength}},
 	TotalAmountNQT:       {{.Block.TotalAmountNQT}},
-	GenerationSignature:  "{{.Block.GenerationSignature}}",
-	GeneratorPublicKey:   "{{.Block.GeneratorPublicKey}}",
-	PayloadHash:          "{{.Block.PayloadHash}}",
-	BlockSignature:       "{{.Block.BlockSignature}}",
+	GenerationSignature:  []byte{ {{.GenerationSignature}} },
+	GeneratorPublicKey:   []byte{ {{.GeneratorPublicKey}} },
+	PayloadHash:          []byte{ {{.PayloadHash}} },
+	BlockSignature:       []byte{ {{.BlockSignature}} },
 	Version:              {{.Block.Version}},
 	Nonce:                {{.Block.Nonce}},
 	TotalFeeNQT:          {{.Block.TotalFeeNQT}},
@@ -45,22 +49,23 @@ var blockTestTmpl = `BlockTest{
 	Timestamp:            {{.Block.Timestamp}},
 	Block:                {{.Block.Block}},
 	Height:               {{.Block.Height}},
-	PreviousBlockHash:    "{{.Block.PreviousBlockHash}}",
+	PreviousBlockHash:    []byte{ {{.PreviousBlockHash}} },
+        BlockATs:             []byte{ {{.BlockATs}} },
     },
     TXLen:     {{.TXLen}},
-    BlockATs: "{{.BlockATs}}",
 },
 `
 
 type BlockTest struct {
 	Block *b.Block
 
-	TXLen               int
+	TXLen int
+
+	BlockATs            string
 	GenerationSignature string
 	GeneratorPublicKey  string
 	PayloadHash         string
 	BlockSignature      string
-	BlockATs            string
 	PreviousBlockHash   string
 }
 
@@ -136,8 +141,14 @@ func main() {
 		blockTest.TXLen = len(b.Transactions)
 
 		if blockTest.Block.BlockATs != nil {
-			blockTest.BlockATs = *blockTest.Block.BlockATs
+			blockTest.BlockATs = toByteStr(blockTest.Block.BlockATs.Bs)
 		}
+
+		blockTest.GenerationSignature = toByteStr(blockTest.Block.GenerationSignature.Bs)
+		blockTest.GeneratorPublicKey = toByteStr(blockTest.Block.GeneratorPublicKey.Bs)
+		blockTest.PayloadHash = toByteStr(blockTest.Block.PayloadHash.Bs)
+		blockTest.BlockSignature = toByteStr(blockTest.Block.BlockSignature.Bs)
+		blockTest.PreviousBlockHash = toByteStr(blockTest.Block.PreviousBlockHash.Bs)
 
 		t.Execute(buf, &blockTest)
 	}
@@ -146,4 +157,16 @@ func main() {
 	log.Println(string(buf.Bytes()))
 
 	f.Write(buf.Bytes())
+}
+
+func toByteStr(bs []byte) string {
+	s := ""
+	for i, b := range bs {
+		if i == len(bs)-1 {
+			s += fmt.Sprintf("%d", b)
+		} else {
+			s += fmt.Sprintf("%d, ", b)
+		}
+	}
+	return s
 }
