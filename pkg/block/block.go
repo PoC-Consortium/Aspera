@@ -36,7 +36,7 @@ type Block struct {
 	Version             int32            `json:"version,omitempty"`
 	Nonce               uint64           `json:"nonce,omitempty,string"`
 	TotalFeeNQT         int64            `json:"totalFeeNQT,omitempty"`
-	BlockATs            jutils.HexSlice  `json:"blockATs"`
+	BlockATs            jutils.HexSlice `json:"blockATs"`
 	PreviousBlock       uint64           `json:"previousBlock,omitempty,string"`
 	Timestamp           uint32           `json:"timestamp,omitempty"`
 	Block               uint64           `json:"block,omitempty,string"`
@@ -171,8 +171,4 @@ func (b *Block) Validate(previous *Block) error {
 	}
 	b.isValid = true
 	return nil
-}
-
-func (b *Block) IsValid() bool {
-	return b.isValid
 }
