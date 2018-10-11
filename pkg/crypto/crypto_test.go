@@ -79,7 +79,7 @@ func TestVerify(t *testing.T) {
 		sig := hexToBytes(tc.sig)
 		pubKey := hexToBytes(tc.pubKey)
 		msg := hexToBytes(tc.msg)
-		assert.True(t, verify(sig, msg, pubKey, true))
+		assert.True(t, Verify(sig, msg, pubKey, true))
 	}
 }
 
@@ -114,6 +114,6 @@ func BenchmarkVerify(b *testing.B) {
 		sig := hexToBytes(tc.sig)
 		pubKey := hexToBytes(tc.pubKey)
 		msg := hexToBytes(tc.msg)
-		verify(sig, msg, pubKey, true)
+		Verify(sig, msg, pubKey, true)
 	}
 }

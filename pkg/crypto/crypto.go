@@ -59,7 +59,7 @@ func sign(msg []byte, secretPhrase string) []byte {
 	return sig
 }
 
-func verify(sig, msg, pubKey []byte, canonical bool) bool {
+func Verify(sig, msg, pubKey []byte, canonical bool) bool {
 	if canonical {
 		if !curve25519.IsCanonicalSignature(sig) {
 			return false
