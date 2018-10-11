@@ -47,6 +47,8 @@ type blockBatch struct {
 	peers  []*Peer
 	ids    []uint64
 	blocks []*b.Block
+
+	isGlueResult bool
 }
 
 func NewSynchronizer(client Client, store *s.Store, milestones []config.Milestone) *Synchronizer {
@@ -144,9 +146,9 @@ func (s *Synchronizer) validateBlocks() {
 			// -> store...
 			storedCount := int32(len(blocks) - 1)
 
-			// if the first block has already been validated no further glue action is necessary
-			// cause it has already been stored
-			if !blocks[0].IsValid() {
+			// we need to store only the successor (last block) of a glue result
+			// .. has alredy been done by the loop around blocks[1:len(blocks)-1]
+			if !blockBatch.isGlueResult {
 				if blocks[0].Height == 0 {
 					// -> store
 					storedCount++
@@ -184,8 +186,9 @@ func (s *Synchronizer) validateBlocks() {
 							height: orphanedBlock.Height,
 						},
 					},
-					blocks: []*b.Block{previousBlock, orphanedBlock},
-					ids:    []uint64{previousBlock.Block, orphanedBlock.Block},
+					blocks:       []*b.Block{previousBlock, orphanedBlock},
+					ids:          []uint64{previousBlock.Block, orphanedBlock.Block},
+					isGlueResult: true,
 				}
 				Log.Info("glue pair found", zap.Int32("leftHeight", previousBlock.Height), zap.Int32("rightHeight", orphanedBlock.Height))
 			} else {
