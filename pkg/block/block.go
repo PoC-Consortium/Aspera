@@ -42,7 +42,6 @@ type Block struct {
 	Block               uint64           `json:"block,omitempty,string"`
 	Height              int32            `json:"height,omitempty"`
 	PreviousBlockHash   jutils.HexSlice  `json:"previousBlockHash,omitempty"` // if version > 1
-	isValid             bool             `struct:"-"`
 }
 
 func (b *Block) CalcScoop() uint32 {
@@ -159,7 +158,6 @@ func (b *Block) CalculateID() (uint64, error) {
 }
 
 func (b *Block) toError(message string) error {
-	b.isValid = false
 	if v, err := json.Marshal(b); err == nil {
 		return errors.New(message + " << " + string(v))
 	} else {
@@ -171,10 +169,5 @@ func (b *Block) Validate(previous *Block) error {
 	if b.Version != 3 {
 		return b.toError("invalid block version")
 	}
-	b.isValid = true
 	return nil
-}
-
-func (b *Block) IsValid() bool {
-	return b.isValid
 }
