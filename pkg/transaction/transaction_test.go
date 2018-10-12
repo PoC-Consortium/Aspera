@@ -47,3 +47,18 @@ func TestTransactionFromAndToBytes(t *testing.T) {
 		}
 	}
 }
+
+func TestVerifySignature(t *testing.T) {
+	for _, parseTest := range ParseTransactionTests {
+		// TODO: escrow result does not need to be check
+		if parseTest.header.Type == 21 && parseTest.header.SubtypeAndVersion == 18 {
+			continue
+		}
+		bsExp, _ := hex.DecodeString(parseTest.txByteStr)
+		tx, _ := FromBytes(bsExp)
+		validSignature, err := tx.VerifySignature()
+		if assert.Nil(t, err) {
+			assert.True(t, validSignature, "timestamp", parseTest.header.Timestamp)
+		}
+	}
+}

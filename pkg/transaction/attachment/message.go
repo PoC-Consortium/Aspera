@@ -4,7 +4,9 @@ import (
 	"bytes"
 	"encoding/binary"
 
+	jutils "github.com/ac0v/aspera/pkg/json"
 	"github.com/ac0v/aspera/pkg/parsing"
+
 	"gopkg.in/restruct.v1"
 )
 
@@ -12,9 +14,9 @@ type Message struct {
 	IsText *bool `struct:"-" json:"messageIsText,omitempty"`
 
 	// IsText is encoded as a single bit
-	IsTextAndLen int32  `json:"-"`
-	Content      string `json:"message,omitempty"`
-	Version      int8   `struct:"-" json:"version.Message,omitempty"`
+	IsTextAndLen int32           `json:"-"`
+	Content      jutils.HexSlice `json:"message,omitempty"`
+	Version      int8            `struct:"-" json:"version.Message,omitempty"`
 }
 
 func (attachment *Message) FromBytes(bs []byte, version uint8) (int, error) {
@@ -32,7 +34,7 @@ func (attachment *Message) FromBytes(bs []byte, version uint8) (int, error) {
 	if err := binary.Read(r, binary.LittleEndian, &content); err != nil {
 		return 0, err
 	}
-	attachment.Content = string(content)
+	attachment.Content = content
 
 	return 4 + int(len), nil
 }

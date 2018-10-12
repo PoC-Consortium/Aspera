@@ -37,18 +37,19 @@ type Header struct {
 	Subtype uint8 `struct:"-" json:"subtype"`
 	Version uint8 `struct:"-" json:"version"`
 
-	Timestamp                     uint32          `json:"timestamp,omitempty"`
-	Deadline                      uint16          `json:"deadline,omitempty"`
-	SenderPublicKey               jutils.HexSlice `struct:"[32]uint8" json:"senderPublicKey,omitempty"`
-	RecipientID                   uint64          `json:"recipient,string,omitempty"`
-	AmountNQT                     uint64          `json:"amountNQT"`
-	FeeNQT                        uint64          `json:"feeNQT"`
+	Timestamp       uint32          `json:"timestamp,omitempty"`
+	Deadline        uint16          `json:"deadline,omitempty"`
+	SenderPublicKey jutils.HexSlice `struct:"[32]uint8" json:"senderPublicKey,omitempty"`
+	RecipientID     uint64          `json:"recipient,string,omitempty"`
+	AmountNQT       uint64          `json:"amountNQT"`
+	FeeNQT          uint64          `json:"feeNQT"`
+	// TODO: make pointer
 	ReferencedTransactionFullHash jutils.HexSlice `struct:"[32]uint8" json:"referencedTransactionFullHash,omitempty"`
 	Signature                     jutils.HexSlice `struct:"[64]uint8" json:"signature,omitempty"`
 
 	Flags         uint32 `struct:"-" json:"-"`
-	EcBlockHeight uint32 `struct:"-" json:"ecBlockHeight"`
-	EcBlockID     uint64 `struct:"-" json:"ecBlockId,string"`
+	EcBlockHeight uint32 `struct:"-" json:"ecBlockHeight,omitempty"`
+	EcBlockID     uint64 `struct:"-" json:"ecBlockId,string,omitempty"`
 
 	// size of bytes of header
 	size int `struct:"-"`
@@ -134,11 +135,13 @@ func (tx *Transaction) MarshalJSON() ([]byte, error) {
 }
 
 func (h *Header) GetVersion() uint8 {
-	return (h.SubtypeAndVersion & 0xF0) >> 4
+	tmp := h.SubtypeAndVersion
+	return (tmp & 0xF0) >> 4
 }
 
 func (h *Header) GetSubtype() uint8 {
-	return h.SubtypeAndVersion & 0x0F
+	tmp := h.SubtypeAndVersion
+	return tmp & 0x0F
 }
 
 func (h *Header) SetSubtypeAndVersion(subtype uint8, version uint8) {
@@ -255,13 +258,12 @@ func (h *Header) ToBytes() ([]byte, error) {
 
 func (t *Transaction) VerifySignature() (bool, error) {
 	var sig [signatureLen]byte
-	var pubKey [pubKeyLen]byte
 	if bs, err := t.ToBytes(); err == nil {
 		for i := signatureOffset; i < signatureOffset+signatureLen; i++ {
-			sig[i] = bs[i]
+			sig[i-signatureOffset] = bs[i]
 			bs[i] = 0
 		}
-		return crypto.Verify(sig[:], bs, pubKey[:], true), nil
+		return crypto.Verify(sig[:], bs, t.Header.SenderPublicKey, true), nil
 	} else {
 		return false, err
 	}

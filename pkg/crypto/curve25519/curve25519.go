@@ -593,7 +593,7 @@ func Verify(Y, v, h, P []byte) {
 		d[i] = byte(di)
 	}
 
-	di = ((nvh & (di & 0x80) << 1) ^ vi) >> 8
+	di = ((nvh & ((di & 0x80) << 1)) ^ vi) >> 8
 
 	/* initialize state */
 	set(yx[0], 1)
