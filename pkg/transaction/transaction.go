@@ -3,6 +3,7 @@ package transaction
 import (
 	"bytes"
 	"encoding/binary"
+	"errors"
 	"io"
 	"reflect"
 
@@ -16,7 +17,11 @@ import (
 	"github.com/ac0v/aspera/pkg/transaction/attachment"
 )
 
-var json = jsoniter.ConfigCompatibleWithStandardLibrary
+var (
+	json = jsoniter.ConfigCompatibleWithStandardLibrary
+
+	ErrSignatureMismatch = errors.New("transaction signature mismatch")
+)
 
 const (
 	pubKeyLen = 64
@@ -256,16 +261,20 @@ func (h *Header) ToBytes() ([]byte, error) {
 	return bs, nil
 }
 
-func (t *Transaction) VerifySignature() (bool, error) {
+func (t *Transaction) VerifySignature() error {
 	var sig [signatureLen]byte
 	if bs, err := t.ToBytes(); err == nil {
 		for i := signatureOffset; i < signatureOffset+signatureLen; i++ {
 			sig[i-signatureOffset] = bs[i]
 			bs[i] = 0
 		}
-		return crypto.Verify(sig[:], bs, t.Header.SenderPublicKey, true), nil
+
+		if crypto.Verify(sig[:], bs, t.Header.SenderPublicKey, true) {
+			return nil
+		}
+		return ErrSignatureMismatch
 	} else {
-		return false, err
+		return err
 	}
 
 }

@@ -162,6 +162,11 @@ func (b *Block) Validate(previous *Block) error {
 	} else if previousID != b.PreviousBlock {
 		return ErrPreviousBlockMismatch
 	}
+
+	for _, t := range b.Transactions {
+		if err := t.VerifySignature(); err != nil {
+			return err
+		}
 	}
 
 	return nil

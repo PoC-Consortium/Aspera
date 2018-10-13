@@ -56,9 +56,6 @@ func TestVerifySignature(t *testing.T) {
 		}
 		bsExp, _ := hex.DecodeString(parseTest.txByteStr)
 		tx, _ := FromBytes(bsExp)
-		validSignature, err := tx.VerifySignature()
-		if assert.Nil(t, err) {
-			assert.True(t, validSignature, "timestamp", parseTest.header.Timestamp)
-		}
+		assert.Nil(t, tx.VerifySignature())
 	}
 }
