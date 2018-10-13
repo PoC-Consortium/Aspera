@@ -14,7 +14,8 @@ import (
 )
 
 var (
-	ErrBlockUnexpectedLen = errors.New("block unexpected length in byte serialisation")
+	ErrBlockUnexpectedLen    = errors.New("block unexpected length in byte serialisation")
+	ErrPreviousBlockMismatch = errors.New("previous block id doesn't match current block's")
 )
 
 const (
@@ -155,5 +156,13 @@ func (b *Block) Validate(previous *Block) error {
 	if b.Version != 3 {
 		return b.toError("invalid block version")
 	}
+
+	if previousID, err := previous.CalculateID(); err != nil {
+		return err
+	} else if previousID != b.PreviousBlock {
+		return ErrPreviousBlockMismatch
+	}
+	}
+
 	return nil
 }
