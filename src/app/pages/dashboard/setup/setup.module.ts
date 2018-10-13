@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule } from '@angular/forms';
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { SharedModule } from '../../../lib/shared.module';
 
 import { SetupRouting } from './setup.routing';
@@ -51,7 +51,8 @@ import { MatStepperModule } from '@angular/material/stepper';
         MatStepperModule,
         ReactiveFormsModule,
         SetupRouting,
-        SharedModule
+        SharedModule,
+        FormsModule
     ],
     declarations: [
         SetupComponent,
@@ -67,6 +68,9 @@ import { MatStepperModule } from '@angular/material/stepper';
         CreateService,
         NodeService,
         SetupService
+    ],
+    exports: [
+        AccountCreateComponent
     ]
 })
 export class SetupModule { }

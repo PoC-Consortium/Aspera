@@ -18,7 +18,9 @@ export class App {
             let event = document.createEvent('Event');
             event.initEvent('resize', false, true);
             window.dispatchEvent(event);
-        }
+        } 
+
+        
     }
 
     // todo: nuke this shit

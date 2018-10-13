@@ -1,0 +1,27 @@
+.accounts-list {
+    height:100%;
+    width:100%;
+    position: fixed;
+    background: linear-gradient(141deg, #3dc6c2 0%, #3ca4bc 25%, #3c8dbc 50%, #3c73bc 75%, #2b50bf 100%);
+    font-family: Arial, Helvetica, sans-serif
+}
+
+.accounts-list-inner {
+    width:500px;
+    margin:0 auto;
+    position: relative;
+    top:20%;
+    color: #FFF;
+    text-align:center;
+
+    ul {
+        margin-top:40px;
+        width:100%;
+        list-style:none;
+    }
+}
+
+.logo {
+    display:block;
+    margin:0 auto;
+}

@@ -2,6 +2,9 @@ import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { MatTableDataSource, MatSort } from '@angular/material';
 import { Account } from '../../../lib/model';
+import { AccountsListActions } from '../../../auth/actions';
+import { AccountService, StoreService } from '../../../lib/services';
+import { Store } from '@ngrx/store';
 
 @Component({
     selector: 'app-accounts',
@@ -15,36 +18,22 @@ export class AccountsComponent {
 
     @ViewChild(MatSort) sort: MatSort;
 
+    constructor(
+        private storeService: StoreService,
+        private accountService: AccountService
+    ) {}
+
     public ngOnInit() {
         this.accounts = [];
         this.displayedColumns = ['id', 'address', 'alias', 'balance', 'selected'];
         this.dataSource = new MatTableDataSource<Account>();
-
-        let a = new Account();
-        a.id = "3664284351270490431";
-        a.address = "BURST-26BZ-8J6S-7MFT-59KQ7";
-        a.alias = "peter pan";
-        a.balance = 624.36;
-        a.selected = true;
-        this.accounts.push(a);
-
-        let b = new Account();
-        b.id = "10416422395811764075";
-        b.address = "BURST-K7VD-ZDYE-NAAJ-BJN53";
-        b.alias = "-";
-        b.balance = 23000;
-        b.selected = false;
-        this.accounts.push(b);
-
-        let c = new Account();
-        c.id = "11642189530862802431";
-        c.address = "BURST-LPHZ-QA3F-4RDF-CXC65";
-        c.alias = "john doe";
-        c.balance = 2621.11205214;
-        c.selected = false;
-        this.accounts.push(c);
-
-        this.dataSource.data = this.accounts;
+  
+        this.storeService.ready.subscribe((ready) => {
+            this.storeService.getAllAccounts().then((accounts) => {
+                this.accounts = accounts;
+                this.dataSource.data = this.accounts;
+            })
+          });
     }
 
     public ngAfterViewInit() {

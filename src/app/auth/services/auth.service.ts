@@ -29,8 +29,7 @@ export class AuthService {
       }),
       tap((account) => {
         console.log(account);
-        let syncAccount = new Account(account); // account is immutable
-        return this.accountService.synchronizeAccount(syncAccount);
+        return this.accountService.synchronizeAccount(account);
       })
     );  
 
