@@ -2,12 +2,11 @@ package block
 
 import (
 	"bytes"
-	"crypto/sha256"
 	"encoding/binary"
 	"errors"
-	"math/big"
 
 	"github.com/ac0v/aspera/pkg/burstmath"
+	"github.com/ac0v/aspera/pkg/crypto"
 	jutils "github.com/ac0v/aspera/pkg/json"
 	t "github.com/ac0v/aspera/pkg/transaction"
 
@@ -136,22 +135,9 @@ func (b *Block) ToBytes() ([]byte, error) {
 	return w.Bytes(), nil
 }
 
-func (b *Block) CalculateHash() (*[32]byte, error) {
-	if bs, err := b.ToBytes(); err == nil {
-		bs := sha256.Sum256(bs)
-		return &bs, nil
-	} else {
-		return nil, err
-	}
-}
-
 func (b *Block) CalculateID() (uint64, error) {
-	if hash, err := b.CalculateHash(); err == nil {
-		bigInt := big.NewInt(0)
-		bigInt.SetBytes([]byte{
-			hash[7], hash[6], hash[5], hash[4],
-			hash[3], hash[2], hash[1], hash[0]})
-		return bigInt.Uint64(), nil
+	if bs, err := b.ToBytes(); err == nil {
+		return crypto.BytesToID(bs), nil
 	} else {
 		return 0, err
 	}
