@@ -20,7 +20,7 @@ export class DashboardComponent implements OnInit {
 
     }
 
-    public ngOnInit() {
+    public ngOnInit() { 
         // let timer = Observable.timer(2000, 10000);
         // timer.subscribe(t =>
         //     this.marketService.updateCurrency()
