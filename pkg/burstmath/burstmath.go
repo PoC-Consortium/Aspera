@@ -298,10 +298,10 @@ func PlanckToBurst(n int64) float64 {
 }
 
 // DateToTimeStamp yields a timestamp counted since block chain start
-func DateToTimeStamp(date time.Time) int64 {
+func DateToTimestamp(date time.Time) uint32 {
 	ts := date.Unix() - blockChainStart
 	if ts < 0 {
 		return 0
 	}
-	return ts
+	return uint32(ts)
 }

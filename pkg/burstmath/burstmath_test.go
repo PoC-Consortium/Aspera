@@ -85,10 +85,10 @@ func TestPlanckToBurst(t *testing.T) {
 	assert.Equal(t, 1.337e-05, PlanckToBurst(1337), "Planck to decimal conversion incorrect (2)")
 }
 
-func TestDateToTimeStamp(t *testing.T) {
+func TestDateToTimestamp(t *testing.T) {
 	loc, _ := time.LoadLocation("UTC")
-	assert.Equal(t, int64(0), DateToTimeStamp(time.Date(1995, time.August, 2, 2, 2, 0, 0, loc)))
-	assert.Equal(t, int64(62380920), DateToTimeStamp(time.Date(2016, time.August, 2, 2, 2, 0, 0, loc)))
+	assert.Equal(t, uint32(0), DateToTimestamp(time.Date(1995, time.August, 2, 2, 2, 0, 0, loc)))
+	assert.Equal(t, uint32(62380920), DateToTimestamp(time.Date(2016, time.August, 2, 2, 2, 0, 0, loc)))
 }
 
 func BenchmarkCalcDeadline(b *testing.B) {

@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/binary"
 	"errors"
+	"time"
 
 	"github.com/ac0v/aspera/pkg/burstmath"
 	"github.com/ac0v/aspera/pkg/crypto"
@@ -14,8 +15,10 @@ import (
 )
 
 var (
-	ErrBlockUnexpectedLen    = errors.New("block unexpected length in byte serialisation")
-	ErrPreviousBlockMismatch = errors.New("previous block id doesn't match current block's")
+	ErrBlockUnexpectedLen       = errors.New("block unexpected length in byte serialisation")
+	ErrPreviousBlockMismatch    = errors.New("previous block id doesn't match current block's")
+	ErrTimestampTooEarly        = errors.New("timestamp to early")
+	ErrTimestampSmallerPrevious = errors.New("timestamp smaller than previous block's")
 )
 
 const (
@@ -167,6 +170,13 @@ func (b *Block) Validate(previous *Block) error {
 		if err := t.VerifySignature(); err != nil {
 			return err
 		}
+	}
+
+	now := burstmath.DateToTimestamp(time.Now())
+	if b.Timestamp > now+15 {
+		return ErrTimestampTooEarly
+	} else if b.Timestamp <= previous.Timestamp {
+		return ErrTimestampSmallerPrevious
 	}
 
 	return nil
