@@ -31,7 +31,7 @@ func TestCalculateDeadlines(t *testing.T) {
 
 	reqs := newCalcDeadlineRequests()
 	for i := 0; i < 8; i++ {
-		reqs[i] = NewCalcDeadlineRequest(10282355196851764065, 6729, 18325193796, 30, genSig).native
+		reqs[i] = NewCalcDeadlineRequest(10282355196851764065, 6729, 18325193796, 30, 0, genSig).native
 	}
 
 	// CalculateDeadline(reqs[0])
@@ -66,7 +66,7 @@ func TestAll(t *testing.T) {
 	assert.Equal(t, 3*time.Second, reqHandler.timeout, "timout is wrong")
 
 	genSig, _ := DecodeGeneratorSignature("2a0757c8af2aa43b29515c872385ede31d0742b1ea29b93a1a8c38a11b8a37a0")
-	req := NewCalcDeadlineRequest(10282355196851764065, 6729, 18325193796, 30, genSig)
+	req := NewCalcDeadlineRequest(10282355196851764065, 6729, 18325193796, 30, 0, genSig)
 
 	deadline := reqHandler.CalcDeadline(req)
 
@@ -101,7 +101,7 @@ func BenchmarkCalcDeadline(b *testing.B) {
 		sem <- struct{}{}
 		wg.Add(1)
 		go func(accountID uint64) {
-			req := NewCalcDeadlineRequest(accountID, 6729, 18325193796, 30, genSig)
+			req := NewCalcDeadlineRequest(accountID, 6729, 18325193796, 30, 0, genSig)
 			reqHandler.CalcDeadline(req)
 			<-sem
 			wg.Done()

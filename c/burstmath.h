@@ -8,6 +8,8 @@ typedef struct {
     uint64_t base_target;
     uint8_t *gen_sig;
     uint64_t deadline;
+    int32_t height;
+    bool with_scoop;
 } CalcDeadlineRequest;
 
 uint32_t calculate_scoop(int32_t height, uint8_t *gensig);

@@ -35,13 +35,14 @@ const (
 // CalcDeadlineRequest stores paramters native that are
 // needed for deadline calculation
 type CalcDeadlineRequest struct {
-	native   *C.CalcDeadlineRequest
-	deadline chan uint64
+	native    *C.CalcDeadlineRequest
+	withScoop bool
+	done      chan struct{}
 }
 
 // NewCalcDeadlineRequest allocated paramters neeeded for deadline
 // calculation native so that C can deal with it
-func NewCalcDeadlineRequest(accountID, nonce, baseTarget uint64, scoop uint32, genSig []byte) *CalcDeadlineRequest {
+func NewCalcDeadlineRequest(accountID, nonce, baseTarget uint64, scoop uint32, height int32, genSig []byte) *CalcDeadlineRequest {
 	var deadline C.uint64_t
 	return &CalcDeadlineRequest{
 		native: &C.CalcDeadlineRequest{
@@ -50,8 +51,9 @@ func NewCalcDeadlineRequest(accountID, nonce, baseTarget uint64, scoop uint32, g
 			base_target: C.uint64_t(baseTarget),
 			scoop_nr:    C.uint32_t(scoop),
 			gen_sig:     (*C.uint8_t)(unsafe.Pointer(&genSig[0])),
-			deadline:    deadline},
-		deadline: make(chan uint64)}
+			deadline:    deadline,
+			height:      C.int32_t(height)},
+		done: make(chan struct{})}
 }
 
 func newCalcDeadlineRequests() []*C.CalcDeadlineRequest {
@@ -153,10 +155,19 @@ func NewDeadlineRequestHandler(workerCount int, timeoutSeconds ...int64) *Deadli
 	return reqHandler
 }
 
-// CalcDeadline calculates a deadline
+// CalcDeadline calculates deadline
 func (reqHandler *DeadlineRequestHandler) CalcDeadline(req *CalcDeadlineRequest) uint64 {
 	reqHandler.reqs <- req
-	return <-req.deadline
+	<-req.done
+	return uint64(req.native.deadline)
+}
+
+// CalcDeadlineAndScoop calculates scoop and deadline
+func (reqHandler *DeadlineRequestHandler) CalcDeadlineAndScoop(req *CalcDeadlineRequest) (uint64, uint32) {
+	req.withScoop = true
+	reqHandler.reqs <- req
+	<-req.done
+	return uint64(req.native.deadline), uint32(req.native.scoop_nr)
 }
 
 func (reqHandler *DeadlineRequestHandler) collectDeadlineReqsAVX2() {
@@ -272,7 +283,7 @@ func (w *worker) processReqs(reqs [avx2Parallel]*CalcDeadlineRequest, total int)
 	}
 
 	for i := 0; i < total; i++ {
-		reqs[i].deadline <- uint64(reqs[i].native.deadline)
+		reqs[i].done <- struct{}{}
 	}
 }
 

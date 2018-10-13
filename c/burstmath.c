@@ -46,6 +46,9 @@ uint32_t calculate_scoop(int32_t height, uint8_t *gensig) {
 }
 
 void calculate_deadline(CalcDeadlineRequest *req) {
+    if (req->with_scoop)
+        req->scoop_nr = calculate_scoop(req->height, req->gen_sig);
+
     char final[32];
     char gendata[16 + NONCE_SIZE];
     char *xv;
@@ -89,6 +92,10 @@ void calculate_deadline(CalcDeadlineRequest *req) {
 }
 
 void calculate_deadlines_sse4(CalcDeadlineRequest **reqs) {
+    for (int i = 0; i < SSE4_PARALLEL; i++)
+        if (reqs[i]->with_scoop)
+            reqs[i]->scoop_nr = calculate_scoop(reqs[i]->height, reqs[i]->gen_sig);
+
     char finals[SSE4_PARALLEL][32];
     char gendata[SSE4_PARALLEL][16 + NONCE_SIZE];
     char *xv;
@@ -142,6 +149,10 @@ void calculate_deadlines_sse4(CalcDeadlineRequest **reqs) {
 }
 
 void calculate_deadlines_avx2(CalcDeadlineRequest **reqs) {
+    for (int i = 0; i < AVX2_PARALLEL; i++)
+        if (reqs[i]->with_scoop)
+            reqs[i]->scoop_nr = calculate_scoop(reqs[i]->height, reqs[i]->gen_sig);
+
     char finals[AVX2_PARALLEL][32];
     char gendata[AVX2_PARALLEL][16 + NONCE_SIZE];
     char *xv;
@@ -202,5 +213,4 @@ void calculate_deadlines_avx2(CalcDeadlineRequest **reqs) {
 
     for (int i = 0; i < AVX2_PARALLEL; i++)
         reqs[i]->deadline = *(uint64_t *)finals2[i] / reqs[i]->base_target;
-    ;
 }
