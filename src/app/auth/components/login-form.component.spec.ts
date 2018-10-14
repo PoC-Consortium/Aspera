@@ -1,7 +1,7 @@
 import { TestBed, ComponentFixture } from '@angular/core/testing';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { StoreModule, Store, combineReducers } from '@ngrx/store';
-import { LoginFormComponent } from '../components/login-form.component';
+import { LoginFormComponent } from './login-form.component';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 
 describe('Login Page', () => {

@@ -1,0 +1,9 @@
+<h2>{{ "send_burst" | i18n }}</h2>
+<mat-tab-group>
+  <mat-tab label="{{ 'ordinary_payment' | i18n }}">
+    <app-send-burst-form></app-send-burst-form>
+  </mat-tab>
+  <mat-tab label="Multi-Out">
+    <app-send-multi-out-form></app-send-multi-out-form>
+  </mat-tab>
+</mat-tab-group>

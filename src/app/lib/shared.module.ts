@@ -17,7 +17,8 @@ import {
     AppHeaderComponent,
     ControlSidebarComponent,
     MenuAsideComponent,
-    NotificationBoxComponent
+    NotificationBoxComponent,
+    SendBurstDialogComponent
 } from './components';
 
 import {
@@ -30,13 +31,17 @@ import {
     StoreService,
 } from './services';
 import { I18nModule } from './i18n/i18n.module';
+import { MatDialogModule, MatFormFieldModule, MatInputModule, MatTabsModule, MatCheckboxModule } from '@angular/material';
+import { SendBurstFormComponent } from './components/send-burst-form/send-burst-form.component';
+import { SendMultiOutFormComponent } from './components/send-multi-out-form/send-multi-out-form.component';
 
 const NGA_COMPONENTS = [
     AppFooterComponent,
     AppHeaderComponent,
     ControlSidebarComponent,
     MenuAsideComponent,
-    NotificationBoxComponent
+    NotificationBoxComponent,
+    SendBurstDialogComponent
 ];
 
 const NGA_DIRECTIVES = [
@@ -66,7 +71,9 @@ const NGA_VALIDATORS = [
     declarations: [
         ...NGA_PIPES,
         ...NGA_DIRECTIVES,
-        ...NGA_COMPONENTS
+        ...NGA_COMPONENTS,
+        SendBurstFormComponent,
+        SendMultiOutFormComponent
     ],
     imports: [
         CommonModule,
@@ -77,10 +84,16 @@ const NGA_VALIDATORS = [
         MatButtonModule,
         MatIconModule,
         MatMenuModule,
+        MatFormFieldModule,
+        MatInputModule,
         MatListModule,
+        MatDialogModule,
         MatSidenavModule,
-        I18nModule
+        MatCheckboxModule,
+        I18nModule,
+        MatTabsModule
     ],
+    entryComponents: [ SendBurstDialogComponent ],
     exports: [
         ...NGA_PIPES,
         ...NGA_DIRECTIVES,
