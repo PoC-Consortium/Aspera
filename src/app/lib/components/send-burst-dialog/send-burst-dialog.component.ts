@@ -31,7 +31,7 @@ export class SendBurstDialogComponent implements OnInit {
     let transactionToSend: Transaction = { 
       senderPublicKey: this.data.account.keys.publicKey,
       ...transaction };
-    return this.accountService.doTransaction(transactionToSend, this.data.account.address, pin);
+    return this.accountService.doTransaction(transactionToSend, this.data.account.keys.publicKey, pin);
   }
 
 }
