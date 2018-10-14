@@ -40,22 +40,30 @@ export class AccountCreateSeedComponent implements OnInit {
         if (this.seed.length >= this.seedLimit) {
             this.cryptoService.generatePassPhrase(this.seed)
                 .then(phrase => {
-                    this.createService.setPassphrase(phrase);
-                    this.cryptoService.generateMasterKeys(this.createService.getCompletePassphrase()).then(keys => {
-                        this.cryptoService.getAccountIdFromPublicKey(keys.publicKey).then(id => {
-                            this.createService.setId(id);
-                            this.cryptoService.getBurstAddressFromAccountId(id).then(address => {
-                                this.createService.setAddress(address);
-                                this.seed = [];
-                                // Angular Stepper hack
-                                setTimeout(x => {
-                                    this.createService.setStepIndex(1);
-                                }, 0);
-                            })
-                        })
-                    })
+                    this.setPassphraseAndGenerateMasterKeys(phrase);
                 });
         }
     }
 
+
+    public setPassphraseAndGenerateMasterKeys(phrase: string[]) {
+        this.createService.setPassphrase(phrase);
+        this.cryptoService.generateMasterKeys(this.createService.getCompletePassphrase()).then(keys => {
+            this.cryptoService.getAccountIdFromPublicKey(keys.publicKey).then(id => {
+                this.createService.setId(id);
+                this.cryptoService.getBurstAddressFromAccountId(id).then(address => {
+                    this.createService.setAddress(address);
+                    this.seed = [];
+                    // Angular Stepper hack
+                    setTimeout(x => {
+                        this.createService.setStepIndex(1);
+                    }, 0);
+                });
+            });
+        });
+    }
+
+    public setManualPassphrase(phrase: string) {
+        return this.setPassphraseAndGenerateMasterKeys(phrase.split(' '));
+    }
 }

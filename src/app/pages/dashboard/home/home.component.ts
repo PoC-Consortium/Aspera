@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy, ViewChild, Input } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, NavigationEnd } from '@angular/router';
 
 import { MatTableDataSource, MatSort } from '@angular/material';
 import { Transaction, Account } from '../../../lib/model';
@@ -15,12 +15,24 @@ export class HomeComponent {
     displayedColumns = ['type', 'opposite', 'amount', 'fee', 'timestamp', 'confirmed'];
     recentTransactionData;
     account: Account;
+    navigationSubscription;
 
     constructor(
         private storeService: StoreService,
-        private accountService: AccountService
+        private accountService: AccountService,
+        private router: Router,
     ) {
 
+        // handle route reloads (i.e. if user changes accounts)
+        this.navigationSubscription = this.router.events.subscribe((e: any) => {
+            if (e instanceof NavigationEnd) {
+                this.fetchTransactions();
+            }
+        });
+            
+    }
+
+    fetchTransactions() {
         this.storeService.getSelectedAccount()
             .then((account) => {
                 this.account = account;
@@ -29,12 +41,13 @@ export class HomeComponent {
                         console.log(transactions);
                         this.recentTransactionData = new MatTableDataSource<Transaction>(transactions);
                         this.recentTransactionData.sort = this.sort;
+                    },
+                    (error) => {
+                        // Todo: throw a warning to the user that their account is unverified!!
+                        console.log(error);
                     })
             })
-               
-            
     }
-
 
     applyFilter(filterValue: string) {
         filterValue = filterValue.trim(); // Remove whitespace
@@ -50,6 +63,12 @@ export class HomeComponent {
 
     public convertTimestamp(timestamp: number): Date {
         return Converter.convertTimestampToDate(timestamp);
+    }
+
+    ngOnDestroy() {
+        if (this.navigationSubscription) {  
+            this.navigationSubscription.unsubscribe();
+        }
     }
 
 }

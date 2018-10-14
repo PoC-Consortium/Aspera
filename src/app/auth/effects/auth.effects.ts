@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { MatDialog } from '@angular/material';
 import { Router } from '@angular/router';
 import { Actions, Effect, ofType } from '@ngrx/effects';
-import { of } from 'rxjs';
+import { of } from 'rxjs'; 
 import { catchError, exhaustMap, map, tap } from 'rxjs/operators';
 import {
   LoginPageActions,
@@ -41,6 +41,16 @@ export class AuthEffects {
     ),
     tap(authed => {
       this.router.navigate(['/login']);
+    })
+  );
+
+  @Effect({ dispatch: false })
+  accountsListRedirect$ = this.actions$.pipe(
+    ofType(
+      AuthApiActions.AuthApiActionTypes.AccountsListRedirect,
+    ),
+    tap(authed => {
+      this.router.navigate(['/accounts']);
     })
   );
 

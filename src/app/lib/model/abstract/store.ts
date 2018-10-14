@@ -1,4 +1,4 @@
-import { Account } from "../";
+import { Account } from "..";
 
 export abstract class Store {
     protected static readonly DATABASE_TABLE = "burst";

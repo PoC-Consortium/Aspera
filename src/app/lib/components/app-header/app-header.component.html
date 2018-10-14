@@ -9,31 +9,31 @@
   <nav class="navbar navbar-static-top" role="navigation">
     <!-- <burst-language-selector></burst-language-selector> -->
 
-    <button mat-button [matMenuTriggerFor]="accounts">
+    <button mat-button [matMenuTriggerFor]="accountsMenu">
       <mat-icon>account_box</mat-icon>
-      <span>BURST-RFR4-DQ4V-XF3Q-9FD3E</span>
+      <span>{{ selectedAccount.address }}</span>
     </button>
-    <mat-menu #accounts="matMenu" class="account-menu-panel" [overlapTrigger]="false">
-      <button mat-menu-item>
+    <mat-menu #accountsMenu="matMenu" class="account-menu-panel" [overlapTrigger]="false">
+      <button mat-menu-item *ngFor="let account of accounts" (click)="selectAccount(account)">
         <mat-icon>account_box</mat-icon>
-        <span>BURST-K7VD-ZDYE-NAAJ-BJN53</span>
+        <span>{{ account.address }}</span>
       </button>
-      <button mat-menu-item>
-        <mat-icon>account_box</mat-icon>
-        <span>BURST-LPHZ-QA3F-4RDF-CXC65</span>
-      </button>
-      <button mat-menu-item>
+      <button mat-menu-item routerLink="/dashboard/setup/create">
         <mat-icon>add_box</mat-icon>
         <span>New Account</span>
+      </button>
+      <button mat-menu-item>
+        <mat-icon>exit_to_app</mat-icon>
+        <span>Logout</span>
       </button>
     </mat-menu>
 
     <button mat-button [matMenuTriggerFor]="balance">
-      <mat-icon>local_atm</mat-icon>
-      <span>564.44528081 BURST | 25605.30911631 BURST</span>
+      <mat-icon>local_atm</mat-icon> 
+      <span>{{ selectedAccount.balance }} | {{ burstMarketCap }} BURST</span>
     </button>
     <mat-menu #balance="matMenu" class="account-menu-panel" [overlapTrigger]="false">
-      <button mat-menu-item>
+      <button mat-menu-item (click)="openSendDialog()">
         <mat-icon>play_arrow</mat-icon>
         <span>Send BURST</span>
       </button>
