@@ -4,13 +4,15 @@
 
 import { Injectable } from "@angular/core";
 import { Headers, RequestOptions, Response, URLSearchParams } from "@angular/http";
-import { HttpClient, HttpHeaders, HttpParams } from "@angular/common/http";
+import { HttpClient, HttpHeaders, HttpParams, HttpResponse, HttpEvent } from "@angular/common/http";
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import 'rxjs/add/operator/timeout'
 
-import { Currency, HttpError, constants } from "../model";
+import { Currency, HttpError, constants, SuggestedFees, Settings, Transaction } from "../model";
 import { NoConnectionError } from "../model/error";
 import { StoreService } from "./store.service";
+import { Observable } from "rxjs";
+import { tap } from "rxjs/operators";
 
 /*
 * MarketService class
@@ -20,12 +22,17 @@ import { StoreService } from "./store.service";
 @Injectable()
 export class MarketService {
     public currency: BehaviorSubject<any> = new BehaviorSubject(undefined);
+    private nodeUrl: string;
 
     constructor(
         private storeService: StoreService,
         private http: HttpClient
     ) {
         // this.updateCurrency().catch(error => {}); //disabled for now, spammy
+
+        this.storeService.settings.subscribe((settings: Settings) => {
+            this.nodeUrl = settings.node;
+        });
     }
 
     public setCurrency(currency: Currency) {
@@ -63,6 +70,17 @@ export class MarketService {
                     reject(new NoConnectionError("Could not reach market for currency updates. Check your internet connection!"))
                 });
         });
+    }
+
+    public getSuggestedFees(): Observable<HttpEvent<SuggestedFees>> {
+        let params: HttpParams = new HttpParams()
+            .set("requestType", "suggestFee");
+
+        let requestOptions = this.getRequestOptions();
+        requestOptions.params = params;
+        console.log(this.nodeUrl)
+        return this.http.get<SuggestedFees>(this.nodeUrl, requestOptions)
+            .timeout(constants.connectionTimeout);
     }
 
     /*

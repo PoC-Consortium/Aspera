@@ -1,12 +1,13 @@
 import { Component, OnInit } from '@angular/core';
+import { StoreService, AccountService } from './lib/services';
 
 @Component( {
     selector: 'app',
     templateUrl: './app.component.html'
 })
 export class App {
-    constructor( ) {
-      // TODO
+    constructor(private storeService: StoreService,
+                private accountService: AccountService) {
     }
 
     ngOnInit() {
@@ -19,8 +20,16 @@ export class App {
             event.initEvent('resize', false, true);
             window.dispatchEvent(event);
         } 
-
         
+        this.storeService.ready.subscribe((ready) => {
+            if (ready) {
+                this.storeService.getSelectedAccount().then((account) => {
+                    if (account) {
+                        this.accountService.selectAccount(account);
+                    }
+                })
+            }
+        });
     }
 
     // todo: nuke this shit
