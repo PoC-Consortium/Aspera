@@ -41,6 +41,10 @@ export class HomeComponent {
                         console.log(transactions);
                         this.recentTransactionData = new MatTableDataSource<Transaction>(transactions);
                         this.recentTransactionData.sort = this.sort;
+                    },
+                    (error) => {
+                        // Todo: throw a warning to the user that their account is unverified!!
+                        console.log(error);
                     })
             })
     }
