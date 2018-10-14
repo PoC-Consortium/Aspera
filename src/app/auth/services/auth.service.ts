@@ -14,7 +14,7 @@ export class AuthService {
   constructor(private accountService: AccountService,
               private storeService: StoreService) {}
 
-  login({ passphrase }: Credentials): Observable<Account> {
+  login({ passphrase, pin }: Credentials): Observable<Account> {
     /**
      * Simulate a failed login to display the error
      * message for the login form.
@@ -22,14 +22,16 @@ export class AuthService {
     // if (passphrase !== 'test') {
     //   return throwError('Invalid passphrase');
     // }
-    return fromPromise(this.accountService.createActiveAccount(passphrase)).pipe(
+    return fromPromise(this.accountService.createActiveAccount(passphrase, pin)).pipe(
       tap((account) => {
         console.log(account);
         return fromPromise(this.storeService.selectAccount(account))
       }),
       tap((account) => {
         console.log(account);
-        return this.accountService.synchronizeAccount(account);
+        return this.accountService.synchronizeAccount(account).catch((error) => {
+          // todo: notify user that their account is unprotected!
+        });
       })
     );  
 

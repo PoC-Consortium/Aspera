@@ -8,3 +8,4 @@ export * from "./keys";
 export * from "./burstNode";
 export * from "./settings";
 export * from "./transaction";
+export * from "./suggestedFees";

@@ -33,7 +33,7 @@
       <span>{{ selectedAccount.balance }} | {{ burstMarketCap }} BURST</span>
     </button>
     <mat-menu #balance="matMenu" class="account-menu-panel" [overlapTrigger]="false">
-      <button mat-menu-item>
+      <button mat-menu-item (click)="openSendDialog()">
         <mat-icon>play_arrow</mat-icon>
         <span>Send BURST</span>
       </button>
