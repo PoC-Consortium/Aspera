@@ -50,9 +50,7 @@ export class SendBurstFormComponent implements OnInit {
     this.feeNQT = feeNQT;
   }
 
-  onSubmit(values) {
-    console.log(values);
-    console.log(this.sendBurstForm);
+  onSubmit() {
     this.submitted$.next({
       recipientAddress: this.recipientAddress,
       amountNQT: parseFloat(this.amountNQT),
