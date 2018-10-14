@@ -6,6 +6,8 @@ import { AccountsListActions } from '../../../auth/actions';
 import { FormatInputPathObject } from 'path';
 import { Store } from '@ngrx/store';
 import * as fromAuth from '../../../reducers';
+import { MatDialog } from '@angular/material';
+import { SendBurstDialogComponent } from '../send-burst-dialog/send-burst-dialog.component';
 
 
 @Component({
@@ -21,9 +23,10 @@ export class AppHeaderComponent {
     constructor(
         private marketService: MarketService,
         private storeService: StoreService,
-        private store: Store<fromAuth.State>
+        private store: Store<fromAuth.State>,
+        public dialog: MatDialog
     ) {
-  
+
         this.storeService.ready.subscribe((ready) => {
             this.storeService.getAllAccounts().then((accounts) => {
                 this.accounts = accounts;
@@ -31,12 +34,24 @@ export class AppHeaderComponent {
             this.storeService.getSelectedAccount().then((account) => {
                 this.selectedAccount = account;
             })
-          });
+        });
 
     }
 
+    openSendDialog(): void {
+        const dialogRef = this.dialog.open(SendBurstDialogComponent, {
+            width: '600px',
+            data: this.selectedAccount
+        });
+
+        dialogRef.afterClosed().subscribe(result => {
+            console.log('The dialog was closed', result);
+            // this.store.dispatch(new AccountServiceActions.SendBurst({ result }))
+        });
+    }
+
     public getTotalBurst(accounts: Account[]) {
-        return accounts.reduce(((acc, {balance}) => acc + balance), 0)
+        return accounts.reduce(((acc, { balance }) => acc + balance), 0)
     }
 
     public selectAccount(account: Account) {

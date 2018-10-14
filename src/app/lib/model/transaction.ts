@@ -10,29 +10,29 @@ import { Attachment, EncryptedMessage, Message } from "./attachment"
 * The Transaction class is a mapping for a transaction on the Burst blockchain
 */
 export class Transaction {
-    public id: string;
-    public amountNQT: number;
-    public attachment: Attachment;
-    public block: string;
-    public blockTimestamp: number;
-    public confirmations: number;
-    public confirmed: boolean;
-    public deadline: number;
-    public feeNQT: number;
-    public fullHash: string;
-    public height: number;
-    public recipientId: string;
+    public id?: string;
+    public amountNQT?: number;
+    public attachment?: Attachment;
+    public block?: string;
+    public blockTimestamp?: number;
+    public confirmations?: number;
+    public confirmed?: boolean;
+    public deadline?: number;
+    public feeNQT?: number;
+    public fullHash?: string;
+    public height?: number;
+    public recipientId?: string;
     public recipientAddress: string;
-    public recipientPublicKey: string;
-    public senderId: string;
-    public senderAddress: string;
-    public senderPublicKey: string;
-    public signature: string;
-    public signatureHash: string;
-    public subtype: number;
-    public timestamp: number;
-    public type: number;
-    public version: number;
+    public recipientPublicKey?: string;
+    public senderId?: string;
+    public senderAddress?: string;
+    public senderPublicKey?: string;
+    public signature?: string;
+    public signatureHash?: string;
+    public subtype?: number;
+    public timestamp?: number;
+    public type?: number;
+    public version?: number;
 
     constructor(data: any = {}) {
         this.id = data.transaction || undefined;
