@@ -212,13 +212,16 @@ export class AccountService {
                 .timeout(constants.connectionTimeout)
                 .toPromise<any>() // todo
                 .then(response => {
+                    if (response.errorCode) {
+                        return reject(response.errorDescription);
+                    }
                     let transactions: Transaction[] = [];
                     response.transactions.map(transaction => {
                         transaction.amountNQT = parseFloat(this.convertStringToNumber(transaction.amountNQT));
                         transaction.feeNQT = parseFloat(this.convertStringToNumber(transaction.feeNQT));
                         transactions.push(new Transaction(transaction));
                     });
-                    resolve(transactions);
+                    return resolve(transactions);
                 })
                 .catch(error => {console.log(error);reject(new NoConnectionError())});
         });
@@ -415,9 +418,10 @@ export class AccountService {
     * Method responsible for hashing the PIN to carry out an ecryption.
     */
     public hashPinEncryption(pin: string): string {
-        if (this.currentAccount.value) {
-            pin = pin + this.currentAccount.value.id;
-        }
+        // todo: make this work?
+        // if (this.currentAccount.value) {
+        //     pin = pin + this.currentAccount.value.id;
+        // }
         return this.cryptoService.hashSHA256(pin);
     }
 

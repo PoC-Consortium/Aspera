@@ -37,7 +37,7 @@ export class BurstUtil {
         */
         public static encode(plain: string): string {
             let plainString10 = [],
-                codeword = BurstUtil.initialCodeword,
+                codeword = BurstUtil.initialCodeword.slice(),
                 pos = 0;
 
             let plainString = new BN(plain).toString();
