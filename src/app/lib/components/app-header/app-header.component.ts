@@ -7,7 +7,8 @@ import { FormatInputPathObject } from 'path';
 import { Store } from '@ngrx/store';
 import * as fromAuth from '../../../reducers';
 import { MatDialog } from '@angular/material';
-import { SendBurstDialogComponent } from '../send-burst-dialog//send-burst-dialog.component';
+import { SendBurstDialogComponent } from '../send-burst-dialog/send-burst-dialog.component';
+import { HttpClient } from '@angular/common/http';
 
 
 @Component({
@@ -24,7 +25,7 @@ export class AppHeaderComponent {
         private marketService: MarketService,
         private storeService: StoreService,
         private store: Store<fromAuth.State>,
-        public dialog: MatDialog
+        public dialog: MatDialog,
     ) {
 
         this.storeService.ready.subscribe((ready) => {
@@ -41,15 +42,23 @@ export class AppHeaderComponent {
     }
 
     openSendDialog(): void {
-        const dialogRef = this.dialog.open(SendBurstDialogComponent, {
-            width: '600px',
-            data: this.selectedAccount
+
+
+        // get suggested fees
+        this.marketService.getSuggestedFees().subscribe((fees) => {
+
+            // open dialog
+            const dialogRef = this.dialog.open(SendBurstDialogComponent, {
+                width: '600px',
+                data: { account: this.selectedAccount, fees: fees }
+            });
+    
+            dialogRef.afterClosed().subscribe(result => {
+                console.log('The dialog was closed', result);
+                // this.store.dispatch(new AccountServiceActions.SendBurst({ result }))
+            });
         });
 
-        dialogRef.afterClosed().subscribe(result => {
-            console.log('The dialog was closed', result);
-            // this.store.dispatch(new AccountServiceActions.SendBurst({ result }))
-        });
     }
 
     public getTotalBurst(accounts: Account[]) {

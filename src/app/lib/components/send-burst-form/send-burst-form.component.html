@@ -12,9 +12,9 @@
   </mat-form-field><br /><br />
 
   <label class="pill">Suggested fee:</label>
-  Standard: <em (click)="setFee(getSuggestedStandardFee())">{{ getSuggestedStandardFee() }}</em> 
-  Cheap: <em>{{ getSuggestedCheapFee() }}</em> 
-  Priority: <em>{{ getSuggestedPriorityFee() }}</em><br /><br />
+  Standard: <em (click)="setFee(fees.standard)">{{ fees.standard }}</em> 
+  Cheap: <em (click)="setFee(fees.cheap)">{{ fees.cheap }}</em> 
+  Priority: <em (click)="setFee(fees.priority)">{{ fees.priority }}</em><br /><br />
 
   <mat-checkbox (click)="showMessage=!showMessage">{{ "add_message_q" | i18n }}</mat-checkbox>
 

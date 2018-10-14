@@ -39,7 +39,7 @@ export class AccountService {
         this.storeService.settings.subscribe((settings: Settings) => {
             this.nodeUrl = settings.node;
         });
-        this.nodeUrl = "https://wallet.burst.cryptoguru.org:8125/burst"
+        // this.nodeUrl = "https://wallet.burst.cryptoguru.org:8125/burst"
     }
 
     public setCurrentAccount(account: Account) {
@@ -338,7 +338,7 @@ export class AccountService {
             let params: HttpParams = new HttpParams()
                 .set("requestType", "sendMoney")
                 .set("amountNQT", this.convertNumberToString(transaction.amountNQT))
-                .set("deadline", "1440")
+                .set("deadline", "1440") // todo
                 .set("feeNQT", this.convertNumberToString(transaction.feeNQT))
                 .set("publicKey", transaction.senderPublicKey)
                 .set("recipient", transaction.recipientAddress);
@@ -360,50 +360,43 @@ export class AccountService {
             return this.http.post(this.nodeUrl, {}, requestOptions)
                 .timeout(constants.connectionTimeout)
                 .toPromise<any>() // todo
-                .then(response => {
+                .then(async response => {
                     if (response.unsignedTransactionBytes != undefined) {
                         // get unsigned transactionbytes
                         unsignedTransactionHex = response.unsignedTransactionBytes;
                         // sign unsigned transaction bytes
-                        return this.cryptoService.generateSignature(unsignedTransactionHex, encryptedPrivateKey, this.hashPinEncryption(pin))
-                            .then(signature => {
-                                return this.cryptoService.verifySignature(signature, unsignedTransactionHex, transaction.senderPublicKey)
-                                    .then(verified => {
-                                        if (verified) {
-                                            return this.cryptoService.generateSignedTransactionBytes(unsignedTransactionHex, signature)
-                                                .then(signedTransactionBytes => {
-                                                    params = new HttpParams()
-                                                        .set("requestType", "broadcastTransaction")
-                                                        .set("transactionBytes", signedTransactionBytes);
-                                                    requestOptions = this.getRequestOptions();
-                                                    requestOptions.params = params;
-                                                    // request 'broadcastTransaction' to burst node
-                                                    return this.http.post(this.nodeUrl, {}, requestOptions)
-                                                        .timeout(constants.connectionTimeout)
-                                                        .toPromise<any>() // todo
-                                                        .then(response => {
-                                                            params = new HttpParams();
-                                                            params.set("requestType", "getTransaction");
-                                                            params.set("transaction", response.transaction);
-                                                            requestOptions = this.getRequestOptions();
-                                                            requestOptions.params = params;
-                                                            // request 'getTransaction' to burst node
-                                                            return this.http.get(this.nodeUrl, requestOptions)
-                                                                .timeout(constants.connectionTimeout)
-                                                                .toPromise<any>() // todo
-                                                                .then(response => {
-                                                                    resolve(new Transaction(response));
-                                                                })
-                                                                .catch(error => reject("Transaction error: Finalizing transaction!"));
-                                                        })
-                                                        .catch(error => reject("Transaction error: Executing transaction!"));
-                                                }).catch(error => reject("Transaction error: Generating signed transaction!"));
-                                        } else {
-                                            reject("Transaction error: Verifying signature!");
-                                        }
-                                    }).catch(error => reject("Transaction error: Verifying signature!"));
-
-                            }).catch(error => reject("Transaction error: Generating signature!"));
+                        const signature = await this.cryptoService.generateSignature(unsignedTransactionHex, encryptedPrivateKey, this.hashPinEncryption(pin));
+                        const verified = await this.cryptoService.verifySignature(signature, unsignedTransactionHex, transaction.senderPublicKey);
+                            
+                        if (verified) {
+                            const signedTransactionBytes = await this.cryptoService.generateSignedTransactionBytes(unsignedTransactionHex, signature);
+                            params = new HttpParams()
+                                .set("requestType", "broadcastTransaction")
+                                .set("transactionBytes", signedTransactionBytes);
+                            requestOptions = this.getRequestOptions();
+                            requestOptions.params = params;
+                            // request 'broadcastTransaction' to burst node
+                            return this.http.post(this.nodeUrl, {}, requestOptions)
+                                .timeout(constants.connectionTimeout)
+                                .toPromise<any>() // todo
+                                .then(response => {
+                                    params = new HttpParams();
+                                    params.set("requestType", "getTransaction");
+                                    params.set("transaction", response.transaction);
+                                    requestOptions = this.getRequestOptions();
+                                    requestOptions.params = params;
+                                    // request 'getTransaction' to burst node
+                                    return this.http.get(this.nodeUrl, requestOptions)
+                                        .timeout(constants.connectionTimeout)
+                                        .toPromise<any>() // todo
+                                        .then(response => {
+                                            resolve(new Transaction(response));
+                                        })
+                                        .catch(error => reject("Transaction error: Finalizing transaction!"));
+                                }).catch(error => reject("Transaction error: Executing transaction!"));
+                        } else {
+                            reject("Transaction error: Verifying signature!");
+                        }
                     } else {
                         reject("Transaction error: Generating transaction. Check the recipient!");
                     }

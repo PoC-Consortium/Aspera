@@ -1,6 +1,6 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, Input } from '@angular/core';
 import { BehaviorSubject, Subject } from 'rxjs';
-import { Transaction, Attachment } from '../../model';
+import { Transaction, Attachment, SuggestedFees } from '../../model';
 import { NgForm } from '@angular/forms';
 
 @Component({
@@ -19,27 +19,18 @@ export class SendBurstFormComponent implements OnInit {
   @ViewChild('encrypt') public encrypt: string;
   @ViewChild('deadline') public deadline: string = "24";
 
+  @Input('fees') public fees: SuggestedFees;
+  @Input('balance') public balance: number;
+
   submitted$: Subject<Transaction>;
   advanced: boolean = false;
   showMessage: boolean = false;
 
-  constructor() { 
+  constructor() {
     this.submitted$ = new Subject<Transaction>();
   }
 
   ngOnInit() {
-  }
-
-  getSuggestedStandardFee() {
-    return "0.04441000"
-  }
-
-  getSuggestedCheapFee() {
-    return "0.007441000"
-  }
-
-  getSuggestedPriorityFee() {
-    return "0.1470000"
   }
 
   getTotal() {
@@ -69,7 +60,7 @@ export class SendBurstFormComponent implements OnInit {
           encryptedMessage: this.message
         }
       } else {
-        return { 
+        return {
           message: this.message
         }
       }
