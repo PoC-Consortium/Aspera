@@ -5,17 +5,21 @@ import { StoreModule } from '@ngrx/store';
 import { EffectsModule } from '@ngrx/effects';
 import { LoginPageComponent } from './containers/login-page.component';
 import { LoginFormComponent } from './components/login-form.component';
+import { AccountsListComponent } from './components/accounts-list/accounts-list.component';
 import { LogoutConfirmationDialogComponent } from './components/logout-confirmation-dialog.component';
 
 import { AuthEffects } from './effects/auth.effects';
 import { reducers } from './reducers';
 import { AuthRoutingModule } from './auth-routing.module';
 import { MatCardModule, MatFormFieldModule, MatInputModule, MatButtonModule, MatDialogModule, MatIconModule } from '@angular/material';
+import { AccountsListEffects } from './effects/accounts-list.effects';
+import { SetupModule } from '../pages/dashboard/setup/setup.module';
 
 export const COMPONENTS = [
   LoginPageComponent,
   LoginFormComponent,
   LogoutConfirmationDialogComponent,
+  AccountsListComponent
 ];
 
 @NgModule({
@@ -33,8 +37,9 @@ export const COMPONENTS = [
     MatInputModule,
     MatButtonModule,
     MatDialogModule,
+    SetupModule,
     StoreModule.forFeature('auth', reducers),
-    EffectsModule.forFeature([AuthEffects]),
+    EffectsModule.forFeature([AuthEffects, AccountsListEffects]),
   ],
   declarations: COMPONENTS,
   entryComponents: [LogoutConfirmationDialogComponent],

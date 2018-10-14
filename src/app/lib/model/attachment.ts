@@ -2,6 +2,11 @@
 * Copyright 2018 PoC-Consortium
 */
 
+export interface Attachment {
+    message?: string;
+    encryptedMessage?: string;
+}
+
 /*
 * Attachment class
 *
@@ -9,7 +14,7 @@
 * It is a super class for Message and EncryptedMessage.
 */
 export class Attachment {
-    public type: string;
+    public type?: string;
 
     constructor(type: string) {
         this.type = type;
