@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, Input } from '@angular/core';
+import { Component, OnInit, ViewChild, Input, Output, EventEmitter } from '@angular/core';
 import { BehaviorSubject, Subject } from 'rxjs';
 import { Transaction, Attachment, SuggestedFees } from '../../model';
 import { NgForm } from '@angular/forms';
@@ -17,17 +17,17 @@ export class SendBurstFormComponent implements OnInit {
   @ViewChild('message') public message: string;
   @ViewChild('fullHash') public fullHash: string;
   @ViewChild('encrypt') public encrypt: string;
-  @ViewChild('deadline') public deadline: string = "24";
+  @ViewChild('pin') public pin: string;
+  @ViewChild('deadline') public deadline: string;
 
   @Input('fees') public fees: SuggestedFees;
   @Input('balance') public balance: number;
 
-  submitted$: Subject<Transaction>;
+  @Output() submit = new EventEmitter<any>();
   advanced: boolean = false;
   showMessage: boolean = false;
 
   constructor() {
-    this.submitted$ = new Subject<Transaction>();
   }
 
   ngOnInit() {
@@ -41,16 +41,20 @@ export class SendBurstFormComponent implements OnInit {
     this.feeNQT = feeNQT;
   }
 
-  onSubmit() {
-    this.submitted$.next({
-      recipientAddress: this.recipientAddress,
-      amountNQT: parseFloat(this.amountNQT),
-      feeNQT: parseFloat(this.feeNQT),
-      attachment: this.getMessage(),
-      deadline: parseFloat(this.deadline),
-      fullHash: this.fullHash,
-      type: 1
+  onSubmit(event) {
+    this.submit.emit({
+      transaction: {
+        recipientAddress: this.recipientAddress,
+        amountNQT: parseFloat(this.amountNQT),
+        feeNQT: parseFloat(this.feeNQT),
+        attachment: this.getMessage(),
+        deadline: parseFloat(this.deadline),
+        fullHash: this.fullHash,
+        type: 1
+      },
+      pin: this.pin
     });
+    event.stopImmediatePropagation();
   }
 
   getMessage() {

@@ -1,7 +1,8 @@
 import { Component, OnInit, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material';
-import { Account } from '../../model';
-import { CryptoService } from '../../services';
+import { Account, Transaction } from '../../model';
+import { CryptoService, AccountService } from '../../services';
+
 
 @Component({
   selector: 'app-send-burst-dialog',
@@ -13,7 +14,8 @@ export class SendBurstDialogComponent implements OnInit {
   constructor(
     public dialogRef: MatDialogRef<SendBurstDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data,
-    public cryptoService: CryptoService) { 
+    public cryptoService: CryptoService,
+    public accountService: AccountService) { 
     }
 
   onNoClick(): void {
@@ -22,6 +24,14 @@ export class SendBurstDialogComponent implements OnInit {
 
   ngOnInit() {
     
+  }
+
+  sendBurst(transactionRequest) {
+    const { transaction, pin } = transactionRequest;
+    let transactionToSend: Transaction = { 
+      senderPublicKey: this.data.account.keys.publicKey,
+      ...transaction };
+    return this.accountService.doTransaction(transactionToSend, this.data.account.address, pin);
   }
 
 }

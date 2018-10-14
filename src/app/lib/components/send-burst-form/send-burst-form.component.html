@@ -1,10 +1,14 @@
-<form (ngSubmit)="onSubmit(sendBurstForm)" #sendBurstForm="ngForm">
+<form (ngSubmit)="onSubmit($event);" #sendBurstForm="ngForm">
   <mat-form-field>
     <input matInput [(ngModel)]="recipientAddress" name="recipientAddress" placeholder="{{ 'recipient' | i18n }}">
   </mat-form-field>
 
   <mat-form-field>
     <input matInput [(ngModel)]="amountNQT" name="amountNQT" placeholder="{{ 'amount' | i18n }}">
+  </mat-form-field>
+
+  <mat-form-field>
+    <input matInput [(ngModel)]="pin" name="pin" placeholder="Your PIN">
   </mat-form-field>
 
   <mat-form-field>
