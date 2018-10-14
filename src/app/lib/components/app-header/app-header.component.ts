@@ -7,7 +7,7 @@ import { FormatInputPathObject } from 'path';
 import { Store } from '@ngrx/store';
 import * as fromAuth from '../../../reducers';
 import { MatDialog } from '@angular/material';
-import { SendBurstDialogComponent } from '../send-burst-dialog/send-burst-dialog.component';
+import { SendBurstDialogComponent } from '../send-burst-dialog//send-burst-dialog.component';
 
 
 @Component({
@@ -36,6 +36,8 @@ export class AppHeaderComponent {
             })
         });
 
+        
+
     }
 
     openSendDialog(): void {
@@ -55,6 +57,7 @@ export class AppHeaderComponent {
     }
 
     public selectAccount(account: Account) {
+        this.selectedAccount = account;
         this.store.dispatch(new AccountsListActions.SelectAccount({ account: account }));
     }
 }
