@@ -127,7 +127,7 @@ func (s *Synchronizer) validateBlocks() {
 			}
 			var err error
 			for i, b := range blocks[1 : len(blocks)-1] {
-				// blocks[i] is the previousBlock .. cause thats a slice above
+				// blocks[i] is the previousBlock .. cause that's a slice above
 				// - starting with element no. 2
 				if err = b.Validate(blocks[i]); err != nil {
 					break
@@ -147,7 +147,7 @@ func (s *Synchronizer) validateBlocks() {
 			storedCount := int32(len(blocks) - 1)
 
 			// we need to store only the successor (last block) of a glue result
-			// .. has alredy been done by the loop around blocks[1:len(blocks)-1]
+			// .. has already been done by the loop around blocks[1:len(blocks)-1]
 			if !blockBatch.isGlueResult {
 				if blocks[0].Height == 0 {
 					// -> store
