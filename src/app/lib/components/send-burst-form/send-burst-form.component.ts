@@ -10,8 +10,12 @@ import { NgForm } from '@angular/forms';
 })
 export class SendBurstFormComponent implements OnInit {
 
+  public burstAddressPattern = {
+    '_': { pattern: new RegExp('\[a-zA-Z0-9\](?!.*(BURST-))')}
+  };
+
   @ViewChild('sendBurstForm') public sendBurstForm: NgForm;
-  @ViewChild('feeNQT') public feeNQT: string;
+  @ViewChild('feeNQT') public feeNQT: number;
   @ViewChild('recipientAddress') public recipientAddress: string;
   @ViewChild('amountNQT') public amountNQT: string;
   @ViewChild('message') public message: string;
@@ -34,19 +38,23 @@ export class SendBurstFormComponent implements OnInit {
   }
 
   getTotal() {
-    return parseFloat(this.amountNQT) + parseFloat(this.feeNQT) || 0;
+    return parseFloat(this.amountNQT) + this.feeNQT || 0;
   }
 
   setFee(feeNQT: string) {
-    this.feeNQT = feeNQT;
+    this.feeNQT = this.convertFeeToBurst(feeNQT);
+  }
+
+  convertFeeToBurst(feeNQT: string) {
+    return parseFloat(feeNQT)/100000000;
   }
 
   onSubmit(event) {
     this.submit.emit({
       transaction: {
-        recipientAddress: this.recipientAddress,
+        recipientAddress: `BURST-${this.recipientAddress}`,
         amountNQT: parseFloat(this.amountNQT),
-        feeNQT: parseFloat(this.feeNQT),
+        feeNQT: this.feeNQT,
         attachment: this.getMessage(),
         deadline: parseFloat(this.deadline),
         fullHash: this.fullHash,
@@ -61,15 +69,18 @@ export class SendBurstFormComponent implements OnInit {
     if (this.message) {
       if (this.encrypt) {
         return {
-          encryptedMessage: this.message
+          data: this.message,
+          nonce: null, //todo
+          type: 'encrypted_message'
         }
       } else {
         return {
-          message: this.message
+          message: this.message,
+          type: 'message',
+          messageIsText: true
         }
       }
     }
     return null;
   }
-
 }

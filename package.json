@@ -43,6 +43,7 @@
     "jquery": ">=2.2.1",
     "lokijs": "^1.5.1",
     "ngx-bootstrap": "^3.0.1",
+    "ngx-mask": "^6.5.18",
     "rxjs": "^6.3.2",
     "rxjs-compat": "^6.3.2",
     "seedrandom": "^2.4.3",
