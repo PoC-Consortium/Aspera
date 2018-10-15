@@ -8,6 +8,7 @@ import (
 
 	"github.com/ac0v/aspera/pkg/burstmath"
 	"github.com/ac0v/aspera/pkg/crypto"
+	"github.com/ac0v/aspera/pkg/crypto/shabal256"
 	jutils "github.com/ac0v/aspera/pkg/json"
 	t "github.com/ac0v/aspera/pkg/transaction"
 
@@ -15,13 +16,15 @@ import (
 )
 
 var (
-	ErrBlockUnexpectedLen       = errors.New("block unexpected length in byte serialisation")
-	ErrPreviousBlockMismatch    = errors.New("previous block id doesn't match current block's")
-	ErrTimestampTooEarly        = errors.New("timestamp to early")
-	ErrTimestampSmallerPrevious = errors.New("timestamp smaller than previous block's")
+	ErrBlockUnexpectedLen          = errors.New("block unexpected length in byte serialisation")
+	ErrPreviousBlockMismatch       = errors.New("previous block id doesn't match current block's")
+	ErrTimestampTooEarly           = errors.New("timestamp to early")
+	ErrTimestampSmallerPrevious    = errors.New("timestamp smaller than previous block's")
+	ErrGenerationSignatureMismatch = errors.New("generation signature mismatch")
 )
 
 const (
+	generationSignatureLen = 64
 	// TODO: move constants
 	oneBurst = 100000000
 )
@@ -179,5 +182,19 @@ func (b *Block) Validate(previous *Block) error {
 		return ErrTimestampSmallerPrevious
 	}
 
+	generationSignatureExp := CalculateGenerationSignature(previous)
+	for i := range b.GenerationSignature {
+		if generationSignatureExp[i] != b.GenerationSignature[i] {
+			return ErrGenerationSignatureMismatch
+		}
+	}
+
 	return nil
+}
+
+func CalculateGenerationSignature(previous *Block) []byte {
+	bs := make([]byte, 8)
+	binary.BigEndian.PutUint64(bs, crypto.BytesToID(previous.GeneratorPublicKey))
+	hash := shabal256.Sum256(append(previous.GenerationSignature, bs...))
+	return hash[:]
 }
