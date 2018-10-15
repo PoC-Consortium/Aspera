@@ -34,6 +34,9 @@ import { I18nModule } from './i18n/i18n.module';
 import { MatDialogModule, MatFormFieldModule, MatInputModule, MatTabsModule, MatCheckboxModule } from '@angular/material';
 import { SendBurstFormComponent } from './components/send-burst-form/send-burst-form.component';
 import { SendMultiOutFormComponent } from './components/send-multi-out-form/send-multi-out-form.component';
+import { BurstInputValidatorDirective } from './components/send-burst-form/burst-input-validator.directive';
+
+import { NgxMaskModule } from 'ngx-mask';
 
 const NGA_COMPONENTS = [
     AppFooterComponent,
@@ -73,7 +76,8 @@ const NGA_VALIDATORS = [
         ...NGA_DIRECTIVES,
         ...NGA_COMPONENTS,
         SendBurstFormComponent,
-        SendMultiOutFormComponent
+        SendMultiOutFormComponent,
+        BurstInputValidatorDirective
     ],
     imports: [
         CommonModule,
@@ -91,7 +95,8 @@ const NGA_VALIDATORS = [
         MatSidenavModule,
         MatCheckboxModule,
         I18nModule,
-        MatTabsModule
+        MatTabsModule,
+        NgxMaskModule.forRoot()
     ],
     entryComponents: [ SendBurstDialogComponent ],
     exports: [
