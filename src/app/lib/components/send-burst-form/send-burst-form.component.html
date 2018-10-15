@@ -59,11 +59,9 @@
     </div>
 
   </div>
-
-  <br /><br />
-
-  <strong>Total:</strong> {{ getTotal() }} BURST - <em (click)="advanced=!advanced">{{ advanced ? "basic" : "advanced" | i18n }}</em><br /><br />
-
-  <button mat-button (click)="sendBurstForm.reset();">{{ "cancel" | i18n }}</button>
-  <button type="submit" mat-button color="primary">{{ "send_burst" | i18n }}</button>
 </form>
+
+<strong>Total:</strong> {{ getTotal() }} BURST - <em (click)="advanced=!advanced">{{ advanced ? "basic" : "advanced" | i18n }}</em><br /><br />
+
+<button mat-button mat-dialog-close>{{ "cancel" | i18n }}</button>
+<button type="submit" mat-button color="primary" (click)="onSubmit($event)">{{ "send_burst" | i18n }}</button>

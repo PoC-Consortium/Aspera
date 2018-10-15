@@ -11,11 +11,11 @@ import { NgForm } from '@angular/forms';
 export class SendBurstFormComponent implements OnInit {
 
   public burstAddressPattern = {
-    '_': { pattern: new RegExp('\[a-zA-Z0-9\](?!.*(BURST-))')}
+    '_': { pattern: new RegExp('\[a-zA-Z0-9\]')}
   };
 
   @ViewChild('sendBurstForm') public sendBurstForm: NgForm;
-  @ViewChild('feeNQT') public feeNQT: number;
+  @ViewChild('feeNQT') public feeNQT: string;
   @ViewChild('recipientAddress') public recipientAddress: string;
   @ViewChild('amountNQT') public amountNQT: string;
   @ViewChild('message') public message: string;
@@ -26,6 +26,7 @@ export class SendBurstFormComponent implements OnInit {
 
   @Input('fees') public fees: SuggestedFees;
   @Input('balance') public balance: number;
+  @Input('close') public close: Function;
 
   @Output() submit = new EventEmitter<any>();
   advanced: boolean = false;
@@ -38,11 +39,11 @@ export class SendBurstFormComponent implements OnInit {
   }
 
   getTotal() {
-    return parseFloat(this.amountNQT) + this.feeNQT || 0;
+    return parseFloat(this.amountNQT) + parseFloat(this.feeNQT) || 0;
   }
 
   setFee(feeNQT: string) {
-    this.feeNQT = this.convertFeeToBurst(feeNQT);
+    this.feeNQT = this.convertFeeToBurst(feeNQT).toString();
   }
 
   convertFeeToBurst(feeNQT: string) {

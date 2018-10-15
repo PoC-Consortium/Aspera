@@ -383,9 +383,9 @@ export class AccountService {
                                 .timeout(constants.connectionTimeout)
                                 .toPromise<any>() // todo
                                 .then(response => {
-                                    params = new HttpParams();
-                                    params.set("requestType", "getTransaction");
-                                    params.set("transaction", response.transaction);
+                                    params = new HttpParams()
+                                    .set("requestType", "getTransaction")
+                                    .set("transaction", response.transaction);
                                     requestOptions = this.getRequestOptions();
                                     requestOptions.params = params;
                                     // request 'getTransaction' to burst node
