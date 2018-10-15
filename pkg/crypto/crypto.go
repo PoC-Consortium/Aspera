@@ -97,11 +97,11 @@ func Verify(sig, msg, pubKey []byte, canonical bool) bool {
 	return true
 }
 
-func BytesToID(bs []byte) uint64 {
+func BytesToHashAndID(bs []byte) ([32]byte, uint64) {
 	hash := sha256.Sum256(bs)
 	bigInt := big.NewInt(0)
 	bigInt.SetBytes([]byte{
 		hash[7], hash[6], hash[5], hash[4],
 		hash[3], hash[2], hash[1], hash[0]})
-	return bigInt.Uint64()
+	return hash, bigInt.Uint64()
 }

@@ -18,7 +18,7 @@ import (
 var (
 	ErrBlockUnexpectedLen          = errors.New("block unexpected length in byte serialisation")
 	ErrPreviousBlockMismatch       = errors.New("previous block id doesn't match current block's")
-	ErrTimestampTooEarly           = errors.New("timestamp to early")
+	ErrTimestampTooLate            = errors.New("timestamp to late")
 	ErrTimestampSmallerPrevious    = errors.New("timestamp smaller than previous block's")
 	ErrGenerationSignatureMismatch = errors.New("generation signature mismatch")
 )
@@ -26,7 +26,8 @@ var (
 const (
 	generationSignatureLen = 64
 	// TODO: move constants
-	oneBurst = 100000000
+	oneBurst               = 100000000
+	maxTimestampDifference = 15
 )
 
 var json = jsoniter.ConfigCompatibleWithStandardLibrary
@@ -142,11 +143,12 @@ func (b *Block) ToBytes() ([]byte, error) {
 	return w.Bytes(), nil
 }
 
-func (b *Block) CalculateID() (uint64, error) {
+func (b *Block) CalculateHashAndID() ([32]byte, uint64, error) {
 	if bs, err := b.ToBytes(); err == nil {
-		return crypto.BytesToID(bs), nil
+		hash, id := crypto.BytesToHashAndID(bs)
+		return hash, id, nil
 	} else {
-		return 0, err
+		return [32]byte{}, 0, err
 	}
 }
 
@@ -159,27 +161,30 @@ func (b *Block) toError(message string) error {
 }
 
 func (b *Block) Validate(previous *Block) error {
+	now := burstmath.DateToTimestamp(time.Now())
+
 	if b.Version != 3 {
 		return b.toError("invalid block version")
-	}
-
-	if previousID, err := previous.CalculateID(); err != nil {
+	} else if b.Timestamp <= previous.Timestamp {
+		return ErrTimestampSmallerPrevious
+	} else if b.Timestamp > now+maxTimestampDifference {
+		return ErrTimestampTooLate
+	//} else if previousHash, previousID, err := previous.CalculateHashAndID(); err != nil {
+	} else if _, previousID, err := previous.CalculateHashAndID(); err != nil {
 		return err
 	} else if previousID != b.PreviousBlock {
 		return ErrPreviousBlockMismatch
-	}
+	} // else if previousHash != b.PreviousBlockHash {
+	//	return ErrPreviousBlockMismatch
+	//}
+
+	// ToDo: check for duplicte blocks - may this should go to the raw storage stuff
+	// throw new BlockNotAcceptedException("Duplicate block or invalid id for block " + block.getHeight());
 
 	for _, t := range b.Transactions {
 		if err := t.VerifySignature(); err != nil {
 			return err
 		}
-	}
-
-	now := burstmath.DateToTimestamp(time.Now())
-	if b.Timestamp > now+15 {
-		return ErrTimestampTooEarly
-	} else if b.Timestamp <= previous.Timestamp {
-		return ErrTimestampSmallerPrevious
 	}
 
 	generationSignatureExp := CalculateGenerationSignature(previous)
@@ -194,7 +199,8 @@ func (b *Block) Validate(previous *Block) error {
 
 func CalculateGenerationSignature(previous *Block) []byte {
 	bs := make([]byte, 8)
-	binary.BigEndian.PutUint64(bs, crypto.BytesToID(previous.GeneratorPublicKey))
+	_, id := crypto.BytesToHashAndID(previous.GeneratorPublicKey)
+	binary.BigEndian.PutUint64(bs, id)
 	hash := shabal256.Sum256(append(previous.GenerationSignature, bs...))
 	return hash[:]
 }
