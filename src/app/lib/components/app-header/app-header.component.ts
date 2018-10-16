@@ -37,12 +37,9 @@ export class AppHeaderComponent {
             })
         });
 
-        
-
     }
 
     openSendDialog(): void {
-
 
         // get suggested fees
         this.marketService.getSuggestedFees().subscribe((fees) => {
