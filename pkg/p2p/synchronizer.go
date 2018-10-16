@@ -143,14 +143,16 @@ func (s *Synchronizer) validateBlocks() {
 				continue
 			}
 
-			// -> store...
+			// ToDo: may we should hand over the block batch to allow blocking bad peers?
+			s.store.RawStore.StoreAndMaybeConsume(blockBatch.blocks)
 			storedCount := int32(len(blocks) - 1)
 
 			// we need to store only the successor (last block) of a glue result
 			// .. has already been done by the loop around blocks[1:len(blocks)-1]
 			if !blockBatch.isGlueResult {
 				if blocks[0].Height == 0 {
-					// -> store
+					// ToDo: may we should hand over the block batch to allow blocking bad peers?
+					s.store.RawStore.StoreAndMaybeConsume(blockBatch.blocks)
 					storedCount++
 				} else {
 					s.blockBatchesGlue <- []*b.Block{
