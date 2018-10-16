@@ -169,14 +169,13 @@ func (b *Block) Validate(previous *Block) error {
 		return ErrTimestampSmallerPrevious
 	} else if b.Timestamp > now+maxTimestampDifference {
 		return ErrTimestampTooLate
-	//} else if previousHash, previousID, err := previous.CalculateHashAndID(); err != nil {
-	} else if _, previousID, err := previous.CalculateHashAndID(); err != nil {
+	} else if previousHash, previousID, err := previous.CalculateHashAndID(); err != nil {
 		return err
 	} else if previousID != b.PreviousBlock {
 		return ErrPreviousBlockMismatch
-	} // else if previousHash != b.PreviousBlockHash {
-	//	return ErrPreviousBlockMismatch
-	//}
+	} else if bytes.Equal(previousHash[:], b.PreviousBlockHash) {
+		return ErrPreviousBlockMismatch
+	}
 
 	// ToDo: check for duplicte blocks - may this should go to the raw storage stuff
 	// throw new BlockNotAcceptedException("Duplicate block or invalid id for block " + block.getHeight());
