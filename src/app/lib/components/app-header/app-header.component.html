@@ -39,16 +39,10 @@
       </button>
     </mat-menu>
 
-    <button mat-button [matMenuTriggerFor]="price">
-      <mat-icon>trending_up</mat-icon>
-      <span>$ | 0.00000305 BTC</span>
+    <button mat-button>
+      <mat-icon>{{ getTrendingIcon() }}</mat-icon>
+      <span>{{ getPriceBTC() }}</span>
     </button>
-    <mat-menu #price="matMenu" class="account-menu-panel" [overlapTrigger]="false">
-      <button mat-menu-item>
-        <mat-icon>account_box</mat-icon>
-        <span>Check</span>
-      </button>
-    </mat-menu>
 
     <button mat-button [matMenuTriggerFor]="connectivity">
       <mat-icon>dns</mat-icon>

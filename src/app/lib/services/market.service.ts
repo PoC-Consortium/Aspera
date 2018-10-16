@@ -23,15 +23,17 @@ import { tap } from "rxjs/operators";
 export class MarketService {
     public currency: BehaviorSubject<any> = new BehaviorSubject(undefined);
     private nodeUrl: string;
+    private marketUrl: string;
 
     constructor(
         private storeService: StoreService,
         private http: HttpClient
     ) {
-        // this.updateCurrency().catch(error => {}); //disabled for now, spammy
+        this.updateCurrency().catch(error => {}); 
 
         this.storeService.settings.subscribe((settings: Settings) => {
             this.nodeUrl = settings.node;
+            this.marketUrl = settings.marketUrl;
         });
     }
 
@@ -53,7 +55,7 @@ export class MarketService {
                 params.set("convert", currency);
                 requestOptions.params = params;
             }
-            return this.http.get(constants.marketUrl, requestOptions)
+            return this.http.get(this.marketUrl, requestOptions)
                 .timeout(constants.connectionTimeout)
                 .toPromise<any>() // todo
                 .then(response => {
@@ -78,7 +80,6 @@ export class MarketService {
 
         let requestOptions = this.getRequestOptions();
         requestOptions.params = params;
-        console.log(this.nodeUrl)
         return this.http.get<SuggestedFees>(this.nodeUrl, requestOptions)
             .timeout(constants.connectionTimeout);
     }
@@ -132,6 +133,17 @@ export class MarketService {
                 return coins.toFixed(8) + " BURST";
             }
         }
+    }
+
+    /*
+    * Get current price of Burst in BTC
+    */
+    public getCurrentBurstPriceBTC(): string {
+        return this.currency.value ? this.currency.value.priceBTC : ''; 
+    }
+
+    public getBurst24hChange(): string {
+        return this.currency.value ? this.currency.value.percentChange24h : '';
     }
 
     /*

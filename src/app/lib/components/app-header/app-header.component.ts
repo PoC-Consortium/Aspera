@@ -69,4 +69,17 @@ export class AppHeaderComponent {
         this.selectedAccount = account;
         this.store.dispatch(new AccountsListActions.SelectAccount({ account: account }));
     }
+
+    public getPriceBTC(): string {
+        const price = this.marketService.getCurrentBurstPriceBTC();
+        if (price.length) {
+            return `${price} BTC`;
+        } else {
+            return `Fetching price...`;
+        }
+    }
+
+    public getTrendingIcon(): string {
+        return Math.sign(parseFloat(this.marketService.getBurst24hChange())) === 1 ? 'trending_up' : 'trending_down';
+    }
 }

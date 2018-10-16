@@ -1,4 +1,4 @@
-<h2>{{ "send_burst" | i18n }}</h2>
+<h2>{{ "send_burst" | i18n }} <span>{{ "account_balance" | i18n }}: {{ data.account.balance }}</span></h2>
 <mat-tab-group>
   <mat-tab label="{{ 'ordinary_payment' | i18n }}">
     <app-send-burst-form [fees]="data.fees" [close]="this.dialogRef.close" [balance]="data.account.balance" (submit)="sendBurst($event)"></app-send-burst-form>

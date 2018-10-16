@@ -61,7 +61,6 @@ export const constants = {
         { name: "தமிழ", code: "ta" },
         { name: "中文", code: "zh" }
     ],
-    marketUrl: "https://api.coinmarketcap.com/v1/ticker/burst/",
     nodes: [
         { "name": "CryptoGuru", "region": "Global", "location": "Munich", "address": "https://wallet.burst.cryptoguru.org", "port": 8125, "selected": true, "ping": -1 },
         { "name": "CryptoGuru", "region": "Africa", "location": "Munich", "address": "https://wallet.burst.cryptoguru.org", "port": 8125, "selected": false, "ping": -1 },
