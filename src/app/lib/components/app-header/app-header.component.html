@@ -15,27 +15,26 @@
     </button>
     <mat-menu #accountsMenu="matMenu" class="account-menu-panel" [overlapTrigger]="false">
       <button mat-menu-item *ngFor="let account of accounts" (click)="selectAccount(account)">
-        <mat-icon>account_box</mat-icon>
         <span>{{ account.address }}</span>
       </button>
       <button mat-menu-item routerLink="/dashboard/setup/create">
         <mat-icon>add_box</mat-icon>
-        <span>New Account</span>
+        <span>{{ "new_account" | i18n }}</span>
       </button>
       <button mat-menu-item>
         <mat-icon>exit_to_app</mat-icon>
-        <span>Logout</span>
+        <span>{{ "logout" | i18n }}</span>
       </button>
     </mat-menu>
 
     <button mat-button [matMenuTriggerFor]="balance">
       <mat-icon>local_atm</mat-icon> 
-      <span>{{ selectedAccount.balance }} | {{ burstMarketCap }} BURST</span>
+      <span>{{ selectedAccount.balance }} BURST</span>
     </button>
-    <mat-menu #balance="matMenu" class="account-menu-panel" [overlapTrigger]="false">
+    <mat-menu #balance="matMenu" class="account-menu-panel" width="300" [overlapTrigger]="false">
       <button mat-menu-item (click)="openSendDialog()">
-        <mat-icon>play_arrow</mat-icon>
-        <span>Send BURST</span>
+        <mat-icon>send</mat-icon>
+        <span>{{ "send_burst" | i18n }}</span>
       </button>
     </mat-menu>
 
