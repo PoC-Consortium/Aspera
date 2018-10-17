@@ -18,7 +18,7 @@ export class SendBurstDialogComponent implements OnInit {
     public accountService: AccountService) { 
     }
 
-  onNoClick(): void {
+  closeDialog(): void {
     this.dialogRef.close();
   }
 
@@ -32,7 +32,10 @@ export class SendBurstDialogComponent implements OnInit {
       senderPublicKey: this.data.account.keys.publicKey,
       ...transaction 
     };
-    return this.accountService.doTransaction(transactionToSend, this.data.account.keys.signPrivateKey, pin);
+    return this.accountService.doTransaction(transactionToSend, this.data.account.keys.signPrivateKey, pin).then((transaction: Transaction) => {
+      console.log(transaction);
+      this.closeDialog();
+    });
   }
 
 }

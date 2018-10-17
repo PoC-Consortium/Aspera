@@ -1,24 +1,33 @@
 <form (ngSubmit)="onSubmit($event);" #sendBurstForm="ngForm">
   <mat-form-field>
-    <input matInput [(ngModel)]="recipientAddress" name="recipientAddress" placeholder="{{ 'recipient' | i18n }}">
+    <input matInput prefix="BURST-" burstInputValidator [patterns]="burstAddressPattern" mask="____-____-____-_____"  [dropSpecialCharacters]="false"
+           [showMaskTyped]="true" [(ngModel)]="recipientAddress" name="recipientAddress" placeholder="{{ 'recipient' | i18n }}">
   </mat-form-field>
 
-  <mat-form-field>
-    <input matInput [(ngModel)]="amountNQT" name="amountNQT" placeholder="{{ 'amount' | i18n }}">
-  </mat-form-field>
+  <div class="row">
+    <div class="col col-2">
+      <mat-form-field>
+        <input matInput [(ngModel)]="amountNQT" name="amountNQT" placeholder="{{ 'amount' | i18n }}">
+      </mat-form-field>
+    </div>
+    <div class="col col-2">
 
-  <mat-form-field>
-    <input matInput [(ngModel)]="pin" name="pin" placeholder="Your PIN">
-  </mat-form-field>
+      <mat-form-field class="fee">
+        <input matInput [(ngModel)]="feeNQT" name="feeNQT" placeholder="{{ 'fee' | i18n }}">
+      </mat-form-field>
+    </div>
+  </div>
 
-  <mat-form-field>
-    <input matInput [(ngModel)]="feeNQT" name="feeNQT" placeholder="{{ 'fee' | i18n }}">
-  </mat-form-field><br /><br />
 
   <label class="pill">Suggested fee:</label>
-  Standard: <em (click)="setFee(fees.standard)">{{ fees.standard }}</em> 
-  Cheap: <em (click)="setFee(fees.cheap)">{{ fees.cheap }}</em> 
-  Priority: <em (click)="setFee(fees.priority)">{{ fees.priority }}</em><br /><br />
+  Standard: <em (click)="setFee(fees.standard)">{{ convertFeeToBurst(fees.standard) }}</em> 
+  Cheap: <em (click)="setFee(fees.cheap)">{{ convertFeeToBurst(fees.cheap) }}</em> 
+  Priority: <em (click)="setFee(fees.priority)">{{ convertFeeToBurst(fees.priority) }}</em><br /><br />
+
+
+  <mat-form-field class="pin">
+    <input matInput [(ngModel)]="pin" name="pin" placeholder="Your PIN">
+  </mat-form-field>
 
   <mat-checkbox (click)="showMessage=!showMessage">{{ "add_message_q" | i18n }}</mat-checkbox>
 
@@ -26,16 +35,16 @@
     <mat-form-field>
       <textarea matInput [(ngModel)]="message" name="message" placeholder="{{ 'message' | i18n }}"></textarea>
     </mat-form-field>
-    <mat-checkbox>{{ "encrypt_message" | i18n }}</mat-checkbox>
+    <mat-checkbox [(ngModel)]="encrypt" name="encrypt" disabled>{{ "encrypt_message" | i18n }}</mat-checkbox>
   </div>
 
   <div *ngIf="advanced">
-    <mat-form-field>
+    <!-- <mat-form-field>
       <label>{{ "deadline_hours" | i18n }}</label>
       <input matInput [(ngModel)]="deadline" value="24" name="deadline">
-    </mat-form-field>
+    </mat-form-field> -->
 
-    <mat-form-field>
+    <mat-form-field> 
       <input matInput [(ngModel)]="fullHash" name="fullHash" placeholder="{{ 'referenced_transaction_full_hash' | i18n }}">
     </mat-form-field>
 
@@ -50,11 +59,9 @@
     </div>
 
   </div>
-
-  <br /><br />
-
-  <strong>Total:</strong> {{ getTotal() }} BURST - <em (click)="advanced=!advanced">{{ advanced ? "basic" : "advanced" | i18n }}</em><br /><br />
-
-  <button mat-button (click)="sendBurstForm.reset();">{{ "cancel" | i18n }}</button>
-  <button type="submit" mat-button color="primary">{{ "send_burst" | i18n }}</button>
 </form>
+
+<strong>Total:</strong> {{ getTotal() }} BURST - <em (click)="advanced=!advanced">{{ advanced ? "basic" : "advanced" | i18n }}</em><br /><br />
+
+<button mat-button mat-dialog-close>{{ "cancel" | i18n }}</button>
+<button type="submit" mat-button color="primary" (click)="onSubmit($event)">{{ "send_burst" | i18n }}</button>
