@@ -230,6 +230,9 @@ func headerFromBytes(bs []byte) (*Header, error) {
 }
 
 func (h *Header) ToBytes() ([]byte, error) {
+	if len(h.ReferencedTransactionFullHash) == 0 {
+		h.ReferencedTransactionFullHash = make([]byte, 32)
+	}
 	bs, err := restruct.Pack(binary.LittleEndian, h)
 	if err != nil {
 		return nil, err
