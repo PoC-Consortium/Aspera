@@ -31,7 +31,7 @@ import {
     StoreService,
 } from './services';
 import { I18nModule } from './i18n/i18n.module';
-import { MatDialogModule, MatFormFieldModule, MatInputModule, MatTabsModule, MatCheckboxModule } from '@angular/material';
+import { MatDialogModule, MatFormFieldModule, MatInputModule, MatTabsModule, MatCheckboxModule, MatGridListModule } from '@angular/material';
 import { SendBurstFormComponent } from './components/send-burst-form/send-burst-form.component';
 import { SendMultiOutFormComponent } from './components/send-multi-out-form/send-multi-out-form.component';
 import { BurstInputValidatorDirective } from './components/send-burst-form/burst-input-validator.directive';
@@ -94,6 +94,7 @@ const NGA_VALIDATORS = [
         MatDialogModule,
         MatSidenavModule,
         MatCheckboxModule,
+        MatGridListModule,
         I18nModule,
         MatTabsModule,
         NgxMaskModule.forRoot()

@@ -5,6 +5,7 @@
 
 export const environment = {
     defaultNode: "http://localhost:4200/burst",
+    marketUrl: "http://localhost:4200/v1/ticker/burst/",
     production: false,
     silent: false
 };

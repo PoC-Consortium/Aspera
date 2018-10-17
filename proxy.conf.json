@@ -3,5 +3,11 @@
         "target": "http://localhost:8125",
         "secure": false,
         "logLevel": "debug"
+    },
+    "/v1/ticker/burst": {
+        "target": "https://api.coinmarketcap.com",
+        "secure": false,
+        "logLevel": "debug",
+        "headers": {"host":"api.coinmarketcap.com"}
     }
 }

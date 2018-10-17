@@ -18,6 +18,7 @@ export class Settings {
     public node: string;
     public theme: string;
     public version: string;
+    public marketUrl: string;
 
     constructor(data: any = {}) {
         this.id = "settings";
@@ -29,6 +30,7 @@ export class Settings {
         this.currency = data.currency || constants.defaultCurrency;
         this.language = data.language || constants.defaultLanguage;
         this.node = data.node || environment.defaultNode;
+        this.marketUrl = data.marketUrl || environment.marketUrl;
         this.theme = data.theme || constants.defaultTheme;
         this.version = data.version || constants.version;
     }
