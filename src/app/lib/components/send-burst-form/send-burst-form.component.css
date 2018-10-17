@@ -20,3 +20,21 @@ mat-form-field {
     width: 100%;
     display: block;
 }
+
+.col {
+    float:left;
+}
+
+.col-2 { 
+    width:50%;
+    margin-right:5%;
+}
+
+.col-2:last-child {
+    width:45%;
+    margin-right:0;
+}
+
+form {
+    margin:20px 0;
+}

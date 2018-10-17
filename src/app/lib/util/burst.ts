@@ -109,7 +109,7 @@ export class BurstUtil {
                 return undefined;
             }
 
-            let codeword = BurstUtil.initialCodeword,
+            let codeword = BurstUtil.initialCodeword.slice(),
                 codewordLength = 0;
 
             for (let i = 0; i < address.length; i++) {
@@ -172,7 +172,7 @@ export class BurstUtil {
                 address = address.substr(6);
             }
 
-            let codeword = BurstUtil.initialCodeword,
+            let codeword = BurstUtil.initialCodeword.slice(),
                 codewordLength = 0;
 
             for (let i = 0; i < address.length; i++) {
