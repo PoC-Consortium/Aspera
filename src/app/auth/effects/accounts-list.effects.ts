@@ -4,9 +4,8 @@ import { Router } from '@angular/router';
 import { Actions, Effect, ofType } from '@ngrx/effects';
 import { map } from 'rxjs/operators';
 import { AccountsListActions } from '../actions';
-import { AuthService } from '../services/auth.service';
 import { AccountsListActionTypes } from '../actions/accounts-list.actions';
-import { StoreService } from '../../lib/services';
+import { StoreService, AccountService } from '../../lib/services';
 
 @Injectable()
 export class AccountsListEffects {
@@ -18,7 +17,7 @@ export class AccountsListEffects {
     ),
     map(({ payload: { account }}) => {
         console.log('Account Selected: ', account);
-        return this.storeService.selectAccount(account).then(() => {
+        return this.accountService.selectAccount(account).then(() => {
             this.router.navigate(['/']);
         });
     }),
@@ -27,9 +26,8 @@ export class AccountsListEffects {
 
   constructor(
     private actions$: Actions,
-    private authService: AuthService,
     private router: Router,
     private dialog: MatDialog,
-    private storeService: StoreService
+    private accountService: AccountService
   ) {}
 }

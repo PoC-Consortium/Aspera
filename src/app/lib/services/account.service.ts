@@ -15,6 +15,10 @@ import { CryptoService } from "./crypto.service";
 import { NotificationService} from "./notification.service";
 import { StoreService } from "./store.service";
 import { HttpClient, HttpHeaders, HttpParams } from "@angular/common/http";
+import { Credentials } from "../../auth/models/credentials";
+import { Observable } from "rxjs";
+import { fromPromise } from "rxjs/internal-compatibility";
+import { tap } from "rxjs/operators";
 
 /*
 * AccountService class
@@ -44,6 +48,23 @@ export class AccountService {
 
     public setCurrentAccount(account: Account) {
         this.currentAccount.next(account);
+    }
+
+
+    public login({ passphrase, pin }: Credentials): Observable<Account> {
+        // if (passphrase !== 'test') {
+        //   return throwError('Invalid passphrase');
+        // }
+        return fromPromise(this.createActiveAccount(passphrase, pin)).pipe(
+            tap((account) => {
+                return fromPromise(this.selectAccount(account))
+            }),
+            tap((account) => {
+                return this.synchronizeAccount(account).catch((error) => {
+                    // todo: notify user that their account is unprotected!
+                });
+            })
+        );  
     }
 
     /*
