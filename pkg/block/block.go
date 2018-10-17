@@ -173,7 +173,7 @@ func (b *Block) Validate(previous *Block) error {
 		return err
 	} else if previousID != b.PreviousBlock {
 		return ErrPreviousBlockMismatch
-	} else if bytes.Equal(previousHash[:], b.PreviousBlockHash) {
+	} else if !bytes.Equal(previousHash[:], b.PreviousBlockHash) {
 		return ErrPreviousBlockMismatch
 	}
 
