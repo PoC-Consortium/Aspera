@@ -4,19 +4,18 @@
            [showMaskTyped]="true" [(ngModel)]="recipientAddress" name="recipientAddress" placeholder="{{ 'recipient' | i18n }}">
   </mat-form-field>
 
-  <div class="row">
-    <div class="col col-2">
+  <mat-grid-list cols="2" rowHeight="65px" gutterSize="10px">
+    <mat-grid-tile>
       <mat-form-field>
         <input matInput [(ngModel)]="amountNQT" name="amountNQT" placeholder="{{ 'amount' | i18n }}">
       </mat-form-field>
-    </div>
-    <div class="col col-2">
-
-      <mat-form-field class="fee">
+    </mat-grid-tile>
+    <mat-grid-tile>
+      <mat-form-field>
         <input matInput [(ngModel)]="feeNQT" name="feeNQT" placeholder="{{ 'fee' | i18n }}">
       </mat-form-field>
-    </div>
-  </div>
+    </mat-grid-tile>
+  </mat-grid-list>
 
 
   <label class="pill">Suggested fee:</label>

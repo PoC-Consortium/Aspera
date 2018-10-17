@@ -23,6 +23,13 @@
         top: 0;
         button {
             background:none;
+            height:50px;
         }
     }
+    mat-icon {
+        margin-right:5px;
+    }
+}
+button {
+    font-size:14px;
 }

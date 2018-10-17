@@ -5,9 +5,9 @@
     </mat-list-item>
 
     <mat-list-item class="top-menu-invisible">
-        <a routerLink="/dashboard/transactions/"><i class="fa fa-lg fa-fw fa-briefcase"></i> <span class="menu-item-parent">{{'Transactions'
-                | i18n}}</span></a>
-        <mat-nav-list>
+        <a routerLink="/dashboard/transactions/"><i class="fa fa-lg fa-fw fa-briefcase"></i> 
+            <span class="menu-item-parent">{{'Transactions' | i18n}}</span></a>
+        <!-- <mat-nav-list>
             <mat-list-item routerLinkActive="active">
                 <a routerLink="/dashboard/transactions/"><i class="fa fa-exchange"></i>
                     {{'Transactions' | i18n}}</a>
@@ -24,10 +24,15 @@
                 <a routerLink="/dashboard/transactions/ats"><i class="fa fa-laptop"></i>
                     {{'ATs (Smart Contracts)' | i18n}}</a>
             </mat-list-item>
-        </mat-nav-list>
+        </mat-nav-list> -->
     </mat-list-item>
 
     <mat-list-item class="top-menu-invisible">
+        <a (click)="openSendDialog()"><i class="fa fa-lg fa-fw fa-send"></i> 
+            <span class="menu-item-parent">{{'send_burst' | i18n}}</span></a>
+    </mat-list-item>
+
+    <!-- <mat-list-item class="top-menu-invisible">
         <a routerLink="/exchange/"><i class="fa fa-lg fa-fw fa-bar-chart-o"></i> <span class="menu-item-parent">{{'Asset
                 Exchange' | i18n}}</span></a>
         <mat-nav-list>
@@ -142,5 +147,5 @@
     <mat-list-item routerLinkActive="active">
         <a routerLink="/peers" title="Peers"><i class="fa fa-lg fa-fw fa-sitemap"></i> <span class="menu-item-parent">{{'Peers'
                 | i18n}}</span></a>
-    </mat-list-item>
+    </mat-list-item> -->
 </mat-nav-list>
