@@ -7,7 +7,7 @@ import { Component } from '@angular/core';
 @Component({
   template: `
     <h2 mat-dialog-title>Logout</h2>
-    <mat-dialog-content>Are you sure you want to logout?</mat-dialog-content>
+    <mat-dialog-content>Are you sure you want to logout of this account?</mat-dialog-content>
     <mat-dialog-actions>
       <button mat-button [mat-dialog-close]="false">Cancel</button>
       <button mat-button [mat-dialog-close]="true">OK</button>

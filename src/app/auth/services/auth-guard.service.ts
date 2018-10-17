@@ -5,7 +5,7 @@ import { Observable, forkJoin } from 'rxjs';
 import { map, take, concatMap, catchError, withLatestFrom, filter, first, concatAll, switchMap } from 'rxjs/operators';
 import { AuthApiActions } from '../actions';
 import * as fromAuth from '../reducers';
-import { StoreService } from '../../lib/services';
+import { StoreService, AccountService } from '../../lib/services';
 import { fromPromise } from 'rxjs/internal-compatibility';
 import { Account } from '../../lib/model';
 import { AccountsComponent } from '../../pages/dashboard/accounts';
@@ -17,7 +17,8 @@ import { mergeMap } from 'rxjs-compat/operator/mergeMap';
 export class AuthGuard implements CanActivate {
   authorized: boolean = false;
   constructor(private store: Store<fromAuth.State>,
-              private storeService: StoreService) {
+              private storeService: StoreService,
+              private accountService: AccountService) {
   }
 
   canActivate(): Observable<boolean> {
@@ -28,6 +29,7 @@ export class AuthGuard implements CanActivate {
         const allAccounts = await this.storeService.getAllAccounts().catch(() => {});
         console.log(selectedAccount, allAccounts);
         if (selectedAccount) {
+          this.accountService.setCurrentAccount(selectedAccount);
           return true;
         } else if (allAccounts && allAccounts.length) {
           this.store.dispatch(new AuthApiActions.AccountsListRedirect());

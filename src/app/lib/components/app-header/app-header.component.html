@@ -21,7 +21,7 @@
         <mat-icon>add_box</mat-icon>
         <span>{{ "new_account" | i18n }}</span>
       </button>
-      <button mat-menu-item>
+      <button mat-menu-item (click)="logout(selectedAccount)">
         <mat-icon>exit_to_app</mat-icon>
         <span>{{ "logout" | i18n }}</span>
       </button>

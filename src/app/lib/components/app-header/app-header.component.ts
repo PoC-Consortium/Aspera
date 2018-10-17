@@ -1,8 +1,8 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
-import { MarketService, StoreService } from '../../services';
+import { MarketService, StoreService, AccountService } from '../../services';
 import { Account } from '../../model';
-import { AccountsListActions } from '../../../auth/actions';
+import { AccountsListActions, AuthActions } from '../../../auth/actions';
 import { FormatInputPathObject } from 'path';
 import { Store } from '@ngrx/store';
 import * as fromAuth from '../../../reducers';
@@ -16,7 +16,7 @@ import { HttpClient } from '@angular/common/http';
     styleUrls: ['./app-header.component.scss'],
     templateUrl: './app-header.component.html'
 })
-export class AppHeaderComponent {
+export class AppHeaderComponent implements OnInit {
 
     public selectedAccount: Account;
     public accounts: Account[];
@@ -25,21 +25,24 @@ export class AppHeaderComponent {
         private marketService: MarketService,
         private storeService: StoreService,
         private store: Store<fromAuth.State>,
+        private accountService: AccountService,
         public dialog: MatDialog,
-    ) {
+    ) {}
 
-        this.storeService.ready.subscribe((ready) => {
-            this.storeService.getAllAccounts().then((accounts) => {
-                this.accounts = accounts;
-            })
-            this.storeService.getSelectedAccount().then((account) => {
-                this.selectedAccount = account;
-            })
-        });
-
+    ngOnInit() {
+        this.accountService.currentAccount.subscribe((account) => {
+            this.getSelectedAccounts();
+            this.selectedAccount = account;
+        })
     }
 
-    openSendDialog(): void {
+    private getSelectedAccounts() {
+        this.storeService.getAllAccounts().then((accounts) => {
+            this.accounts = accounts;
+        });
+    }
+
+    public openSendDialog(): void {
 
         // get suggested fees
         this.marketService.getSuggestedFees().subscribe((fees) => {
@@ -52,10 +55,13 @@ export class AppHeaderComponent {
     
             dialogRef.afterClosed().subscribe(result => {
                 console.log('The dialog was closed', result);
-                // this.store.dispatch(new AccountServiceActions.SendBurst({ result }))
             });
         });
 
+    }
+
+    public logout(account: Account) {
+        return this.store.dispatch(new AuthActions.LogoutConfirmation({ account: account }));
     }
 
     public getTotalBurst(accounts: Account[]) {
@@ -63,8 +69,7 @@ export class AppHeaderComponent {
     }
 
     public selectAccount(account: Account) {
-        this.selectedAccount = account;
-        this.store.dispatch(new AccountsListActions.SelectAccount({ account: account }));
+        return this.store.dispatch(new AccountsListActions.SelectAccount({ account: account }));
     }
 
     public getPriceBTC(): string {

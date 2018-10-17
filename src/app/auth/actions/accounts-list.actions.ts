@@ -11,4 +11,5 @@ export class SelectAccount implements Action {
   constructor(public payload: { account: Account }) {}
 }
 
+
 export type AccountsListActionsUnion = SelectAccount;
