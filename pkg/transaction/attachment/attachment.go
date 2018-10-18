@@ -173,7 +173,7 @@ func GuessAttachmentsAndAppendicesFromJSON(bs []byte) ([]Attachment, error) {
 	if children, err := txJSON.S("attachment").ChildrenMap(); err != nil {
 		return nil, err
 	} else if len(children) == 0 {
-		return []Attachment{new(Dummy)}, nil
+		return []Attachment{}, nil
 	}
 	attachmentType, exists := typeFor[uint16(txJSON.Path("type").Data().(float64))<<4|uint16(txJSON.Path("subtype").Data().(float64))]
 	if exists {
