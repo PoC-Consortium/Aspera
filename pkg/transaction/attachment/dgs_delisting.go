@@ -19,3 +19,7 @@ func (attachment *DgsDelisting) FromBytes(bs []byte, version uint8) (int, error)
 func (attachment *DgsDelisting) ToBytes(version uint8) ([]byte, error) {
 	return restruct.Pack(binary.LittleEndian, attachment)
 }
+
+func (attachment *DgsDelisting) GetFlag() uint32 {
+	return StandardAttachmentFlag
+}

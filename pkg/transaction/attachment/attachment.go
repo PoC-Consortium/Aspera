@@ -12,7 +12,16 @@ import (
 	"github.com/ac0v/aspera/pkg/parsing"
 )
 
+const (
+	StandardAttachmentFlag     = 0
+	MessageFlag                = 1 << 0
+	EncryptedMessageFlag       = 1 << 1
+	PublicKeyAnnouncementFlag  = 1 << 2
+	EncryptedToSelfMessageFlag = 1 << 3
+)
+
 type Attachment interface {
+	GetFlag() uint32
 	ToBytes(version uint8) ([]byte, error)
 	FromBytes(bs []byte, version uint8) (int, error)
 }

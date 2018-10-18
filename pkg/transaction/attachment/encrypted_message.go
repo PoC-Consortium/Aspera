@@ -59,9 +59,9 @@ func (attachment *EncryptedMessage) ToBytes(version uint8) ([]byte, error) {
 		return nil, err
 	}
 
-	if version > 0 {
-		return append([]byte{version}, bs...), nil
-	}
-
 	return bs, nil
+}
+
+func (attachment *EncryptedMessage) GetFlag() uint32 {
+	return EncryptedMessageFlag
 }

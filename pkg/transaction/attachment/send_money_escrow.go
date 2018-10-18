@@ -75,3 +75,7 @@ func (e *EscrowDeadlineAction) MarshalJSON() ([]byte, error) {
 	}
 	return nil, errors.New("unknown deadlineAction")
 }
+
+func (attachment *SendMoneyEscrow) GetFlag() uint32 {
+	return StandardAttachmentFlag
+}

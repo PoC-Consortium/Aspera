@@ -42,3 +42,7 @@ func (p *Payment) UnmarshalJSON(b []byte) error {
 func (p *Payment) MarshalJSON() ([]byte, error) {
 	return json.Marshal([]string{strconv.FormatUint(p.Recip, 10), strconv.FormatUint(p.Amount, 10)})
 }
+
+func (attachment *SendMoneyMulti) GetFlag() uint32 {
+	return StandardAttachmentFlag
+}

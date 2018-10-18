@@ -75,9 +75,9 @@ func (attachment *Message) ToBytes(version uint8) ([]byte, error) {
 		}
 	}
 
-	if version > 0 {
-		return append([]byte{version}, buf.Bytes()...), nil
-	}
-
 	return buf.Bytes(), nil
+}
+
+func (attachment *Message) GetFlag() uint32 {
+	return MessageFlag
 }

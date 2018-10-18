@@ -32,3 +32,7 @@ func (attachment *PublicKeyAnnouncement) ToBytes(version uint8) ([]byte, error) 
 
 	return bs, nil
 }
+
+func (attachment *PublicKeyAnnouncement) GetFlag() uint32 {
+	return PublicKeyAnnouncementFlag
+}

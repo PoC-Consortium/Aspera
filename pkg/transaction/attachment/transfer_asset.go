@@ -63,3 +63,7 @@ func (attachment *TransferAsset) ToBytes(version uint8) ([]byte, error) {
 
 	return bs, nil
 }
+
+func (attachment *TransferAsset) GetFlag() uint32 {
+	return StandardAttachmentFlag
+}

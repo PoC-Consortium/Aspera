@@ -19,3 +19,7 @@ func (attachment *CancelBidOrder) FromBytes(bs []byte, version uint8) (int, erro
 func (attachment *CancelBidOrder) ToBytes(version uint8) ([]byte, error) {
 	return restruct.Pack(binary.LittleEndian, attachment)
 }
+
+func (attachment *CancelBidOrder) GetFlag() uint32 {
+	return StandardAttachmentFlag
+}

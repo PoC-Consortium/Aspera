@@ -60,9 +60,9 @@ func (attachment *EncryptedToSelfMessage) ToBytes(version uint8) ([]byte, error)
 		return nil, err
 	}
 
-	if version > 0 {
-		return append([]byte{version}, bs...), nil
-	}
-
 	return bs, nil
+}
+
+func (attachment *EncryptedToSelfMessage) GetFlag() uint32 {
+	return EncryptedToSelfMessageFlag
 }

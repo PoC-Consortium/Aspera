@@ -19,3 +19,7 @@ func (attachment *LeaseBalance) FromBytes(bs []byte, version uint8) (int, error)
 func (attachment *LeaseBalance) ToBytes(version uint8) ([]byte, error) {
 	return restruct.Pack(binary.LittleEndian, attachment)
 }
+
+func (attachment *LeaseBalance) GetFlag() uint32 {
+	return StandardAttachmentFlag
+}

@@ -36,3 +36,7 @@ func (r *Recipient) UnmarshalJSON(b []byte) error {
 func (p *Recipient) MarshalJSON() ([]byte, error) {
 	return []byte(`"` + strconv.FormatUint(p.Recip, 10) + `"`), nil
 }
+
+func (attachment *SendMoneyMultiSame) GetFlag() uint32 {
+	return StandardAttachmentFlag
+}

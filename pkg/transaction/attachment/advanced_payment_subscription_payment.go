@@ -18,3 +18,7 @@ func (attachment *AdvancedPaymentSubscriptionPayment) FromBytes(bs []byte, versi
 func (attachment *AdvancedPaymentSubscriptionPayment) ToBytes(version uint8) ([]byte, error) {
 	return restruct.Pack(binary.LittleEndian, attachment)
 }
+
+func (attachment *AdvancedPaymentSubscriptionPayment) GetFlag() uint32 {
+	return StandardAttachmentFlag
+}

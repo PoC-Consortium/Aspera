@@ -173,18 +173,24 @@ func FromBytes(bs []byte) (*Transaction, error) {
 }
 
 func (tx *Transaction) ToBytes() ([]byte, error) {
-	headerBs, err := tx.Header.ToBytes()
-	if err != nil {
-		return nil, err
-	}
-
+	var flags uint32
 	var attachmentsBs []byte
+	version := tx.Header.GetVersion()
 	for _, attachment := range tx.Attachments {
-		bs, err := attachment.ToBytes(tx.Header.GetVersion())
+		flags |= attachment.GetFlag()
+		bs, err := attachment.ToBytes(version)
 		if err != nil {
 			return nil, err
 		}
+		if version > 0 {
+			bs = append([]byte{version}, bs...)
+		}
 		attachmentsBs = append(attachmentsBs, bs...)
+	}
+
+	headerBs, err := tx.Header.ToBytes(flags)
+	if err != nil {
+		return nil, err
 	}
 
 	bs := append(headerBs, attachmentsBs...)
@@ -229,7 +235,10 @@ func headerFromBytes(bs []byte) (*Header, error) {
 	return &header, nil
 }
 
-func (h *Header) ToBytes() ([]byte, error) {
+func (h *Header) ToBytes(flags uint32) ([]byte, error) {
+	// TODO: we should probably set flags somewhere else, for example when a tx is created
+	h.Flags = flags
+
 	if len(h.ReferencedTransactionFullHash) == 0 {
 		h.ReferencedTransactionFullHash = make([]byte, 32)
 	}
@@ -251,10 +260,6 @@ func (h *Header) ToBytes() ([]byte, error) {
 		}
 
 		if err := binary.Write(buf, binary.LittleEndian, h.EcBlockID); err != nil {
-			return nil, err
-		}
-
-		if err := binary.Write(buf, binary.LittleEndian, version); err != nil {
 			return nil, err
 		}
 

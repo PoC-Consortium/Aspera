@@ -10,3 +10,7 @@ func (attachment *Dummy) FromBytes(bs []byte, version uint8) (int, error) {
 func (attachment *Dummy) ToBytes(version uint8) ([]byte, error) {
 	return nil, nil
 }
+
+func (attachment *Dummy) GetFlag() uint32 {
+	return StandardAttachmentFlag
+}

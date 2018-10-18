@@ -21,3 +21,7 @@ func (attachment *SellAlias) FromBytes(bs []byte, version uint8) (int, error) {
 func (attachment *SellAlias) ToBytes(version uint8) ([]byte, error) {
 	return restruct.Pack(binary.LittleEndian, attachment)
 }
+
+func (attachment *SellAlias) GetFlag() uint32 {
+	return StandardAttachmentFlag
+}

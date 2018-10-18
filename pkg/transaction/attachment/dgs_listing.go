@@ -26,3 +26,7 @@ func (attachment *DgsListing) FromBytes(bs []byte, version uint8) (int, error) {
 func (attachment *DgsListing) ToBytes(version uint8) ([]byte, error) {
 	return restruct.Pack(binary.LittleEndian, attachment)
 }
+
+func (attachment *DgsListing) GetFlag() uint32 {
+	return StandardAttachmentFlag
+}

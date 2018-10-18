@@ -20,3 +20,7 @@ func (attachment *DgsQuantityChange) FromBytes(bs []byte, version uint8) (int, e
 func (attachment *DgsQuantityChange) ToBytes(version uint8) ([]byte, error) {
 	return restruct.Pack(binary.LittleEndian, attachment)
 }
+
+func (attachment *DgsQuantityChange) GetFlag() uint32 {
+	return StandardAttachmentFlag
+}

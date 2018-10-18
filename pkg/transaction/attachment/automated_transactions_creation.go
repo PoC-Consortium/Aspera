@@ -174,3 +174,7 @@ func (attachment *AutomatedTransactionsCreation) ToBytes(version uint8) ([]byte,
 
 	return buf.Bytes(), nil
 }
+
+func (attachment *AutomatedTransactionsCreation) GetFlag() uint32 {
+	return StandardAttachmentFlag
+}

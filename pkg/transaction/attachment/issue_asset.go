@@ -24,3 +24,7 @@ func (attachment *IssueAsset) FromBytes(bs []byte, version uint8) (int, error) {
 func (attachment *IssueAsset) ToBytes(version uint8) ([]byte, error) {
 	return restruct.Pack(binary.LittleEndian, attachment)
 }
+
+func (attachment *IssueAsset) GetFlag() uint32 {
+	return StandardAttachmentFlag
+}
