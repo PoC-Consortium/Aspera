@@ -39,6 +39,9 @@ func (attachment *TransferAsset) FromBytes(bs []byte, version uint8) (int, error
 }
 
 func (attachment *TransferAsset) ToBytes(version uint8) ([]byte, error) {
+	// TODO: might be better to put this into a unmarshaller...
+	attachment.NumComment = uint16(len(attachment.Comment))
+
 	bs, err := restruct.Pack(binary.LittleEndian, attachment)
 	if err != nil {
 		return nil, err
