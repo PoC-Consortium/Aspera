@@ -3,6 +3,7 @@ package attachment
 import (
 	"bytes"
 	"encoding/binary"
+	"math"
 
 	"github.com/ac0v/aspera/pkg/parsing"
 	"gopkg.in/restruct.v1"
@@ -45,6 +46,14 @@ func (attachment *EncryptedMessage) FromBytes(bs []byte, version uint8) (int, er
 }
 
 func (attachment *EncryptedMessage) ToBytes(version uint8) ([]byte, error) {
+	attachment.Message.IsTextAndLen = int32(len(attachment.Message.Data))
+	if attachment.Message.IsText {
+		attachment.Message.IsTextAndLen |= math.MinInt32
+	} else {
+		// hex encoding
+		attachment.Message.IsTextAndLen /= 2
+	}
+
 	bs, err := restruct.Pack(binary.LittleEndian, attachment)
 	if err != nil {
 		return nil, err

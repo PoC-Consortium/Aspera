@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/binary"
 	"encoding/hex"
+	"math"
 
 	"github.com/ac0v/aspera/pkg/parsing"
 	"github.com/json-iterator/go"
@@ -18,26 +19,6 @@ type Message struct {
 	IsTextAndLen int32  `json:"-"`
 	Content      string `json:"message,omitempty"`
 	Version      int8   `struct:"-" json:"version.Message,omitempty"`
-}
-
-func (m *Message) UnmarshalJSON(bs []byte) error {
-	type Alias Message
-	ma := &struct {
-		*Alias
-	}{
-		Alias: (*Alias)(m),
-	}
-	if err := js.Unmarshal(bs, ma); err != nil {
-		return err
-	}
-
-	if m.IsText != nil && *m.IsText {
-		m.IsTextAndLen = int32(-len(m.Content))
-	} else {
-		m.IsTextAndLen = int32(len(m.Content) / 2)
-	}
-
-	return nil
 }
 
 func (attachment *Message) FromBytes(bs []byte, version uint8) (int, error) {
@@ -65,6 +46,14 @@ func (attachment *Message) FromBytes(bs []byte, version uint8) (int, error) {
 }
 
 func (attachment *Message) ToBytes(version uint8) ([]byte, error) {
+	attachment.IsTextAndLen = int32(len(attachment.Content))
+	if attachment.IsText != nil && *attachment.IsText {
+		attachment.IsTextAndLen |= math.MinInt32
+	} else {
+		// hex encoding
+		attachment.IsTextAndLen /= 2
+	}
+
 	buf := bytes.NewBuffer(nil)
 
 	if err := binary.Write(buf, binary.LittleEndian, attachment.IsTextAndLen); err != nil {

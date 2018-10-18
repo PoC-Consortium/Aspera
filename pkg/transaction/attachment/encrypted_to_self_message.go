@@ -3,6 +3,7 @@ package attachment
 import (
 	"bytes"
 	"encoding/binary"
+	"math"
 
 	"gopkg.in/restruct.v1"
 
@@ -46,6 +47,14 @@ func (attachment *EncryptedToSelfMessage) FromBytes(bs []byte, version uint8) (i
 }
 
 func (attachment *EncryptedToSelfMessage) ToBytes(version uint8) ([]byte, error) {
+	attachment.Message.IsTextAndLen = int32(len(attachment.Message.Data))
+	if attachment.Message.IsText {
+		attachment.Message.IsTextAndLen |= math.MinInt32
+	} else {
+		// hex encoding
+		attachment.Message.IsTextAndLen /= 2
+	}
+
 	bs, err := restruct.Pack(binary.LittleEndian, attachment)
 	if err != nil {
 		return nil, err
