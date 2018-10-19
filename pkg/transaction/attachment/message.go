@@ -60,7 +60,7 @@ func (attachment *Message) ToBytes(version uint8) ([]byte, error) {
 		return nil, err
 	}
 
-	if *attachment.IsText {
+	if attachment.IsText != nil && *attachment.IsText {
 		if err := binary.Write(buf, binary.LittleEndian, []byte(attachment.Content)); err != nil {
 			return nil, err
 		}
