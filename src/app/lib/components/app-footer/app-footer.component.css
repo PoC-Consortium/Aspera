@@ -7,8 +7,18 @@
 
 .footer-info > li {
     display: inline;
-    color:red;
     font-size: 0.8em;
     margin-left: 0px;
     padding-left: 10px;
+}
+
+.footer-info a {
+    color:rgba(0,0,0,.87);
+    text-decoration: none;
+}
+
+.main-footer {
+    border-top: solid 1px rgba(0,0,0,.12);
+    padding:10px;
+    text-align: center;
 }

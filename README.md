@@ -30,7 +30,7 @@
 4. Start Webpack Server
 
     ```
-    ng serve
+    npm run start
     ```
 
 5. Navigate with your browser to localhost:4200 to see the UI

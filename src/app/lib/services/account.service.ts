@@ -50,29 +50,12 @@ export class AccountService {
         this.currentAccount.next(account);
     }
 
-
-    public login({ passphrase, pin }: Credentials): Observable<Account> {
-        // if (passphrase !== 'test') {
-        //   return throwError('Invalid passphrase');
-        // }
-        return fromPromise(this.createActiveAccount(passphrase, pin)).pipe(
-            tap((account) => {
-                return fromPromise(this.selectAccount(account))
-            }),
-            tap((account) => {
-                return this.synchronizeAccount(account).catch((error) => {
-                    // todo: notify user that their account is unprotected!
-                });
-            })
-        );  
-    }
-
     /*
     * Method responsible for creating a new active account from a passphrase.
     * Generates keys for an account, encrypts them with the provided key and saves them.
     * TODO: error handling of asynchronous method calls
     */
-    public createActiveAccount(passphrase: string, pin: string = ""): Promise<Account> {
+    public createActiveAccount({passphrase, pin = ""}: Credentials): Promise<Account> {
         return new Promise((resolve, reject) => {
             let account: Account = new Account();
             // import active account
