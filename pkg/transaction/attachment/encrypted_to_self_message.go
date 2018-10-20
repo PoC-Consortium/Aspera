@@ -7,6 +7,7 @@ import (
 
 	"gopkg.in/restruct.v1"
 
+	jutils "github.com/ac0v/aspera/pkg/json"
 	"github.com/ac0v/aspera/pkg/parsing"
 )
 
@@ -14,9 +15,9 @@ type EncryptedToSelfMessageContainer struct {
 	IsText bool `struct:"-" json:"isText"`
 
 	// IsText is encoded as a signle bit
-	IsTextAndLen int32  `json:"-"`
-	Data         []byte `json:"data"`
-	Nonce        []byte `json:"nonce"`
+	IsTextAndLen int32           `json:"-"`
+	Data         jutils.HexSlice `json:"data"`
+	Nonce        jutils.HexSlice `json:"nonce"`
 }
 
 type EncryptedToSelfMessage struct {
@@ -52,7 +53,7 @@ func (attachment *EncryptedToSelfMessage) ToBytes(version uint8) ([]byte, error)
 		attachment.Message.IsTextAndLen |= math.MinInt32
 	} else {
 		// hex encoding
-		attachment.Message.IsTextAndLen /= 2
+		// attachment.Message.IsTextAndLen /= 2
 	}
 
 	bs, err := restruct.Pack(binary.LittleEndian, attachment)
