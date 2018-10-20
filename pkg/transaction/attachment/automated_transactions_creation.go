@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"io"
 	"math"
+
+	jutils "github.com/ac0v/aspera/pkg/json"
 )
 
 const (
@@ -16,16 +18,16 @@ const (
 )
 
 type AutomatedTransactionsCreation struct {
-	NumName        uint8  `json:"-"`
-	Name           string `json:"name"`
-	NumDescription uint16 `json:"-"`
-	Description    string `json:"description"`
-	CodePages      uint16 `json:"-"`
-	DataPages      uint16 `json:"-"`
-	Code           string `json:"-"`
-	Data           string `json:"-"`
-	CreationBytes  string `json:"creationBytes"`
-	Version        int8   `struct:"-" json:"version.AutomatedTransactionsCreation,omitempty"`
+	NumName        uint8           `json:"-"`
+	Name           string          `json:"name"`
+	NumDescription uint16          `json:"-"`
+	Description    string          `json:"description"`
+	CodePages      uint16          `json:"-"`
+	DataPages      uint16          `json:"-"`
+	Code           jutils.HexSlice `json:"-"`
+	Data           jutils.HexSlice `json:"-"`
+	CreationBytes  jutils.HexSlice `json:"creationBytes"`
+	Version        int8            `struct:"-" json:"version.AutomatedTransactionsCreation,omitempty"`
 }
 
 /* TODO: bullshit
@@ -105,11 +107,10 @@ func (attachment *AutomatedTransactionsCreation) FromBytes(bs []byte, version ui
 		}
 	}
 
-	attachmentCode := make([]byte, codeLen)
-	if err := binary.Read(r, binary.LittleEndian, &attachmentCode); err != nil {
+	attachment.Code = make([]byte, codeLen)
+	if err := binary.Read(r, binary.LittleEndian, &attachment.Code); err != nil {
 		return 0, nil
 	}
-	attachment.Code = string(attachmentCode)
 
 	var dataLen uint32
 	if attachment.DataPages*pageSize < 257 {
@@ -130,26 +131,27 @@ func (attachment *AutomatedTransactionsCreation) FromBytes(bs []byte, version ui
 		}
 	}
 
-	attachmentData := make([]byte, dataLen)
-	if err := binary.Read(r, binary.LittleEndian, &attachmentData); err != nil {
+	attachment.Data = make([]byte, dataLen)
+	if err := binary.Read(r, binary.LittleEndian, &attachment.Data); err != nil {
 		return 0, nil
 	}
-	attachment.Data = string(attachmentData)
 
 	endPosition := int(r.Size()) - r.Len()
 	if _, err := r.Seek(int64(startPosition), io.SeekStart); err != nil {
 		return 0, err
 	}
-	attachmentCreationBytes := make([]byte, endPosition-startPosition)
-	if err := binary.Read(r, binary.LittleEndian, &attachmentCreationBytes); err != nil {
+	attachment.CreationBytes = make([]byte, endPosition-startPosition)
+	if err := binary.Read(r, binary.LittleEndian, &attachment.CreationBytes); err != nil {
 		return 0, nil
 	}
-	attachment.CreationBytes = string(attachmentCreationBytes)
 
 	return 0, nil
 }
 
 func (attachment *AutomatedTransactionsCreation) ToBytes(version uint8) ([]byte, error) {
+	attachment.NumName = uint8(len(attachment.Name))
+	attachment.NumDescription = uint16(len(attachment.Description))
+
 	buf := bytes.NewBuffer(nil)
 
 	if err := binary.Write(buf, binary.LittleEndian, attachment.NumName); err != nil {
