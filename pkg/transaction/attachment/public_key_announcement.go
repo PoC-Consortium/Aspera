@@ -5,10 +5,12 @@ import (
 	"encoding/binary"
 
 	"gopkg.in/restruct.v1"
+
+	jutils "github.com/ac0v/aspera/pkg/json"
 )
 
 type PublicKeyAnnouncement struct {
-	PublicKey []byte
+	PublicKey jutils.HexSlice `json:"recipientPublicKey"`
 }
 
 func (attachment *PublicKeyAnnouncement) FromBytes(bs []byte, version uint8) (int, error) {
@@ -24,10 +26,6 @@ func (attachment *PublicKeyAnnouncement) ToBytes(version uint8) ([]byte, error) 
 	bs, err := restruct.Pack(binary.LittleEndian, attachment)
 	if err != nil {
 		return nil, err
-	}
-
-	if version > 0 {
-		return append([]byte{version}, bs...), nil
 	}
 
 	return bs, nil
