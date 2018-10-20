@@ -16,6 +16,7 @@ import (
 type Synchronizer struct {
 	store     *s.Store
 	client    Client
+	manager   Manager
 	statistic *statistic
 
 	blockRanges        chan *blockRange
@@ -44,20 +45,21 @@ type blockMeta struct {
 type blockBatch struct {
 	blockRange *blockRange
 
-	peers  []*Peer
+	peers  []string
 	ids    []uint64
 	blocks []*b.Block
 
 	isGlueResult bool
 }
 
-func NewSynchronizer(client Client, store *s.Store, milestones []config.Milestone) *Synchronizer {
+func NewSynchronizer(client Client, manager Manager, store *s.Store, milestones []config.Milestone) *Synchronizer {
 	s := &Synchronizer{
 		statistic: &statistic{
 			start:     time.Now(),
 			processed: 0,
 		},
 		client:             client,
+		manager:            manager,
 		store:              store,
 		blockRanges:        make(chan *blockRange, len(milestones)),
 		blockBatchesEmpty:  make(chan *blockBatch, len(milestones)),
@@ -137,7 +139,7 @@ func (s *Synchronizer) validateBlocks() {
 			if err != nil {
 				Log.Error("got invalid blocks", zap.Error(err))
 				for _, p := range blockBatch.peers {
-					p.Block(PeerDataIntegrityValidation)
+					s.manager.BlockPeer(p, PeerDataIntegrityValidation)
 				}
 				s.blockRanges <- blockBatch.blockRange
 				continue

@@ -6,11 +6,9 @@ import (
 	"gopkg.in/resty.v1"
 	"net/http"
 	"strconv"
-	"time"
-	
 
-	b "github.com/ac0v/aspera/pkg/block"
 	pb "github.com/ac0v/aspera/internal/api/protobuf-spec"
+	b "github.com/ac0v/aspera/pkg/block"
 	"github.com/ac0v/aspera/pkg/config"
 	"github.com/golang/protobuf/jsonpb"
 	"github.com/json-iterator/go"
@@ -28,9 +26,11 @@ type GetNextBlocksResponse struct {
 }
 
 type Client interface {
-	GetNextBlockIDs(blockID uint64) (*pb.GetNextBlockIdsResponse, []*Peer, error)
-	GetNextBlocks(blockID uint64) (*GetNextBlocksResponse, []*Peer, error)
+	GetNextBlockIDs(blockID uint64) (*pb.GetNextBlockIdsResponse, []string, error)
+	GetNextBlocks(blockID uint64) (*GetNextBlocksResponse, []string, error)
 	GetPeersOf(apiUrl string) (*pb.GetPeers, error)
+
+	SetManager(m Manager)
 }
 
 type client struct {
@@ -42,23 +42,22 @@ func NewClient(config *config.P2P, internetProtocols []string) Client {
 	resty.SetTimeout(config.Timeout)
 	resty.SetDebug(config.Debug)
 
-	c := &client{
+	return &client{
 		unmarshaler: &jsonpb.Unmarshaler{AllowUnknownFields: true},
 	}
-	pm := NewManager(c, config.Peers, internetProtocols, time.Minute)
-
-	c.manager = pm
-
-	return c
 }
 
-func (c *client) request(req *resty.Request) (*resty.Response, *Peer, error) {
+func (c *client) SetManager(m Manager) {
+	c.manager = m
+}
+
+func (c *client) request(req *resty.Request) (*resty.Response, string, error) {
 	peer := c.manager.RandomPeer()
-	res, err := req.Post(peer.apiUrl)
+	res, err := req.Post(peer)
 	return res, peer, err
 }
 
-func (c *client) requestByMajority(requestType string, params map[string]interface{}) ([]byte, []*Peer, error) {
+func (c *client) requestByMajority(requestType string, params map[string]interface{}) ([]byte, []string, error) {
 	foundMajority := make(chan struct{})
 
 	sem := make(chan struct{}, parallelism)
@@ -67,7 +66,7 @@ func (c *client) requestByMajority(requestType string, params map[string]interfa
 	}
 
 	type peerResponse struct {
-		of   *Peer
+		of   string
 		body string
 	}
 	peerResponses := make(chan *peerResponse)
@@ -80,7 +79,7 @@ func (c *client) requestByMajority(requestType string, params map[string]interfa
 			case <-sem:
 				go func() {
 					peer := c.manager.RandomPeer()
-					res, err := c.buildRequest(requestType, params).Post(peer.apiUrl)
+					res, err := c.buildRequest(requestType, params).Post(peer)
 
 					if err != nil || res == nil || res.StatusCode() != http.StatusOK {
 						c.manager.BlockPeer(peer, PeerTimeout)
@@ -97,11 +96,11 @@ func (c *client) requestByMajority(requestType string, params map[string]interfa
 		}
 	}()
 
-	seenBy := make(map[string]map[*Peer]struct{})
+	seenBy := make(map[string]map[string]struct{})
 	for peerResponse := range peerResponses {
 		peers := seenBy[peerResponse.body]
 		if peers == nil {
-			seenBy[peerResponse.body] = map[*Peer]struct{}{peerResponse.of: struct{}{}}
+			seenBy[peerResponse.body] = map[string]struct{}{peerResponse.of: struct{}{}}
 		} else {
 			if _, processedPeer := peers[peerResponse.of]; processedPeer {
 				continue
@@ -118,7 +117,7 @@ func (c *client) requestByMajority(requestType string, params map[string]interfa
 						}
 					}
 				}
-				var peersSlice []*Peer
+				var peersSlice []string
 				for p := range peers {
 					peersSlice = append(peersSlice, p)
 				}
@@ -143,7 +142,7 @@ func (c *client) buildRequest(requestType string, params map[string]interface{})
 	return resty.R().SetBody(paramsCopy)
 }
 
-func (c *client) GetNextBlockIDs(blockId uint64) (*pb.GetNextBlockIdsResponse, []*Peer, error) {
+func (c *client) GetNextBlockIDs(blockId uint64) (*pb.GetNextBlockIdsResponse, []string, error) {
 	body, peers, err := c.requestByMajority("getNextBlockIds", map[string]interface{}{
 		"blockId": strconv.FormatUint(blockId, 10),
 	})
@@ -156,7 +155,7 @@ func (c *client) GetNextBlockIDs(blockId uint64) (*pb.GetNextBlockIdsResponse, [
 	return msg, peers, err
 }
 
-func (c *client) GetNextBlocks(blockId uint64) (*GetNextBlocksResponse, []*Peer, error) {
+func (c *client) GetNextBlocks(blockId uint64) (*GetNextBlocksResponse, []string, error) {
 	req := c.buildRequest("getNextBlocks", map[string]interface{}{
 		"blockId": strconv.FormatUint(blockId, 10),
 	})
@@ -166,7 +165,7 @@ func (c *client) GetNextBlocks(blockId uint64) (*GetNextBlocksResponse, []*Peer,
 	}
 
 	var msg = new(GetNextBlocksResponse)
-	return msg, []*Peer{peers}, json.Unmarshal(res.Body(), msg)
+	return msg, []string{peers}, json.Unmarshal(res.Body(), msg)
 }
 
 func (c *client) GetPeersOf(apiUrl string) (*pb.GetPeers, error) {
