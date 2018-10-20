@@ -10,6 +10,8 @@ import (
 	//"encoding/json"
 	"github.com/Jeffail/gabs"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/ac0v/aspera/pkg/transaction"
 )
 
 func TestParseBlocks(t *testing.T) {
@@ -25,27 +27,26 @@ func TestParseBlocks(t *testing.T) {
 			panic(err)
 		}
 
-		foo, _ := json.Marshal(blockMsg)
-		/*
-			for _, tx := range blockMsg.Transactions {
-				if tx.Header.RecipientID == 0 {
-					panic(string(foo))
-				}
-			}*/
-		var comperands [2]string
-		comperands[0] = string(foo)
-		comperands[1] = parseTest.JSON
-		for i, comperand := range comperands {
-			jsonParsed, _ := gabs.ParseJSON([]byte(comperand))
-			comperands[i] = string(jsonParsed.StringIndent("", "  "))
+		marshalled, _ := json.Marshal(blockMsg)
+
+		compareJSON(t, string(marshalled), parseTest.JSON)
+
+		for i, tx := range blockMsg.Transactions {
+			bs, _ := tx.ToBytes()
+			blockMsg.Transactions[i], _ = transaction.FromBytes(bs)
 		}
-		assert.EqualValues(t, comperands[1], comperands[0])
 
-		//result, _ := json.Marshal(&blockMsg)
-		//assert.JSONEq(t, parseTest.JSON, string(foo), "json valid")
+		marshalled, _ = json.Marshal(blockMsg)
+		compareJSON(t, string(marshalled), parseTest.JSON)
 
-		// fmt.Println(parseTest.JSON)
-		//fmt.Printf("%+v\n", blockMsg.Transactions)
-		//		panic("fuck")
 	}
+}
+
+func compareJSON(t *testing.T, left string, right string) {
+	comperands := []string{left, right}
+	for i, comperand := range comperands {
+		jsonParsed, _ := gabs.ParseJSON([]byte(comperand))
+		comperands[i] = string(jsonParsed.StringIndent("", "  "))
+	}
+	assert.EqualValues(t, comperands[1], comperands[0])
 }
