@@ -19,7 +19,7 @@ func TestGetID(t *testing.T) {
 			b.BlockATs = &blockTest.BlockATs
 		}
 
-		id, err := b.CalculateID()
+		_, id, err := b.CalculateHashAndID()
 		if assert.Nil(t, err) {
 			assert.Equal(t, b.Block, id)
 		}
