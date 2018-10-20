@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
-import { LoginPageActions } from '../../../../../auth/actions';
+import { CreateActiveAccount, CreatePassiveAccount } from './create.actions';
 import { Store } from '@ngrx/store';
-import * as fromAuth from '../../../../../auth/reducers';
+import * as fromAuth from '../../../../auth/reducers';
 
 @Injectable()
 export class CreateService {
@@ -68,8 +68,12 @@ export class CreateService {
         return this.passphrase.length > 0 && this.address != undefined && this.id != undefined
     }
 
-    public createAccount() {
-        return this.store.dispatch(new LoginPageActions.Login({ credentials: { passphrase: this.getCompletePassphrase(), pin: this.pin } }));
+    public createActiveAccount() {
+        return this.store.dispatch(new CreateActiveAccount({ passphrase: this.getCompletePassphrase(), pin: this.pin }));
+    }
+
+    public createPassiveAccount() {
+        return this.store.dispatch(new CreatePassiveAccount({ address: this.address }));
     }
 
     public reset() {

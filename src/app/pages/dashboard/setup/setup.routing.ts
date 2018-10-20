@@ -2,6 +2,8 @@ import { Routes, RouterModule }  from '@angular/router';
 
 import { SetupComponent } from './setup.component';
 import { AccountNewComponent } from './account/account.component';
+import { CreateActiveAccountComponent } from './account/create-active/create.component';
+import { CreatePassiveAccountComponent } from './account/create-passive/create-passive.component';
 
 // noinspection TypeScriptValidateTypes
 const routes: Routes = [
@@ -12,6 +14,14 @@ const routes: Routes = [
     {
         path: 'create',
         component: AccountNewComponent
+    },
+    {
+        path: 'create/active',
+        component: CreateActiveAccountComponent
+    },
+    {
+        path: 'create/passive',
+        component: CreatePassiveAccountComponent
     }
 ];
 

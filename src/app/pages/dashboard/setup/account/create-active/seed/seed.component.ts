@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy, ViewEncapsulation } from '@angular/core';
 import { Router } from '@angular/router';
 import { CryptoService } from '../../../../../../lib/services';
-import { CreateService } from '../create.service';
+import { CreateService } from '../../create.service';
 
 @Component({
     selector: 'app-account-create-seed',

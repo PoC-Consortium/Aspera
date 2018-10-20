@@ -5,7 +5,6 @@ import { Actions, Effect, ofType } from '@ngrx/effects';
 import { of, combineLatest, merge, pipe, forkJoin, concat } from 'rxjs'; 
 import { catchError, exhaustMap, map, tap, mergeMap, mapTo, withLatestFrom, filter } from 'rxjs/operators';
 import {
-  LoginPageActions,
   AuthActions,
   AuthApiActions,
 } from '../actions';
@@ -13,15 +12,17 @@ import { Credentials } from '../models/credentials';
 import { LogoutConfirmationDialogComponent } from '../components/logout-confirmation-dialog.component';
 import { Account } from '../../lib/model';
 import { AccountService } from '../../lib/services';
+import { AccountCreateActionsTypes, CreateActiveAccount } from '../../pages/dashboard/setup/account/create.actions';
+import { fromPromise } from 'rxjs/internal-compatibility';
 
 @Injectable()
 export class AuthEffects {
   @Effect()
   login$ = this.actions$.pipe(
-    ofType<LoginPageActions.Login>(LoginPageActions.LoginPageActionTypes.Login),
-    map(action => action.payload.credentials),
+    ofType<CreateActiveAccount>(AccountCreateActionsTypes.CreateActiveAccount),
+    map(action => action.payload),
     exhaustMap((auth: Credentials) =>
-      this.accountService.login(auth).pipe(
+      fromPromise(this.accountService.createActiveAccount(auth)).pipe(
         map(account => new AuthApiActions.LoginSuccess({ account })),
         catchError(error => of(new AuthApiActions.LoginFailure({ error })))
       )
