@@ -8,7 +8,7 @@ import (
 
 type DgsQuantityChange struct {
 	Goods         uint64 `json:"goods,omitempty,string"`
-	DeltaQuantity uint32 `json:"deltaQuantity,omitempty"`
+	DeltaQuantity int32  `json:"deltaQuantity,omitempty"`
 	Version       int8   `struct:"-" json:"version.DigitalGoodsQuantityChange,omitempty"`
 }
 
