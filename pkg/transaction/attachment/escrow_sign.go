@@ -8,7 +8,7 @@ import (
 )
 
 type EscrowSign struct {
-	Escrow       uint64 `json:"escrow"`
+	Escrow       uint64 `json:"escrowId,string"`
 	DecisionByte uint8  `json:"-"`
 	Decision     string `struct:"-" json:"decision"`
 }
