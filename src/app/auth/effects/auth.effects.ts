@@ -41,7 +41,7 @@ export class AuthEffects {
       AuthApiActions.AuthApiActionTypes.LoginRedirect,
     ),
     tap(authed => {
-      this.router.navigate(['/login']);
+      this.router.navigate(['/welcome']);
     })
   );
 
