@@ -5,6 +5,7 @@ import { MatTableDataSource, MatSort } from '@angular/material';
 import { Transaction, Account } from '../../../lib/model';
 import { AccountService, StoreService } from '../../../lib/services';
 import { Converter } from '../../../lib/util';
+import { NotifierService } from 'angular-notifier';
 
 @Component({
     selector: 'app-home',
@@ -21,6 +22,7 @@ export class HomeComponent {
         private storeService: StoreService,
         private accountService: AccountService,
         private router: Router,
+        private notificationService: NotifierService
     ) {
 
         // handle route reloads (i.e. if user changes accounts)
@@ -45,6 +47,7 @@ export class HomeComponent {
                     (error) => {
                         // Todo: throw a warning to the user that their account is unverified!!
                         console.log(error);
+                        this.notificationService.notify('error', error.toString());
                     })
             })
     }
