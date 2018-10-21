@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"strconv"
 
-	pb "github.com/ac0v/aspera/internal/api/protobuf-spec"
+	api "github.com/ac0v/aspera/pkg/api/p2p"
 	b "github.com/ac0v/aspera/pkg/block"
 	"github.com/ac0v/aspera/pkg/config"
 	"github.com/golang/protobuf/jsonpb"
@@ -26,9 +26,9 @@ type GetNextBlocksResponse struct {
 }
 
 type Client interface {
-	GetNextBlockIDs(blockID uint64) (*pb.GetNextBlockIdsResponse, []string, error)
+	GetNextBlockIDs(blockID uint64) (*api.GetNextBlockIdsResponse, []string, error)
 	GetNextBlocks(blockID uint64) (*GetNextBlocksResponse, []string, error)
-	GetPeersOf(apiUrl string) (*pb.GetPeers, error)
+	GetPeersOf(apiUrl string) (*api.GetPeers, error)
 
 	SetManager(m Manager)
 }
@@ -142,7 +142,7 @@ func (c *client) buildRequest(requestType string, params map[string]interface{})
 	return resty.R().SetBody(paramsCopy)
 }
 
-func (c *client) GetNextBlockIDs(blockId uint64) (*pb.GetNextBlockIdsResponse, []string, error) {
+func (c *client) GetNextBlockIDs(blockId uint64) (*api.GetNextBlockIdsResponse, []string, error) {
 	body, peers, err := c.requestByMajority("getNextBlockIds", map[string]interface{}{
 		"blockId": strconv.FormatUint(blockId, 10),
 	})
@@ -150,7 +150,7 @@ func (c *client) GetNextBlockIDs(blockId uint64) (*pb.GetNextBlockIdsResponse, [
 		return nil, nil, err
 	}
 
-	var msg = new(pb.GetNextBlockIdsResponse)
+	var msg = new(api.GetNextBlockIdsResponse)
 	err = c.unmarshaler.Unmarshal(bytes.NewReader(body), msg)
 	return msg, peers, err
 }
@@ -168,12 +168,12 @@ func (c *client) GetNextBlocks(blockId uint64) (*GetNextBlocksResponse, []string
 	return msg, []string{peers}, json.Unmarshal(res.Body(), msg)
 }
 
-func (c *client) GetPeersOf(apiUrl string) (*pb.GetPeers, error) {
+func (c *client) GetPeersOf(apiUrl string) (*api.GetPeers, error) {
 	res, err := c.buildRequest("getPeers", map[string]interface{}{}).Post(apiUrl)
 	if err != nil {
 		return nil, err
 	}
 
-	msg := new(pb.GetPeers)
+	msg := new(api.GetPeers)
 	return msg, c.unmarshaler.Unmarshal(bytes.NewReader(res.Body()), msg)
 }

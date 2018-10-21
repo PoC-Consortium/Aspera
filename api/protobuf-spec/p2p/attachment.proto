@@ -1,6 +1,8 @@
 syntax = "proto3";
 
-package attachment;
+//option go_package = "github.com/ac0v/aspera/pkg/api/p2p/attachment";
+
+package p2p;
 
 import "google/protobuf/any.proto";
 

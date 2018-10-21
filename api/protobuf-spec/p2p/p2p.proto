@@ -1,8 +1,10 @@
 syntax = "proto3";
 
+//option go_package = "github.com/ac0v/aspera/pkg/api/p2p/";
+
 package p2p;
 
-import "github.com/ac0v/api/protobuf-spec/p2p/attachment/attachment.proto";
+import "attachment.proto";
 
 message GetCumulativeDifficultyResponse {
   int32 blockchainHeight = 1;
@@ -54,7 +56,7 @@ message Transaction {
     bytes signature = 11;
     uint32 ecBlockHeight = 12;
     uint64 ecBlockID = 13;
-    attachment.Attachment attachment = 14;
-    repeated attachment.Attachment appendixes = 15;
+    Attachment attachment = 14;
+    repeated Attachment appendixes = 15;
 }
 
