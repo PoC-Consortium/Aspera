@@ -1,6 +1,6 @@
 {
     "/burst*": {
-        "target": "http://localhost:8125",
+        "target": "http://localhost:6876",
         "secure": false,
         "logLevel": "debug"
     },

@@ -9,7 +9,7 @@ import { CreateActiveAccount } from '../../pages/dashboard/setup/account/create.
   template: `
     <h1>Burst</h1>
     <h2>Add an account to get started</h2>
-    <app-account-create></app-account-create>
+    <app-account-new></app-account-new>
   `,
   styles: [],
 })
