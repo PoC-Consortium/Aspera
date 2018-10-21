@@ -32,6 +32,8 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatStepperModule } from '@angular/material/stepper';
+import { I18nModule } from '../../../lib/i18n/i18n.module';
+import { NgxMaskModule } from 'ngx-mask';
 
 @NgModule({
     imports: [
@@ -53,7 +55,9 @@ import { MatStepperModule } from '@angular/material/stepper';
         ReactiveFormsModule,
         SetupRouting,
         SharedModule,
-        FormsModule
+        FormsModule,
+        I18nModule,
+        NgxMaskModule.forRoot()
     ],
     declarations: [
         SetupComponent,

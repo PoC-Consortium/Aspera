@@ -1,3 +1,15 @@
-<p>
-  create-passive works!
-</p>
+
+<mat-expansion-panel expanded="true" disabled="true" hideToggle="false">
+    <mat-expansion-panel-header>
+        <mat-panel-title>
+            Create Passive Account
+        </mat-panel-title>
+    </mat-expansion-panel-header>
+    <div class="address-container">
+        <mat-form-field>
+          <input matInput prefix="BURST-" burstInputValidator [patterns]="burstAddressPattern" mask="____-____-____-_____"  [dropSpecialCharacters]="false"
+                  [showMaskTyped]="true" [(ngModel)]="address" name="address" placeholder="{{ 'address' | i18n }}">
+        </mat-form-field><br />
+        <button mat-raised-button (click)="submit(this.address)">Submit</button>
+    </div>
+</mat-expansion-panel>

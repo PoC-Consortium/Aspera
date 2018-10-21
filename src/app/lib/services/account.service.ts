@@ -96,7 +96,13 @@ export class AccountService {
     */
     public createOfflineAccount(address: string): Promise<Account> {
         return new Promise((resolve, reject) => {
+
+            if (!BurstUtil.isValid(address)) {
+                reject("Invalid Burst Address");
+            }
+
             let account: Account = new Account();
+            
             this.storeService.findAccount(BurstUtil.decode(address))
                 .then(found => {
                     if (found == undefined) {

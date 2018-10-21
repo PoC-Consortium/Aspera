@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { StoreService, AccountService } from './lib/services';
 
 @Component( {
+    styleUrls: ['app.component.scss'],
     selector: 'app',
     templateUrl: './app.component.html'
 })

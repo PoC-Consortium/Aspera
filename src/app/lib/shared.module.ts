@@ -15,9 +15,7 @@ import { TimeAgoPipe } from 'time-ago-pipe';
 import {
     AppFooterComponent,
     AppHeaderComponent,
-    ControlSidebarComponent,
     MenuAsideComponent,
-    NotificationBoxComponent,
     SendBurstDialogComponent
 } from './components';
 
@@ -41,14 +39,12 @@ import { NgxMaskModule } from 'ngx-mask';
 const NGA_COMPONENTS = [
     AppFooterComponent,
     AppHeaderComponent,
-    ControlSidebarComponent,
     MenuAsideComponent,
-    NotificationBoxComponent,
     SendBurstDialogComponent
 ];
 
 const NGA_DIRECTIVES = [
-
+    BurstInputValidatorDirective
 ];
 
 const NGA_PIPES = [
@@ -76,8 +72,7 @@ const NGA_VALIDATORS = [
         ...NGA_DIRECTIVES,
         ...NGA_COMPONENTS,
         SendBurstFormComponent,
-        SendMultiOutFormComponent,
-        BurstInputValidatorDirective
+        SendMultiOutFormComponent
     ],
     imports: [
         CommonModule,

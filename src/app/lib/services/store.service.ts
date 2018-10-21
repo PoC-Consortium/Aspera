@@ -163,7 +163,7 @@ export class StoreService {
             if (this.ready.value) {
                 let accounts = this.store.getCollection("accounts");
                 let rs = accounts.find({ id : id });
-                if (rs.length > 0) {
+                if (id && rs.length > 0) {
                     let account = new Account(rs[0]);
                     resolve(account);
                 } else {
