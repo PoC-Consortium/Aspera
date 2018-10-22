@@ -18,7 +18,7 @@ import { SetupModule } from './setup/setup.module';
         MatSidenavModule,
         AccountsModule,
         SetupModule,
-        routing
+        routing,
     ],
     declarations: [
         DashboardComponent

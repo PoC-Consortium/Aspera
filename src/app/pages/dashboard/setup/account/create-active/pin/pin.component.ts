@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy, ViewEncapsulation } from '@angular/core';
 import { Router } from '@angular/router';
 import { CryptoService } from '../../../../../../lib/services';
-import { CreateService } from '../create.service';
+import { CreateService } from '../../create.service';
 import { SetupService } from '../../../setup.service';
 
 @Component({
@@ -31,7 +31,7 @@ export class AccountCreatePinComponent implements OnInit {
 
     public finish(pin: string) {
         this.createService.setPin(pin);
-        this.createService.createAccount();
+        this.createService.createActiveAccount();
     }
 
 }

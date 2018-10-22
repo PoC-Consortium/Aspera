@@ -20,6 +20,7 @@ import { DashboardModule } from './pages/dashboard/dashboard.module';
 
 import { environment } from '../environments/environment';
 import { TranslateModule } from '@ngx-translate/core';
+import { NotifierModule } from 'angular-notifier';
 
 let modules = [
     BrowserModule,
@@ -31,6 +32,7 @@ let modules = [
     TranslateModule,
     DashboardModule,
     AuthModule,
+    NotifierModule
 ];
 
 // Main App
