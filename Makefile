@@ -4,7 +4,7 @@ ROOT_DIR := $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
 
 build:
 	mkdir -p $(ROOT_DIR)/pkg/api/p2p
-	protoc -I $(ROOT_DIR)/api/protobuf-spec/p2p --go_out=plugins=grpc:$(ROOT_DIR)/pkg/api/p2p attachment.proto
+	protoc -I $(ROOT_DIR)/api/protobuf-spec/p2p --go_out=plugins=grpc:$(ROOT_DIR)/pkg/api/p2p transaction.proto
 	protoc -I $(ROOT_DIR)/api/protobuf-spec/p2p --go_out=plugins=grpc:$(ROOT_DIR)/pkg/api/p2p p2p.proto
 	go build -ldflags="-s -w" main.go
 start:
