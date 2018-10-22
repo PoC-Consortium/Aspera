@@ -15,6 +15,10 @@ import { CryptoService } from "./crypto.service";
 import { NotificationService} from "./notification.service";
 import { StoreService } from "./store.service";
 import { HttpClient, HttpHeaders, HttpParams } from "@angular/common/http";
+import { Credentials } from "../../auth/models/credentials";
+import { Observable } from "rxjs";
+import { fromPromise } from "rxjs/internal-compatibility";
+import { tap } from "rxjs/operators";
 
 /*
 * AccountService class
@@ -51,7 +55,7 @@ export class AccountService {
     * Generates keys for an account, encrypts them with the provided key and saves them.
     * TODO: error handling of asynchronous method calls
     */
-    public createActiveAccount(passphrase: string, pin: string = ""): Promise<Account> {
+    public createActiveAccount({passphrase, pin = ""}: Credentials): Promise<Account> {
         return new Promise((resolve, reject) => {
             let account: Account = new Account();
             // import active account
@@ -92,7 +96,13 @@ export class AccountService {
     */
     public createOfflineAccount(address: string): Promise<Account> {
         return new Promise((resolve, reject) => {
+
+            if (!BurstUtil.isValid(address)) {
+                reject("Invalid Burst Address");
+            }
+
             let account: Account = new Account();
+            
             this.storeService.findAccount(BurstUtil.decode(address))
                 .then(found => {
                     if (found == undefined) {

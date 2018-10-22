@@ -8,13 +8,14 @@ import { SetupComponent } from './setup.component';
 import { NodeSetupComponent } from './node/node.component';
 import { NodeSetupAddressComponent } from './node/address/address.component';
 import { AccountNewComponent } from './account/account.component';
-import { AccountCreateComponent } from './account/create/create.component';
-import { AccountCreatePinComponent } from './account/create/pin/pin.component';
-import { AccountCreateRecordComponent } from './account/create/record/record.component';
-import { AccountCreateSeedComponent } from './account/create/seed/seed.component';
+import { CreatePassiveAccountComponent } from './account/create-passive/create-passive.component';
+import { CreateActiveAccountComponent } from './account/create-active/create.component';
+import { AccountCreatePinComponent } from './account/create-active/pin/pin.component';
+import { AccountCreateRecordComponent } from './account/create-active/record/record.component';
+import { AccountCreateSeedComponent } from './account/create-active/seed/seed.component';
 
 import { SetupService } from './setup.service';
-import { CreateService } from './account/create/create.service';
+import { CreateService } from './account/create.service';
 import { NodeService } from './node/node.service';
 
 import { MatButtonModule } from '@angular/material/button';
@@ -31,6 +32,8 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatStepperModule } from '@angular/material/stepper';
+import { I18nModule } from '../../../lib/i18n/i18n.module';
+import { NgxMaskModule } from 'ngx-mask';
 
 @NgModule({
     imports: [
@@ -52,17 +55,20 @@ import { MatStepperModule } from '@angular/material/stepper';
         ReactiveFormsModule,
         SetupRouting,
         SharedModule,
-        FormsModule
+        FormsModule,
+        I18nModule,
+        NgxMaskModule.forRoot()
     ],
     declarations: [
         SetupComponent,
-        AccountCreateComponent,
+        CreateActiveAccountComponent,
+        CreatePassiveAccountComponent,
         AccountCreatePinComponent,
         AccountCreateRecordComponent,
         AccountCreateSeedComponent,
         AccountNewComponent,
         NodeSetupComponent,
-        NodeSetupAddressComponent
+        NodeSetupAddressComponent,
     ],
     providers: [
         CreateService,
@@ -70,7 +76,9 @@ import { MatStepperModule } from '@angular/material/stepper';
         SetupService
     ],
     exports: [
-        AccountCreateComponent
+        AccountNewComponent,
+        CreateActiveAccountComponent,
+        CreatePassiveAccountComponent
     ]
 })
 export class SetupModule { }

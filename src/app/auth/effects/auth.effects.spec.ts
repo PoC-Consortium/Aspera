@@ -12,8 +12,7 @@ import {
 } from '../actions';
 
 import { Credentials } from '../models/credentials';
-import { AuthService } from '../services/auth.service';
-import { AuthEffects } from '../effects/auth.effects';
+import { AuthEffects } from './auth.effects';
 import { Account } from '../../lib/model';
 
 describe('AuthEffects', () => {
@@ -113,7 +112,7 @@ describe('AuthEffects', () => {
     });
 
     xit('should dispatch a RouterNavigation action when auth.Logout is dispatched', (done: any) => {
-      const action = new AuthActions.Logout();
+      const action = new AuthActions.Logout({ account: new Account() });
 
       actions$ = of(action);
 
@@ -128,8 +127,8 @@ describe('AuthEffects', () => {
 
     
     xit('should dispatch a Logout action if dialog closes with true result', () => {
-      const action = new AuthActions.LogoutConfirmation();
-      const completion = new AuthActions.Logout();
+      const action = new AuthActions.LogoutConfirmation({ account: new Account() });
+      const completion = new AuthActions.Logout({ account: new Account() });
 
       actions$ = hot('-a', { a: action });
       const expected = cold('-b', { b: completion });
@@ -142,7 +141,7 @@ describe('AuthEffects', () => {
     });
 
     xit('should dispatch a LogoutConfirmationDismiss action if dialog closes with falsy result', () => {
-      const action = new AuthActions.LogoutConfirmation();
+      const action = new AuthActions.LogoutConfirmation({ account: new Account() });
       const completion = new AuthActions.LogoutConfirmationDismiss();
 
       actions$ = hot('-a', { a: action });

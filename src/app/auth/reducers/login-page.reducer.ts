@@ -1,4 +1,5 @@
-import { AuthApiActions, LoginPageActions } from '../actions';
+import { AuthApiActions } from '../actions';
+import { AccountCreateActionsTypes, AccountCreateActionsUnion } from '../../pages/dashboard/setup/account/create.actions';
 
 export interface State {
   error: string | null;
@@ -14,10 +15,10 @@ export function reducer(
   state = initialState,
   action:
     | AuthApiActions.AuthApiActionsUnion
-    | LoginPageActions.LoginPageActionsUnion
+    | AccountCreateActionsUnion
 ): State {
   switch (action.type) {
-    case LoginPageActions.LoginPageActionTypes.Login: {
+    case AccountCreateActionsTypes.CreateActiveAccount: {
       return {
         ...state,
         error: null,

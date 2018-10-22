@@ -1,6 +1,6 @@
-import { reducer } from '../reducers/auth.reducer';
-import * as fromAuth from '../reducers/auth.reducer';
-import { AuthApiActions, AuthActions } from '../actions/';
+import { reducer } from './auth.reducer';
+import * as fromAuth from './auth.reducer';
+import { AuthApiActions, AuthActions } from '../actions';
 
 import { Account } from '../../lib/model';
 
@@ -38,7 +38,7 @@ describe('AuthReducer', () => {
       const initialState = {
         account: new Account(),
       } as fromAuth.State;
-      const createAction = new AuthActions.Logout();
+      const createAction = new AuthActions.Logout({ account: new Account() });
 
       const result = reducer(initialState, createAction);
 

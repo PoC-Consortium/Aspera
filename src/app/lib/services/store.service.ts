@@ -6,18 +6,16 @@ import { Account, Settings, constants } from "../model";
 
 import * as Loki from "lokijs";
 import * as LokiIndexedAdapter from "lokijs/src/loki-indexed-adapter.js";
+import { AccountService } from './account.service';
 
 @Injectable()
-export class StoreService extends Store {
+export class StoreService {
 
     private store: any;
-
     public ready: BehaviorSubject<any> = new BehaviorSubject(false);
     public settings: BehaviorSubject<any> = new BehaviorSubject(false);
 
     constructor() {
-        super();
-        // todo: refactor to ngrx
         this.store = new Loki(constants.database, {
             autoload: true,
             autoloadCallback: this.init.bind(this),
@@ -165,7 +163,7 @@ export class StoreService extends Store {
             if (this.ready.value) {
                 let accounts = this.store.getCollection("accounts");
                 let rs = accounts.find({ id : id });
-                if (rs.length > 0) {
+                if (id && rs.length > 0) {
                     let account = new Account(rs[0]);
                     resolve(account);
                 } else {

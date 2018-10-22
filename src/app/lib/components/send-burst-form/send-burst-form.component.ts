@@ -2,6 +2,7 @@ import { Component, OnInit, ViewChild, Input, Output, EventEmitter } from '@angu
 import { BehaviorSubject, Subject } from 'rxjs';
 import { Transaction, Attachment, SuggestedFees } from '../../model';
 import { NgForm } from '@angular/forms';
+import { BurstUtil } from '../../util/burst';
 
 @Component({
   selector: 'app-send-burst-form',
@@ -9,11 +10,6 @@ import { NgForm } from '@angular/forms';
   styleUrls: ['./send-burst-form.component.css']
 })
 export class SendBurstFormComponent implements OnInit {
-
-  public burstAddressPattern = {
-    '_': { pattern: new RegExp('\[a-zA-Z0-9\]')}
-  };
-
   @ViewChild('sendBurstForm') public sendBurstForm: NgForm;
   @ViewChild('feeNQT') public feeNQT: string;
   @ViewChild('recipientAddress') public recipientAddress: string;
@@ -31,6 +27,7 @@ export class SendBurstFormComponent implements OnInit {
   @Output() submit = new EventEmitter<any>();
   advanced: boolean = false;
   showMessage: boolean = false;
+  burstAddressPattern = BurstUtil.burstAddressPattern;
 
   constructor() {
   }

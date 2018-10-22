@@ -11,6 +11,8 @@
 // @import "/public/assets/css/particle.css";
 @import "/public/fonts/material/material-icons.css";
 
+@import "~angular-notifier/styles.scss";
+
 // .danger {
 //     color: $red;
 // }
@@ -148,4 +150,17 @@ app-root:empty + .loading h1 {
     -webkit-transform: scale3D(0, 0, 1);
             transform: scale3D(0, 0, 1);
   }
+}
+
+// todo: create burst material theme
+.mat-step-header .mat-step-icon {
+  background: #3c8dbc;
+}
+
+.mat-progress-bar-buffer {
+  background: lighten(#3c8dbc, 30%);
+}
+
+.mat-progress-bar-fill::after {
+  background: #3c8dbc;
 }
