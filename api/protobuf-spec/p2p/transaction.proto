@@ -111,8 +111,9 @@ message AssetIssuance {
 
 message AssetTransfer {
     message Attachment {
-        uint64 quantity = 1;
-        string comment = 2;
+        uint64 asserassert = 1;
+        uint64 quantity = 2;
+        string comment = 3;
     }
     TransactionHeader header = 1;
     Attachment attachment = 2;
@@ -175,7 +176,7 @@ message DigitalGoodsListing {
 
 message DigitalGoodsDelisting {
     message Attachment {
-        string goods = 1;
+        uint64 goods = 1;
     }
     TransactionHeader header = 1;
     Attachment attachment = 2;
@@ -269,9 +270,10 @@ message EscrowCreation {
             SPLIT = 3;
         }
         uint64 amount = 1;
-        DeadlineAction deadlineAction = 2;
-        int32 requiredSigners = 3;
-        repeated uint64 signers = 4;
+        uint32 deadline = 2;
+        DeadlineAction deadlineAction = 3;
+        int32 requiredSigners = 4;
+        repeated uint64 signers = 5;
     }
     TransactionHeader header = 1;
     Attachment attachment = 2;
@@ -318,7 +320,7 @@ message SubscriptionCancel {
 
 message SubscriptionPayment {
     message Attachment {
-        repeated uint64 subscriptionID = 1;
+        repeated uint64 subscriptionIDs = 1;
     }
     TransactionHeader header = 1;
     Attachment attachment = 2;
