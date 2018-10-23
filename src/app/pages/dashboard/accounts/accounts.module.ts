@@ -10,8 +10,9 @@ import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatGridListModule } from '@angular/material/grid-list';
 import { MatIconModule } from '@angular/material/icon';
-import { MatInputModule, MatSortModule } from '@angular/material';
+import { MatInputModule, MatSortModule, MatCheckboxModule, MatButtonModule, MatDialogModule } from '@angular/material';
 import { MatTableModule } from '@angular/material/table';
+import { DeleteAccountDialogComponent } from './delete-account-dialog/delete-account-dialog.component';
 
 @NgModule({
     imports: [
@@ -25,12 +26,17 @@ import { MatTableModule } from '@angular/material/table';
         MatIconModule,
         MatInputModule,
         MatSortModule,
-        MatTableModule
+        MatTableModule,
+        MatCheckboxModule,
+        MatButtonModule,
+        MatDialogModule
     ],
     declarations: [
-        AccountsComponent
+        AccountsComponent,
+        DeleteAccountDialogComponent
     ],
     providers: [
-    ]
+    ],
+    entryComponents: [ DeleteAccountDialogComponent ]
 })
 export class AccountsModule { }
