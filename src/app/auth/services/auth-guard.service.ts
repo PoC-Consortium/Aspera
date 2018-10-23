@@ -1,24 +1,17 @@
 import { Injectable } from '@angular/core';
-import { CanActivate } from '@angular/router';
-import { Store, select } from '@ngrx/store';
-import { Observable, forkJoin } from 'rxjs';
-import { map, take, concatMap, catchError, withLatestFrom, filter, first, concatAll, switchMap } from 'rxjs/operators';
-import { AuthApiActions } from '../actions';
-import * as fromAuth from '../reducers';
+import { CanActivate, Router } from '@angular/router';
+import { Observable } from 'rxjs';
+import { filter, switchMap } from 'rxjs/operators';
 import { StoreService, AccountService } from '../../lib/services';
-import { fromPromise } from 'rxjs/internal-compatibility';
-import { Account } from '../../lib/model';
-import { AccountsComponent } from '../../pages/dashboard/accounts';
-import { mergeMap } from 'rxjs-compat/operator/mergeMap';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthGuard implements CanActivate {
   authorized: boolean = false;
-  constructor(private store: Store<fromAuth.State>,
-              private storeService: StoreService,
-              private accountService: AccountService) {
+  constructor(private storeService: StoreService,
+              private accountService: AccountService,
+              private router: Router) {
   }
 
   canActivate(): Observable<boolean> {
@@ -32,10 +25,10 @@ export class AuthGuard implements CanActivate {
           this.accountService.setCurrentAccount(selectedAccount);
           return true;
         } else if (allAccounts && allAccounts.length) {
-          this.store.dispatch(new AuthApiActions.AccountsListRedirect());
+          this.router.navigate(['/dashboard/accounts'])
           return false;
         } else {
-          this.store.dispatch(new AuthApiActions.LoginRedirect());
+          this.router.navigate(['/welcome']);
           return false;
         }
       })
