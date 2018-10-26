@@ -26,28 +26,60 @@
 
 
 [[constraint]]
+  name = "github.com/Jeffail/gabs"
+  version = "1.1.1"
+
+[[constraint]]
   name = "github.com/dgraph-io/badger"
-  version = "1.5.3"
-
-[[constraint]]
-  name = "github.com/golang/protobuf"
-  version = "1.1.0"
-
-[[constraint]]
-  name = "github.com/nats-io/go-nats"
-  version = "1.5.0"
-
-[[constraint]]
-  name = "go.uber.org/zap"
-  version = "1.9.0"
+  version = "1.5.4"
 
 [[constraint]]
   branch = "master"
-  name = "golang.org/x/net"
+  name = "github.com/dixonwille/skywalker"
 
 [[constraint]]
-  name = "google.golang.org/grpc"
-  version = "1.13.0"
+  name = "github.com/golang/protobuf"
+  version = "1.2.0"
+
+[[constraint]]
+  name = "github.com/imroc/req"
+  version = "0.2.1"
+
+[[constraint]]
+  name = "github.com/json-iterator/go"
+  version = "1.1.5"
+
+[[constraint]]
+  name = "github.com/klauspost/cpuid"
+  version = "1.1.0"
+
+[[constraint]]
+  branch = "master"
+  name = "github.com/lukechampine/randmap"
+
+[[constraint]]
+  name = "github.com/spf13/viper"
+  version = "1.2.1"
+
+[[constraint]]
+  name = "github.com/stretchr/testify"
+  version = "1.2.2"
+
+[[constraint]]
+  branch = "master"
+  name = "github.com/valyala/fastjson"
+
+[[constraint]]
+  name = "go.uber.org/zap"
+  version = "1.9.1"
+
+[[constraint]]
+  branch = "master"
+  name = "golang.org/x/crypto"
+
+[[constraint]]
+  name = "gopkg.in/resty.v1"
+  version = "1.10.0"
 
 [prune]
   go-tests = true
