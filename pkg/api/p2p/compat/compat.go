@@ -1,9 +1,10 @@
 package compat
 
 import (
-	"github.com/valyala/fastjson"
-
+	api "github.com/ac0v/aspera/pkg/api/p2p"
 	"github.com/ac0v/aspera/pkg/api/p2p/compat/template"
+
+	"github.com/valyala/fastjson"
 )
 
 func Upgrade(srcBs []byte) ([]byte, error) {
@@ -15,4 +16,8 @@ func Upgrade(srcBs []byte) ([]byte, error) {
 	}
 
 	return []byte(template.Upgrade(src)), err
+}
+
+func Downgrade(pb *api.GetNextBlocksResponse) []byte {
+	return []byte(template.Downgrade(pb))
 }

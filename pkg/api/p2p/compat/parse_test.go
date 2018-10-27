@@ -23,10 +23,14 @@ func TestParseBlocks(t *testing.T) {
 		data, _ = Upgrade(data)
 
 		msg := new(api.GetNextBlocksResponse)
-		if !assert.NoError(t, unmarshaler.Unmarshal(bytes.NewReader(data), msg)) {
+		if assert.NoError(t, unmarshaler.Unmarshal(bytes.NewReader(data), msg)) {
+			unmarshaler.Unmarshal(bytes.NewReader(data), msg)
+			dst := Downgrade(msg)
+			panic(string(dst))
+		} else {
 			fmt.Println(string(data))
-			panic(1)
 		}
+
 		//panic(string(data))
 		/*
 			// convert from JSON -> go type

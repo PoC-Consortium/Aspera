@@ -1,6 +1,7 @@
 {% import "github.com/valyala/fastjson" %}
 {% import "encoding/base64" %}
 {% import "github.com/ac0v/aspera/pkg/encoding" %}
+{% import api "github.com/ac0v/aspera/pkg/api/p2p" %}
 {% func Upgrade(src *fastjson.Value) %}
 {
     "nextBlocks": [
@@ -328,6 +329,36 @@
                     {% endfor %}
                 ]
             }{% if blockId + 1 < len(blocks) %},{% endif %}
+        {% endfor %}
+    ]
+}
+{% endfunc %}
+{% func Downgrade(pb *api.GetNextBlocksResponse) %}
+{
+    "nextBlocks": [
+        {% code
+           blocks := pb.NextBlocks
+         %}
+        {% for blockId, block := range blocks %}
+        {
+            "timestamp":           {%v block.Timestamp %},
+            "previousBlock":       {%v block.PreviousBlock %},
+            "blockATs":            {%qz= block.BlockATs %},
+            "totalFeeNQT":         {%v block.TotalFee %},
+            "nonce":               {%v block.Nonce %},
+            "version":             {%v block.Version %},
+            "blockSignature":      {%qz= encoding.BytesToHexStringBytes(block.BlockSignature) %},
+            "payloadHash":         {%qz= encoding.BytesToHexStringBytes(block.PayloadHash) %},
+            "generatorPublicKey":  {%qz= encoding.BytesToHexStringBytes(block.GeneratorPublicKey) %},
+            "generationSignature": {%qz= encoding.BytesToHexStringBytes(block.GenerationSignature) %},
+            "totalAmountNQT":      {%v block.TotalAmount %},
+            "payloadLength":       {%v block.PayloadLength %},
+            "previousBlockHash":   {%qz= encoding.BytesToHexStringBytes(block.PreviousBlockHash) %},
+            "transactions": [
+
+            ]
+            
+        }{% if blockId + 1 < len(blocks) %},{% endif %}
         {% endfor %}
     ]
 }

@@ -14,3 +14,9 @@ func HexStringBytesToBase64Bytes(bs []byte) []byte {
 
 	return base64Bs
 }
+
+func BytesToHexStringBytes(bs []byte) []byte {
+	hexBs := make([]byte, hex.EncodedLen(len(bs)))
+	hex.Encode(hexBs, bs)
+	return hexBs
+}
