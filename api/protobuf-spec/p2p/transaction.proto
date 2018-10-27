@@ -4,8 +4,6 @@ syntax = "proto3";
 
 package p2p;
 
-import "google/protobuf/any.proto";
-
 message TransactionHeader {
     uint32 version = 1;
     uint32 timestamp = 2;
