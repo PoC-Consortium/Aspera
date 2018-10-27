@@ -11,1188 +11,1191 @@ import "github.com/valyala/fastjson"
 import "encoding/base64"
 
 //line pkg/api/p2p/compat/template/block.qtpl:3
+import "github.com/ac0v/aspera/pkg/encoding"
+
+//line pkg/api/p2p/compat/template/block.qtpl:4
 import (
 	qtio422016 "io"
 
 	qt422016 "github.com/valyala/quicktemplate"
 )
 
-//line pkg/api/p2p/compat/template/block.qtpl:3
+//line pkg/api/p2p/compat/template/block.qtpl:4
 var (
 	_ = qtio422016.Copy
 	_ = qt422016.AcquireByteBuffer
 )
 
-//line pkg/api/p2p/compat/template/block.qtpl:3
+//line pkg/api/p2p/compat/template/block.qtpl:4
 func StreamUpgrade(qw422016 *qt422016.Writer, src *fastjson.Value) {
-	//line pkg/api/p2p/compat/template/block.qtpl:3
+	//line pkg/api/p2p/compat/template/block.qtpl:4
 	qw422016.N().S(`
 {
     "nextBlocks": [
         `)
-	//line pkg/api/p2p/compat/template/block.qtpl:7
+	//line pkg/api/p2p/compat/template/block.qtpl:8
 	blocks := src.GetArray("nextBlocks")
 
-	//line pkg/api/p2p/compat/template/block.qtpl:8
+	//line pkg/api/p2p/compat/template/block.qtpl:9
 	qw422016.N().S(`
         `)
-	//line pkg/api/p2p/compat/template/block.qtpl:9
+	//line pkg/api/p2p/compat/template/block.qtpl:10
 	for blockId, block := range blocks {
-		//line pkg/api/p2p/compat/template/block.qtpl:9
+		//line pkg/api/p2p/compat/template/block.qtpl:10
 		qw422016.N().S(`
             {
                 "timestamp":           `)
-		//line pkg/api/p2p/compat/template/block.qtpl:11
+		//line pkg/api/p2p/compat/template/block.qtpl:12
 		qw422016.N().D(block.GetInt("timestamp"))
-		//line pkg/api/p2p/compat/template/block.qtpl:11
+		//line pkg/api/p2p/compat/template/block.qtpl:12
 		qw422016.N().S(`,
                 "previousBlock":       `)
-		//line pkg/api/p2p/compat/template/block.qtpl:12
+		//line pkg/api/p2p/compat/template/block.qtpl:13
 		qw422016.N().QZ(block.GetStringBytes("previousBlock"))
-		//line pkg/api/p2p/compat/template/block.qtpl:12
+		//line pkg/api/p2p/compat/template/block.qtpl:13
 		qw422016.N().S(`,
                 "blockATs":            `)
-		//line pkg/api/p2p/compat/template/block.qtpl:13
-		qw422016.N().QZ(block.GetStringBytes("blockATs"))
-		//line pkg/api/p2p/compat/template/block.qtpl:13
+		//line pkg/api/p2p/compat/template/block.qtpl:14
+		qw422016.N().QZ(encoding.HexStringBytesToBase64Bytes(block.GetStringBytes("blockATs")))
+		//line pkg/api/p2p/compat/template/block.qtpl:14
 		qw422016.N().S(`,
                 "totalFee":            `)
-		//line pkg/api/p2p/compat/template/block.qtpl:14
+		//line pkg/api/p2p/compat/template/block.qtpl:15
 		qw422016.N().D(block.GetInt("totalFeeNQT"))
-		//line pkg/api/p2p/compat/template/block.qtpl:14
+		//line pkg/api/p2p/compat/template/block.qtpl:15
 		qw422016.N().S(`,
                 "nonce":               `)
-		//line pkg/api/p2p/compat/template/block.qtpl:15
+		//line pkg/api/p2p/compat/template/block.qtpl:16
 		qw422016.N().QZ(block.GetStringBytes("nonce"))
-		//line pkg/api/p2p/compat/template/block.qtpl:15
+		//line pkg/api/p2p/compat/template/block.qtpl:16
 		qw422016.N().S(`,
                 "version":             `)
-		//line pkg/api/p2p/compat/template/block.qtpl:16
+		//line pkg/api/p2p/compat/template/block.qtpl:17
 		qw422016.N().D(block.GetInt("version"))
-		//line pkg/api/p2p/compat/template/block.qtpl:16
+		//line pkg/api/p2p/compat/template/block.qtpl:17
 		qw422016.N().S(`,
                 "blockSignature":      `)
-		//line pkg/api/p2p/compat/template/block.qtpl:17
-		qw422016.N().QZ(block.GetStringBytes("blockSignature"))
-		//line pkg/api/p2p/compat/template/block.qtpl:17
+		//line pkg/api/p2p/compat/template/block.qtpl:18
+		qw422016.N().QZ(encoding.HexStringBytesToBase64Bytes(block.GetStringBytes("blockSignature")))
+		//line pkg/api/p2p/compat/template/block.qtpl:18
 		qw422016.N().S(`,
                 "payloadHash":         `)
-		//line pkg/api/p2p/compat/template/block.qtpl:18
-		qw422016.N().QZ(block.GetStringBytes("payloadHash"))
-		//line pkg/api/p2p/compat/template/block.qtpl:18
+		//line pkg/api/p2p/compat/template/block.qtpl:19
+		qw422016.N().QZ(encoding.HexStringBytesToBase64Bytes(block.GetStringBytes("payloadHash")))
+		//line pkg/api/p2p/compat/template/block.qtpl:19
 		qw422016.N().S(`,
                 "generatorPublicKey":  `)
-		//line pkg/api/p2p/compat/template/block.qtpl:19
-		qw422016.N().QZ(block.GetStringBytes("generatorPublicKey"))
-		//line pkg/api/p2p/compat/template/block.qtpl:19
+		//line pkg/api/p2p/compat/template/block.qtpl:20
+		qw422016.N().QZ(encoding.HexStringBytesToBase64Bytes(block.GetStringBytes("generatorPublicKey")))
+		//line pkg/api/p2p/compat/template/block.qtpl:20
 		qw422016.N().S(`,
                 "generationSignature": `)
-		//line pkg/api/p2p/compat/template/block.qtpl:20
-		qw422016.N().QZ(block.GetStringBytes("generationSignature"))
-		//line pkg/api/p2p/compat/template/block.qtpl:20
+		//line pkg/api/p2p/compat/template/block.qtpl:21
+		qw422016.N().QZ(encoding.HexStringBytesToBase64Bytes(block.GetStringBytes("generationSignature")))
+		//line pkg/api/p2p/compat/template/block.qtpl:21
 		qw422016.N().S(`,
                 "totalAmount":         `)
-		//line pkg/api/p2p/compat/template/block.qtpl:21
+		//line pkg/api/p2p/compat/template/block.qtpl:22
 		qw422016.N().D(block.GetInt("totalAmountNQT"))
-		//line pkg/api/p2p/compat/template/block.qtpl:21
+		//line pkg/api/p2p/compat/template/block.qtpl:22
 		qw422016.N().S(`,
                 "payloadLength":       `)
-		//line pkg/api/p2p/compat/template/block.qtpl:22
+		//line pkg/api/p2p/compat/template/block.qtpl:23
 		qw422016.N().D(block.GetInt("payloadLength"))
-		//line pkg/api/p2p/compat/template/block.qtpl:22
+		//line pkg/api/p2p/compat/template/block.qtpl:23
 		qw422016.N().S(`,
                 "previousBlockHash":   `)
-		//line pkg/api/p2p/compat/template/block.qtpl:23
-		qw422016.N().QZ(block.GetStringBytes("previousBlockHash"))
-		//line pkg/api/p2p/compat/template/block.qtpl:23
+		//line pkg/api/p2p/compat/template/block.qtpl:24
+		qw422016.N().QZ(encoding.HexStringBytesToBase64Bytes(block.GetStringBytes("previousBlockHash")))
+		//line pkg/api/p2p/compat/template/block.qtpl:24
 		qw422016.N().S(`,
                 "transactions": [
                     `)
-		//line pkg/api/p2p/compat/template/block.qtpl:26
+		//line pkg/api/p2p/compat/template/block.qtpl:27
 		transactions := block.GetArray("transactions")
 
-		//line pkg/api/p2p/compat/template/block.qtpl:27
+		//line pkg/api/p2p/compat/template/block.qtpl:28
 		qw422016.N().S(`
                     `)
-		//line pkg/api/p2p/compat/template/block.qtpl:28
+		//line pkg/api/p2p/compat/template/block.qtpl:29
 		for txId, tx := range transactions {
-			//line pkg/api/p2p/compat/template/block.qtpl:28
+			//line pkg/api/p2p/compat/template/block.qtpl:29
 			qw422016.N().S(`
                         `)
-			//line pkg/api/p2p/compat/template/block.qtpl:30
+			//line pkg/api/p2p/compat/template/block.qtpl:31
 			surtype := tx.GetInt("type")
 			subtype := tx.GetInt("subtype")
 			attachment := tx.Get("attachment")
 
-			//line pkg/api/p2p/compat/template/block.qtpl:33
+			//line pkg/api/p2p/compat/template/block.qtpl:34
 			qw422016.N().S(`
                         {
                             `)
-			//line pkg/api/p2p/compat/template/block.qtpl:35
-			switch surtype {
 			//line pkg/api/p2p/compat/template/block.qtpl:36
+			switch surtype {
+			//line pkg/api/p2p/compat/template/block.qtpl:37
 			case 0:
-				//line pkg/api/p2p/compat/template/block.qtpl:36
+				//line pkg/api/p2p/compat/template/block.qtpl:37
 				qw422016.N().S(`
                                 `)
-				//line pkg/api/p2p/compat/template/block.qtpl:37
-				switch subtype {
 				//line pkg/api/p2p/compat/template/block.qtpl:38
+				switch subtype {
+				//line pkg/api/p2p/compat/template/block.qtpl:39
 				case 0:
-					//line pkg/api/p2p/compat/template/block.qtpl:38
+					//line pkg/api/p2p/compat/template/block.qtpl:39
 					qw422016.N().S(`
                                 "@type":"type.googleapis.com/p2p.OrdinaryPayment",
                                 `)
-				//line pkg/api/p2p/compat/template/block.qtpl:40
+				//line pkg/api/p2p/compat/template/block.qtpl:41
 				case 1:
-					//line pkg/api/p2p/compat/template/block.qtpl:40
+					//line pkg/api/p2p/compat/template/block.qtpl:41
 					qw422016.N().S(`
                                 "@type":"type.googleapis.com/p2p.MultiOutCreation",
                                 "attachment": {
                                     "recipients": [
                                         `)
-					//line pkg/api/p2p/compat/template/block.qtpl:45
+					//line pkg/api/p2p/compat/template/block.qtpl:46
 					recipients := attachment.GetArray("recipients")
 
-					//line pkg/api/p2p/compat/template/block.qtpl:46
+					//line pkg/api/p2p/compat/template/block.qtpl:47
 					qw422016.N().S(`
                                         `)
-					//line pkg/api/p2p/compat/template/block.qtpl:47
+					//line pkg/api/p2p/compat/template/block.qtpl:48
 					for recipientId, recipient := range recipients {
-						//line pkg/api/p2p/compat/template/block.qtpl:47
+						//line pkg/api/p2p/compat/template/block.qtpl:48
 						qw422016.N().S(`
                                             {
                                                 "id":     `)
-						//line pkg/api/p2p/compat/template/block.qtpl:49
+						//line pkg/api/p2p/compat/template/block.qtpl:50
 						qw422016.N().QZ(recipient.GetStringBytes("0"))
-						//line pkg/api/p2p/compat/template/block.qtpl:49
+						//line pkg/api/p2p/compat/template/block.qtpl:50
 						qw422016.N().S(`,
                                                 "amount": `)
-						//line pkg/api/p2p/compat/template/block.qtpl:50
+						//line pkg/api/p2p/compat/template/block.qtpl:51
 						qw422016.N().QZ(recipient.GetStringBytes("1"))
-						//line pkg/api/p2p/compat/template/block.qtpl:50
+						//line pkg/api/p2p/compat/template/block.qtpl:51
 						qw422016.N().S(`
                                             }`)
-						//line pkg/api/p2p/compat/template/block.qtpl:51
+						//line pkg/api/p2p/compat/template/block.qtpl:52
 						if recipientId+1 < len(recipients) {
-							//line pkg/api/p2p/compat/template/block.qtpl:51
+							//line pkg/api/p2p/compat/template/block.qtpl:52
 							qw422016.N().S(`,`)
-							//line pkg/api/p2p/compat/template/block.qtpl:51
+							//line pkg/api/p2p/compat/template/block.qtpl:52
 						}
-						//line pkg/api/p2p/compat/template/block.qtpl:51
+						//line pkg/api/p2p/compat/template/block.qtpl:52
 						qw422016.N().S(`
                                         `)
-						//line pkg/api/p2p/compat/template/block.qtpl:52
+						//line pkg/api/p2p/compat/template/block.qtpl:53
 					}
-					//line pkg/api/p2p/compat/template/block.qtpl:52
+					//line pkg/api/p2p/compat/template/block.qtpl:53
 					qw422016.N().S(`
                                     ]
                                 },
                                 `)
-				//line pkg/api/p2p/compat/template/block.qtpl:55
+				//line pkg/api/p2p/compat/template/block.qtpl:56
 				case 2:
-					//line pkg/api/p2p/compat/template/block.qtpl:55
+					//line pkg/api/p2p/compat/template/block.qtpl:56
 					qw422016.N().S(`
                                 "@type":"type.googleapis.com/p2p.MultiSameOutCreation",
                                 "attachment": {
                                     "recipients": [
                                         `)
-					//line pkg/api/p2p/compat/template/block.qtpl:60
+					//line pkg/api/p2p/compat/template/block.qtpl:61
 					recipients := attachment.GetArray("recipients")
 
-					//line pkg/api/p2p/compat/template/block.qtpl:61
+					//line pkg/api/p2p/compat/template/block.qtpl:62
 					qw422016.N().S(`
                                         `)
-					//line pkg/api/p2p/compat/template/block.qtpl:62
+					//line pkg/api/p2p/compat/template/block.qtpl:63
 					for recipientId, recipient := range recipients {
-						//line pkg/api/p2p/compat/template/block.qtpl:62
-						qw422016.N().S(`
-                                        `)
-						//line pkg/api/p2p/compat/template/block.qtpl:63
-						qw422016.N().QZ(recipient.GetStringBytes())
-						//line pkg/api/p2p/compat/template/block.qtpl:63
-						if recipientId+1 < len(recipients) {
-							//line pkg/api/p2p/compat/template/block.qtpl:63
-							qw422016.N().S(`,`)
-							//line pkg/api/p2p/compat/template/block.qtpl:63
-						}
 						//line pkg/api/p2p/compat/template/block.qtpl:63
 						qw422016.N().S(`
                                         `)
 						//line pkg/api/p2p/compat/template/block.qtpl:64
+						qw422016.N().QZ(recipient.GetStringBytes())
+						//line pkg/api/p2p/compat/template/block.qtpl:64
+						if recipientId+1 < len(recipients) {
+							//line pkg/api/p2p/compat/template/block.qtpl:64
+							qw422016.N().S(`,`)
+							//line pkg/api/p2p/compat/template/block.qtpl:64
+						}
+						//line pkg/api/p2p/compat/template/block.qtpl:64
+						qw422016.N().S(`
+                                        `)
+						//line pkg/api/p2p/compat/template/block.qtpl:65
 					}
-					//line pkg/api/p2p/compat/template/block.qtpl:64
+					//line pkg/api/p2p/compat/template/block.qtpl:65
 					qw422016.N().S(`
                                     ]
                                 },
                                 `)
-					//line pkg/api/p2p/compat/template/block.qtpl:67
+					//line pkg/api/p2p/compat/template/block.qtpl:68
 				}
-				//line pkg/api/p2p/compat/template/block.qtpl:67
-				qw422016.N().S(`
-                            `)
-			//line pkg/api/p2p/compat/template/block.qtpl:68
-			case 1:
 				//line pkg/api/p2p/compat/template/block.qtpl:68
 				qw422016.N().S(`
-                                `)
+                            `)
+			//line pkg/api/p2p/compat/template/block.qtpl:69
+			case 1:
 				//line pkg/api/p2p/compat/template/block.qtpl:69
-				switch subtype {
+				qw422016.N().S(`
+                                `)
 				//line pkg/api/p2p/compat/template/block.qtpl:70
+				switch subtype {
+				//line pkg/api/p2p/compat/template/block.qtpl:71
 				case 0:
-					//line pkg/api/p2p/compat/template/block.qtpl:70
+					//line pkg/api/p2p/compat/template/block.qtpl:71
 					qw422016.N().S(`
                                 "@type":"type.googleapis.com/p2p.ArbitaryMessage",
                                 `)
-				//line pkg/api/p2p/compat/template/block.qtpl:72
+				//line pkg/api/p2p/compat/template/block.qtpl:73
 				case 1:
-					//line pkg/api/p2p/compat/template/block.qtpl:72
+					//line pkg/api/p2p/compat/template/block.qtpl:73
 					qw422016.N().S(`
                                 "@type":"type.googleapis.com/p2p.AliasAssignment",
                                 "attachment": {
                                     "alias": `)
-					//line pkg/api/p2p/compat/template/block.qtpl:75
+					//line pkg/api/p2p/compat/template/block.qtpl:76
 					qw422016.N().QZ(attachment.GetStringBytes("alias"))
-					//line pkg/api/p2p/compat/template/block.qtpl:75
+					//line pkg/api/p2p/compat/template/block.qtpl:76
 					qw422016.N().S(`,
                                     "uri": `)
-					//line pkg/api/p2p/compat/template/block.qtpl:76
+					//line pkg/api/p2p/compat/template/block.qtpl:77
 					qw422016.N().QZ(attachment.GetStringBytes("uri"))
-					//line pkg/api/p2p/compat/template/block.qtpl:76
+					//line pkg/api/p2p/compat/template/block.qtpl:77
 					qw422016.N().S(`
                                 },
                                 `)
-				//line pkg/api/p2p/compat/template/block.qtpl:78
+				//line pkg/api/p2p/compat/template/block.qtpl:79
 				case 5:
-					//line pkg/api/p2p/compat/template/block.qtpl:78
+					//line pkg/api/p2p/compat/template/block.qtpl:79
 					qw422016.N().S(`
                                 "@type":"type.googleapis.com/p2p.AccountInfo",
                                 "attachment": {
                                     "name": `)
-					//line pkg/api/p2p/compat/template/block.qtpl:81
+					//line pkg/api/p2p/compat/template/block.qtpl:82
 					qw422016.N().QZ(attachment.GetStringBytes("name"))
-					//line pkg/api/p2p/compat/template/block.qtpl:81
+					//line pkg/api/p2p/compat/template/block.qtpl:82
 					qw422016.N().S(`,
                                     "description": `)
-					//line pkg/api/p2p/compat/template/block.qtpl:82
+					//line pkg/api/p2p/compat/template/block.qtpl:83
 					qw422016.N().QZ(attachment.GetStringBytes("description"))
-					//line pkg/api/p2p/compat/template/block.qtpl:82
+					//line pkg/api/p2p/compat/template/block.qtpl:83
 					qw422016.N().S(`
                                 },
                                 `)
-				//line pkg/api/p2p/compat/template/block.qtpl:84
+				//line pkg/api/p2p/compat/template/block.qtpl:85
 				case 6:
-					//line pkg/api/p2p/compat/template/block.qtpl:84
+					//line pkg/api/p2p/compat/template/block.qtpl:85
 					qw422016.N().S(`
                                 "@type":"type.googleapis.com/p2p.AliasSell",
                                 "attachment": {
                                     "name": `)
-					//line pkg/api/p2p/compat/template/block.qtpl:87
+					//line pkg/api/p2p/compat/template/block.qtpl:88
 					qw422016.N().QZ(attachment.GetStringBytes("alias"))
-					//line pkg/api/p2p/compat/template/block.qtpl:87
+					//line pkg/api/p2p/compat/template/block.qtpl:88
 					qw422016.N().S(`,
                                     "price": `)
-					//line pkg/api/p2p/compat/template/block.qtpl:88
+					//line pkg/api/p2p/compat/template/block.qtpl:89
 					qw422016.N().D(attachment.GetInt("priceNQT"))
-					//line pkg/api/p2p/compat/template/block.qtpl:88
+					//line pkg/api/p2p/compat/template/block.qtpl:89
 					qw422016.N().S(`
                                 },
                                 `)
-				//line pkg/api/p2p/compat/template/block.qtpl:90
+				//line pkg/api/p2p/compat/template/block.qtpl:91
 				case 7:
-					//line pkg/api/p2p/compat/template/block.qtpl:90
+					//line pkg/api/p2p/compat/template/block.qtpl:91
 					qw422016.N().S(`
                                 "@type":"type.googleapis.com/p2p.AliasBuy",
                                 "attachment": {
                                     "name": `)
-					//line pkg/api/p2p/compat/template/block.qtpl:93
+					//line pkg/api/p2p/compat/template/block.qtpl:94
 					qw422016.N().QZ(attachment.GetStringBytes("alias"))
-					//line pkg/api/p2p/compat/template/block.qtpl:93
+					//line pkg/api/p2p/compat/template/block.qtpl:94
 					qw422016.N().S(`
                                 },
                                 `)
-					//line pkg/api/p2p/compat/template/block.qtpl:95
+					//line pkg/api/p2p/compat/template/block.qtpl:96
 				}
-				//line pkg/api/p2p/compat/template/block.qtpl:95
-				qw422016.N().S(`
-                            `)
-			//line pkg/api/p2p/compat/template/block.qtpl:96
-			case 2:
 				//line pkg/api/p2p/compat/template/block.qtpl:96
 				qw422016.N().S(`
-                                `)
+                            `)
+			//line pkg/api/p2p/compat/template/block.qtpl:97
+			case 2:
 				//line pkg/api/p2p/compat/template/block.qtpl:97
-				switch subtype {
+				qw422016.N().S(`
+                                `)
 				//line pkg/api/p2p/compat/template/block.qtpl:98
+				switch subtype {
+				//line pkg/api/p2p/compat/template/block.qtpl:99
 				case 0:
-					//line pkg/api/p2p/compat/template/block.qtpl:98
+					//line pkg/api/p2p/compat/template/block.qtpl:99
 					qw422016.N().S(`
                                 "@type":"type.googleapis.com/p2p.AssetIssuance",
                                 "attachment": {
                                     "name": `)
-					//line pkg/api/p2p/compat/template/block.qtpl:101
+					//line pkg/api/p2p/compat/template/block.qtpl:102
 					qw422016.N().QZ(attachment.GetStringBytes("name"))
-					//line pkg/api/p2p/compat/template/block.qtpl:101
+					//line pkg/api/p2p/compat/template/block.qtpl:102
 					qw422016.N().S(`,
                                     "description": `)
-					//line pkg/api/p2p/compat/template/block.qtpl:102
+					//line pkg/api/p2p/compat/template/block.qtpl:103
 					qw422016.N().QZ(attachment.GetStringBytes("description"))
-					//line pkg/api/p2p/compat/template/block.qtpl:102
+					//line pkg/api/p2p/compat/template/block.qtpl:103
 					qw422016.N().S(`,
                                     "quantity": `)
-					//line pkg/api/p2p/compat/template/block.qtpl:103
+					//line pkg/api/p2p/compat/template/block.qtpl:104
 					qw422016.N().D(attachment.GetInt("quantityQNT"))
-					//line pkg/api/p2p/compat/template/block.qtpl:103
+					//line pkg/api/p2p/compat/template/block.qtpl:104
 					qw422016.N().S(`,
                                     "decimals": `)
-					//line pkg/api/p2p/compat/template/block.qtpl:104
+					//line pkg/api/p2p/compat/template/block.qtpl:105
 					qw422016.N().D(attachment.GetInt("decimals"))
-					//line pkg/api/p2p/compat/template/block.qtpl:104
+					//line pkg/api/p2p/compat/template/block.qtpl:105
 					qw422016.N().S(`,
                                     "comment": `)
-					//line pkg/api/p2p/compat/template/block.qtpl:105
+					//line pkg/api/p2p/compat/template/block.qtpl:106
 					qw422016.N().QZ(attachment.GetStringBytes("comment"))
-					//line pkg/api/p2p/compat/template/block.qtpl:105
+					//line pkg/api/p2p/compat/template/block.qtpl:106
 					qw422016.N().S(`
                                 },
                                 `)
-				//line pkg/api/p2p/compat/template/block.qtpl:107
+				//line pkg/api/p2p/compat/template/block.qtpl:108
 				case 1:
-					//line pkg/api/p2p/compat/template/block.qtpl:107
+					//line pkg/api/p2p/compat/template/block.qtpl:108
 					qw422016.N().S(`
                                 "@type":"type.googleapis.com/p2p.AssetTransfer",
                                 "attachment": {
                                     "asset": `)
-					//line pkg/api/p2p/compat/template/block.qtpl:110
+					//line pkg/api/p2p/compat/template/block.qtpl:111
 					qw422016.N().QZ(attachment.GetStringBytes("asset"))
-					//line pkg/api/p2p/compat/template/block.qtpl:110
+					//line pkg/api/p2p/compat/template/block.qtpl:111
 					qw422016.N().S(`,
                                     "quantity": `)
-					//line pkg/api/p2p/compat/template/block.qtpl:111
+					//line pkg/api/p2p/compat/template/block.qtpl:112
 					qw422016.N().D(attachment.GetInt("quantityQNT"))
-					//line pkg/api/p2p/compat/template/block.qtpl:111
+					//line pkg/api/p2p/compat/template/block.qtpl:112
 					qw422016.N().S(`,
                                     "comment": `)
-					//line pkg/api/p2p/compat/template/block.qtpl:112
+					//line pkg/api/p2p/compat/template/block.qtpl:113
 					qw422016.N().QZ(attachment.GetStringBytes("comment"))
-					//line pkg/api/p2p/compat/template/block.qtpl:112
+					//line pkg/api/p2p/compat/template/block.qtpl:113
 					qw422016.N().S(`
                                 },
                                 `)
-				//line pkg/api/p2p/compat/template/block.qtpl:114
+				//line pkg/api/p2p/compat/template/block.qtpl:115
 				case 2:
-					//line pkg/api/p2p/compat/template/block.qtpl:114
+					//line pkg/api/p2p/compat/template/block.qtpl:115
 					qw422016.N().S(`
                                 "@type":"type.googleapis.com/p2p.AskOrderPlacement",
                                 "attachment": {
                                     "asset": `)
-					//line pkg/api/p2p/compat/template/block.qtpl:117
+					//line pkg/api/p2p/compat/template/block.qtpl:118
 					qw422016.N().QZ(attachment.GetStringBytes("asset"))
-					//line pkg/api/p2p/compat/template/block.qtpl:117
+					//line pkg/api/p2p/compat/template/block.qtpl:118
 					qw422016.N().S(`,
                                     "quantity": `)
-					//line pkg/api/p2p/compat/template/block.qtpl:118
+					//line pkg/api/p2p/compat/template/block.qtpl:119
 					qw422016.N().D(attachment.GetInt("quantityQNT"))
-					//line pkg/api/p2p/compat/template/block.qtpl:118
+					//line pkg/api/p2p/compat/template/block.qtpl:119
 					qw422016.N().S(`,
                                     "price": `)
-					//line pkg/api/p2p/compat/template/block.qtpl:119
+					//line pkg/api/p2p/compat/template/block.qtpl:120
 					qw422016.N().D(attachment.GetInt("priceNQT"))
-					//line pkg/api/p2p/compat/template/block.qtpl:119
+					//line pkg/api/p2p/compat/template/block.qtpl:120
 					qw422016.N().S(`,
                                     "comment": `)
-					//line pkg/api/p2p/compat/template/block.qtpl:120
+					//line pkg/api/p2p/compat/template/block.qtpl:121
 					qw422016.N().QZ(attachment.GetStringBytes("comment"))
-					//line pkg/api/p2p/compat/template/block.qtpl:120
+					//line pkg/api/p2p/compat/template/block.qtpl:121
 					qw422016.N().S(`
                                 },
                                 `)
-				//line pkg/api/p2p/compat/template/block.qtpl:122
+				//line pkg/api/p2p/compat/template/block.qtpl:123
 				case 3:
-					//line pkg/api/p2p/compat/template/block.qtpl:122
+					//line pkg/api/p2p/compat/template/block.qtpl:123
 					qw422016.N().S(`
                                 "@type":"type.googleapis.com/p2p.BidOrderPlacement",
                                 "attachment": {
                                     "asset": `)
-					//line pkg/api/p2p/compat/template/block.qtpl:125
+					//line pkg/api/p2p/compat/template/block.qtpl:126
 					qw422016.N().QZ(attachment.GetStringBytes("asset"))
-					//line pkg/api/p2p/compat/template/block.qtpl:125
+					//line pkg/api/p2p/compat/template/block.qtpl:126
 					qw422016.N().S(`,
                                     "quantity": "`)
-					//line pkg/api/p2p/compat/template/block.qtpl:126
+					//line pkg/api/p2p/compat/template/block.qtpl:127
 					qw422016.N().D(attachment.GetInt("quantityQNT"))
-					//line pkg/api/p2p/compat/template/block.qtpl:126
+					//line pkg/api/p2p/compat/template/block.qtpl:127
 					qw422016.N().S(`",
                                     "price": "`)
-					//line pkg/api/p2p/compat/template/block.qtpl:127
+					//line pkg/api/p2p/compat/template/block.qtpl:128
 					qw422016.N().D(attachment.GetInt("priceNQT"))
-					//line pkg/api/p2p/compat/template/block.qtpl:127
+					//line pkg/api/p2p/compat/template/block.qtpl:128
 					qw422016.N().S(`"
                                 },
                                 `)
-				//line pkg/api/p2p/compat/template/block.qtpl:129
+				//line pkg/api/p2p/compat/template/block.qtpl:130
 				case 4:
-					//line pkg/api/p2p/compat/template/block.qtpl:129
+					//line pkg/api/p2p/compat/template/block.qtpl:130
 					qw422016.N().S(`
                                 "@type":"type.googleapis.com/p2p.AskOrderCancellation",
                                 "attachment": {
                                     "order": `)
-					//line pkg/api/p2p/compat/template/block.qtpl:132
+					//line pkg/api/p2p/compat/template/block.qtpl:133
 					qw422016.N().QZ(attachment.GetStringBytes("order"))
-					//line pkg/api/p2p/compat/template/block.qtpl:132
+					//line pkg/api/p2p/compat/template/block.qtpl:133
 					qw422016.N().S(`
                                 },
                                 `)
-				//line pkg/api/p2p/compat/template/block.qtpl:134
+				//line pkg/api/p2p/compat/template/block.qtpl:135
 				case 5:
-					//line pkg/api/p2p/compat/template/block.qtpl:134
+					//line pkg/api/p2p/compat/template/block.qtpl:135
 					qw422016.N().S(`
                                 "@type":"type.googleapis.com/p2p.BidOrderCancellation",
                                 "attachment": {
                                     "order": `)
-					//line pkg/api/p2p/compat/template/block.qtpl:137
+					//line pkg/api/p2p/compat/template/block.qtpl:138
 					qw422016.N().QZ(attachment.GetStringBytes("order"))
-					//line pkg/api/p2p/compat/template/block.qtpl:137
+					//line pkg/api/p2p/compat/template/block.qtpl:138
 					qw422016.N().S(`
                                 },
                                 `)
-					//line pkg/api/p2p/compat/template/block.qtpl:139
+					//line pkg/api/p2p/compat/template/block.qtpl:140
 				}
-				//line pkg/api/p2p/compat/template/block.qtpl:139
-				qw422016.N().S(`
-                            `)
-			//line pkg/api/p2p/compat/template/block.qtpl:140
-			case 3:
 				//line pkg/api/p2p/compat/template/block.qtpl:140
 				qw422016.N().S(`
-                                `)
+                            `)
+			//line pkg/api/p2p/compat/template/block.qtpl:141
+			case 3:
 				//line pkg/api/p2p/compat/template/block.qtpl:141
-				switch subtype {
+				qw422016.N().S(`
+                                `)
 				//line pkg/api/p2p/compat/template/block.qtpl:142
+				switch subtype {
+				//line pkg/api/p2p/compat/template/block.qtpl:143
 				case 0:
-					//line pkg/api/p2p/compat/template/block.qtpl:142
+					//line pkg/api/p2p/compat/template/block.qtpl:143
 					qw422016.N().S(`
                                 "@type":"type.googleapis.com/p2p.DigitalGoodsListing",
                                 "attachment": {
                                     "name": `)
-					//line pkg/api/p2p/compat/template/block.qtpl:145
+					//line pkg/api/p2p/compat/template/block.qtpl:146
 					qw422016.N().QZ(attachment.GetStringBytes("name"))
-					//line pkg/api/p2p/compat/template/block.qtpl:145
+					//line pkg/api/p2p/compat/template/block.qtpl:146
 					qw422016.N().S(`,
                                     "description": `)
-					//line pkg/api/p2p/compat/template/block.qtpl:146
+					//line pkg/api/p2p/compat/template/block.qtpl:147
 					qw422016.N().QZ(attachment.GetStringBytes("description"))
-					//line pkg/api/p2p/compat/template/block.qtpl:146
+					//line pkg/api/p2p/compat/template/block.qtpl:147
 					qw422016.N().S(`,
                                     "tags": `)
-					//line pkg/api/p2p/compat/template/block.qtpl:147
+					//line pkg/api/p2p/compat/template/block.qtpl:148
 					qw422016.N().QZ(attachment.GetStringBytes("tags"))
-					//line pkg/api/p2p/compat/template/block.qtpl:147
+					//line pkg/api/p2p/compat/template/block.qtpl:148
 					qw422016.N().S(`,
                                     "quantity": `)
-					//line pkg/api/p2p/compat/template/block.qtpl:148
+					//line pkg/api/p2p/compat/template/block.qtpl:149
 					qw422016.N().D(attachment.GetInt("quantityQNT"))
-					//line pkg/api/p2p/compat/template/block.qtpl:148
+					//line pkg/api/p2p/compat/template/block.qtpl:149
 					qw422016.N().S(`,
                                     "price": "`)
-					//line pkg/api/p2p/compat/template/block.qtpl:149
+					//line pkg/api/p2p/compat/template/block.qtpl:150
 					qw422016.N().D(attachment.GetInt("priceNQT"))
-					//line pkg/api/p2p/compat/template/block.qtpl:149
+					//line pkg/api/p2p/compat/template/block.qtpl:150
 					qw422016.N().S(`"
                                 },
                                 `)
-				//line pkg/api/p2p/compat/template/block.qtpl:151
+				//line pkg/api/p2p/compat/template/block.qtpl:152
 				case 1:
-					//line pkg/api/p2p/compat/template/block.qtpl:151
+					//line pkg/api/p2p/compat/template/block.qtpl:152
 					qw422016.N().S(`
                                 "@type":"type.googleapis.com/p2p.DigitalGoodsDelisting",
                                 "attachment": {
                                     "id": `)
-					//line pkg/api/p2p/compat/template/block.qtpl:154
+					//line pkg/api/p2p/compat/template/block.qtpl:155
 					qw422016.N().QZ(attachment.GetStringBytes("goods"))
-					//line pkg/api/p2p/compat/template/block.qtpl:154
+					//line pkg/api/p2p/compat/template/block.qtpl:155
 					qw422016.N().S(`
                                 },
                                 `)
-				//line pkg/api/p2p/compat/template/block.qtpl:156
+				//line pkg/api/p2p/compat/template/block.qtpl:157
 				case 2:
-					//line pkg/api/p2p/compat/template/block.qtpl:156
+					//line pkg/api/p2p/compat/template/block.qtpl:157
 					qw422016.N().S(`
                                 "@type":"type.googleapis.com/p2p.DigitalGoodsPriceChange",
                                 "attachment": {
                                     "id": `)
-					//line pkg/api/p2p/compat/template/block.qtpl:159
+					//line pkg/api/p2p/compat/template/block.qtpl:160
 					qw422016.N().QZ(attachment.GetStringBytes("goods"))
-					//line pkg/api/p2p/compat/template/block.qtpl:159
+					//line pkg/api/p2p/compat/template/block.qtpl:160
 					qw422016.N().S(`,
                                     "price": "`)
-					//line pkg/api/p2p/compat/template/block.qtpl:160
+					//line pkg/api/p2p/compat/template/block.qtpl:161
 					qw422016.N().D(attachment.GetInt("priceNQT"))
-					//line pkg/api/p2p/compat/template/block.qtpl:160
+					//line pkg/api/p2p/compat/template/block.qtpl:161
 					qw422016.N().S(`"
                                 },
                                 `)
-				//line pkg/api/p2p/compat/template/block.qtpl:162
+				//line pkg/api/p2p/compat/template/block.qtpl:163
 				case 3:
-					//line pkg/api/p2p/compat/template/block.qtpl:162
+					//line pkg/api/p2p/compat/template/block.qtpl:163
 					qw422016.N().S(`
                                 "@type":"type.googleapis.com/p2p.DigitalGoodsQuantityChange",
                                 "attachment": {
                                     "id": `)
-					//line pkg/api/p2p/compat/template/block.qtpl:165
+					//line pkg/api/p2p/compat/template/block.qtpl:166
 					qw422016.N().QZ(attachment.GetStringBytes("goods"))
-					//line pkg/api/p2p/compat/template/block.qtpl:165
+					//line pkg/api/p2p/compat/template/block.qtpl:166
 					qw422016.N().S(`,
                                     "delta": `)
-					//line pkg/api/p2p/compat/template/block.qtpl:166
+					//line pkg/api/p2p/compat/template/block.qtpl:167
 					qw422016.N().D(attachment.GetInt("deltaQuantityQNT"))
-					//line pkg/api/p2p/compat/template/block.qtpl:166
+					//line pkg/api/p2p/compat/template/block.qtpl:167
 					qw422016.N().S(`
                                 },
                                 `)
-				//line pkg/api/p2p/compat/template/block.qtpl:168
+				//line pkg/api/p2p/compat/template/block.qtpl:169
 				case 4:
-					//line pkg/api/p2p/compat/template/block.qtpl:168
+					//line pkg/api/p2p/compat/template/block.qtpl:169
 					qw422016.N().S(`
                                 "@type":"type.googleapis.com/p2p.DigitalGoodsPurchase",
                                 "attachment": {
                                     "id": `)
-					//line pkg/api/p2p/compat/template/block.qtpl:171
+					//line pkg/api/p2p/compat/template/block.qtpl:172
 					qw422016.N().QZ(attachment.GetStringBytes("goods"))
-					//line pkg/api/p2p/compat/template/block.qtpl:171
+					//line pkg/api/p2p/compat/template/block.qtpl:172
 					qw422016.N().S(`,
                                     "quantity": `)
-					//line pkg/api/p2p/compat/template/block.qtpl:172
+					//line pkg/api/p2p/compat/template/block.qtpl:173
 					qw422016.N().D(attachment.GetInt("quantityQNT"))
-					//line pkg/api/p2p/compat/template/block.qtpl:172
+					//line pkg/api/p2p/compat/template/block.qtpl:173
 					qw422016.N().S(`,
                                     "price": "`)
-					//line pkg/api/p2p/compat/template/block.qtpl:173
+					//line pkg/api/p2p/compat/template/block.qtpl:174
 					qw422016.N().D(attachment.GetInt("priceNQT"))
-					//line pkg/api/p2p/compat/template/block.qtpl:173
+					//line pkg/api/p2p/compat/template/block.qtpl:174
 					qw422016.N().S(`",
                                     "deliveryDeadlineTimestamp": `)
-					//line pkg/api/p2p/compat/template/block.qtpl:174
+					//line pkg/api/p2p/compat/template/block.qtpl:175
 					qw422016.N().D(attachment.GetInt("deliveryDeadlineTimestamp"))
-					//line pkg/api/p2p/compat/template/block.qtpl:174
+					//line pkg/api/p2p/compat/template/block.qtpl:175
 					qw422016.N().S(`
                                 },
                                 `)
-				//line pkg/api/p2p/compat/template/block.qtpl:176
+				//line pkg/api/p2p/compat/template/block.qtpl:177
 				case 5:
-					//line pkg/api/p2p/compat/template/block.qtpl:176
+					//line pkg/api/p2p/compat/template/block.qtpl:177
 					qw422016.N().S(`
                                 "@type":"type.googleapis.com/p2p.DigitalGoodsDelivery",
                                 "attachment": {
                                     "purchase": `)
-					//line pkg/api/p2p/compat/template/block.qtpl:179
+					//line pkg/api/p2p/compat/template/block.qtpl:180
 					qw422016.N().QZ(attachment.GetStringBytes("purchase"))
-					//line pkg/api/p2p/compat/template/block.qtpl:179
+					//line pkg/api/p2p/compat/template/block.qtpl:180
 					qw422016.N().S(`,
                                     "isText": `)
-					//line pkg/api/p2p/compat/template/block.qtpl:180
+					//line pkg/api/p2p/compat/template/block.qtpl:181
 					if attachment.GetBool("goodsIsText") {
-						//line pkg/api/p2p/compat/template/block.qtpl:180
+						//line pkg/api/p2p/compat/template/block.qtpl:181
 						qw422016.N().S(`true`)
-						//line pkg/api/p2p/compat/template/block.qtpl:180
+						//line pkg/api/p2p/compat/template/block.qtpl:181
 					} else {
-						//line pkg/api/p2p/compat/template/block.qtpl:180
+						//line pkg/api/p2p/compat/template/block.qtpl:181
 						qw422016.N().S(`false`)
-						//line pkg/api/p2p/compat/template/block.qtpl:180
+						//line pkg/api/p2p/compat/template/block.qtpl:181
 					}
-					//line pkg/api/p2p/compat/template/block.qtpl:180
+					//line pkg/api/p2p/compat/template/block.qtpl:181
 					qw422016.N().S(`,
                                     "data": `)
-					//line pkg/api/p2p/compat/template/block.qtpl:181
+					//line pkg/api/p2p/compat/template/block.qtpl:182
 					qw422016.N().QZ(attachment.GetStringBytes("goodsData"))
-					//line pkg/api/p2p/compat/template/block.qtpl:181
+					//line pkg/api/p2p/compat/template/block.qtpl:182
 					qw422016.N().S(`,
                                     "nonce": `)
-					//line pkg/api/p2p/compat/template/block.qtpl:182
+					//line pkg/api/p2p/compat/template/block.qtpl:183
 					qw422016.N().QZ(attachment.GetStringBytes("goodsNonce"))
-					//line pkg/api/p2p/compat/template/block.qtpl:182
+					//line pkg/api/p2p/compat/template/block.qtpl:183
 					qw422016.N().S(`,
                                     "discount": "`)
-					//line pkg/api/p2p/compat/template/block.qtpl:183
+					//line pkg/api/p2p/compat/template/block.qtpl:184
 					qw422016.N().D(attachment.GetInt("discountNQT"))
-					//line pkg/api/p2p/compat/template/block.qtpl:183
+					//line pkg/api/p2p/compat/template/block.qtpl:184
 					qw422016.N().S(`"
                                 },
                                 `)
-				//line pkg/api/p2p/compat/template/block.qtpl:185
+				//line pkg/api/p2p/compat/template/block.qtpl:186
 				case 6:
-					//line pkg/api/p2p/compat/template/block.qtpl:185
+					//line pkg/api/p2p/compat/template/block.qtpl:186
 					qw422016.N().S(`
                                 "@type":"type.googleapis.com/p2p.DigitalGoodsFeedback",
                                 "attachment": {
                                     "purchase": `)
-					//line pkg/api/p2p/compat/template/block.qtpl:188
+					//line pkg/api/p2p/compat/template/block.qtpl:189
 					qw422016.N().QZ(attachment.GetStringBytes("purchase"))
-					//line pkg/api/p2p/compat/template/block.qtpl:188
+					//line pkg/api/p2p/compat/template/block.qtpl:189
 					qw422016.N().S(`
                                 },
                                 `)
-				//line pkg/api/p2p/compat/template/block.qtpl:190
+				//line pkg/api/p2p/compat/template/block.qtpl:191
 				case 7:
-					//line pkg/api/p2p/compat/template/block.qtpl:190
+					//line pkg/api/p2p/compat/template/block.qtpl:191
 					qw422016.N().S(`
                                 "@type":"type.googleapis.com/p2p.DigitalGoodsRefund",
                                 "attachment": {
                                     "purchase": `)
-					//line pkg/api/p2p/compat/template/block.qtpl:193
+					//line pkg/api/p2p/compat/template/block.qtpl:194
 					qw422016.N().QZ(attachment.GetStringBytes("purchase"))
-					//line pkg/api/p2p/compat/template/block.qtpl:193
+					//line pkg/api/p2p/compat/template/block.qtpl:194
 					qw422016.N().S(`,
                                     "refund": "`)
-					//line pkg/api/p2p/compat/template/block.qtpl:194
+					//line pkg/api/p2p/compat/template/block.qtpl:195
 					qw422016.N().D(attachment.GetInt("refundNQT"))
-					//line pkg/api/p2p/compat/template/block.qtpl:194
+					//line pkg/api/p2p/compat/template/block.qtpl:195
 					qw422016.N().S(`"
                                 },
                                 `)
-					//line pkg/api/p2p/compat/template/block.qtpl:196
+					//line pkg/api/p2p/compat/template/block.qtpl:197
 				}
-				//line pkg/api/p2p/compat/template/block.qtpl:196
-				qw422016.N().S(`
-                            `)
-			//line pkg/api/p2p/compat/template/block.qtpl:197
-			case 4:
 				//line pkg/api/p2p/compat/template/block.qtpl:197
 				qw422016.N().S(`
-                                `)
+                            `)
+			//line pkg/api/p2p/compat/template/block.qtpl:198
+			case 4:
 				//line pkg/api/p2p/compat/template/block.qtpl:198
-				switch subtype {
+				qw422016.N().S(`
+                                `)
 				//line pkg/api/p2p/compat/template/block.qtpl:199
+				switch subtype {
+				//line pkg/api/p2p/compat/template/block.qtpl:200
 				case 0:
-					//line pkg/api/p2p/compat/template/block.qtpl:199
+					//line pkg/api/p2p/compat/template/block.qtpl:200
 					qw422016.N().S(`
                                 "@type":"type.googleapis.com/p2p.EffectiveBalanceLeasing",
                                 "attachment": {
                                     "period": `)
-					//line pkg/api/p2p/compat/template/block.qtpl:202
+					//line pkg/api/p2p/compat/template/block.qtpl:203
 					qw422016.N().D(attachment.GetInt("period"))
-					//line pkg/api/p2p/compat/template/block.qtpl:202
+					//line pkg/api/p2p/compat/template/block.qtpl:203
 					qw422016.N().S(`
                                 },
                                 `)
-					//line pkg/api/p2p/compat/template/block.qtpl:204
+					//line pkg/api/p2p/compat/template/block.qtpl:205
 				}
-				//line pkg/api/p2p/compat/template/block.qtpl:204
-				qw422016.N().S(`
-                            `)
-			//line pkg/api/p2p/compat/template/block.qtpl:205
-			case 20:
 				//line pkg/api/p2p/compat/template/block.qtpl:205
 				qw422016.N().S(`
-                                `)
+                            `)
+			//line pkg/api/p2p/compat/template/block.qtpl:206
+			case 20:
 				//line pkg/api/p2p/compat/template/block.qtpl:206
-				switch subtype {
+				qw422016.N().S(`
+                                `)
 				//line pkg/api/p2p/compat/template/block.qtpl:207
+				switch subtype {
+				//line pkg/api/p2p/compat/template/block.qtpl:208
 				case 0:
-					//line pkg/api/p2p/compat/template/block.qtpl:207
+					//line pkg/api/p2p/compat/template/block.qtpl:208
 					qw422016.N().S(`
                                 "@type":"type.googleapis.com/p2p.RewardRecipientAssignment",
                                 `)
-					//line pkg/api/p2p/compat/template/block.qtpl:209
+					//line pkg/api/p2p/compat/template/block.qtpl:210
 				}
-				//line pkg/api/p2p/compat/template/block.qtpl:209
-				qw422016.N().S(`
-                            `)
-			//line pkg/api/p2p/compat/template/block.qtpl:210
-			case 21:
 				//line pkg/api/p2p/compat/template/block.qtpl:210
 				qw422016.N().S(`
-                                `)
+                            `)
+			//line pkg/api/p2p/compat/template/block.qtpl:211
+			case 21:
 				//line pkg/api/p2p/compat/template/block.qtpl:211
-				switch subtype {
+				qw422016.N().S(`
+                                `)
 				//line pkg/api/p2p/compat/template/block.qtpl:212
+				switch subtype {
+				//line pkg/api/p2p/compat/template/block.qtpl:213
 				case 0:
-					//line pkg/api/p2p/compat/template/block.qtpl:212
+					//line pkg/api/p2p/compat/template/block.qtpl:213
 					qw422016.N().S(`
                                 "@type":"type.googleapis.com/p2p.EscrowCreation",
                                 "attachment": {
                                     "amount": `)
-					//line pkg/api/p2p/compat/template/block.qtpl:215
+					//line pkg/api/p2p/compat/template/block.qtpl:216
 					qw422016.N().QZ(attachment.GetStringBytes("amountNQT"))
-					//line pkg/api/p2p/compat/template/block.qtpl:215
+					//line pkg/api/p2p/compat/template/block.qtpl:216
 					qw422016.N().S(`,
                                     "deadline": `)
-					//line pkg/api/p2p/compat/template/block.qtpl:216
+					//line pkg/api/p2p/compat/template/block.qtpl:217
 					qw422016.N().D(attachment.GetInt("deadline"))
-					//line pkg/api/p2p/compat/template/block.qtpl:216
+					//line pkg/api/p2p/compat/template/block.qtpl:217
 					qw422016.N().S(`,
                                     "deadlineAction": `)
-					//line pkg/api/p2p/compat/template/block.qtpl:217
+					//line pkg/api/p2p/compat/template/block.qtpl:218
 					qw422016.N().QZ(attachment.GetStringBytes("deadlineAction"))
-					//line pkg/api/p2p/compat/template/block.qtpl:217
+					//line pkg/api/p2p/compat/template/block.qtpl:218
 					qw422016.N().S(`,
                                     "requiredSigners": `)
-					//line pkg/api/p2p/compat/template/block.qtpl:218
+					//line pkg/api/p2p/compat/template/block.qtpl:219
 					qw422016.N().D(attachment.GetInt("requiredSigners"))
-					//line pkg/api/p2p/compat/template/block.qtpl:218
+					//line pkg/api/p2p/compat/template/block.qtpl:219
 					qw422016.N().S(`,
                                     "signers": [
                                         `)
-					//line pkg/api/p2p/compat/template/block.qtpl:221
+					//line pkg/api/p2p/compat/template/block.qtpl:222
 					signers := attachment.GetArray("signers")
 
-					//line pkg/api/p2p/compat/template/block.qtpl:222
+					//line pkg/api/p2p/compat/template/block.qtpl:223
 					qw422016.N().S(`
                                         `)
-					//line pkg/api/p2p/compat/template/block.qtpl:223
+					//line pkg/api/p2p/compat/template/block.qtpl:224
 					for signerId, signer := range signers {
-						//line pkg/api/p2p/compat/template/block.qtpl:223
-						qw422016.N().S(`
-                                        `)
-						//line pkg/api/p2p/compat/template/block.qtpl:224
-						qw422016.N().QZ(signer.GetStringBytes())
-						//line pkg/api/p2p/compat/template/block.qtpl:224
-						if signerId+1 < len(signers) {
-							//line pkg/api/p2p/compat/template/block.qtpl:224
-							qw422016.N().S(`,`)
-							//line pkg/api/p2p/compat/template/block.qtpl:224
-						}
 						//line pkg/api/p2p/compat/template/block.qtpl:224
 						qw422016.N().S(`
                                         `)
 						//line pkg/api/p2p/compat/template/block.qtpl:225
+						qw422016.N().QZ(signer.GetStringBytes())
+						//line pkg/api/p2p/compat/template/block.qtpl:225
+						if signerId+1 < len(signers) {
+							//line pkg/api/p2p/compat/template/block.qtpl:225
+							qw422016.N().S(`,`)
+							//line pkg/api/p2p/compat/template/block.qtpl:225
+						}
+						//line pkg/api/p2p/compat/template/block.qtpl:225
+						qw422016.N().S(`
+                                        `)
+						//line pkg/api/p2p/compat/template/block.qtpl:226
 					}
-					//line pkg/api/p2p/compat/template/block.qtpl:225
+					//line pkg/api/p2p/compat/template/block.qtpl:226
 					qw422016.N().S(`
                                     ]
                                 },
                                 `)
-				//line pkg/api/p2p/compat/template/block.qtpl:228
+				//line pkg/api/p2p/compat/template/block.qtpl:229
 				case 1:
-					//line pkg/api/p2p/compat/template/block.qtpl:228
+					//line pkg/api/p2p/compat/template/block.qtpl:229
 					qw422016.N().S(`
                                 "@type":"type.googleapis.com/p2p.EscrowSign",
                                 "attachment": {
                                     "id": `)
-					//line pkg/api/p2p/compat/template/block.qtpl:231
+					//line pkg/api/p2p/compat/template/block.qtpl:232
 					qw422016.N().QZ(attachment.GetStringBytes("escrowID"))
-					//line pkg/api/p2p/compat/template/block.qtpl:231
+					//line pkg/api/p2p/compat/template/block.qtpl:232
 					qw422016.N().S(`,
                                     "decision": `)
-					//line pkg/api/p2p/compat/template/block.qtpl:232
+					//line pkg/api/p2p/compat/template/block.qtpl:233
 					qw422016.N().D(attachment.GetInt("decision"))
-					//line pkg/api/p2p/compat/template/block.qtpl:232
+					//line pkg/api/p2p/compat/template/block.qtpl:233
 					qw422016.N().S(`
                                 },
                                 `)
-				//line pkg/api/p2p/compat/template/block.qtpl:234
+				//line pkg/api/p2p/compat/template/block.qtpl:235
 				case 2:
-					//line pkg/api/p2p/compat/template/block.qtpl:234
+					//line pkg/api/p2p/compat/template/block.qtpl:235
 					qw422016.N().S(`
                                 "@type":"type.googleapis.com/p2p.EscrowResult",
                                 "attachment": {
                                     "id": `)
-					//line pkg/api/p2p/compat/template/block.qtpl:237
+					//line pkg/api/p2p/compat/template/block.qtpl:238
 					qw422016.N().QZ(attachment.GetStringBytes("escrowID"))
-					//line pkg/api/p2p/compat/template/block.qtpl:237
+					//line pkg/api/p2p/compat/template/block.qtpl:238
 					qw422016.N().S(`,
                                     "decision": `)
-					//line pkg/api/p2p/compat/template/block.qtpl:238
+					//line pkg/api/p2p/compat/template/block.qtpl:239
 					qw422016.N().D(attachment.GetInt("decision"))
-					//line pkg/api/p2p/compat/template/block.qtpl:238
+					//line pkg/api/p2p/compat/template/block.qtpl:239
 					qw422016.N().S(`
                                 },
                                 `)
-				//line pkg/api/p2p/compat/template/block.qtpl:240
+				//line pkg/api/p2p/compat/template/block.qtpl:241
 				case 3:
-					//line pkg/api/p2p/compat/template/block.qtpl:240
+					//line pkg/api/p2p/compat/template/block.qtpl:241
 					qw422016.N().S(`
                                 "@type":"type.googleapis.com/p2p.SubscriptionSubscribe",
                                 "attachment": {
                                     "frequency": `)
-					//line pkg/api/p2p/compat/template/block.qtpl:243
+					//line pkg/api/p2p/compat/template/block.qtpl:244
 					qw422016.N().D(attachment.GetInt("frequency"))
-					//line pkg/api/p2p/compat/template/block.qtpl:243
+					//line pkg/api/p2p/compat/template/block.qtpl:244
 					qw422016.N().S(`
                                 },
                                 `)
-				//line pkg/api/p2p/compat/template/block.qtpl:245
+				//line pkg/api/p2p/compat/template/block.qtpl:246
 				case 4:
-					//line pkg/api/p2p/compat/template/block.qtpl:245
+					//line pkg/api/p2p/compat/template/block.qtpl:246
 					qw422016.N().S(`
                                 "@type":"type.googleapis.com/p2p.SubscriptionCancel",
                                 "attachment": {
                                     "id": `)
-					//line pkg/api/p2p/compat/template/block.qtpl:248
+					//line pkg/api/p2p/compat/template/block.qtpl:249
 					qw422016.N().QZ(attachment.GetStringBytes("subscriptionId"))
-					//line pkg/api/p2p/compat/template/block.qtpl:248
+					//line pkg/api/p2p/compat/template/block.qtpl:249
 					qw422016.N().S(`
                                 },
                                 `)
-				//line pkg/api/p2p/compat/template/block.qtpl:250
+				//line pkg/api/p2p/compat/template/block.qtpl:251
 				case 5:
-					//line pkg/api/p2p/compat/template/block.qtpl:250
+					//line pkg/api/p2p/compat/template/block.qtpl:251
 					qw422016.N().S(`
                                 "@type":"type.googleapis.com/p2p.SubscriptionPayment",
                                 "attachment": {
                                     "ids": [
                                         `)
-					//line pkg/api/p2p/compat/template/block.qtpl:255
+					//line pkg/api/p2p/compat/template/block.qtpl:256
 					subscribers := attachment.GetArray("subscriptionIDs")
 
-					//line pkg/api/p2p/compat/template/block.qtpl:256
+					//line pkg/api/p2p/compat/template/block.qtpl:257
 					qw422016.N().S(`
                                         `)
-					//line pkg/api/p2p/compat/template/block.qtpl:257
+					//line pkg/api/p2p/compat/template/block.qtpl:258
 					for subscriberId, subscriber := range subscribers {
-						//line pkg/api/p2p/compat/template/block.qtpl:257
-						qw422016.N().S(`
-                                        `)
-						//line pkg/api/p2p/compat/template/block.qtpl:258
-						qw422016.N().QZ(subscriber.GetStringBytes())
-						//line pkg/api/p2p/compat/template/block.qtpl:258
-						if subscriberId+1 < len(subscribers) {
-							//line pkg/api/p2p/compat/template/block.qtpl:258
-							qw422016.N().S(`,`)
-							//line pkg/api/p2p/compat/template/block.qtpl:258
-						}
 						//line pkg/api/p2p/compat/template/block.qtpl:258
 						qw422016.N().S(`
                                         `)
 						//line pkg/api/p2p/compat/template/block.qtpl:259
+						qw422016.N().QZ(subscriber.GetStringBytes())
+						//line pkg/api/p2p/compat/template/block.qtpl:259
+						if subscriberId+1 < len(subscribers) {
+							//line pkg/api/p2p/compat/template/block.qtpl:259
+							qw422016.N().S(`,`)
+							//line pkg/api/p2p/compat/template/block.qtpl:259
+						}
+						//line pkg/api/p2p/compat/template/block.qtpl:259
+						qw422016.N().S(`
+                                        `)
+						//line pkg/api/p2p/compat/template/block.qtpl:260
 					}
-					//line pkg/api/p2p/compat/template/block.qtpl:259
+					//line pkg/api/p2p/compat/template/block.qtpl:260
 					qw422016.N().S(`
                                     ]
                                 }
                                 `)
-					//line pkg/api/p2p/compat/template/block.qtpl:262
+					//line pkg/api/p2p/compat/template/block.qtpl:263
 				}
-				//line pkg/api/p2p/compat/template/block.qtpl:262
-				qw422016.N().S(`
-                            `)
-			//line pkg/api/p2p/compat/template/block.qtpl:263
-			case 22:
 				//line pkg/api/p2p/compat/template/block.qtpl:263
 				qw422016.N().S(`
-                                `)
+                            `)
+			//line pkg/api/p2p/compat/template/block.qtpl:264
+			case 22:
 				//line pkg/api/p2p/compat/template/block.qtpl:264
-				switch subtype {
+				qw422016.N().S(`
+                                `)
 				//line pkg/api/p2p/compat/template/block.qtpl:265
+				switch subtype {
+				//line pkg/api/p2p/compat/template/block.qtpl:266
 				case 0:
-					//line pkg/api/p2p/compat/template/block.qtpl:265
+					//line pkg/api/p2p/compat/template/block.qtpl:266
 					qw422016.N().S(`
                                 "@type":"type.googleapis.com/p2p.AutomatedTransactionsCreation",
                                 "attachment": {
                                     "name": `)
-					//line pkg/api/p2p/compat/template/block.qtpl:268
+					//line pkg/api/p2p/compat/template/block.qtpl:269
 					qw422016.N().QZ(attachment.GetStringBytes("name"))
-					//line pkg/api/p2p/compat/template/block.qtpl:268
+					//line pkg/api/p2p/compat/template/block.qtpl:269
 					qw422016.N().S(`,
                                     "description": `)
-					//line pkg/api/p2p/compat/template/block.qtpl:269
+					//line pkg/api/p2p/compat/template/block.qtpl:270
 					qw422016.N().QZ(attachment.GetStringBytes("description"))
-					//line pkg/api/p2p/compat/template/block.qtpl:269
+					//line pkg/api/p2p/compat/template/block.qtpl:270
 					qw422016.N().S(`,
                                     "bytes": `)
-					//line pkg/api/p2p/compat/template/block.qtpl:270
+					//line pkg/api/p2p/compat/template/block.qtpl:271
 					qw422016.N().QZ([]byte(base64.StdEncoding.EncodeToString(attachment.GetStringBytes("creationBytes"))))
-					//line pkg/api/p2p/compat/template/block.qtpl:270
+					//line pkg/api/p2p/compat/template/block.qtpl:271
 					qw422016.N().S(`
                                 },
                                 `)
-				//line pkg/api/p2p/compat/template/block.qtpl:272
+				//line pkg/api/p2p/compat/template/block.qtpl:273
 				case 1:
-					//line pkg/api/p2p/compat/template/block.qtpl:272
+					//line pkg/api/p2p/compat/template/block.qtpl:273
 					qw422016.N().S(`
                                 "@type":"type.googleapis.com/p2p.AutomatedTransactionsPayment",
                                 `)
-					//line pkg/api/p2p/compat/template/block.qtpl:274
+					//line pkg/api/p2p/compat/template/block.qtpl:275
 				}
-				//line pkg/api/p2p/compat/template/block.qtpl:274
+				//line pkg/api/p2p/compat/template/block.qtpl:275
 				qw422016.N().S(`
                             `)
-				//line pkg/api/p2p/compat/template/block.qtpl:275
+				//line pkg/api/p2p/compat/template/block.qtpl:276
 			}
-			//line pkg/api/p2p/compat/template/block.qtpl:275
+			//line pkg/api/p2p/compat/template/block.qtpl:276
 			qw422016.N().S(`
                             "header": {
                                 "version":         `)
-			//line pkg/api/p2p/compat/template/block.qtpl:277
+			//line pkg/api/p2p/compat/template/block.qtpl:278
 			qw422016.N().D(tx.GetInt("version"))
-			//line pkg/api/p2p/compat/template/block.qtpl:277
+			//line pkg/api/p2p/compat/template/block.qtpl:278
 			qw422016.N().S(`,
                                 "timestamp":       `)
-			//line pkg/api/p2p/compat/template/block.qtpl:278
+			//line pkg/api/p2p/compat/template/block.qtpl:279
 			qw422016.N().D(tx.GetInt("timestamp"))
-			//line pkg/api/p2p/compat/template/block.qtpl:278
+			//line pkg/api/p2p/compat/template/block.qtpl:279
 			qw422016.N().S(`,
                                 "amount":          `)
-			//line pkg/api/p2p/compat/template/block.qtpl:279
+			//line pkg/api/p2p/compat/template/block.qtpl:280
 			qw422016.N().D(tx.GetInt("amountNQT"))
-			//line pkg/api/p2p/compat/template/block.qtpl:279
+			//line pkg/api/p2p/compat/template/block.qtpl:280
 			qw422016.N().S(`,
                                 "fee":             `)
-			//line pkg/api/p2p/compat/template/block.qtpl:280
+			//line pkg/api/p2p/compat/template/block.qtpl:281
 			qw422016.N().D(tx.GetInt("feeNQT"))
-			//line pkg/api/p2p/compat/template/block.qtpl:280
+			//line pkg/api/p2p/compat/template/block.qtpl:281
 			qw422016.N().S(`,
                                 `)
-			//line pkg/api/p2p/compat/template/block.qtpl:281
+			//line pkg/api/p2p/compat/template/block.qtpl:282
 			if tx.Exists("recipient") {
-				//line pkg/api/p2p/compat/template/block.qtpl:281
+				//line pkg/api/p2p/compat/template/block.qtpl:282
 				qw422016.N().S(`
                                 "recipient":       `)
-				//line pkg/api/p2p/compat/template/block.qtpl:282
+				//line pkg/api/p2p/compat/template/block.qtpl:283
 				qw422016.N().QZ(tx.GetStringBytes("recipient"))
-				//line pkg/api/p2p/compat/template/block.qtpl:282
+				//line pkg/api/p2p/compat/template/block.qtpl:283
 				qw422016.N().S(`,
                                 `)
-				//line pkg/api/p2p/compat/template/block.qtpl:283
+				//line pkg/api/p2p/compat/template/block.qtpl:284
 			}
-			//line pkg/api/p2p/compat/template/block.qtpl:283
+			//line pkg/api/p2p/compat/template/block.qtpl:284
 			qw422016.N().S(`
                                 "senderPublicKey": `)
-			//line pkg/api/p2p/compat/template/block.qtpl:284
+			//line pkg/api/p2p/compat/template/block.qtpl:285
 			qw422016.N().QZ(tx.GetStringBytes("senderPublicKey"))
-			//line pkg/api/p2p/compat/template/block.qtpl:284
+			//line pkg/api/p2p/compat/template/block.qtpl:285
 			qw422016.N().S(`,
                                 "deadline":        `)
-			//line pkg/api/p2p/compat/template/block.qtpl:285
+			//line pkg/api/p2p/compat/template/block.qtpl:286
 			qw422016.N().D(tx.GetInt("deadline"))
-			//line pkg/api/p2p/compat/template/block.qtpl:285
+			//line pkg/api/p2p/compat/template/block.qtpl:286
 			qw422016.N().S(`,
                                 "ecBlockId":       `)
-			//line pkg/api/p2p/compat/template/block.qtpl:286
+			//line pkg/api/p2p/compat/template/block.qtpl:287
 			qw422016.N().QZ(tx.GetStringBytes("ecBlockId"))
-			//line pkg/api/p2p/compat/template/block.qtpl:286
+			//line pkg/api/p2p/compat/template/block.qtpl:287
 			qw422016.N().S(`,
                                 "ecBlockHeight":   `)
-			//line pkg/api/p2p/compat/template/block.qtpl:287
+			//line pkg/api/p2p/compat/template/block.qtpl:288
 			qw422016.N().D(tx.GetInt("ecBlockHeight"))
-			//line pkg/api/p2p/compat/template/block.qtpl:287
+			//line pkg/api/p2p/compat/template/block.qtpl:288
 			qw422016.N().S(`,
                                 "signature":       `)
-			//line pkg/api/p2p/compat/template/block.qtpl:288
+			//line pkg/api/p2p/compat/template/block.qtpl:289
 			qw422016.N().QZ(tx.GetStringBytes("signature"))
-			//line pkg/api/p2p/compat/template/block.qtpl:288
+			//line pkg/api/p2p/compat/template/block.qtpl:289
 			qw422016.N().S(`
                             }
                             `)
-			//line pkg/api/p2p/compat/template/block.qtpl:291
+			//line pkg/api/p2p/compat/template/block.qtpl:292
 			hasMessage := attachment.Exists("version.Message")
 			hasEncryptedMessage := attachment.Exists("version.EncryptedMessage")
 			hasPublicKeyAnnouncement := attachment.Exists("version.PublicKeyAnnouncement")
 			hasEncryptToSelfMessage := attachment.Exists("version.EncryptToSelfMessage")
 
-			//line pkg/api/p2p/compat/template/block.qtpl:295
+			//line pkg/api/p2p/compat/template/block.qtpl:296
 			qw422016.N().S(`
                             `)
-			//line pkg/api/p2p/compat/template/block.qtpl:296
+			//line pkg/api/p2p/compat/template/block.qtpl:297
 			if hasMessage || hasEncryptedMessage || hasPublicKeyAnnouncement || hasEncryptToSelfMessage {
-				//line pkg/api/p2p/compat/template/block.qtpl:296
+				//line pkg/api/p2p/compat/template/block.qtpl:297
 				qw422016.N().S(`
                             ,
                             "appendix": {
                                 `)
-				//line pkg/api/p2p/compat/template/block.qtpl:299
+				//line pkg/api/p2p/compat/template/block.qtpl:300
 				if hasMessage {
-					//line pkg/api/p2p/compat/template/block.qtpl:299
+					//line pkg/api/p2p/compat/template/block.qtpl:300
 					qw422016.N().S(`
                                 "message": {
                                     "isText":  `)
-					//line pkg/api/p2p/compat/template/block.qtpl:301
+					//line pkg/api/p2p/compat/template/block.qtpl:302
 					if attachment.GetBool("messageIsText") {
-						//line pkg/api/p2p/compat/template/block.qtpl:301
+						//line pkg/api/p2p/compat/template/block.qtpl:302
 						qw422016.N().S(`true`)
-						//line pkg/api/p2p/compat/template/block.qtpl:301
+						//line pkg/api/p2p/compat/template/block.qtpl:302
 					} else {
-						//line pkg/api/p2p/compat/template/block.qtpl:301
+						//line pkg/api/p2p/compat/template/block.qtpl:302
 						qw422016.N().S(`false`)
-						//line pkg/api/p2p/compat/template/block.qtpl:301
+						//line pkg/api/p2p/compat/template/block.qtpl:302
 					}
-					//line pkg/api/p2p/compat/template/block.qtpl:301
+					//line pkg/api/p2p/compat/template/block.qtpl:302
 					qw422016.N().S(`,
                                     "content": `)
-					//line pkg/api/p2p/compat/template/block.qtpl:302
+					//line pkg/api/p2p/compat/template/block.qtpl:303
 					qw422016.N().QZ(attachment.GetStringBytes("message"))
-					//line pkg/api/p2p/compat/template/block.qtpl:302
+					//line pkg/api/p2p/compat/template/block.qtpl:303
 					qw422016.N().S(`
                                 }`)
-					//line pkg/api/p2p/compat/template/block.qtpl:303
+					//line pkg/api/p2p/compat/template/block.qtpl:304
 					if hasEncryptedMessage || hasPublicKeyAnnouncement || hasEncryptToSelfMessage {
-						//line pkg/api/p2p/compat/template/block.qtpl:303
+						//line pkg/api/p2p/compat/template/block.qtpl:304
 						qw422016.N().S(`,`)
-						//line pkg/api/p2p/compat/template/block.qtpl:303
+						//line pkg/api/p2p/compat/template/block.qtpl:304
 					}
-					//line pkg/api/p2p/compat/template/block.qtpl:303
+					//line pkg/api/p2p/compat/template/block.qtpl:304
 					qw422016.N().S(`
                                 `)
-					//line pkg/api/p2p/compat/template/block.qtpl:304
+					//line pkg/api/p2p/compat/template/block.qtpl:305
 				}
-				//line pkg/api/p2p/compat/template/block.qtpl:304
+				//line pkg/api/p2p/compat/template/block.qtpl:305
 				qw422016.N().S(`
                                 `)
-				//line pkg/api/p2p/compat/template/block.qtpl:305
+				//line pkg/api/p2p/compat/template/block.qtpl:306
 				if hasEncryptedMessage {
-					//line pkg/api/p2p/compat/template/block.qtpl:305
+					//line pkg/api/p2p/compat/template/block.qtpl:306
 					qw422016.N().S(`
                                 "encryptedMessage": {
                                     "data":   `)
-					//line pkg/api/p2p/compat/template/block.qtpl:307
+					//line pkg/api/p2p/compat/template/block.qtpl:308
 					qw422016.N().QZ(attachment.GetStringBytes("encryptedMessage", "data"))
-					//line pkg/api/p2p/compat/template/block.qtpl:307
+					//line pkg/api/p2p/compat/template/block.qtpl:308
 					qw422016.N().S(`,
                                     "isText": `)
-					//line pkg/api/p2p/compat/template/block.qtpl:308
+					//line pkg/api/p2p/compat/template/block.qtpl:309
 					if attachment.GetBool("encryptedMessage", "isText") {
-						//line pkg/api/p2p/compat/template/block.qtpl:308
+						//line pkg/api/p2p/compat/template/block.qtpl:309
 						qw422016.N().S(`true`)
-						//line pkg/api/p2p/compat/template/block.qtpl:308
+						//line pkg/api/p2p/compat/template/block.qtpl:309
 					} else {
-						//line pkg/api/p2p/compat/template/block.qtpl:308
+						//line pkg/api/p2p/compat/template/block.qtpl:309
 						qw422016.N().S(`false`)
-						//line pkg/api/p2p/compat/template/block.qtpl:308
+						//line pkg/api/p2p/compat/template/block.qtpl:309
 					}
-					//line pkg/api/p2p/compat/template/block.qtpl:308
+					//line pkg/api/p2p/compat/template/block.qtpl:309
 					qw422016.N().S(`,
                                     "nonce":  `)
-					//line pkg/api/p2p/compat/template/block.qtpl:309
+					//line pkg/api/p2p/compat/template/block.qtpl:310
 					qw422016.N().QZ(attachment.GetStringBytes("encryptedMessage", "nonce"))
-					//line pkg/api/p2p/compat/template/block.qtpl:309
+					//line pkg/api/p2p/compat/template/block.qtpl:310
 					qw422016.N().S(`
                                 }`)
-					//line pkg/api/p2p/compat/template/block.qtpl:310
+					//line pkg/api/p2p/compat/template/block.qtpl:311
 					if hasPublicKeyAnnouncement || hasEncryptToSelfMessage {
-						//line pkg/api/p2p/compat/template/block.qtpl:310
+						//line pkg/api/p2p/compat/template/block.qtpl:311
 						qw422016.N().S(`,`)
-						//line pkg/api/p2p/compat/template/block.qtpl:310
+						//line pkg/api/p2p/compat/template/block.qtpl:311
 					}
-					//line pkg/api/p2p/compat/template/block.qtpl:310
+					//line pkg/api/p2p/compat/template/block.qtpl:311
 					qw422016.N().S(`
                                 `)
-					//line pkg/api/p2p/compat/template/block.qtpl:311
+					//line pkg/api/p2p/compat/template/block.qtpl:312
 				}
-				//line pkg/api/p2p/compat/template/block.qtpl:311
+				//line pkg/api/p2p/compat/template/block.qtpl:312
 				qw422016.N().S(`
                                 `)
-				//line pkg/api/p2p/compat/template/block.qtpl:312
+				//line pkg/api/p2p/compat/template/block.qtpl:313
 				if hasPublicKeyAnnouncement {
-					//line pkg/api/p2p/compat/template/block.qtpl:312
+					//line pkg/api/p2p/compat/template/block.qtpl:313
 					qw422016.N().S(`
                                 "publicKeyAnnouncement": {
                                     "publicKey": `)
-					//line pkg/api/p2p/compat/template/block.qtpl:314
+					//line pkg/api/p2p/compat/template/block.qtpl:315
 					qw422016.N().QZ(attachment.GetStringBytes("recipientPublicKey"))
-					//line pkg/api/p2p/compat/template/block.qtpl:314
+					//line pkg/api/p2p/compat/template/block.qtpl:315
 					qw422016.N().S(`
                                 }`)
-					//line pkg/api/p2p/compat/template/block.qtpl:315
+					//line pkg/api/p2p/compat/template/block.qtpl:316
 					if hasEncryptToSelfMessage {
-						//line pkg/api/p2p/compat/template/block.qtpl:315
+						//line pkg/api/p2p/compat/template/block.qtpl:316
 						qw422016.N().S(`,`)
-						//line pkg/api/p2p/compat/template/block.qtpl:315
+						//line pkg/api/p2p/compat/template/block.qtpl:316
 					}
-					//line pkg/api/p2p/compat/template/block.qtpl:315
+					//line pkg/api/p2p/compat/template/block.qtpl:316
 					qw422016.N().S(`
                                 `)
-					//line pkg/api/p2p/compat/template/block.qtpl:316
+					//line pkg/api/p2p/compat/template/block.qtpl:317
 				}
-				//line pkg/api/p2p/compat/template/block.qtpl:316
+				//line pkg/api/p2p/compat/template/block.qtpl:317
 				qw422016.N().S(`
                                 `)
-				//line pkg/api/p2p/compat/template/block.qtpl:317
+				//line pkg/api/p2p/compat/template/block.qtpl:318
 				if hasEncryptToSelfMessage {
-					//line pkg/api/p2p/compat/template/block.qtpl:317
+					//line pkg/api/p2p/compat/template/block.qtpl:318
 					qw422016.N().S(`    
                                 "encryptToSelfMessage": {
                                     "data":   `)
-					//line pkg/api/p2p/compat/template/block.qtpl:319
+					//line pkg/api/p2p/compat/template/block.qtpl:320
 					qw422016.N().QZ(attachment.GetStringBytes("encryptToSelfMessage", "data"))
-					//line pkg/api/p2p/compat/template/block.qtpl:319
+					//line pkg/api/p2p/compat/template/block.qtpl:320
 					qw422016.N().S(`,
                                     "isText": `)
-					//line pkg/api/p2p/compat/template/block.qtpl:320
+					//line pkg/api/p2p/compat/template/block.qtpl:321
 					if attachment.GetBool("encryptToSelfMessage", "isText") {
-						//line pkg/api/p2p/compat/template/block.qtpl:320
+						//line pkg/api/p2p/compat/template/block.qtpl:321
 						qw422016.N().S(`true`)
-						//line pkg/api/p2p/compat/template/block.qtpl:320
+						//line pkg/api/p2p/compat/template/block.qtpl:321
 					} else {
-						//line pkg/api/p2p/compat/template/block.qtpl:320
+						//line pkg/api/p2p/compat/template/block.qtpl:321
 						qw422016.N().S(`false`)
-						//line pkg/api/p2p/compat/template/block.qtpl:320
+						//line pkg/api/p2p/compat/template/block.qtpl:321
 					}
-					//line pkg/api/p2p/compat/template/block.qtpl:320
+					//line pkg/api/p2p/compat/template/block.qtpl:321
 					qw422016.N().S(`,
                                     "nonce":  `)
-					//line pkg/api/p2p/compat/template/block.qtpl:321
+					//line pkg/api/p2p/compat/template/block.qtpl:322
 					qw422016.N().QZ(attachment.GetStringBytes("encryptToSelfMessage", "nonce"))
-					//line pkg/api/p2p/compat/template/block.qtpl:321
+					//line pkg/api/p2p/compat/template/block.qtpl:322
 					qw422016.N().S(`
                                 }
                                 `)
-					//line pkg/api/p2p/compat/template/block.qtpl:323
+					//line pkg/api/p2p/compat/template/block.qtpl:324
 				}
-				//line pkg/api/p2p/compat/template/block.qtpl:323
+				//line pkg/api/p2p/compat/template/block.qtpl:324
 				qw422016.N().S(`
                             }
                             `)
-				//line pkg/api/p2p/compat/template/block.qtpl:325
+				//line pkg/api/p2p/compat/template/block.qtpl:326
 			}
-			//line pkg/api/p2p/compat/template/block.qtpl:325
+			//line pkg/api/p2p/compat/template/block.qtpl:326
 			qw422016.N().S(`
                         }`)
-			//line pkg/api/p2p/compat/template/block.qtpl:326
+			//line pkg/api/p2p/compat/template/block.qtpl:327
 			if txId+1 < len(transactions) {
-				//line pkg/api/p2p/compat/template/block.qtpl:326
+				//line pkg/api/p2p/compat/template/block.qtpl:327
 				qw422016.N().S(`,`)
-				//line pkg/api/p2p/compat/template/block.qtpl:326
+				//line pkg/api/p2p/compat/template/block.qtpl:327
 			}
-			//line pkg/api/p2p/compat/template/block.qtpl:326
+			//line pkg/api/p2p/compat/template/block.qtpl:327
 			qw422016.N().S(`
                     `)
-			//line pkg/api/p2p/compat/template/block.qtpl:327
+			//line pkg/api/p2p/compat/template/block.qtpl:328
 		}
-		//line pkg/api/p2p/compat/template/block.qtpl:327
+		//line pkg/api/p2p/compat/template/block.qtpl:328
 		qw422016.N().S(`
                 ]
             }`)
-		//line pkg/api/p2p/compat/template/block.qtpl:329
+		//line pkg/api/p2p/compat/template/block.qtpl:330
 		if blockId+1 < len(blocks) {
-			//line pkg/api/p2p/compat/template/block.qtpl:329
+			//line pkg/api/p2p/compat/template/block.qtpl:330
 			qw422016.N().S(`,`)
-			//line pkg/api/p2p/compat/template/block.qtpl:329
+			//line pkg/api/p2p/compat/template/block.qtpl:330
 		}
-		//line pkg/api/p2p/compat/template/block.qtpl:329
+		//line pkg/api/p2p/compat/template/block.qtpl:330
 		qw422016.N().S(`
         `)
-		//line pkg/api/p2p/compat/template/block.qtpl:330
+		//line pkg/api/p2p/compat/template/block.qtpl:331
 	}
-	//line pkg/api/p2p/compat/template/block.qtpl:330
+	//line pkg/api/p2p/compat/template/block.qtpl:331
 	qw422016.N().S(`
     ]
 }
 `)
-//line pkg/api/p2p/compat/template/block.qtpl:333
+//line pkg/api/p2p/compat/template/block.qtpl:334
 }
 
-//line pkg/api/p2p/compat/template/block.qtpl:333
+//line pkg/api/p2p/compat/template/block.qtpl:334
 func WriteUpgrade(qq422016 qtio422016.Writer, src *fastjson.Value) {
-	//line pkg/api/p2p/compat/template/block.qtpl:333
+	//line pkg/api/p2p/compat/template/block.qtpl:334
 	qw422016 := qt422016.AcquireWriter(qq422016)
-	//line pkg/api/p2p/compat/template/block.qtpl:333
+	//line pkg/api/p2p/compat/template/block.qtpl:334
 	StreamUpgrade(qw422016, src)
-	//line pkg/api/p2p/compat/template/block.qtpl:333
+	//line pkg/api/p2p/compat/template/block.qtpl:334
 	qt422016.ReleaseWriter(qw422016)
-//line pkg/api/p2p/compat/template/block.qtpl:333
+//line pkg/api/p2p/compat/template/block.qtpl:334
 }
 
-//line pkg/api/p2p/compat/template/block.qtpl:333
+//line pkg/api/p2p/compat/template/block.qtpl:334
 func Upgrade(src *fastjson.Value) string {
-	//line pkg/api/p2p/compat/template/block.qtpl:333
+	//line pkg/api/p2p/compat/template/block.qtpl:334
 	qb422016 := qt422016.AcquireByteBuffer()
-	//line pkg/api/p2p/compat/template/block.qtpl:333
+	//line pkg/api/p2p/compat/template/block.qtpl:334
 	WriteUpgrade(qb422016, src)
-	//line pkg/api/p2p/compat/template/block.qtpl:333
+	//line pkg/api/p2p/compat/template/block.qtpl:334
 	qs422016 := string(qb422016.B)
-	//line pkg/api/p2p/compat/template/block.qtpl:333
+	//line pkg/api/p2p/compat/template/block.qtpl:334
 	qt422016.ReleaseByteBuffer(qb422016)
-	//line pkg/api/p2p/compat/template/block.qtpl:333
+	//line pkg/api/p2p/compat/template/block.qtpl:334
 	return qs422016
-//line pkg/api/p2p/compat/template/block.qtpl:333
+//line pkg/api/p2p/compat/template/block.qtpl:334
 }

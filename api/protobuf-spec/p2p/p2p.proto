@@ -37,7 +37,7 @@ message Block {
     int64 totalFee = 10;
     bytes blockATs = 11;
     uint64 previousBlock = 12;
-    uint64 timestamp = 13;
+    uint32 timestamp = 13;
     uint64 id = 14;
     int32 height = 15;
     bytes previousBlockHash = 16;

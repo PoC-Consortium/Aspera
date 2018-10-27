@@ -192,7 +192,7 @@ type Block struct {
 	TotalFee             int64      `protobuf:"varint,10,opt,name=totalFee" json:"totalFee,omitempty"`
 	BlockATs             []byte     `protobuf:"bytes,11,opt,name=blockATs,proto3" json:"blockATs,omitempty"`
 	PreviousBlock        uint64     `protobuf:"varint,12,opt,name=previousBlock" json:"previousBlock,omitempty"`
-	Timestamp            uint64     `protobuf:"varint,13,opt,name=timestamp" json:"timestamp,omitempty"`
+	Timestamp            uint32     `protobuf:"varint,13,opt,name=timestamp" json:"timestamp,omitempty"`
 	Id                   uint64     `protobuf:"varint,14,opt,name=id" json:"id,omitempty"`
 	Height               int32      `protobuf:"varint,15,opt,name=height" json:"height,omitempty"`
 	PreviousBlockHash    []byte     `protobuf:"bytes,16,opt,name=previousBlockHash,proto3" json:"previousBlockHash,omitempty"`
@@ -309,7 +309,7 @@ func (m *Block) GetPreviousBlock() uint64 {
 	return 0
 }
 
-func (m *Block) GetTimestamp() uint64 {
+func (m *Block) GetTimestamp() uint32 {
 	if m != nil {
 		return m.Timestamp
 	}

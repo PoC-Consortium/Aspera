@@ -8,6 +8,7 @@ import (
 	"go.uber.org/zap"
 
 	api "github.com/ac0v/aspera/pkg/api/p2p"
+	"github.com/ac0v/aspera/pkg/block"
 	"github.com/ac0v/aspera/pkg/config"
 	. "github.com/ac0v/aspera/pkg/log"
 	s "github.com/ac0v/aspera/pkg/store"
@@ -127,15 +128,20 @@ func (s *Synchronizer) validateBlocks() {
 				s.blockBatchesGlue <- []*api.Block{blockBatch.blocks[0]}
 				continue
 			}
+
+			blockWrappers := make([]*block.Block, len(blocks))
+			for i, b := range blocks {
+				blockWrappers[i] = block.NewBlock(b)
+			}
+
 			var err error
-			//for i, b := range blocks[1 : len(blocks)-1] {
-			// blocks[i] is the previousBlock .. cause that's a slice above
-			// - starting with element no. 2
-			// ToDo:
-			// if err = b.Validate(blocks[i]); err != nil {
-			// 	break
-			// }
-			//}
+			for i, b := range blockWrappers[1 : len(blockWrappers)-1] {
+				// blocks[i] is the previousBlock .. cause that's a slice above
+				// - starting with element no. 2
+				if err = b.Validate(blockWrappers[i]); err != nil {
+					break
+				}
+			}
 
 			if err != nil {
 				Log.Error("got invalid blocks", zap.Error(err))

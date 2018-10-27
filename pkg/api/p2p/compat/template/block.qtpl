@@ -1,5 +1,6 @@
 {% import "github.com/valyala/fastjson" %}
 {% import "encoding/base64" %}
+{% import "github.com/ac0v/aspera/pkg/encoding" %}
 {% func Upgrade(src *fastjson.Value) %}
 {
     "nextBlocks": [
@@ -10,17 +11,17 @@
             {
                 "timestamp":           {%d block.GetInt("timestamp") %},
                 "previousBlock":       {%qz= block.GetStringBytes("previousBlock") %},
-                "blockATs":            {%qz= block.GetStringBytes("blockATs") %},
+                "blockATs":            {%qz= encoding.HexStringBytesToBase64Bytes(block.GetStringBytes("blockATs")) %},
                 "totalFee":            {%d block.GetInt("totalFeeNQT") %},
                 "nonce":               {%qz= block.GetStringBytes("nonce") %},
                 "version":             {%d block.GetInt("version") %},
-                "blockSignature":      {%qz= block.GetStringBytes("blockSignature") %},
-                "payloadHash":         {%qz= block.GetStringBytes("payloadHash") %},
-                "generatorPublicKey":  {%qz= block.GetStringBytes("generatorPublicKey") %},
-                "generationSignature": {%qz= block.GetStringBytes("generationSignature") %},
+                "blockSignature":      {%qz= encoding.HexStringBytesToBase64Bytes(block.GetStringBytes("blockSignature")) %},
+                "payloadHash":         {%qz= encoding.HexStringBytesToBase64Bytes(block.GetStringBytes("payloadHash")) %},
+                "generatorPublicKey":  {%qz= encoding.HexStringBytesToBase64Bytes(block.GetStringBytes("generatorPublicKey")) %},
+                "generationSignature": {%qz= encoding.HexStringBytesToBase64Bytes(block.GetStringBytes("generationSignature")) %},
                 "totalAmount":         {%d block.GetInt("totalAmountNQT") %},
                 "payloadLength":       {%d block.GetInt("payloadLength") %},
-                "previousBlockHash":   {%qz= block.GetStringBytes("previousBlockHash") %},
+                "previousBlockHash":   {%qz= encoding.HexStringBytesToBase64Bytes(block.GetStringBytes("previousBlockHash")) %},
                 "transactions": [
                     {% code
                        transactions := block.GetArray("transactions")

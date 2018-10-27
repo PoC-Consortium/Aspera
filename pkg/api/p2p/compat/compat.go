@@ -1,9 +1,9 @@
 package compat
 
 import (
-	"github.com/ac0v/aspera/pkg/api/p2p/compat/template"
-
 	"github.com/valyala/fastjson"
+
+	"github.com/ac0v/aspera/pkg/api/p2p/compat/template"
 )
 
 func Upgrade(srcBs []byte) ([]byte, error) {
