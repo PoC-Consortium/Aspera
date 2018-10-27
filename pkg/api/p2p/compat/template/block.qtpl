@@ -1,0 +1,333 @@
+{% import "github.com/valyala/fastjson" %}
+{% import "encoding/base64" %}
+{% func Upgrade(src *fastjson.Value) %}
+{
+    "nextBlocks": [
+        {% code
+           blocks := src.GetArray("nextBlocks")
+        %}
+        {% for blockId, block := range blocks %}
+            {
+                "timestamp":           {%d block.GetInt("timestamp") %},
+                "previousBlock":       {%qz= block.GetStringBytes("previousBlock") %},
+                "blockATs":            {%qz= block.GetStringBytes("blockATs") %},
+                "totalFee":            {%d block.GetInt("totalFeeNQT") %},
+                "nonce":               {%qz= block.GetStringBytes("nonce") %},
+                "version":             {%d block.GetInt("version") %},
+                "blockSignature":      {%qz= block.GetStringBytes("blockSignature") %},
+                "payloadHash":         {%qz= block.GetStringBytes("payloadHash") %},
+                "generatorPublicKey":  {%qz= block.GetStringBytes("generatorPublicKey") %},
+                "generationSignature": {%qz= block.GetStringBytes("generationSignature") %},
+                "totalAmount":         {%d block.GetInt("totalAmountNQT") %},
+                "payloadLength":       {%d block.GetInt("payloadLength") %},
+                "previousBlockHash":   {%qz= block.GetStringBytes("previousBlockHash") %},
+                "transactions": [
+                    {% code
+                       transactions := block.GetArray("transactions")
+                    %}
+                    {% for txId, tx := range transactions %}
+                        {% code
+                           surtype    := tx.GetInt("type")
+                           subtype    := tx.GetInt("subtype")
+                           attachment := tx.Get("attachment")
+                        %}
+                        {
+                            {% switch surtype %}
+                            {% case 0 %}
+                                {% switch subtype %}
+                                {% case 0 %}
+                                "@type":"type.googleapis.com/p2p.OrdinaryPayment",
+                                {% case 1 %}
+                                "@type":"type.googleapis.com/p2p.MultiOutCreation",
+                                "attachment": {
+                                    "recipients": [
+                                        {% code
+                                           recipients := attachment.GetArray("recipients")
+                                         %}
+                                        {% for recipientId, recipient := range recipients %}
+                                            {
+                                                "id":     {%qz= recipient.GetStringBytes("0") %},
+                                                "amount": {%qz= recipient.GetStringBytes("1") %}
+                                            }{% if recipientId + 1 < len(recipients) %},{% endif %}
+                                        {% endfor %}
+                                    ]
+                                },
+                                {% case 2 %}
+                                "@type":"type.googleapis.com/p2p.MultiSameOutCreation",
+                                "attachment": {
+                                    "recipients": [
+                                        {% code
+                                           recipients := attachment.GetArray("recipients")
+                                         %}
+                                        {% for recipientId, recipient := range recipients %}
+                                        {%qz= recipient.GetStringBytes() %}{% if recipientId + 1 < len(recipients) %},{% endif %}
+                                        {% endfor %}
+                                    ]
+                                },
+                                {% endswitch %}
+                            {% case 1 %}
+                                {% switch subtype %}
+                                {% case 0 %}
+                                "@type":"type.googleapis.com/p2p.ArbitaryMessage",
+                                {% case 1 %}
+                                "@type":"type.googleapis.com/p2p.AliasAssignment",
+                                "attachment": {
+                                    "alias": {%qz= attachment.GetStringBytes("alias") %},
+                                    "uri": {%qz= attachment.GetStringBytes("uri") %}
+                                },
+                                {% case 5 %}
+                                "@type":"type.googleapis.com/p2p.AccountInfo",
+                                "attachment": {
+                                    "name": {%qz= attachment.GetStringBytes("name") %},
+                                    "description": {%qz= attachment.GetStringBytes("description") %}
+                                },
+                                {% case 6 %}
+                                "@type":"type.googleapis.com/p2p.AliasSell",
+                                "attachment": {
+                                    "name": {%qz= attachment.GetStringBytes("alias") %},
+                                    "price": {%d attachment.GetInt("priceNQT") %}
+                                },
+                                {% case 7 %}
+                                "@type":"type.googleapis.com/p2p.AliasBuy",
+                                "attachment": {
+                                    "name": {%qz= attachment.GetStringBytes("alias") %}
+                                },
+                                {% endswitch %}
+                            {% case 2 %}
+                                {% switch subtype %}
+                                {% case 0 %}
+                                "@type":"type.googleapis.com/p2p.AssetIssuance",
+                                "attachment": {
+                                    "name": {%qz= attachment.GetStringBytes("name") %},
+                                    "description": {%qz= attachment.GetStringBytes("description") %},
+                                    "quantity": {%d attachment.GetInt("quantityQNT") %},
+                                    "decimals": {%d attachment.GetInt("decimals") %},
+                                    "comment": {%qz= attachment.GetStringBytes("comment") %}
+                                },
+                                {% case 1 %}
+                                "@type":"type.googleapis.com/p2p.AssetTransfer",
+                                "attachment": {
+                                    "asset": {%qz= attachment.GetStringBytes("asset") %},
+                                    "quantity": {%d attachment.GetInt("quantityQNT") %},
+                                    "comment": {%qz= attachment.GetStringBytes("comment") %}
+                                },
+                                {% case 2 %}
+                                "@type":"type.googleapis.com/p2p.AskOrderPlacement",
+                                "attachment": {
+                                    "asset": {%qz= attachment.GetStringBytes("asset") %},
+                                    "quantity": {%d attachment.GetInt("quantityQNT") %},
+                                    "price": {%d attachment.GetInt("priceNQT") %},
+                                    "comment": {%qz= attachment.GetStringBytes("comment") %}
+                                },
+                                {% case 3 %}
+                                "@type":"type.googleapis.com/p2p.BidOrderPlacement",
+                                "attachment": {
+                                    "asset": {%qz= attachment.GetStringBytes("asset") %},
+                                    "quantity": "{%d attachment.GetInt("quantityQNT") %}",
+                                    "price": "{%d attachment.GetInt("priceNQT") %}"
+                                },
+                                {% case 4 %}
+                                "@type":"type.googleapis.com/p2p.AskOrderCancellation",
+                                "attachment": {
+                                    "order": {%qz= attachment.GetStringBytes("order") %}
+                                },
+                                {% case 5 %}
+                                "@type":"type.googleapis.com/p2p.BidOrderCancellation",
+                                "attachment": {
+                                    "order": {%qz= attachment.GetStringBytes("order") %}
+                                },
+                                {% endswitch %}
+                            {% case 3 %}
+                                {% switch subtype %}
+                                {% case 0 %}
+                                "@type":"type.googleapis.com/p2p.DigitalGoodsListing",
+                                "attachment": {
+                                    "name": {%qz= attachment.GetStringBytes("name") %},
+                                    "description": {%qz= attachment.GetStringBytes("description") %},
+                                    "tags": {%qz= attachment.GetStringBytes("tags") %},
+                                    "quantity": {%d attachment.GetInt("quantityQNT") %},
+                                    "price": "{%d attachment.GetInt("priceNQT") %}"
+                                },
+                                {% case 1 %}
+                                "@type":"type.googleapis.com/p2p.DigitalGoodsDelisting",
+                                "attachment": {
+                                    "id": {%qz= attachment.GetStringBytes("goods") %}
+                                },
+                                {% case 2 %}
+                                "@type":"type.googleapis.com/p2p.DigitalGoodsPriceChange",
+                                "attachment": {
+                                    "id": {%qz= attachment.GetStringBytes("goods") %},
+                                    "price": "{%d attachment.GetInt("priceNQT") %}"
+                                },
+                                {% case 3 %}
+                                "@type":"type.googleapis.com/p2p.DigitalGoodsQuantityChange",
+                                "attachment": {
+                                    "id": {%qz= attachment.GetStringBytes("goods") %},
+                                    "delta": {%d attachment.GetInt("deltaQuantityQNT") %}
+                                },
+                                {% case 4 %}
+                                "@type":"type.googleapis.com/p2p.DigitalGoodsPurchase",
+                                "attachment": {
+                                    "id": {%qz= attachment.GetStringBytes("goods") %},
+                                    "quantity": {%d attachment.GetInt("quantityQNT") %},
+                                    "price": "{%d attachment.GetInt("priceNQT") %}",
+                                    "deliveryDeadlineTimestamp": {%d attachment.GetInt("deliveryDeadlineTimestamp") %}
+                                },
+                                {% case 5 %}
+                                "@type":"type.googleapis.com/p2p.DigitalGoodsDelivery",
+                                "attachment": {
+                                    "purchase": {%qz= attachment.GetStringBytes("purchase") %},
+                                    "isText": {% if attachment.GetBool("goodsIsText") %}true{% else %}false{% endif %},
+                                    "data": {%qz= attachment.GetStringBytes("goodsData") %},
+                                    "nonce": {%qz= attachment.GetStringBytes("goodsNonce") %},
+                                    "discount": "{%d attachment.GetInt("discountNQT") %}"
+                                },
+                                {% case 6 %}
+                                "@type":"type.googleapis.com/p2p.DigitalGoodsFeedback",
+                                "attachment": {
+                                    "purchase": {%qz= attachment.GetStringBytes("purchase") %}
+                                },
+                                {% case 7 %}
+                                "@type":"type.googleapis.com/p2p.DigitalGoodsRefund",
+                                "attachment": {
+                                    "purchase": {%qz= attachment.GetStringBytes("purchase") %},
+                                    "refund": "{%d attachment.GetInt("refundNQT") %}"
+                                },
+                                {% endswitch %}
+                            {% case 4 %}
+                                {% switch subtype %}
+                                {% case 0%}
+                                "@type":"type.googleapis.com/p2p.EffectiveBalanceLeasing",
+                                "attachment": {
+                                    "period": {%d attachment.GetInt("period") %}
+                                },
+                                {% endswitch %}
+                            {% case 20 %}
+                                {% switch subtype %}
+                                {% case 0%}
+                                "@type":"type.googleapis.com/p2p.RewardRecipientAssignment",
+                                {% endswitch %}
+                            {% case 21 %}
+                                {% switch subtype %}
+                                {% case 0 %}
+                                "@type":"type.googleapis.com/p2p.EscrowCreation",
+                                "attachment": {
+                                    "amount": {%qz= attachment.GetStringBytes("amountNQT") %},
+                                    "deadline": {%d attachment.GetInt("deadline") %},
+                                    "deadlineAction": {%qz= attachment.GetStringBytes("deadlineAction") %},
+                                    "requiredSigners": {%d attachment.GetInt("requiredSigners") %},
+                                    "signers": [
+                                        {% code
+                                         signers := attachment.GetArray("signers")
+                                         %}
+                                        {% for signerId, signer := range signers %}
+                                        {%qz= signer.GetStringBytes() %}{% if signerId + 1 < len(signers) %},{% endif %}
+                                        {% endfor %}
+                                    ]
+                                },
+                                {% case 1 %}
+                                "@type":"type.googleapis.com/p2p.EscrowSign",
+                                "attachment": {
+                                    "id": {%qz= attachment.GetStringBytes("escrowID") %},
+                                    "decision": {%d attachment.GetInt("decision") %}
+                                },
+                                {% case 2 %}
+                                "@type":"type.googleapis.com/p2p.EscrowResult",
+                                "attachment": {
+                                    "id": {%qz= attachment.GetStringBytes("escrowID") %},
+                                    "decision": {%d attachment.GetInt("decision") %}
+                                },
+                                {% case 3 %}
+                                "@type":"type.googleapis.com/p2p.SubscriptionSubscribe",
+                                "attachment": {
+                                    "frequency": {%d attachment.GetInt("frequency") %}
+                                },
+                                {% case 4 %}
+                                "@type":"type.googleapis.com/p2p.SubscriptionCancel",
+                                "attachment": {
+                                    "id": {%qz= attachment.GetStringBytes("subscriptionId") %}
+                                },
+                                {% case 5 %}
+                                "@type":"type.googleapis.com/p2p.SubscriptionPayment",
+                                "attachment": {
+                                    "ids": [
+                                        {% code
+                                         subscribers := attachment.GetArray("subscriptionIDs")
+                                         %}
+                                        {% for subscriberId, subscriber := range subscribers %}
+                                        {%qz= subscriber.GetStringBytes() %}{% if subscriberId + 1 < len(subscribers) %},{% endif %}
+                                        {% endfor %}
+                                    ]
+                                }
+                                {% endswitch %}
+                            {% case 22 %}
+                                {% switch subtype %}
+                                {% case 0%}
+                                "@type":"type.googleapis.com/p2p.AutomatedTransactionsCreation",
+                                "attachment": {
+                                    "name": {%qz= attachment.GetStringBytes("name") %},
+                                    "description": {%qz= attachment.GetStringBytes("description") %},
+                                    "bytes": {%qz= []byte(base64.StdEncoding.EncodeToString(attachment.GetStringBytes("creationBytes"))) %}
+                                },
+                                {% case 1%}
+                                "@type":"type.googleapis.com/p2p.AutomatedTransactionsPayment",
+                                {% endswitch %}
+                            {% endswitch %}
+                            "header": {
+                                "version":         {%d tx.GetInt("version") %},
+                                "timestamp":       {%d tx.GetInt("timestamp") %},
+                                "amount":          {%d tx.GetInt("amountNQT") %},
+                                "fee":             {%d tx.GetInt("feeNQT") %},
+                                {% if tx.Exists("recipient") %}
+                                "recipient":       {%qz= tx.GetStringBytes("recipient") %},
+                                {% endif %}
+                                "senderPublicKey": {%qz= tx.GetStringBytes("senderPublicKey") %},
+                                "deadline":        {%d tx.GetInt("deadline") %},
+                                "ecBlockId":       {%qz= tx.GetStringBytes("ecBlockId") %},
+                                "ecBlockHeight":   {%d tx.GetInt("ecBlockHeight") %},
+                                "signature":       {%qz= tx.GetStringBytes("signature") %}
+                            }
+                            {% code
+                               hasMessage               :=  attachment.Exists("version.Message")
+                               hasEncryptedMessage      :=  attachment.Exists("version.EncryptedMessage")
+                               hasPublicKeyAnnouncement :=  attachment.Exists("version.PublicKeyAnnouncement")
+                               hasEncryptToSelfMessage  :=  attachment.Exists("version.EncryptToSelfMessage")
+                             %}
+                            {% if hasMessage || hasEncryptedMessage || hasPublicKeyAnnouncement || hasEncryptToSelfMessage %}
+                            ,
+                            "appendix": {
+                                {% if hasMessage %}
+                                "message": {
+                                    "isText":  {% if attachment.GetBool("messageIsText") %}true{% else %}false{% endif %},
+                                    "content": {%qz= attachment.GetStringBytes("message") %}
+                                }{% if hasEncryptedMessage || hasPublicKeyAnnouncement || hasEncryptToSelfMessage %},{% endif %}
+                                {% endif %}
+                                {% if hasEncryptedMessage %}
+                                "encryptedMessage": {
+                                    "data":   {%qz= attachment.GetStringBytes("encryptedMessage", "data") %},
+                                    "isText": {% if attachment.GetBool("encryptedMessage", "isText") %}true{% else %}false{% endif %},
+                                    "nonce":  {%qz= attachment.GetStringBytes("encryptedMessage", "nonce") %}
+                                }{% if hasPublicKeyAnnouncement || hasEncryptToSelfMessage %},{% endif %}
+                                {% endif %}
+                                {% if hasPublicKeyAnnouncement %}
+                                "publicKeyAnnouncement": {
+                                    "publicKey": {%qz= attachment.GetStringBytes("recipientPublicKey") %}
+                                }{% if hasEncryptToSelfMessage %},{% endif %}
+                                {% endif %}
+                                {% if hasEncryptToSelfMessage %}    
+                                "encryptToSelfMessage": {
+                                    "data":   {%qz= attachment.GetStringBytes("encryptToSelfMessage", "data") %},
+                                    "isText": {% if attachment.GetBool("encryptToSelfMessage", "isText") %}true{% else %}false{% endif %},
+                                    "nonce":  {%qz= attachment.GetStringBytes("encryptToSelfMessage", "nonce") %}
+                                }
+                                {% endif %}
+                            }
+                            {% endif %}
+                        }{% if txId + 1 < len(transactions) %},{% endif %}
+                    {% endfor %}
+                ]
+            }{% if blockId + 1 < len(blocks) %},{% endif %}
+        {% endfor %}
+    ]
+}
+{% endfunc %}

@@ -11,7 +11,7 @@ message TransactionHeader {
     uint32 timestamp = 2;
     uint32 deadline = 3;
     bytes senderPublicKey = 4;
-    uint64 recipients = 5;
+    uint64 recipient = 5;
     uint64 amount = 6;
     uint64 fee = 7;
     bytes referencedTransactionFullHash = 8;
@@ -21,8 +21,22 @@ message TransactionHeader {
 }
 
 message Appendix {
-    uint32 version = 1;
-    google.protobuf.Any data = 2;
+    message Message {
+        bool isText = 1;
+        string content = 2;
+    }
+    message EncryptedMessage {
+        bool isText = 1;
+        bytes data = 2;
+        bytes nonce = 3;
+    }
+    message PublicKeyAnnouncement {
+        bytes publicKey = 1;
+    }
+    Message message = 1;
+    EncryptedMessage encryptedMessage = 2;
+    EncryptedMessage encryptToSelfMessage = 3;
+    PublicKeyAnnouncement publicKeyAnnouncement = 4;
 }
 
 message MultiOutCreation {    
@@ -35,7 +49,7 @@ message MultiOutCreation {
     }
     TransactionHeader header = 1;
     Attachment attachment = 2;
-    repeated Appendix appendixes = 3;
+    Appendix appendix = 3;
 }
 
 message MultiSameOutCreation {
@@ -44,14 +58,12 @@ message MultiSameOutCreation {
     }
     TransactionHeader header = 1;
     Attachment attachment = 2;
-    repeated Appendix appendixes = 3;
+    Appendix appendix = 3;
 }
 
 message ArbitaryMessage {
-    message Attachment {}
     TransactionHeader header = 1;
-    Attachment attachment = 2;
-    repeated Appendix appendixes = 3;
+    Appendix appendix = 2;
 }
 
 message AliasAssignment {
@@ -61,7 +73,7 @@ message AliasAssignment {
     }
     TransactionHeader header = 1;
     Attachment attachment = 2;
-    repeated Appendix appendixes = 3;
+    Appendix appendix = 3;
 }
 
 message AccountInfo {
@@ -71,26 +83,26 @@ message AccountInfo {
     }
     TransactionHeader header = 1;
     Attachment attachment = 2;
-    repeated Appendix appendixes = 3;
+    Appendix appendix = 3;
 }
 
 message AliasSell {
     message Attachment { 
-        string alias = 1;
+        string name = 1;
         int64 price = 2;
     }
     TransactionHeader header = 1;
     Attachment attachment = 2;
-    repeated Appendix appendixes = 3;
+    Appendix appendix = 3;
 }
 
 message AliasBuy {
     message Attachment {
-        string alias = 1;
+        string name = 1;
     }
     TransactionHeader header = 1;
     Attachment attachment = 2;
-    repeated Appendix appendixes = 3;
+    Appendix appendix = 3;
 }
 
 message AssetIssuance {
@@ -103,30 +115,30 @@ message AssetIssuance {
     }
     TransactionHeader header = 1;
     Attachment attachment = 2;
-    repeated Appendix appendixes = 3;
+    Appendix appendix = 3;
 }
 
 message AssetTransfer {
     message Attachment {
-        uint64 asserassert = 1;
+        uint64 asset = 1;
         uint64 quantity = 2;
         string comment = 3;
     }
     TransactionHeader header = 1;
     Attachment attachment = 2;
-    repeated Appendix appendixes = 3;
+    Appendix appendix = 3;
 }
 
 message AskOrderPlacement {
     message Attachment {
-        uint64 assetTransfer = 1;
+        uint64 asset = 1;
         uint64 quantity = 2;
         uint64 price = 3;
         string comment = 4;
     }
     TransactionHeader header = 1;
     Attachment attachment = 2;
-    repeated Appendix appendixes = 3;
+    Appendix appendix = 3;
 }
 
 message BidOrderPlacement {
@@ -137,7 +149,7 @@ message BidOrderPlacement {
     }
     TransactionHeader header = 1;
     Attachment attachment = 2;
-    repeated Appendix appendixes = 3;
+    Appendix appendix = 3;
 }
 
 message AskOrderCancellation {
@@ -146,7 +158,7 @@ message AskOrderCancellation {
     }
     TransactionHeader header = 1;
     Attachment attachment = 2;
-    repeated Appendix appendixes = 3;
+    Appendix appendix = 3;
 }
 
 message BidOrderCancellation {
@@ -155,74 +167,74 @@ message BidOrderCancellation {
     }
     TransactionHeader header = 1;
     Attachment attachment = 2;
-    repeated Appendix appendixes = 3;
+    Appendix appendix = 3;
 }
 
 message DigitalGoodsListing {
     message Attachment {
         string name = 1;
         string description = 2;
-        string tags = 3; // repeated ?
+        string tags = 3; // ToDo: repeated ?
         uint32 quantity = 4;
         uint64 price = 5;
     }
     TransactionHeader header = 1;
     Attachment attachment = 2;
-    repeated Appendix appendixes = 3;
+    Appendix appendix = 3;
 }
 
 message DigitalGoodsDelisting {
     message Attachment {
-        uint64 goods = 1;
+        uint64 id = 1;
     }
     TransactionHeader header = 1;
     Attachment attachment = 2;
-    repeated Appendix appendixes = 3;
+    Appendix appendix = 3;
 }
 
 message DigitalGoodsPriceChange {
     message Attachment {
-        uint64 goods = 1;
+        uint64 id = 1;
         uint64 price = 2;
     }
     TransactionHeader header = 1;
     Attachment attachment = 2;
-    repeated Appendix appendixes = 3;
+    Appendix appendix = 3;
 }
 
 message DigitalGoodsQuantityChange {
     message Attachment {
-        uint64 goods = 1;
-        int32 deltaQuantity = 2;
+        uint64 id = 1;
+        int32 delta = 2;
     }
     TransactionHeader header = 1;
     Attachment attachment = 2;
-    repeated Appendix appendixes = 3;
+    Appendix appendix = 3;
 }
 
 message DigitalGoodsPurchase {
     message Attachment {
-        uint64 goods = 1;
+        uint64 id = 1;
         uint32 quantity = 2;
         uint64 price = 3;
         uint32 deliveryDeadlineTimestamp = 4;
     }
     TransactionHeader header = 1;
     Attachment attachment = 2;
-    repeated Appendix appendixes = 3;
+    Appendix appendix = 3;
 }
 
 message DigitalGoodsDelivery {
     message Attachment {
         uint64 purchase = 1;
-        bool goodsIsText = 2;
-        bytes goodsData = 3;
-        bytes goodsNonce = 4;
+        bool isText = 2;
+        bytes data = 3;
+        bytes nonce = 4;
         uint64 discount = 5;
     }
     TransactionHeader header = 1;
     Attachment attachment = 2;
-    repeated Appendix appendixes = 3;
+    Appendix appendix = 3;
 }
 
 message DigitalGoodsFeedback {
@@ -231,17 +243,17 @@ message DigitalGoodsFeedback {
     }
     TransactionHeader header = 1;
     Attachment attachment = 2;
-    repeated Appendix appendixes = 3;
+    Appendix appendix = 3;
 }
 
 message DigitalGoodsRefund {
     message Attachment {
         uint64 purchase = 1;
-        uint64 refundPrice = 2;
+        uint64 refund = 2;
     }
     TransactionHeader header = 1;
     Attachment attachment = 2;
-    repeated Appendix appendixes = 3;
+    Appendix appendix = 3;
 }
 
 message EffectiveBalanceLeasing {
@@ -250,22 +262,23 @@ message EffectiveBalanceLeasing {
     }
     TransactionHeader header = 1;
     Attachment attachment = 2;
-    repeated Appendix appendixes = 3;
+    Appendix appendix = 3;
 }
 
 message RewardRecipientAssignment {
     TransactionHeader header = 1;
-    repeated Appendix appendixes = 2;
+    Appendix appendix = 2;
+}
+
+enum DeadlineAction {
+    undecided = 0;
+    release = 1;
+    refund = 2;
+    split = 3;
 }
 
 message EscrowCreation {
     message Attachment {
-        enum DeadlineAction {
-            UNDECIDED = 0;
-            RELEASE = 1;
-            REFUND = 2;
-            SPLIT = 3;
-        }
         uint64 amount = 1;
         uint32 deadline = 2;
         DeadlineAction deadlineAction = 3;
@@ -274,27 +287,27 @@ message EscrowCreation {
     }
     TransactionHeader header = 1;
     Attachment attachment = 2;
-    repeated Appendix appendixes = 3;
+    Appendix appendix = 3;
 }
 
 message EscrowSign {
     message Attachment {
-        uint64 escrowID = 1;
-        uint32 decision = 2; // enum ?
+        uint64 id = 1;
+        DeadlineAction decision = 2;
     }
     TransactionHeader header = 1;
     Attachment attachment = 2;
-    repeated Appendix appendixes = 3;
+    Appendix appendix = 3;
 }
 
 message EscrowResult {
     message Attachment {
-        uint64 escrowID = 1;
-        uint32 decision = 2; // enum ?
+        uint64 id = 1;
+        DeadlineAction decision = 2;
     }
     TransactionHeader header = 1;
     Attachment attachment = 2;
-    repeated Appendix appendixes = 3;
+    Appendix appendix = 3;
 }
 
 message SubscriptionSubscribe {
@@ -303,64 +316,44 @@ message SubscriptionSubscribe {
     }
     TransactionHeader header = 1;
     Attachment attachment = 2;
-    repeated Appendix appendixes = 3;
+    Appendix appendix = 3;
 }
 
 message SubscriptionCancel {
     message Attachment {
-        uint64 subscriptionID = 1;
+        uint64 id = 1;
     }
     TransactionHeader header = 1;
     Attachment attachment = 2;
-    repeated Appendix appendixes = 3;
+    Appendix appendix = 3;
 }
 
 message SubscriptionPayment {
     message Attachment {
-        repeated uint64 subscriptionIDs = 1;
+        repeated uint64 ids = 1;
     }
     TransactionHeader header = 1;
     Attachment attachment = 2;
-    repeated Appendix appendixes = 3;
+    Appendix appendix = 3;
 }
 
 message AutomatedTransactionsCreation {
     message Attachment {
         string name = 1;
         string description = 2;
-        bytes creationBytes = 3;
+        bytes bytes = 3;
     }
     TransactionHeader header = 1;
     Attachment attachment = 2;
-    repeated Appendix appendixes = 3;
+    Appendix appendix = 3;
 }
 
 message AutomatedTransactionsPayment {
-    message Attachment {}
     TransactionHeader header = 1;
-    Attachment attachment = 2;
-    repeated Appendix appendixes = 3;
+    Appendix appendix = 2;
 }
 
-// Appendixes
-
-message Message {
-    bool isText = 1;
-    string content = 2;
-}
-
-message EncryptedMessage {
-    bool isText = 1;
-    bytes data = 2;
-    bytes nonce = 3;
-}
-
-message EncryptedToSelfMessage {
-    bool isText = 1;
-    bytes data = 2;
-    bytes nonce = 3;
-}
-
-message PublicKeyAnnouncement {
-    bytes publicKey = 1;
+message OrdinaryPayment {
+    TransactionHeader header = 1;
+    Appendix appendix = 2;
 }

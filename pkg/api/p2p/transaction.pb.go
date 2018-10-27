@@ -6,7 +6,7 @@ package p2p
 import proto "github.com/golang/protobuf/proto"
 import fmt "fmt"
 import math "math"
-import any "github.com/golang/protobuf/ptypes/any"
+import _ "github.com/golang/protobuf/ptypes/any"
 
 // Reference imports to suppress errors if they are not otherwise used.
 var _ = proto.Marshal
@@ -19,33 +19,33 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.ProtoPackageIsVersion2 // please upgrade the proto package
 
-type EscrowCreation_Attachment_DeadlineAction int32
+type DeadlineAction int32
 
 const (
-	EscrowCreation_Attachment_UNDECIDED EscrowCreation_Attachment_DeadlineAction = 0
-	EscrowCreation_Attachment_RELEASE   EscrowCreation_Attachment_DeadlineAction = 1
-	EscrowCreation_Attachment_REFUND    EscrowCreation_Attachment_DeadlineAction = 2
-	EscrowCreation_Attachment_SPLIT     EscrowCreation_Attachment_DeadlineAction = 3
+	DeadlineAction_undecided DeadlineAction = 0
+	DeadlineAction_release   DeadlineAction = 1
+	DeadlineAction_refund    DeadlineAction = 2
+	DeadlineAction_split     DeadlineAction = 3
 )
 
-var EscrowCreation_Attachment_DeadlineAction_name = map[int32]string{
-	0: "UNDECIDED",
-	1: "RELEASE",
-	2: "REFUND",
-	3: "SPLIT",
+var DeadlineAction_name = map[int32]string{
+	0: "undecided",
+	1: "release",
+	2: "refund",
+	3: "split",
 }
-var EscrowCreation_Attachment_DeadlineAction_value = map[string]int32{
-	"UNDECIDED": 0,
-	"RELEASE":   1,
-	"REFUND":    2,
-	"SPLIT":     3,
+var DeadlineAction_value = map[string]int32{
+	"undecided": 0,
+	"release":   1,
+	"refund":    2,
+	"split":     3,
 }
 
-func (x EscrowCreation_Attachment_DeadlineAction) String() string {
-	return proto.EnumName(EscrowCreation_Attachment_DeadlineAction_name, int32(x))
+func (x DeadlineAction) String() string {
+	return proto.EnumName(DeadlineAction_name, int32(x))
 }
-func (EscrowCreation_Attachment_DeadlineAction) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_transaction_c8a87d91d7888997, []int{25, 0, 0}
+func (DeadlineAction) EnumDescriptor() ([]byte, []int) {
+	return fileDescriptor_transaction_4cf31c87b402708a, []int{0}
 }
 
 type TransactionHeader struct {
@@ -53,7 +53,7 @@ type TransactionHeader struct {
 	Timestamp                     uint32   `protobuf:"varint,2,opt,name=timestamp" json:"timestamp,omitempty"`
 	Deadline                      uint32   `protobuf:"varint,3,opt,name=deadline" json:"deadline,omitempty"`
 	SenderPublicKey               []byte   `protobuf:"bytes,4,opt,name=senderPublicKey,proto3" json:"senderPublicKey,omitempty"`
-	Recipients                    uint64   `protobuf:"varint,5,opt,name=recipients" json:"recipients,omitempty"`
+	Recipient                     uint64   `protobuf:"varint,5,opt,name=recipient" json:"recipient,omitempty"`
 	Amount                        uint64   `protobuf:"varint,6,opt,name=amount" json:"amount,omitempty"`
 	Fee                           uint64   `protobuf:"varint,7,opt,name=fee" json:"fee,omitempty"`
 	ReferencedTransactionFullHash []byte   `protobuf:"bytes,8,opt,name=referencedTransactionFullHash,proto3" json:"referencedTransactionFullHash,omitempty"`
@@ -69,7 +69,7 @@ func (m *TransactionHeader) Reset()         { *m = TransactionHeader{} }
 func (m *TransactionHeader) String() string { return proto.CompactTextString(m) }
 func (*TransactionHeader) ProtoMessage()    {}
 func (*TransactionHeader) Descriptor() ([]byte, []int) {
-	return fileDescriptor_transaction_c8a87d91d7888997, []int{0}
+	return fileDescriptor_transaction_4cf31c87b402708a, []int{0}
 }
 func (m *TransactionHeader) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_TransactionHeader.Unmarshal(m, b)
@@ -117,9 +117,9 @@ func (m *TransactionHeader) GetSenderPublicKey() []byte {
 	return nil
 }
 
-func (m *TransactionHeader) GetRecipients() uint64 {
+func (m *TransactionHeader) GetRecipient() uint64 {
 	if m != nil {
-		return m.Recipients
+		return m.Recipient
 	}
 	return 0
 }
@@ -167,18 +167,20 @@ func (m *TransactionHeader) GetEcBlockId() uint64 {
 }
 
 type Appendix struct {
-	Version              uint32   `protobuf:"varint,1,opt,name=version" json:"version,omitempty"`
-	Data                 *any.Any `protobuf:"bytes,2,opt,name=data" json:"data,omitempty"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
+	Message               *Appendix_Message               `protobuf:"bytes,1,opt,name=message" json:"message,omitempty"`
+	EncryptedMessage      *Appendix_EncryptedMessage      `protobuf:"bytes,2,opt,name=encryptedMessage" json:"encryptedMessage,omitempty"`
+	EncryptToSelfMessage  *Appendix_EncryptedMessage      `protobuf:"bytes,3,opt,name=encryptToSelfMessage" json:"encryptToSelfMessage,omitempty"`
+	PublicKeyAnnouncement *Appendix_PublicKeyAnnouncement `protobuf:"bytes,4,opt,name=publicKeyAnnouncement" json:"publicKeyAnnouncement,omitempty"`
+	XXX_NoUnkeyedLiteral  struct{}                        `json:"-"`
+	XXX_unrecognized      []byte                          `json:"-"`
+	XXX_sizecache         int32                           `json:"-"`
 }
 
 func (m *Appendix) Reset()         { *m = Appendix{} }
 func (m *Appendix) String() string { return proto.CompactTextString(m) }
 func (*Appendix) ProtoMessage()    {}
 func (*Appendix) Descriptor() ([]byte, []int) {
-	return fileDescriptor_transaction_c8a87d91d7888997, []int{1}
+	return fileDescriptor_transaction_4cf31c87b402708a, []int{1}
 }
 func (m *Appendix) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_Appendix.Unmarshal(m, b)
@@ -198,16 +200,168 @@ func (m *Appendix) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_Appendix proto.InternalMessageInfo
 
-func (m *Appendix) GetVersion() uint32 {
+func (m *Appendix) GetMessage() *Appendix_Message {
 	if m != nil {
-		return m.Version
+		return m.Message
 	}
-	return 0
+	return nil
 }
 
-func (m *Appendix) GetData() *any.Any {
+func (m *Appendix) GetEncryptedMessage() *Appendix_EncryptedMessage {
+	if m != nil {
+		return m.EncryptedMessage
+	}
+	return nil
+}
+
+func (m *Appendix) GetEncryptToSelfMessage() *Appendix_EncryptedMessage {
+	if m != nil {
+		return m.EncryptToSelfMessage
+	}
+	return nil
+}
+
+func (m *Appendix) GetPublicKeyAnnouncement() *Appendix_PublicKeyAnnouncement {
+	if m != nil {
+		return m.PublicKeyAnnouncement
+	}
+	return nil
+}
+
+type Appendix_Message struct {
+	IsText               bool     `protobuf:"varint,1,opt,name=isText" json:"isText,omitempty"`
+	Content              string   `protobuf:"bytes,2,opt,name=content" json:"content,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *Appendix_Message) Reset()         { *m = Appendix_Message{} }
+func (m *Appendix_Message) String() string { return proto.CompactTextString(m) }
+func (*Appendix_Message) ProtoMessage()    {}
+func (*Appendix_Message) Descriptor() ([]byte, []int) {
+	return fileDescriptor_transaction_4cf31c87b402708a, []int{1, 0}
+}
+func (m *Appendix_Message) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_Appendix_Message.Unmarshal(m, b)
+}
+func (m *Appendix_Message) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_Appendix_Message.Marshal(b, m, deterministic)
+}
+func (dst *Appendix_Message) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Appendix_Message.Merge(dst, src)
+}
+func (m *Appendix_Message) XXX_Size() int {
+	return xxx_messageInfo_Appendix_Message.Size(m)
+}
+func (m *Appendix_Message) XXX_DiscardUnknown() {
+	xxx_messageInfo_Appendix_Message.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_Appendix_Message proto.InternalMessageInfo
+
+func (m *Appendix_Message) GetIsText() bool {
+	if m != nil {
+		return m.IsText
+	}
+	return false
+}
+
+func (m *Appendix_Message) GetContent() string {
+	if m != nil {
+		return m.Content
+	}
+	return ""
+}
+
+type Appendix_EncryptedMessage struct {
+	IsText               bool     `protobuf:"varint,1,opt,name=isText" json:"isText,omitempty"`
+	Data                 []byte   `protobuf:"bytes,2,opt,name=data,proto3" json:"data,omitempty"`
+	Nonce                []byte   `protobuf:"bytes,3,opt,name=nonce,proto3" json:"nonce,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *Appendix_EncryptedMessage) Reset()         { *m = Appendix_EncryptedMessage{} }
+func (m *Appendix_EncryptedMessage) String() string { return proto.CompactTextString(m) }
+func (*Appendix_EncryptedMessage) ProtoMessage()    {}
+func (*Appendix_EncryptedMessage) Descriptor() ([]byte, []int) {
+	return fileDescriptor_transaction_4cf31c87b402708a, []int{1, 1}
+}
+func (m *Appendix_EncryptedMessage) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_Appendix_EncryptedMessage.Unmarshal(m, b)
+}
+func (m *Appendix_EncryptedMessage) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_Appendix_EncryptedMessage.Marshal(b, m, deterministic)
+}
+func (dst *Appendix_EncryptedMessage) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Appendix_EncryptedMessage.Merge(dst, src)
+}
+func (m *Appendix_EncryptedMessage) XXX_Size() int {
+	return xxx_messageInfo_Appendix_EncryptedMessage.Size(m)
+}
+func (m *Appendix_EncryptedMessage) XXX_DiscardUnknown() {
+	xxx_messageInfo_Appendix_EncryptedMessage.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_Appendix_EncryptedMessage proto.InternalMessageInfo
+
+func (m *Appendix_EncryptedMessage) GetIsText() bool {
+	if m != nil {
+		return m.IsText
+	}
+	return false
+}
+
+func (m *Appendix_EncryptedMessage) GetData() []byte {
 	if m != nil {
 		return m.Data
+	}
+	return nil
+}
+
+func (m *Appendix_EncryptedMessage) GetNonce() []byte {
+	if m != nil {
+		return m.Nonce
+	}
+	return nil
+}
+
+type Appendix_PublicKeyAnnouncement struct {
+	PublicKey            []byte   `protobuf:"bytes,1,opt,name=publicKey,proto3" json:"publicKey,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *Appendix_PublicKeyAnnouncement) Reset()         { *m = Appendix_PublicKeyAnnouncement{} }
+func (m *Appendix_PublicKeyAnnouncement) String() string { return proto.CompactTextString(m) }
+func (*Appendix_PublicKeyAnnouncement) ProtoMessage()    {}
+func (*Appendix_PublicKeyAnnouncement) Descriptor() ([]byte, []int) {
+	return fileDescriptor_transaction_4cf31c87b402708a, []int{1, 2}
+}
+func (m *Appendix_PublicKeyAnnouncement) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_Appendix_PublicKeyAnnouncement.Unmarshal(m, b)
+}
+func (m *Appendix_PublicKeyAnnouncement) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_Appendix_PublicKeyAnnouncement.Marshal(b, m, deterministic)
+}
+func (dst *Appendix_PublicKeyAnnouncement) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Appendix_PublicKeyAnnouncement.Merge(dst, src)
+}
+func (m *Appendix_PublicKeyAnnouncement) XXX_Size() int {
+	return xxx_messageInfo_Appendix_PublicKeyAnnouncement.Size(m)
+}
+func (m *Appendix_PublicKeyAnnouncement) XXX_DiscardUnknown() {
+	xxx_messageInfo_Appendix_PublicKeyAnnouncement.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_Appendix_PublicKeyAnnouncement proto.InternalMessageInfo
+
+func (m *Appendix_PublicKeyAnnouncement) GetPublicKey() []byte {
+	if m != nil {
+		return m.PublicKey
 	}
 	return nil
 }
@@ -215,7 +369,7 @@ func (m *Appendix) GetData() *any.Any {
 type MultiOutCreation struct {
 	Header               *TransactionHeader           `protobuf:"bytes,1,opt,name=header" json:"header,omitempty"`
 	Attachment           *MultiOutCreation_Attachment `protobuf:"bytes,2,opt,name=attachment" json:"attachment,omitempty"`
-	Appendixes           []*Appendix                  `protobuf:"bytes,3,rep,name=appendixes" json:"appendixes,omitempty"`
+	Appendix             *Appendix                    `protobuf:"bytes,3,opt,name=appendix" json:"appendix,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}                     `json:"-"`
 	XXX_unrecognized     []byte                       `json:"-"`
 	XXX_sizecache        int32                        `json:"-"`
@@ -225,7 +379,7 @@ func (m *MultiOutCreation) Reset()         { *m = MultiOutCreation{} }
 func (m *MultiOutCreation) String() string { return proto.CompactTextString(m) }
 func (*MultiOutCreation) ProtoMessage()    {}
 func (*MultiOutCreation) Descriptor() ([]byte, []int) {
-	return fileDescriptor_transaction_c8a87d91d7888997, []int{2}
+	return fileDescriptor_transaction_4cf31c87b402708a, []int{2}
 }
 func (m *MultiOutCreation) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_MultiOutCreation.Unmarshal(m, b)
@@ -259,9 +413,9 @@ func (m *MultiOutCreation) GetAttachment() *MultiOutCreation_Attachment {
 	return nil
 }
 
-func (m *MultiOutCreation) GetAppendixes() []*Appendix {
+func (m *MultiOutCreation) GetAppendix() *Appendix {
 	if m != nil {
-		return m.Appendixes
+		return m.Appendix
 	}
 	return nil
 }
@@ -277,7 +431,7 @@ func (m *MultiOutCreation_Attachment) Reset()         { *m = MultiOutCreation_At
 func (m *MultiOutCreation_Attachment) String() string { return proto.CompactTextString(m) }
 func (*MultiOutCreation_Attachment) ProtoMessage()    {}
 func (*MultiOutCreation_Attachment) Descriptor() ([]byte, []int) {
-	return fileDescriptor_transaction_c8a87d91d7888997, []int{2, 0}
+	return fileDescriptor_transaction_4cf31c87b402708a, []int{2, 0}
 }
 func (m *MultiOutCreation_Attachment) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_MultiOutCreation_Attachment.Unmarshal(m, b)
@@ -318,7 +472,7 @@ func (m *MultiOutCreation_Attachment_Recipients) Reset() {
 func (m *MultiOutCreation_Attachment_Recipients) String() string { return proto.CompactTextString(m) }
 func (*MultiOutCreation_Attachment_Recipients) ProtoMessage()    {}
 func (*MultiOutCreation_Attachment_Recipients) Descriptor() ([]byte, []int) {
-	return fileDescriptor_transaction_c8a87d91d7888997, []int{2, 0, 0}
+	return fileDescriptor_transaction_4cf31c87b402708a, []int{2, 0, 0}
 }
 func (m *MultiOutCreation_Attachment_Recipients) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_MultiOutCreation_Attachment_Recipients.Unmarshal(m, b)
@@ -355,7 +509,7 @@ func (m *MultiOutCreation_Attachment_Recipients) GetAmount() uint64 {
 type MultiSameOutCreation struct {
 	Header               *TransactionHeader               `protobuf:"bytes,1,opt,name=header" json:"header,omitempty"`
 	Attachment           *MultiSameOutCreation_Attachment `protobuf:"bytes,2,opt,name=attachment" json:"attachment,omitempty"`
-	Appendixes           []*Appendix                      `protobuf:"bytes,3,rep,name=appendixes" json:"appendixes,omitempty"`
+	Appendix             *Appendix                        `protobuf:"bytes,3,opt,name=appendix" json:"appendix,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}                         `json:"-"`
 	XXX_unrecognized     []byte                           `json:"-"`
 	XXX_sizecache        int32                            `json:"-"`
@@ -365,7 +519,7 @@ func (m *MultiSameOutCreation) Reset()         { *m = MultiSameOutCreation{} }
 func (m *MultiSameOutCreation) String() string { return proto.CompactTextString(m) }
 func (*MultiSameOutCreation) ProtoMessage()    {}
 func (*MultiSameOutCreation) Descriptor() ([]byte, []int) {
-	return fileDescriptor_transaction_c8a87d91d7888997, []int{3}
+	return fileDescriptor_transaction_4cf31c87b402708a, []int{3}
 }
 func (m *MultiSameOutCreation) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_MultiSameOutCreation.Unmarshal(m, b)
@@ -399,9 +553,9 @@ func (m *MultiSameOutCreation) GetAttachment() *MultiSameOutCreation_Attachment 
 	return nil
 }
 
-func (m *MultiSameOutCreation) GetAppendixes() []*Appendix {
+func (m *MultiSameOutCreation) GetAppendix() *Appendix {
 	if m != nil {
-		return m.Appendixes
+		return m.Appendix
 	}
 	return nil
 }
@@ -417,7 +571,7 @@ func (m *MultiSameOutCreation_Attachment) Reset()         { *m = MultiSameOutCre
 func (m *MultiSameOutCreation_Attachment) String() string { return proto.CompactTextString(m) }
 func (*MultiSameOutCreation_Attachment) ProtoMessage()    {}
 func (*MultiSameOutCreation_Attachment) Descriptor() ([]byte, []int) {
-	return fileDescriptor_transaction_c8a87d91d7888997, []int{3, 0}
+	return fileDescriptor_transaction_4cf31c87b402708a, []int{3, 0}
 }
 func (m *MultiSameOutCreation_Attachment) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_MultiSameOutCreation_Attachment.Unmarshal(m, b)
@@ -445,19 +599,18 @@ func (m *MultiSameOutCreation_Attachment) GetRecipients() []uint64 {
 }
 
 type ArbitaryMessage struct {
-	Header               *TransactionHeader          `protobuf:"bytes,1,opt,name=header" json:"header,omitempty"`
-	Attachment           *ArbitaryMessage_Attachment `protobuf:"bytes,2,opt,name=attachment" json:"attachment,omitempty"`
-	Appendixes           []*Appendix                 `protobuf:"bytes,3,rep,name=appendixes" json:"appendixes,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}                    `json:"-"`
-	XXX_unrecognized     []byte                      `json:"-"`
-	XXX_sizecache        int32                       `json:"-"`
+	Header               *TransactionHeader `protobuf:"bytes,1,opt,name=header" json:"header,omitempty"`
+	Appendix             *Appendix          `protobuf:"bytes,2,opt,name=appendix" json:"appendix,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}           `json:"-"`
+	XXX_unrecognized     []byte             `json:"-"`
+	XXX_sizecache        int32              `json:"-"`
 }
 
 func (m *ArbitaryMessage) Reset()         { *m = ArbitaryMessage{} }
 func (m *ArbitaryMessage) String() string { return proto.CompactTextString(m) }
 func (*ArbitaryMessage) ProtoMessage()    {}
 func (*ArbitaryMessage) Descriptor() ([]byte, []int) {
-	return fileDescriptor_transaction_c8a87d91d7888997, []int{4}
+	return fileDescriptor_transaction_4cf31c87b402708a, []int{4}
 }
 func (m *ArbitaryMessage) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_ArbitaryMessage.Unmarshal(m, b)
@@ -484,70 +637,17 @@ func (m *ArbitaryMessage) GetHeader() *TransactionHeader {
 	return nil
 }
 
-func (m *ArbitaryMessage) GetAttachment() *ArbitaryMessage_Attachment {
+func (m *ArbitaryMessage) GetAppendix() *Appendix {
 	if m != nil {
-		return m.Attachment
+		return m.Appendix
 	}
 	return nil
-}
-
-func (m *ArbitaryMessage) GetAppendixes() []*Appendix {
-	if m != nil {
-		return m.Appendixes
-	}
-	return nil
-}
-
-type ArbitaryMessage_Attachment struct {
-	IsText               bool     `protobuf:"varint,1,opt,name=isText" json:"isText,omitempty"`
-	Content              string   `protobuf:"bytes,2,opt,name=content" json:"content,omitempty"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
-}
-
-func (m *ArbitaryMessage_Attachment) Reset()         { *m = ArbitaryMessage_Attachment{} }
-func (m *ArbitaryMessage_Attachment) String() string { return proto.CompactTextString(m) }
-func (*ArbitaryMessage_Attachment) ProtoMessage()    {}
-func (*ArbitaryMessage_Attachment) Descriptor() ([]byte, []int) {
-	return fileDescriptor_transaction_c8a87d91d7888997, []int{4, 0}
-}
-func (m *ArbitaryMessage_Attachment) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_ArbitaryMessage_Attachment.Unmarshal(m, b)
-}
-func (m *ArbitaryMessage_Attachment) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_ArbitaryMessage_Attachment.Marshal(b, m, deterministic)
-}
-func (dst *ArbitaryMessage_Attachment) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_ArbitaryMessage_Attachment.Merge(dst, src)
-}
-func (m *ArbitaryMessage_Attachment) XXX_Size() int {
-	return xxx_messageInfo_ArbitaryMessage_Attachment.Size(m)
-}
-func (m *ArbitaryMessage_Attachment) XXX_DiscardUnknown() {
-	xxx_messageInfo_ArbitaryMessage_Attachment.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_ArbitaryMessage_Attachment proto.InternalMessageInfo
-
-func (m *ArbitaryMessage_Attachment) GetIsText() bool {
-	if m != nil {
-		return m.IsText
-	}
-	return false
-}
-
-func (m *ArbitaryMessage_Attachment) GetContent() string {
-	if m != nil {
-		return m.Content
-	}
-	return ""
 }
 
 type AliasAssignment struct {
 	Header               *TransactionHeader          `protobuf:"bytes,1,opt,name=header" json:"header,omitempty"`
 	Attachment           *AliasAssignment_Attachment `protobuf:"bytes,2,opt,name=attachment" json:"attachment,omitempty"`
-	Appendixes           []*Appendix                 `protobuf:"bytes,3,rep,name=appendixes" json:"appendixes,omitempty"`
+	Appendix             *Appendix                   `protobuf:"bytes,3,opt,name=appendix" json:"appendix,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}                    `json:"-"`
 	XXX_unrecognized     []byte                      `json:"-"`
 	XXX_sizecache        int32                       `json:"-"`
@@ -557,7 +657,7 @@ func (m *AliasAssignment) Reset()         { *m = AliasAssignment{} }
 func (m *AliasAssignment) String() string { return proto.CompactTextString(m) }
 func (*AliasAssignment) ProtoMessage()    {}
 func (*AliasAssignment) Descriptor() ([]byte, []int) {
-	return fileDescriptor_transaction_c8a87d91d7888997, []int{5}
+	return fileDescriptor_transaction_4cf31c87b402708a, []int{5}
 }
 func (m *AliasAssignment) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_AliasAssignment.Unmarshal(m, b)
@@ -591,9 +691,9 @@ func (m *AliasAssignment) GetAttachment() *AliasAssignment_Attachment {
 	return nil
 }
 
-func (m *AliasAssignment) GetAppendixes() []*Appendix {
+func (m *AliasAssignment) GetAppendix() *Appendix {
 	if m != nil {
-		return m.Appendixes
+		return m.Appendix
 	}
 	return nil
 }
@@ -610,7 +710,7 @@ func (m *AliasAssignment_Attachment) Reset()         { *m = AliasAssignment_Atta
 func (m *AliasAssignment_Attachment) String() string { return proto.CompactTextString(m) }
 func (*AliasAssignment_Attachment) ProtoMessage()    {}
 func (*AliasAssignment_Attachment) Descriptor() ([]byte, []int) {
-	return fileDescriptor_transaction_c8a87d91d7888997, []int{5, 0}
+	return fileDescriptor_transaction_4cf31c87b402708a, []int{5, 0}
 }
 func (m *AliasAssignment_Attachment) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_AliasAssignment_Attachment.Unmarshal(m, b)
@@ -647,7 +747,7 @@ func (m *AliasAssignment_Attachment) GetUri() string {
 type AccountInfo struct {
 	Header               *TransactionHeader      `protobuf:"bytes,1,opt,name=header" json:"header,omitempty"`
 	Attachment           *AccountInfo_Attachment `protobuf:"bytes,2,opt,name=attachment" json:"attachment,omitempty"`
-	Appendixes           []*Appendix             `protobuf:"bytes,3,rep,name=appendixes" json:"appendixes,omitempty"`
+	Appendix             *Appendix               `protobuf:"bytes,3,opt,name=appendix" json:"appendix,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}                `json:"-"`
 	XXX_unrecognized     []byte                  `json:"-"`
 	XXX_sizecache        int32                   `json:"-"`
@@ -657,7 +757,7 @@ func (m *AccountInfo) Reset()         { *m = AccountInfo{} }
 func (m *AccountInfo) String() string { return proto.CompactTextString(m) }
 func (*AccountInfo) ProtoMessage()    {}
 func (*AccountInfo) Descriptor() ([]byte, []int) {
-	return fileDescriptor_transaction_c8a87d91d7888997, []int{6}
+	return fileDescriptor_transaction_4cf31c87b402708a, []int{6}
 }
 func (m *AccountInfo) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_AccountInfo.Unmarshal(m, b)
@@ -691,9 +791,9 @@ func (m *AccountInfo) GetAttachment() *AccountInfo_Attachment {
 	return nil
 }
 
-func (m *AccountInfo) GetAppendixes() []*Appendix {
+func (m *AccountInfo) GetAppendix() *Appendix {
 	if m != nil {
-		return m.Appendixes
+		return m.Appendix
 	}
 	return nil
 }
@@ -710,7 +810,7 @@ func (m *AccountInfo_Attachment) Reset()         { *m = AccountInfo_Attachment{}
 func (m *AccountInfo_Attachment) String() string { return proto.CompactTextString(m) }
 func (*AccountInfo_Attachment) ProtoMessage()    {}
 func (*AccountInfo_Attachment) Descriptor() ([]byte, []int) {
-	return fileDescriptor_transaction_c8a87d91d7888997, []int{6, 0}
+	return fileDescriptor_transaction_4cf31c87b402708a, []int{6, 0}
 }
 func (m *AccountInfo_Attachment) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_AccountInfo_Attachment.Unmarshal(m, b)
@@ -747,7 +847,7 @@ func (m *AccountInfo_Attachment) GetDescription() string {
 type AliasSell struct {
 	Header               *TransactionHeader    `protobuf:"bytes,1,opt,name=header" json:"header,omitempty"`
 	Attachment           *AliasSell_Attachment `protobuf:"bytes,2,opt,name=attachment" json:"attachment,omitempty"`
-	Appendixes           []*Appendix           `protobuf:"bytes,3,rep,name=appendixes" json:"appendixes,omitempty"`
+	Appendix             *Appendix             `protobuf:"bytes,3,opt,name=appendix" json:"appendix,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}              `json:"-"`
 	XXX_unrecognized     []byte                `json:"-"`
 	XXX_sizecache        int32                 `json:"-"`
@@ -757,7 +857,7 @@ func (m *AliasSell) Reset()         { *m = AliasSell{} }
 func (m *AliasSell) String() string { return proto.CompactTextString(m) }
 func (*AliasSell) ProtoMessage()    {}
 func (*AliasSell) Descriptor() ([]byte, []int) {
-	return fileDescriptor_transaction_c8a87d91d7888997, []int{7}
+	return fileDescriptor_transaction_4cf31c87b402708a, []int{7}
 }
 func (m *AliasSell) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_AliasSell.Unmarshal(m, b)
@@ -791,15 +891,15 @@ func (m *AliasSell) GetAttachment() *AliasSell_Attachment {
 	return nil
 }
 
-func (m *AliasSell) GetAppendixes() []*Appendix {
+func (m *AliasSell) GetAppendix() *Appendix {
 	if m != nil {
-		return m.Appendixes
+		return m.Appendix
 	}
 	return nil
 }
 
 type AliasSell_Attachment struct {
-	Alias                string   `protobuf:"bytes,1,opt,name=alias" json:"alias,omitempty"`
+	Name                 string   `protobuf:"bytes,1,opt,name=name" json:"name,omitempty"`
 	Price                int64    `protobuf:"varint,2,opt,name=price" json:"price,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
@@ -810,7 +910,7 @@ func (m *AliasSell_Attachment) Reset()         { *m = AliasSell_Attachment{} }
 func (m *AliasSell_Attachment) String() string { return proto.CompactTextString(m) }
 func (*AliasSell_Attachment) ProtoMessage()    {}
 func (*AliasSell_Attachment) Descriptor() ([]byte, []int) {
-	return fileDescriptor_transaction_c8a87d91d7888997, []int{7, 0}
+	return fileDescriptor_transaction_4cf31c87b402708a, []int{7, 0}
 }
 func (m *AliasSell_Attachment) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_AliasSell_Attachment.Unmarshal(m, b)
@@ -830,9 +930,9 @@ func (m *AliasSell_Attachment) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_AliasSell_Attachment proto.InternalMessageInfo
 
-func (m *AliasSell_Attachment) GetAlias() string {
+func (m *AliasSell_Attachment) GetName() string {
 	if m != nil {
-		return m.Alias
+		return m.Name
 	}
 	return ""
 }
@@ -847,7 +947,7 @@ func (m *AliasSell_Attachment) GetPrice() int64 {
 type AliasBuy struct {
 	Header               *TransactionHeader   `protobuf:"bytes,1,opt,name=header" json:"header,omitempty"`
 	Attachment           *AliasBuy_Attachment `protobuf:"bytes,2,opt,name=attachment" json:"attachment,omitempty"`
-	Appendixes           []*Appendix          `protobuf:"bytes,3,rep,name=appendixes" json:"appendixes,omitempty"`
+	Appendix             *Appendix            `protobuf:"bytes,3,opt,name=appendix" json:"appendix,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}             `json:"-"`
 	XXX_unrecognized     []byte               `json:"-"`
 	XXX_sizecache        int32                `json:"-"`
@@ -857,7 +957,7 @@ func (m *AliasBuy) Reset()         { *m = AliasBuy{} }
 func (m *AliasBuy) String() string { return proto.CompactTextString(m) }
 func (*AliasBuy) ProtoMessage()    {}
 func (*AliasBuy) Descriptor() ([]byte, []int) {
-	return fileDescriptor_transaction_c8a87d91d7888997, []int{8}
+	return fileDescriptor_transaction_4cf31c87b402708a, []int{8}
 }
 func (m *AliasBuy) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_AliasBuy.Unmarshal(m, b)
@@ -891,15 +991,15 @@ func (m *AliasBuy) GetAttachment() *AliasBuy_Attachment {
 	return nil
 }
 
-func (m *AliasBuy) GetAppendixes() []*Appendix {
+func (m *AliasBuy) GetAppendix() *Appendix {
 	if m != nil {
-		return m.Appendixes
+		return m.Appendix
 	}
 	return nil
 }
 
 type AliasBuy_Attachment struct {
-	Alias                string   `protobuf:"bytes,1,opt,name=alias" json:"alias,omitempty"`
+	Name                 string   `protobuf:"bytes,1,opt,name=name" json:"name,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -909,7 +1009,7 @@ func (m *AliasBuy_Attachment) Reset()         { *m = AliasBuy_Attachment{} }
 func (m *AliasBuy_Attachment) String() string { return proto.CompactTextString(m) }
 func (*AliasBuy_Attachment) ProtoMessage()    {}
 func (*AliasBuy_Attachment) Descriptor() ([]byte, []int) {
-	return fileDescriptor_transaction_c8a87d91d7888997, []int{8, 0}
+	return fileDescriptor_transaction_4cf31c87b402708a, []int{8, 0}
 }
 func (m *AliasBuy_Attachment) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_AliasBuy_Attachment.Unmarshal(m, b)
@@ -929,9 +1029,9 @@ func (m *AliasBuy_Attachment) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_AliasBuy_Attachment proto.InternalMessageInfo
 
-func (m *AliasBuy_Attachment) GetAlias() string {
+func (m *AliasBuy_Attachment) GetName() string {
 	if m != nil {
-		return m.Alias
+		return m.Name
 	}
 	return ""
 }
@@ -939,7 +1039,7 @@ func (m *AliasBuy_Attachment) GetAlias() string {
 type AssetIssuance struct {
 	Header               *TransactionHeader        `protobuf:"bytes,1,opt,name=header" json:"header,omitempty"`
 	Attachment           *AssetIssuance_Attachment `protobuf:"bytes,2,opt,name=attachment" json:"attachment,omitempty"`
-	Appendixes           []*Appendix               `protobuf:"bytes,3,rep,name=appendixes" json:"appendixes,omitempty"`
+	Appendix             *Appendix                 `protobuf:"bytes,3,opt,name=appendix" json:"appendix,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}                  `json:"-"`
 	XXX_unrecognized     []byte                    `json:"-"`
 	XXX_sizecache        int32                     `json:"-"`
@@ -949,7 +1049,7 @@ func (m *AssetIssuance) Reset()         { *m = AssetIssuance{} }
 func (m *AssetIssuance) String() string { return proto.CompactTextString(m) }
 func (*AssetIssuance) ProtoMessage()    {}
 func (*AssetIssuance) Descriptor() ([]byte, []int) {
-	return fileDescriptor_transaction_c8a87d91d7888997, []int{9}
+	return fileDescriptor_transaction_4cf31c87b402708a, []int{9}
 }
 func (m *AssetIssuance) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_AssetIssuance.Unmarshal(m, b)
@@ -983,9 +1083,9 @@ func (m *AssetIssuance) GetAttachment() *AssetIssuance_Attachment {
 	return nil
 }
 
-func (m *AssetIssuance) GetAppendixes() []*Appendix {
+func (m *AssetIssuance) GetAppendix() *Appendix {
 	if m != nil {
-		return m.Appendixes
+		return m.Appendix
 	}
 	return nil
 }
@@ -1005,7 +1105,7 @@ func (m *AssetIssuance_Attachment) Reset()         { *m = AssetIssuance_Attachme
 func (m *AssetIssuance_Attachment) String() string { return proto.CompactTextString(m) }
 func (*AssetIssuance_Attachment) ProtoMessage()    {}
 func (*AssetIssuance_Attachment) Descriptor() ([]byte, []int) {
-	return fileDescriptor_transaction_c8a87d91d7888997, []int{9, 0}
+	return fileDescriptor_transaction_4cf31c87b402708a, []int{9, 0}
 }
 func (m *AssetIssuance_Attachment) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_AssetIssuance_Attachment.Unmarshal(m, b)
@@ -1063,7 +1163,7 @@ func (m *AssetIssuance_Attachment) GetComment() string {
 type AssetTransfer struct {
 	Header               *TransactionHeader        `protobuf:"bytes,1,opt,name=header" json:"header,omitempty"`
 	Attachment           *AssetTransfer_Attachment `protobuf:"bytes,2,opt,name=attachment" json:"attachment,omitempty"`
-	Appendixes           []*Appendix               `protobuf:"bytes,3,rep,name=appendixes" json:"appendixes,omitempty"`
+	Appendix             *Appendix                 `protobuf:"bytes,3,opt,name=appendix" json:"appendix,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}                  `json:"-"`
 	XXX_unrecognized     []byte                    `json:"-"`
 	XXX_sizecache        int32                     `json:"-"`
@@ -1073,7 +1173,7 @@ func (m *AssetTransfer) Reset()         { *m = AssetTransfer{} }
 func (m *AssetTransfer) String() string { return proto.CompactTextString(m) }
 func (*AssetTransfer) ProtoMessage()    {}
 func (*AssetTransfer) Descriptor() ([]byte, []int) {
-	return fileDescriptor_transaction_c8a87d91d7888997, []int{10}
+	return fileDescriptor_transaction_4cf31c87b402708a, []int{10}
 }
 func (m *AssetTransfer) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_AssetTransfer.Unmarshal(m, b)
@@ -1107,16 +1207,17 @@ func (m *AssetTransfer) GetAttachment() *AssetTransfer_Attachment {
 	return nil
 }
 
-func (m *AssetTransfer) GetAppendixes() []*Appendix {
+func (m *AssetTransfer) GetAppendix() *Appendix {
 	if m != nil {
-		return m.Appendixes
+		return m.Appendix
 	}
 	return nil
 }
 
 type AssetTransfer_Attachment struct {
-	Quantity             uint64   `protobuf:"varint,1,opt,name=quantity" json:"quantity,omitempty"`
-	Comment              string   `protobuf:"bytes,2,opt,name=comment" json:"comment,omitempty"`
+	Asset                uint64   `protobuf:"varint,1,opt,name=asset" json:"asset,omitempty"`
+	Quantity             uint64   `protobuf:"varint,2,opt,name=quantity" json:"quantity,omitempty"`
+	Comment              string   `protobuf:"bytes,3,opt,name=comment" json:"comment,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -1126,7 +1227,7 @@ func (m *AssetTransfer_Attachment) Reset()         { *m = AssetTransfer_Attachme
 func (m *AssetTransfer_Attachment) String() string { return proto.CompactTextString(m) }
 func (*AssetTransfer_Attachment) ProtoMessage()    {}
 func (*AssetTransfer_Attachment) Descriptor() ([]byte, []int) {
-	return fileDescriptor_transaction_c8a87d91d7888997, []int{10, 0}
+	return fileDescriptor_transaction_4cf31c87b402708a, []int{10, 0}
 }
 func (m *AssetTransfer_Attachment) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_AssetTransfer_Attachment.Unmarshal(m, b)
@@ -1146,6 +1247,13 @@ func (m *AssetTransfer_Attachment) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_AssetTransfer_Attachment proto.InternalMessageInfo
 
+func (m *AssetTransfer_Attachment) GetAsset() uint64 {
+	if m != nil {
+		return m.Asset
+	}
+	return 0
+}
+
 func (m *AssetTransfer_Attachment) GetQuantity() uint64 {
 	if m != nil {
 		return m.Quantity
@@ -1163,7 +1271,7 @@ func (m *AssetTransfer_Attachment) GetComment() string {
 type AskOrderPlacement struct {
 	Header               *TransactionHeader            `protobuf:"bytes,1,opt,name=header" json:"header,omitempty"`
 	Attachment           *AskOrderPlacement_Attachment `protobuf:"bytes,2,opt,name=attachment" json:"attachment,omitempty"`
-	Appendixes           []*Appendix                   `protobuf:"bytes,3,rep,name=appendixes" json:"appendixes,omitempty"`
+	Appendix             *Appendix                     `protobuf:"bytes,3,opt,name=appendix" json:"appendix,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}                      `json:"-"`
 	XXX_unrecognized     []byte                        `json:"-"`
 	XXX_sizecache        int32                         `json:"-"`
@@ -1173,7 +1281,7 @@ func (m *AskOrderPlacement) Reset()         { *m = AskOrderPlacement{} }
 func (m *AskOrderPlacement) String() string { return proto.CompactTextString(m) }
 func (*AskOrderPlacement) ProtoMessage()    {}
 func (*AskOrderPlacement) Descriptor() ([]byte, []int) {
-	return fileDescriptor_transaction_c8a87d91d7888997, []int{11}
+	return fileDescriptor_transaction_4cf31c87b402708a, []int{11}
 }
 func (m *AskOrderPlacement) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_AskOrderPlacement.Unmarshal(m, b)
@@ -1207,15 +1315,15 @@ func (m *AskOrderPlacement) GetAttachment() *AskOrderPlacement_Attachment {
 	return nil
 }
 
-func (m *AskOrderPlacement) GetAppendixes() []*Appendix {
+func (m *AskOrderPlacement) GetAppendix() *Appendix {
 	if m != nil {
-		return m.Appendixes
+		return m.Appendix
 	}
 	return nil
 }
 
 type AskOrderPlacement_Attachment struct {
-	AssetTransfer        uint64   `protobuf:"varint,1,opt,name=assetTransfer" json:"assetTransfer,omitempty"`
+	Asset                uint64   `protobuf:"varint,1,opt,name=asset" json:"asset,omitempty"`
 	Quantity             uint64   `protobuf:"varint,2,opt,name=quantity" json:"quantity,omitempty"`
 	Price                uint64   `protobuf:"varint,3,opt,name=price" json:"price,omitempty"`
 	Comment              string   `protobuf:"bytes,4,opt,name=comment" json:"comment,omitempty"`
@@ -1228,7 +1336,7 @@ func (m *AskOrderPlacement_Attachment) Reset()         { *m = AskOrderPlacement_
 func (m *AskOrderPlacement_Attachment) String() string { return proto.CompactTextString(m) }
 func (*AskOrderPlacement_Attachment) ProtoMessage()    {}
 func (*AskOrderPlacement_Attachment) Descriptor() ([]byte, []int) {
-	return fileDescriptor_transaction_c8a87d91d7888997, []int{11, 0}
+	return fileDescriptor_transaction_4cf31c87b402708a, []int{11, 0}
 }
 func (m *AskOrderPlacement_Attachment) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_AskOrderPlacement_Attachment.Unmarshal(m, b)
@@ -1248,9 +1356,9 @@ func (m *AskOrderPlacement_Attachment) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_AskOrderPlacement_Attachment proto.InternalMessageInfo
 
-func (m *AskOrderPlacement_Attachment) GetAssetTransfer() uint64 {
+func (m *AskOrderPlacement_Attachment) GetAsset() uint64 {
 	if m != nil {
-		return m.AssetTransfer
+		return m.Asset
 	}
 	return 0
 }
@@ -1279,7 +1387,7 @@ func (m *AskOrderPlacement_Attachment) GetComment() string {
 type BidOrderPlacement struct {
 	Header               *TransactionHeader            `protobuf:"bytes,1,opt,name=header" json:"header,omitempty"`
 	Attachment           *BidOrderPlacement_Attachment `protobuf:"bytes,2,opt,name=attachment" json:"attachment,omitempty"`
-	Appendixes           []*Appendix                   `protobuf:"bytes,3,rep,name=appendixes" json:"appendixes,omitempty"`
+	Appendix             *Appendix                     `protobuf:"bytes,3,opt,name=appendix" json:"appendix,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}                      `json:"-"`
 	XXX_unrecognized     []byte                        `json:"-"`
 	XXX_sizecache        int32                         `json:"-"`
@@ -1289,7 +1397,7 @@ func (m *BidOrderPlacement) Reset()         { *m = BidOrderPlacement{} }
 func (m *BidOrderPlacement) String() string { return proto.CompactTextString(m) }
 func (*BidOrderPlacement) ProtoMessage()    {}
 func (*BidOrderPlacement) Descriptor() ([]byte, []int) {
-	return fileDescriptor_transaction_c8a87d91d7888997, []int{12}
+	return fileDescriptor_transaction_4cf31c87b402708a, []int{12}
 }
 func (m *BidOrderPlacement) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_BidOrderPlacement.Unmarshal(m, b)
@@ -1323,9 +1431,9 @@ func (m *BidOrderPlacement) GetAttachment() *BidOrderPlacement_Attachment {
 	return nil
 }
 
-func (m *BidOrderPlacement) GetAppendixes() []*Appendix {
+func (m *BidOrderPlacement) GetAppendix() *Appendix {
 	if m != nil {
-		return m.Appendixes
+		return m.Appendix
 	}
 	return nil
 }
@@ -1343,7 +1451,7 @@ func (m *BidOrderPlacement_Attachment) Reset()         { *m = BidOrderPlacement_
 func (m *BidOrderPlacement_Attachment) String() string { return proto.CompactTextString(m) }
 func (*BidOrderPlacement_Attachment) ProtoMessage()    {}
 func (*BidOrderPlacement_Attachment) Descriptor() ([]byte, []int) {
-	return fileDescriptor_transaction_c8a87d91d7888997, []int{12, 0}
+	return fileDescriptor_transaction_4cf31c87b402708a, []int{12, 0}
 }
 func (m *BidOrderPlacement_Attachment) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_BidOrderPlacement_Attachment.Unmarshal(m, b)
@@ -1387,7 +1495,7 @@ func (m *BidOrderPlacement_Attachment) GetPrice() uint64 {
 type AskOrderCancellation struct {
 	Header               *TransactionHeader               `protobuf:"bytes,1,opt,name=header" json:"header,omitempty"`
 	Attachment           *AskOrderCancellation_Attachment `protobuf:"bytes,2,opt,name=attachment" json:"attachment,omitempty"`
-	Appendixes           []*Appendix                      `protobuf:"bytes,3,rep,name=appendixes" json:"appendixes,omitempty"`
+	Appendix             *Appendix                        `protobuf:"bytes,3,opt,name=appendix" json:"appendix,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}                         `json:"-"`
 	XXX_unrecognized     []byte                           `json:"-"`
 	XXX_sizecache        int32                            `json:"-"`
@@ -1397,7 +1505,7 @@ func (m *AskOrderCancellation) Reset()         { *m = AskOrderCancellation{} }
 func (m *AskOrderCancellation) String() string { return proto.CompactTextString(m) }
 func (*AskOrderCancellation) ProtoMessage()    {}
 func (*AskOrderCancellation) Descriptor() ([]byte, []int) {
-	return fileDescriptor_transaction_c8a87d91d7888997, []int{13}
+	return fileDescriptor_transaction_4cf31c87b402708a, []int{13}
 }
 func (m *AskOrderCancellation) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_AskOrderCancellation.Unmarshal(m, b)
@@ -1431,9 +1539,9 @@ func (m *AskOrderCancellation) GetAttachment() *AskOrderCancellation_Attachment 
 	return nil
 }
 
-func (m *AskOrderCancellation) GetAppendixes() []*Appendix {
+func (m *AskOrderCancellation) GetAppendix() *Appendix {
 	if m != nil {
-		return m.Appendixes
+		return m.Appendix
 	}
 	return nil
 }
@@ -1449,7 +1557,7 @@ func (m *AskOrderCancellation_Attachment) Reset()         { *m = AskOrderCancell
 func (m *AskOrderCancellation_Attachment) String() string { return proto.CompactTextString(m) }
 func (*AskOrderCancellation_Attachment) ProtoMessage()    {}
 func (*AskOrderCancellation_Attachment) Descriptor() ([]byte, []int) {
-	return fileDescriptor_transaction_c8a87d91d7888997, []int{13, 0}
+	return fileDescriptor_transaction_4cf31c87b402708a, []int{13, 0}
 }
 func (m *AskOrderCancellation_Attachment) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_AskOrderCancellation_Attachment.Unmarshal(m, b)
@@ -1479,7 +1587,7 @@ func (m *AskOrderCancellation_Attachment) GetOrder() uint64 {
 type BidOrderCancellation struct {
 	Header               *TransactionHeader               `protobuf:"bytes,1,opt,name=header" json:"header,omitempty"`
 	Attachment           *BidOrderCancellation_Attachment `protobuf:"bytes,2,opt,name=attachment" json:"attachment,omitempty"`
-	Appendixes           []*Appendix                      `protobuf:"bytes,3,rep,name=appendixes" json:"appendixes,omitempty"`
+	Appendix             *Appendix                        `protobuf:"bytes,3,opt,name=appendix" json:"appendix,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}                         `json:"-"`
 	XXX_unrecognized     []byte                           `json:"-"`
 	XXX_sizecache        int32                            `json:"-"`
@@ -1489,7 +1597,7 @@ func (m *BidOrderCancellation) Reset()         { *m = BidOrderCancellation{} }
 func (m *BidOrderCancellation) String() string { return proto.CompactTextString(m) }
 func (*BidOrderCancellation) ProtoMessage()    {}
 func (*BidOrderCancellation) Descriptor() ([]byte, []int) {
-	return fileDescriptor_transaction_c8a87d91d7888997, []int{14}
+	return fileDescriptor_transaction_4cf31c87b402708a, []int{14}
 }
 func (m *BidOrderCancellation) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_BidOrderCancellation.Unmarshal(m, b)
@@ -1523,9 +1631,9 @@ func (m *BidOrderCancellation) GetAttachment() *BidOrderCancellation_Attachment 
 	return nil
 }
 
-func (m *BidOrderCancellation) GetAppendixes() []*Appendix {
+func (m *BidOrderCancellation) GetAppendix() *Appendix {
 	if m != nil {
-		return m.Appendixes
+		return m.Appendix
 	}
 	return nil
 }
@@ -1541,7 +1649,7 @@ func (m *BidOrderCancellation_Attachment) Reset()         { *m = BidOrderCancell
 func (m *BidOrderCancellation_Attachment) String() string { return proto.CompactTextString(m) }
 func (*BidOrderCancellation_Attachment) ProtoMessage()    {}
 func (*BidOrderCancellation_Attachment) Descriptor() ([]byte, []int) {
-	return fileDescriptor_transaction_c8a87d91d7888997, []int{14, 0}
+	return fileDescriptor_transaction_4cf31c87b402708a, []int{14, 0}
 }
 func (m *BidOrderCancellation_Attachment) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_BidOrderCancellation_Attachment.Unmarshal(m, b)
@@ -1571,7 +1679,7 @@ func (m *BidOrderCancellation_Attachment) GetOrder() uint64 {
 type DigitalGoodsListing struct {
 	Header               *TransactionHeader              `protobuf:"bytes,1,opt,name=header" json:"header,omitempty"`
 	Attachment           *DigitalGoodsListing_Attachment `protobuf:"bytes,2,opt,name=attachment" json:"attachment,omitempty"`
-	Appendixes           []*Appendix                     `protobuf:"bytes,3,rep,name=appendixes" json:"appendixes,omitempty"`
+	Appendix             *Appendix                       `protobuf:"bytes,3,opt,name=appendix" json:"appendix,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}                        `json:"-"`
 	XXX_unrecognized     []byte                          `json:"-"`
 	XXX_sizecache        int32                           `json:"-"`
@@ -1581,7 +1689,7 @@ func (m *DigitalGoodsListing) Reset()         { *m = DigitalGoodsListing{} }
 func (m *DigitalGoodsListing) String() string { return proto.CompactTextString(m) }
 func (*DigitalGoodsListing) ProtoMessage()    {}
 func (*DigitalGoodsListing) Descriptor() ([]byte, []int) {
-	return fileDescriptor_transaction_c8a87d91d7888997, []int{15}
+	return fileDescriptor_transaction_4cf31c87b402708a, []int{15}
 }
 func (m *DigitalGoodsListing) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_DigitalGoodsListing.Unmarshal(m, b)
@@ -1615,9 +1723,9 @@ func (m *DigitalGoodsListing) GetAttachment() *DigitalGoodsListing_Attachment {
 	return nil
 }
 
-func (m *DigitalGoodsListing) GetAppendixes() []*Appendix {
+func (m *DigitalGoodsListing) GetAppendix() *Appendix {
 	if m != nil {
-		return m.Appendixes
+		return m.Appendix
 	}
 	return nil
 }
@@ -1637,7 +1745,7 @@ func (m *DigitalGoodsListing_Attachment) Reset()         { *m = DigitalGoodsList
 func (m *DigitalGoodsListing_Attachment) String() string { return proto.CompactTextString(m) }
 func (*DigitalGoodsListing_Attachment) ProtoMessage()    {}
 func (*DigitalGoodsListing_Attachment) Descriptor() ([]byte, []int) {
-	return fileDescriptor_transaction_c8a87d91d7888997, []int{15, 0}
+	return fileDescriptor_transaction_4cf31c87b402708a, []int{15, 0}
 }
 func (m *DigitalGoodsListing_Attachment) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_DigitalGoodsListing_Attachment.Unmarshal(m, b)
@@ -1695,7 +1803,7 @@ func (m *DigitalGoodsListing_Attachment) GetPrice() uint64 {
 type DigitalGoodsDelisting struct {
 	Header               *TransactionHeader                `protobuf:"bytes,1,opt,name=header" json:"header,omitempty"`
 	Attachment           *DigitalGoodsDelisting_Attachment `protobuf:"bytes,2,opt,name=attachment" json:"attachment,omitempty"`
-	Appendixes           []*Appendix                       `protobuf:"bytes,3,rep,name=appendixes" json:"appendixes,omitempty"`
+	Appendix             *Appendix                         `protobuf:"bytes,3,opt,name=appendix" json:"appendix,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}                          `json:"-"`
 	XXX_unrecognized     []byte                            `json:"-"`
 	XXX_sizecache        int32                             `json:"-"`
@@ -1705,7 +1813,7 @@ func (m *DigitalGoodsDelisting) Reset()         { *m = DigitalGoodsDelisting{} }
 func (m *DigitalGoodsDelisting) String() string { return proto.CompactTextString(m) }
 func (*DigitalGoodsDelisting) ProtoMessage()    {}
 func (*DigitalGoodsDelisting) Descriptor() ([]byte, []int) {
-	return fileDescriptor_transaction_c8a87d91d7888997, []int{16}
+	return fileDescriptor_transaction_4cf31c87b402708a, []int{16}
 }
 func (m *DigitalGoodsDelisting) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_DigitalGoodsDelisting.Unmarshal(m, b)
@@ -1739,15 +1847,15 @@ func (m *DigitalGoodsDelisting) GetAttachment() *DigitalGoodsDelisting_Attachmen
 	return nil
 }
 
-func (m *DigitalGoodsDelisting) GetAppendixes() []*Appendix {
+func (m *DigitalGoodsDelisting) GetAppendix() *Appendix {
 	if m != nil {
-		return m.Appendixes
+		return m.Appendix
 	}
 	return nil
 }
 
 type DigitalGoodsDelisting_Attachment struct {
-	Goods                string   `protobuf:"bytes,1,opt,name=goods" json:"goods,omitempty"`
+	Id                   uint64   `protobuf:"varint,1,opt,name=id" json:"id,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -1757,7 +1865,7 @@ func (m *DigitalGoodsDelisting_Attachment) Reset()         { *m = DigitalGoodsDe
 func (m *DigitalGoodsDelisting_Attachment) String() string { return proto.CompactTextString(m) }
 func (*DigitalGoodsDelisting_Attachment) ProtoMessage()    {}
 func (*DigitalGoodsDelisting_Attachment) Descriptor() ([]byte, []int) {
-	return fileDescriptor_transaction_c8a87d91d7888997, []int{16, 0}
+	return fileDescriptor_transaction_4cf31c87b402708a, []int{16, 0}
 }
 func (m *DigitalGoodsDelisting_Attachment) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_DigitalGoodsDelisting_Attachment.Unmarshal(m, b)
@@ -1777,17 +1885,17 @@ func (m *DigitalGoodsDelisting_Attachment) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_DigitalGoodsDelisting_Attachment proto.InternalMessageInfo
 
-func (m *DigitalGoodsDelisting_Attachment) GetGoods() string {
+func (m *DigitalGoodsDelisting_Attachment) GetId() uint64 {
 	if m != nil {
-		return m.Goods
+		return m.Id
 	}
-	return ""
+	return 0
 }
 
 type DigitalGoodsPriceChange struct {
 	Header               *TransactionHeader                  `protobuf:"bytes,1,opt,name=header" json:"header,omitempty"`
 	Attachment           *DigitalGoodsPriceChange_Attachment `protobuf:"bytes,2,opt,name=attachment" json:"attachment,omitempty"`
-	Appendixes           []*Appendix                         `protobuf:"bytes,3,rep,name=appendixes" json:"appendixes,omitempty"`
+	Appendix             *Appendix                           `protobuf:"bytes,3,opt,name=appendix" json:"appendix,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}                            `json:"-"`
 	XXX_unrecognized     []byte                              `json:"-"`
 	XXX_sizecache        int32                               `json:"-"`
@@ -1797,7 +1905,7 @@ func (m *DigitalGoodsPriceChange) Reset()         { *m = DigitalGoodsPriceChange
 func (m *DigitalGoodsPriceChange) String() string { return proto.CompactTextString(m) }
 func (*DigitalGoodsPriceChange) ProtoMessage()    {}
 func (*DigitalGoodsPriceChange) Descriptor() ([]byte, []int) {
-	return fileDescriptor_transaction_c8a87d91d7888997, []int{17}
+	return fileDescriptor_transaction_4cf31c87b402708a, []int{17}
 }
 func (m *DigitalGoodsPriceChange) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_DigitalGoodsPriceChange.Unmarshal(m, b)
@@ -1831,15 +1939,15 @@ func (m *DigitalGoodsPriceChange) GetAttachment() *DigitalGoodsPriceChange_Attac
 	return nil
 }
 
-func (m *DigitalGoodsPriceChange) GetAppendixes() []*Appendix {
+func (m *DigitalGoodsPriceChange) GetAppendix() *Appendix {
 	if m != nil {
-		return m.Appendixes
+		return m.Appendix
 	}
 	return nil
 }
 
 type DigitalGoodsPriceChange_Attachment struct {
-	Goods                uint64   `protobuf:"varint,1,opt,name=goods" json:"goods,omitempty"`
+	Id                   uint64   `protobuf:"varint,1,opt,name=id" json:"id,omitempty"`
 	Price                uint64   `protobuf:"varint,2,opt,name=price" json:"price,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
@@ -1850,7 +1958,7 @@ func (m *DigitalGoodsPriceChange_Attachment) Reset()         { *m = DigitalGoods
 func (m *DigitalGoodsPriceChange_Attachment) String() string { return proto.CompactTextString(m) }
 func (*DigitalGoodsPriceChange_Attachment) ProtoMessage()    {}
 func (*DigitalGoodsPriceChange_Attachment) Descriptor() ([]byte, []int) {
-	return fileDescriptor_transaction_c8a87d91d7888997, []int{17, 0}
+	return fileDescriptor_transaction_4cf31c87b402708a, []int{17, 0}
 }
 func (m *DigitalGoodsPriceChange_Attachment) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_DigitalGoodsPriceChange_Attachment.Unmarshal(m, b)
@@ -1870,9 +1978,9 @@ func (m *DigitalGoodsPriceChange_Attachment) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_DigitalGoodsPriceChange_Attachment proto.InternalMessageInfo
 
-func (m *DigitalGoodsPriceChange_Attachment) GetGoods() uint64 {
+func (m *DigitalGoodsPriceChange_Attachment) GetId() uint64 {
 	if m != nil {
-		return m.Goods
+		return m.Id
 	}
 	return 0
 }
@@ -1887,7 +1995,7 @@ func (m *DigitalGoodsPriceChange_Attachment) GetPrice() uint64 {
 type DigitalGoodsQuantityChange struct {
 	Header               *TransactionHeader                     `protobuf:"bytes,1,opt,name=header" json:"header,omitempty"`
 	Attachment           *DigitalGoodsQuantityChange_Attachment `protobuf:"bytes,2,opt,name=attachment" json:"attachment,omitempty"`
-	Appendixes           []*Appendix                            `protobuf:"bytes,3,rep,name=appendixes" json:"appendixes,omitempty"`
+	Appendix             *Appendix                              `protobuf:"bytes,3,opt,name=appendix" json:"appendix,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}                               `json:"-"`
 	XXX_unrecognized     []byte                                 `json:"-"`
 	XXX_sizecache        int32                                  `json:"-"`
@@ -1897,7 +2005,7 @@ func (m *DigitalGoodsQuantityChange) Reset()         { *m = DigitalGoodsQuantity
 func (m *DigitalGoodsQuantityChange) String() string { return proto.CompactTextString(m) }
 func (*DigitalGoodsQuantityChange) ProtoMessage()    {}
 func (*DigitalGoodsQuantityChange) Descriptor() ([]byte, []int) {
-	return fileDescriptor_transaction_c8a87d91d7888997, []int{18}
+	return fileDescriptor_transaction_4cf31c87b402708a, []int{18}
 }
 func (m *DigitalGoodsQuantityChange) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_DigitalGoodsQuantityChange.Unmarshal(m, b)
@@ -1931,16 +2039,16 @@ func (m *DigitalGoodsQuantityChange) GetAttachment() *DigitalGoodsQuantityChange
 	return nil
 }
 
-func (m *DigitalGoodsQuantityChange) GetAppendixes() []*Appendix {
+func (m *DigitalGoodsQuantityChange) GetAppendix() *Appendix {
 	if m != nil {
-		return m.Appendixes
+		return m.Appendix
 	}
 	return nil
 }
 
 type DigitalGoodsQuantityChange_Attachment struct {
-	Goods                uint64   `protobuf:"varint,1,opt,name=goods" json:"goods,omitempty"`
-	DeltaQuantity        int32    `protobuf:"varint,2,opt,name=deltaQuantity" json:"deltaQuantity,omitempty"`
+	Id                   uint64   `protobuf:"varint,1,opt,name=id" json:"id,omitempty"`
+	Delta                int32    `protobuf:"varint,2,opt,name=delta" json:"delta,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -1950,7 +2058,7 @@ func (m *DigitalGoodsQuantityChange_Attachment) Reset()         { *m = DigitalGo
 func (m *DigitalGoodsQuantityChange_Attachment) String() string { return proto.CompactTextString(m) }
 func (*DigitalGoodsQuantityChange_Attachment) ProtoMessage()    {}
 func (*DigitalGoodsQuantityChange_Attachment) Descriptor() ([]byte, []int) {
-	return fileDescriptor_transaction_c8a87d91d7888997, []int{18, 0}
+	return fileDescriptor_transaction_4cf31c87b402708a, []int{18, 0}
 }
 func (m *DigitalGoodsQuantityChange_Attachment) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_DigitalGoodsQuantityChange_Attachment.Unmarshal(m, b)
@@ -1970,16 +2078,16 @@ func (m *DigitalGoodsQuantityChange_Attachment) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_DigitalGoodsQuantityChange_Attachment proto.InternalMessageInfo
 
-func (m *DigitalGoodsQuantityChange_Attachment) GetGoods() uint64 {
+func (m *DigitalGoodsQuantityChange_Attachment) GetId() uint64 {
 	if m != nil {
-		return m.Goods
+		return m.Id
 	}
 	return 0
 }
 
-func (m *DigitalGoodsQuantityChange_Attachment) GetDeltaQuantity() int32 {
+func (m *DigitalGoodsQuantityChange_Attachment) GetDelta() int32 {
 	if m != nil {
-		return m.DeltaQuantity
+		return m.Delta
 	}
 	return 0
 }
@@ -1987,7 +2095,7 @@ func (m *DigitalGoodsQuantityChange_Attachment) GetDeltaQuantity() int32 {
 type DigitalGoodsPurchase struct {
 	Header               *TransactionHeader               `protobuf:"bytes,1,opt,name=header" json:"header,omitempty"`
 	Attachment           *DigitalGoodsPurchase_Attachment `protobuf:"bytes,2,opt,name=attachment" json:"attachment,omitempty"`
-	Appendixes           []*Appendix                      `protobuf:"bytes,3,rep,name=appendixes" json:"appendixes,omitempty"`
+	Appendix             *Appendix                        `protobuf:"bytes,3,opt,name=appendix" json:"appendix,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}                         `json:"-"`
 	XXX_unrecognized     []byte                           `json:"-"`
 	XXX_sizecache        int32                            `json:"-"`
@@ -1997,7 +2105,7 @@ func (m *DigitalGoodsPurchase) Reset()         { *m = DigitalGoodsPurchase{} }
 func (m *DigitalGoodsPurchase) String() string { return proto.CompactTextString(m) }
 func (*DigitalGoodsPurchase) ProtoMessage()    {}
 func (*DigitalGoodsPurchase) Descriptor() ([]byte, []int) {
-	return fileDescriptor_transaction_c8a87d91d7888997, []int{19}
+	return fileDescriptor_transaction_4cf31c87b402708a, []int{19}
 }
 func (m *DigitalGoodsPurchase) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_DigitalGoodsPurchase.Unmarshal(m, b)
@@ -2031,15 +2139,15 @@ func (m *DigitalGoodsPurchase) GetAttachment() *DigitalGoodsPurchase_Attachment 
 	return nil
 }
 
-func (m *DigitalGoodsPurchase) GetAppendixes() []*Appendix {
+func (m *DigitalGoodsPurchase) GetAppendix() *Appendix {
 	if m != nil {
-		return m.Appendixes
+		return m.Appendix
 	}
 	return nil
 }
 
 type DigitalGoodsPurchase_Attachment struct {
-	Goods                     uint64   `protobuf:"varint,1,opt,name=goods" json:"goods,omitempty"`
+	Id                        uint64   `protobuf:"varint,1,opt,name=id" json:"id,omitempty"`
 	Quantity                  uint32   `protobuf:"varint,2,opt,name=quantity" json:"quantity,omitempty"`
 	Price                     uint64   `protobuf:"varint,3,opt,name=price" json:"price,omitempty"`
 	DeliveryDeadlineTimestamp uint32   `protobuf:"varint,4,opt,name=deliveryDeadlineTimestamp" json:"deliveryDeadlineTimestamp,omitempty"`
@@ -2052,7 +2160,7 @@ func (m *DigitalGoodsPurchase_Attachment) Reset()         { *m = DigitalGoodsPur
 func (m *DigitalGoodsPurchase_Attachment) String() string { return proto.CompactTextString(m) }
 func (*DigitalGoodsPurchase_Attachment) ProtoMessage()    {}
 func (*DigitalGoodsPurchase_Attachment) Descriptor() ([]byte, []int) {
-	return fileDescriptor_transaction_c8a87d91d7888997, []int{19, 0}
+	return fileDescriptor_transaction_4cf31c87b402708a, []int{19, 0}
 }
 func (m *DigitalGoodsPurchase_Attachment) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_DigitalGoodsPurchase_Attachment.Unmarshal(m, b)
@@ -2072,9 +2180,9 @@ func (m *DigitalGoodsPurchase_Attachment) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_DigitalGoodsPurchase_Attachment proto.InternalMessageInfo
 
-func (m *DigitalGoodsPurchase_Attachment) GetGoods() uint64 {
+func (m *DigitalGoodsPurchase_Attachment) GetId() uint64 {
 	if m != nil {
-		return m.Goods
+		return m.Id
 	}
 	return 0
 }
@@ -2103,7 +2211,7 @@ func (m *DigitalGoodsPurchase_Attachment) GetDeliveryDeadlineTimestamp() uint32 
 type DigitalGoodsDelivery struct {
 	Header               *TransactionHeader               `protobuf:"bytes,1,opt,name=header" json:"header,omitempty"`
 	Attachment           *DigitalGoodsDelivery_Attachment `protobuf:"bytes,2,opt,name=attachment" json:"attachment,omitempty"`
-	Appendixes           []*Appendix                      `protobuf:"bytes,3,rep,name=appendixes" json:"appendixes,omitempty"`
+	Appendix             *Appendix                        `protobuf:"bytes,3,opt,name=appendix" json:"appendix,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}                         `json:"-"`
 	XXX_unrecognized     []byte                           `json:"-"`
 	XXX_sizecache        int32                            `json:"-"`
@@ -2113,7 +2221,7 @@ func (m *DigitalGoodsDelivery) Reset()         { *m = DigitalGoodsDelivery{} }
 func (m *DigitalGoodsDelivery) String() string { return proto.CompactTextString(m) }
 func (*DigitalGoodsDelivery) ProtoMessage()    {}
 func (*DigitalGoodsDelivery) Descriptor() ([]byte, []int) {
-	return fileDescriptor_transaction_c8a87d91d7888997, []int{20}
+	return fileDescriptor_transaction_4cf31c87b402708a, []int{20}
 }
 func (m *DigitalGoodsDelivery) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_DigitalGoodsDelivery.Unmarshal(m, b)
@@ -2147,18 +2255,18 @@ func (m *DigitalGoodsDelivery) GetAttachment() *DigitalGoodsDelivery_Attachment 
 	return nil
 }
 
-func (m *DigitalGoodsDelivery) GetAppendixes() []*Appendix {
+func (m *DigitalGoodsDelivery) GetAppendix() *Appendix {
 	if m != nil {
-		return m.Appendixes
+		return m.Appendix
 	}
 	return nil
 }
 
 type DigitalGoodsDelivery_Attachment struct {
 	Purchase             uint64   `protobuf:"varint,1,opt,name=purchase" json:"purchase,omitempty"`
-	GoodsIsText          bool     `protobuf:"varint,2,opt,name=goodsIsText" json:"goodsIsText,omitempty"`
-	GoodsData            []byte   `protobuf:"bytes,3,opt,name=goodsData,proto3" json:"goodsData,omitempty"`
-	GoodsNonce           []byte   `protobuf:"bytes,4,opt,name=goodsNonce,proto3" json:"goodsNonce,omitempty"`
+	IsText               bool     `protobuf:"varint,2,opt,name=isText" json:"isText,omitempty"`
+	Data                 []byte   `protobuf:"bytes,3,opt,name=data,proto3" json:"data,omitempty"`
+	Nonce                []byte   `protobuf:"bytes,4,opt,name=nonce,proto3" json:"nonce,omitempty"`
 	Discount             uint64   `protobuf:"varint,5,opt,name=discount" json:"discount,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
@@ -2169,7 +2277,7 @@ func (m *DigitalGoodsDelivery_Attachment) Reset()         { *m = DigitalGoodsDel
 func (m *DigitalGoodsDelivery_Attachment) String() string { return proto.CompactTextString(m) }
 func (*DigitalGoodsDelivery_Attachment) ProtoMessage()    {}
 func (*DigitalGoodsDelivery_Attachment) Descriptor() ([]byte, []int) {
-	return fileDescriptor_transaction_c8a87d91d7888997, []int{20, 0}
+	return fileDescriptor_transaction_4cf31c87b402708a, []int{20, 0}
 }
 func (m *DigitalGoodsDelivery_Attachment) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_DigitalGoodsDelivery_Attachment.Unmarshal(m, b)
@@ -2196,23 +2304,23 @@ func (m *DigitalGoodsDelivery_Attachment) GetPurchase() uint64 {
 	return 0
 }
 
-func (m *DigitalGoodsDelivery_Attachment) GetGoodsIsText() bool {
+func (m *DigitalGoodsDelivery_Attachment) GetIsText() bool {
 	if m != nil {
-		return m.GoodsIsText
+		return m.IsText
 	}
 	return false
 }
 
-func (m *DigitalGoodsDelivery_Attachment) GetGoodsData() []byte {
+func (m *DigitalGoodsDelivery_Attachment) GetData() []byte {
 	if m != nil {
-		return m.GoodsData
+		return m.Data
 	}
 	return nil
 }
 
-func (m *DigitalGoodsDelivery_Attachment) GetGoodsNonce() []byte {
+func (m *DigitalGoodsDelivery_Attachment) GetNonce() []byte {
 	if m != nil {
-		return m.GoodsNonce
+		return m.Nonce
 	}
 	return nil
 }
@@ -2227,7 +2335,7 @@ func (m *DigitalGoodsDelivery_Attachment) GetDiscount() uint64 {
 type DigitalGoodsFeedback struct {
 	Header               *TransactionHeader               `protobuf:"bytes,1,opt,name=header" json:"header,omitempty"`
 	Attachment           *DigitalGoodsFeedback_Attachment `protobuf:"bytes,2,opt,name=attachment" json:"attachment,omitempty"`
-	Appendixes           []*Appendix                      `protobuf:"bytes,3,rep,name=appendixes" json:"appendixes,omitempty"`
+	Appendix             *Appendix                        `protobuf:"bytes,3,opt,name=appendix" json:"appendix,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}                         `json:"-"`
 	XXX_unrecognized     []byte                           `json:"-"`
 	XXX_sizecache        int32                            `json:"-"`
@@ -2237,7 +2345,7 @@ func (m *DigitalGoodsFeedback) Reset()         { *m = DigitalGoodsFeedback{} }
 func (m *DigitalGoodsFeedback) String() string { return proto.CompactTextString(m) }
 func (*DigitalGoodsFeedback) ProtoMessage()    {}
 func (*DigitalGoodsFeedback) Descriptor() ([]byte, []int) {
-	return fileDescriptor_transaction_c8a87d91d7888997, []int{21}
+	return fileDescriptor_transaction_4cf31c87b402708a, []int{21}
 }
 func (m *DigitalGoodsFeedback) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_DigitalGoodsFeedback.Unmarshal(m, b)
@@ -2271,9 +2379,9 @@ func (m *DigitalGoodsFeedback) GetAttachment() *DigitalGoodsFeedback_Attachment 
 	return nil
 }
 
-func (m *DigitalGoodsFeedback) GetAppendixes() []*Appendix {
+func (m *DigitalGoodsFeedback) GetAppendix() *Appendix {
 	if m != nil {
-		return m.Appendixes
+		return m.Appendix
 	}
 	return nil
 }
@@ -2289,7 +2397,7 @@ func (m *DigitalGoodsFeedback_Attachment) Reset()         { *m = DigitalGoodsFee
 func (m *DigitalGoodsFeedback_Attachment) String() string { return proto.CompactTextString(m) }
 func (*DigitalGoodsFeedback_Attachment) ProtoMessage()    {}
 func (*DigitalGoodsFeedback_Attachment) Descriptor() ([]byte, []int) {
-	return fileDescriptor_transaction_c8a87d91d7888997, []int{21, 0}
+	return fileDescriptor_transaction_4cf31c87b402708a, []int{21, 0}
 }
 func (m *DigitalGoodsFeedback_Attachment) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_DigitalGoodsFeedback_Attachment.Unmarshal(m, b)
@@ -2319,7 +2427,7 @@ func (m *DigitalGoodsFeedback_Attachment) GetPurchase() uint64 {
 type DigitalGoodsRefund struct {
 	Header               *TransactionHeader             `protobuf:"bytes,1,opt,name=header" json:"header,omitempty"`
 	Attachment           *DigitalGoodsRefund_Attachment `protobuf:"bytes,2,opt,name=attachment" json:"attachment,omitempty"`
-	Appendixes           []*Appendix                    `protobuf:"bytes,3,rep,name=appendixes" json:"appendixes,omitempty"`
+	Appendix             *Appendix                      `protobuf:"bytes,3,opt,name=appendix" json:"appendix,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}                       `json:"-"`
 	XXX_unrecognized     []byte                         `json:"-"`
 	XXX_sizecache        int32                          `json:"-"`
@@ -2329,7 +2437,7 @@ func (m *DigitalGoodsRefund) Reset()         { *m = DigitalGoodsRefund{} }
 func (m *DigitalGoodsRefund) String() string { return proto.CompactTextString(m) }
 func (*DigitalGoodsRefund) ProtoMessage()    {}
 func (*DigitalGoodsRefund) Descriptor() ([]byte, []int) {
-	return fileDescriptor_transaction_c8a87d91d7888997, []int{22}
+	return fileDescriptor_transaction_4cf31c87b402708a, []int{22}
 }
 func (m *DigitalGoodsRefund) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_DigitalGoodsRefund.Unmarshal(m, b)
@@ -2363,16 +2471,16 @@ func (m *DigitalGoodsRefund) GetAttachment() *DigitalGoodsRefund_Attachment {
 	return nil
 }
 
-func (m *DigitalGoodsRefund) GetAppendixes() []*Appendix {
+func (m *DigitalGoodsRefund) GetAppendix() *Appendix {
 	if m != nil {
-		return m.Appendixes
+		return m.Appendix
 	}
 	return nil
 }
 
 type DigitalGoodsRefund_Attachment struct {
 	Purchase             uint64   `protobuf:"varint,1,opt,name=purchase" json:"purchase,omitempty"`
-	RefundPrice          uint64   `protobuf:"varint,2,opt,name=refundPrice" json:"refundPrice,omitempty"`
+	Refund               uint64   `protobuf:"varint,2,opt,name=refund" json:"refund,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -2382,7 +2490,7 @@ func (m *DigitalGoodsRefund_Attachment) Reset()         { *m = DigitalGoodsRefun
 func (m *DigitalGoodsRefund_Attachment) String() string { return proto.CompactTextString(m) }
 func (*DigitalGoodsRefund_Attachment) ProtoMessage()    {}
 func (*DigitalGoodsRefund_Attachment) Descriptor() ([]byte, []int) {
-	return fileDescriptor_transaction_c8a87d91d7888997, []int{22, 0}
+	return fileDescriptor_transaction_4cf31c87b402708a, []int{22, 0}
 }
 func (m *DigitalGoodsRefund_Attachment) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_DigitalGoodsRefund_Attachment.Unmarshal(m, b)
@@ -2409,9 +2517,9 @@ func (m *DigitalGoodsRefund_Attachment) GetPurchase() uint64 {
 	return 0
 }
 
-func (m *DigitalGoodsRefund_Attachment) GetRefundPrice() uint64 {
+func (m *DigitalGoodsRefund_Attachment) GetRefund() uint64 {
 	if m != nil {
-		return m.RefundPrice
+		return m.Refund
 	}
 	return 0
 }
@@ -2419,7 +2527,7 @@ func (m *DigitalGoodsRefund_Attachment) GetRefundPrice() uint64 {
 type EffectiveBalanceLeasing struct {
 	Header               *TransactionHeader                  `protobuf:"bytes,1,opt,name=header" json:"header,omitempty"`
 	Attachment           *EffectiveBalanceLeasing_Attachment `protobuf:"bytes,2,opt,name=attachment" json:"attachment,omitempty"`
-	Appendixes           []*Appendix                         `protobuf:"bytes,3,rep,name=appendixes" json:"appendixes,omitempty"`
+	Appendix             *Appendix                           `protobuf:"bytes,3,opt,name=appendix" json:"appendix,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}                            `json:"-"`
 	XXX_unrecognized     []byte                              `json:"-"`
 	XXX_sizecache        int32                               `json:"-"`
@@ -2429,7 +2537,7 @@ func (m *EffectiveBalanceLeasing) Reset()         { *m = EffectiveBalanceLeasing
 func (m *EffectiveBalanceLeasing) String() string { return proto.CompactTextString(m) }
 func (*EffectiveBalanceLeasing) ProtoMessage()    {}
 func (*EffectiveBalanceLeasing) Descriptor() ([]byte, []int) {
-	return fileDescriptor_transaction_c8a87d91d7888997, []int{23}
+	return fileDescriptor_transaction_4cf31c87b402708a, []int{23}
 }
 func (m *EffectiveBalanceLeasing) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_EffectiveBalanceLeasing.Unmarshal(m, b)
@@ -2463,9 +2571,9 @@ func (m *EffectiveBalanceLeasing) GetAttachment() *EffectiveBalanceLeasing_Attac
 	return nil
 }
 
-func (m *EffectiveBalanceLeasing) GetAppendixes() []*Appendix {
+func (m *EffectiveBalanceLeasing) GetAppendix() *Appendix {
 	if m != nil {
-		return m.Appendixes
+		return m.Appendix
 	}
 	return nil
 }
@@ -2481,7 +2589,7 @@ func (m *EffectiveBalanceLeasing_Attachment) Reset()         { *m = EffectiveBal
 func (m *EffectiveBalanceLeasing_Attachment) String() string { return proto.CompactTextString(m) }
 func (*EffectiveBalanceLeasing_Attachment) ProtoMessage()    {}
 func (*EffectiveBalanceLeasing_Attachment) Descriptor() ([]byte, []int) {
-	return fileDescriptor_transaction_c8a87d91d7888997, []int{23, 0}
+	return fileDescriptor_transaction_4cf31c87b402708a, []int{23, 0}
 }
 func (m *EffectiveBalanceLeasing_Attachment) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_EffectiveBalanceLeasing_Attachment.Unmarshal(m, b)
@@ -2510,7 +2618,7 @@ func (m *EffectiveBalanceLeasing_Attachment) GetPeriod() uint32 {
 
 type RewardRecipientAssignment struct {
 	Header               *TransactionHeader `protobuf:"bytes,1,opt,name=header" json:"header,omitempty"`
-	Appendixes           []*Appendix        `protobuf:"bytes,2,rep,name=appendixes" json:"appendixes,omitempty"`
+	Appendix             *Appendix          `protobuf:"bytes,2,opt,name=appendix" json:"appendix,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}           `json:"-"`
 	XXX_unrecognized     []byte             `json:"-"`
 	XXX_sizecache        int32              `json:"-"`
@@ -2520,7 +2628,7 @@ func (m *RewardRecipientAssignment) Reset()         { *m = RewardRecipientAssign
 func (m *RewardRecipientAssignment) String() string { return proto.CompactTextString(m) }
 func (*RewardRecipientAssignment) ProtoMessage()    {}
 func (*RewardRecipientAssignment) Descriptor() ([]byte, []int) {
-	return fileDescriptor_transaction_c8a87d91d7888997, []int{24}
+	return fileDescriptor_transaction_4cf31c87b402708a, []int{24}
 }
 func (m *RewardRecipientAssignment) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_RewardRecipientAssignment.Unmarshal(m, b)
@@ -2547,9 +2655,9 @@ func (m *RewardRecipientAssignment) GetHeader() *TransactionHeader {
 	return nil
 }
 
-func (m *RewardRecipientAssignment) GetAppendixes() []*Appendix {
+func (m *RewardRecipientAssignment) GetAppendix() *Appendix {
 	if m != nil {
-		return m.Appendixes
+		return m.Appendix
 	}
 	return nil
 }
@@ -2557,7 +2665,7 @@ func (m *RewardRecipientAssignment) GetAppendixes() []*Appendix {
 type EscrowCreation struct {
 	Header               *TransactionHeader         `protobuf:"bytes,1,opt,name=header" json:"header,omitempty"`
 	Attachment           *EscrowCreation_Attachment `protobuf:"bytes,2,opt,name=attachment" json:"attachment,omitempty"`
-	Appendixes           []*Appendix                `protobuf:"bytes,3,rep,name=appendixes" json:"appendixes,omitempty"`
+	Appendix             *Appendix                  `protobuf:"bytes,3,opt,name=appendix" json:"appendix,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}                   `json:"-"`
 	XXX_unrecognized     []byte                     `json:"-"`
 	XXX_sizecache        int32                      `json:"-"`
@@ -2567,7 +2675,7 @@ func (m *EscrowCreation) Reset()         { *m = EscrowCreation{} }
 func (m *EscrowCreation) String() string { return proto.CompactTextString(m) }
 func (*EscrowCreation) ProtoMessage()    {}
 func (*EscrowCreation) Descriptor() ([]byte, []int) {
-	return fileDescriptor_transaction_c8a87d91d7888997, []int{25}
+	return fileDescriptor_transaction_4cf31c87b402708a, []int{25}
 }
 func (m *EscrowCreation) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_EscrowCreation.Unmarshal(m, b)
@@ -2601,28 +2709,29 @@ func (m *EscrowCreation) GetAttachment() *EscrowCreation_Attachment {
 	return nil
 }
 
-func (m *EscrowCreation) GetAppendixes() []*Appendix {
+func (m *EscrowCreation) GetAppendix() *Appendix {
 	if m != nil {
-		return m.Appendixes
+		return m.Appendix
 	}
 	return nil
 }
 
 type EscrowCreation_Attachment struct {
-	Amount               uint64                                   `protobuf:"varint,1,opt,name=amount" json:"amount,omitempty"`
-	DeadlineAction       EscrowCreation_Attachment_DeadlineAction `protobuf:"varint,2,opt,name=deadlineAction,enum=p2p.EscrowCreation_Attachment_DeadlineAction" json:"deadlineAction,omitempty"`
-	RequiredSigners      int32                                    `protobuf:"varint,3,opt,name=requiredSigners" json:"requiredSigners,omitempty"`
-	Signers              []uint64                                 `protobuf:"varint,4,rep,packed,name=signers" json:"signers,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}                                 `json:"-"`
-	XXX_unrecognized     []byte                                   `json:"-"`
-	XXX_sizecache        int32                                    `json:"-"`
+	Amount               uint64         `protobuf:"varint,1,opt,name=amount" json:"amount,omitempty"`
+	Deadline             uint32         `protobuf:"varint,2,opt,name=deadline" json:"deadline,omitempty"`
+	DeadlineAction       DeadlineAction `protobuf:"varint,3,opt,name=deadlineAction,enum=p2p.DeadlineAction" json:"deadlineAction,omitempty"`
+	RequiredSigners      int32          `protobuf:"varint,4,opt,name=requiredSigners" json:"requiredSigners,omitempty"`
+	Signers              []uint64       `protobuf:"varint,5,rep,packed,name=signers" json:"signers,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}       `json:"-"`
+	XXX_unrecognized     []byte         `json:"-"`
+	XXX_sizecache        int32          `json:"-"`
 }
 
 func (m *EscrowCreation_Attachment) Reset()         { *m = EscrowCreation_Attachment{} }
 func (m *EscrowCreation_Attachment) String() string { return proto.CompactTextString(m) }
 func (*EscrowCreation_Attachment) ProtoMessage()    {}
 func (*EscrowCreation_Attachment) Descriptor() ([]byte, []int) {
-	return fileDescriptor_transaction_c8a87d91d7888997, []int{25, 0}
+	return fileDescriptor_transaction_4cf31c87b402708a, []int{25, 0}
 }
 func (m *EscrowCreation_Attachment) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_EscrowCreation_Attachment.Unmarshal(m, b)
@@ -2649,11 +2758,18 @@ func (m *EscrowCreation_Attachment) GetAmount() uint64 {
 	return 0
 }
 
-func (m *EscrowCreation_Attachment) GetDeadlineAction() EscrowCreation_Attachment_DeadlineAction {
+func (m *EscrowCreation_Attachment) GetDeadline() uint32 {
+	if m != nil {
+		return m.Deadline
+	}
+	return 0
+}
+
+func (m *EscrowCreation_Attachment) GetDeadlineAction() DeadlineAction {
 	if m != nil {
 		return m.DeadlineAction
 	}
-	return EscrowCreation_Attachment_UNDECIDED
+	return DeadlineAction_undecided
 }
 
 func (m *EscrowCreation_Attachment) GetRequiredSigners() int32 {
@@ -2673,7 +2789,7 @@ func (m *EscrowCreation_Attachment) GetSigners() []uint64 {
 type EscrowSign struct {
 	Header               *TransactionHeader     `protobuf:"bytes,1,opt,name=header" json:"header,omitempty"`
 	Attachment           *EscrowSign_Attachment `protobuf:"bytes,2,opt,name=attachment" json:"attachment,omitempty"`
-	Appendixes           []*Appendix            `protobuf:"bytes,3,rep,name=appendixes" json:"appendixes,omitempty"`
+	Appendix             *Appendix              `protobuf:"bytes,3,opt,name=appendix" json:"appendix,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}               `json:"-"`
 	XXX_unrecognized     []byte                 `json:"-"`
 	XXX_sizecache        int32                  `json:"-"`
@@ -2683,7 +2799,7 @@ func (m *EscrowSign) Reset()         { *m = EscrowSign{} }
 func (m *EscrowSign) String() string { return proto.CompactTextString(m) }
 func (*EscrowSign) ProtoMessage()    {}
 func (*EscrowSign) Descriptor() ([]byte, []int) {
-	return fileDescriptor_transaction_c8a87d91d7888997, []int{26}
+	return fileDescriptor_transaction_4cf31c87b402708a, []int{26}
 }
 func (m *EscrowSign) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_EscrowSign.Unmarshal(m, b)
@@ -2717,26 +2833,26 @@ func (m *EscrowSign) GetAttachment() *EscrowSign_Attachment {
 	return nil
 }
 
-func (m *EscrowSign) GetAppendixes() []*Appendix {
+func (m *EscrowSign) GetAppendix() *Appendix {
 	if m != nil {
-		return m.Appendixes
+		return m.Appendix
 	}
 	return nil
 }
 
 type EscrowSign_Attachment struct {
-	EscrowID             uint64   `protobuf:"varint,1,opt,name=escrowID" json:"escrowID,omitempty"`
-	Decision             uint32   `protobuf:"varint,2,opt,name=decision" json:"decision,omitempty"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
+	Id                   uint64         `protobuf:"varint,1,opt,name=id" json:"id,omitempty"`
+	Decision             DeadlineAction `protobuf:"varint,2,opt,name=decision,enum=p2p.DeadlineAction" json:"decision,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}       `json:"-"`
+	XXX_unrecognized     []byte         `json:"-"`
+	XXX_sizecache        int32          `json:"-"`
 }
 
 func (m *EscrowSign_Attachment) Reset()         { *m = EscrowSign_Attachment{} }
 func (m *EscrowSign_Attachment) String() string { return proto.CompactTextString(m) }
 func (*EscrowSign_Attachment) ProtoMessage()    {}
 func (*EscrowSign_Attachment) Descriptor() ([]byte, []int) {
-	return fileDescriptor_transaction_c8a87d91d7888997, []int{26, 0}
+	return fileDescriptor_transaction_4cf31c87b402708a, []int{26, 0}
 }
 func (m *EscrowSign_Attachment) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_EscrowSign_Attachment.Unmarshal(m, b)
@@ -2756,24 +2872,24 @@ func (m *EscrowSign_Attachment) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_EscrowSign_Attachment proto.InternalMessageInfo
 
-func (m *EscrowSign_Attachment) GetEscrowID() uint64 {
+func (m *EscrowSign_Attachment) GetId() uint64 {
 	if m != nil {
-		return m.EscrowID
+		return m.Id
 	}
 	return 0
 }
 
-func (m *EscrowSign_Attachment) GetDecision() uint32 {
+func (m *EscrowSign_Attachment) GetDecision() DeadlineAction {
 	if m != nil {
 		return m.Decision
 	}
-	return 0
+	return DeadlineAction_undecided
 }
 
 type EscrowResult struct {
 	Header               *TransactionHeader       `protobuf:"bytes,1,opt,name=header" json:"header,omitempty"`
 	Attachment           *EscrowResult_Attachment `protobuf:"bytes,2,opt,name=attachment" json:"attachment,omitempty"`
-	Appendixes           []*Appendix              `protobuf:"bytes,3,rep,name=appendixes" json:"appendixes,omitempty"`
+	Appendix             *Appendix                `protobuf:"bytes,3,opt,name=appendix" json:"appendix,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}                 `json:"-"`
 	XXX_unrecognized     []byte                   `json:"-"`
 	XXX_sizecache        int32                    `json:"-"`
@@ -2783,7 +2899,7 @@ func (m *EscrowResult) Reset()         { *m = EscrowResult{} }
 func (m *EscrowResult) String() string { return proto.CompactTextString(m) }
 func (*EscrowResult) ProtoMessage()    {}
 func (*EscrowResult) Descriptor() ([]byte, []int) {
-	return fileDescriptor_transaction_c8a87d91d7888997, []int{27}
+	return fileDescriptor_transaction_4cf31c87b402708a, []int{27}
 }
 func (m *EscrowResult) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_EscrowResult.Unmarshal(m, b)
@@ -2817,26 +2933,26 @@ func (m *EscrowResult) GetAttachment() *EscrowResult_Attachment {
 	return nil
 }
 
-func (m *EscrowResult) GetAppendixes() []*Appendix {
+func (m *EscrowResult) GetAppendix() *Appendix {
 	if m != nil {
-		return m.Appendixes
+		return m.Appendix
 	}
 	return nil
 }
 
 type EscrowResult_Attachment struct {
-	EscrowID             uint64   `protobuf:"varint,1,opt,name=escrowID" json:"escrowID,omitempty"`
-	Decision             uint32   `protobuf:"varint,2,opt,name=decision" json:"decision,omitempty"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
+	Id                   uint64         `protobuf:"varint,1,opt,name=id" json:"id,omitempty"`
+	Decision             DeadlineAction `protobuf:"varint,2,opt,name=decision,enum=p2p.DeadlineAction" json:"decision,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}       `json:"-"`
+	XXX_unrecognized     []byte         `json:"-"`
+	XXX_sizecache        int32          `json:"-"`
 }
 
 func (m *EscrowResult_Attachment) Reset()         { *m = EscrowResult_Attachment{} }
 func (m *EscrowResult_Attachment) String() string { return proto.CompactTextString(m) }
 func (*EscrowResult_Attachment) ProtoMessage()    {}
 func (*EscrowResult_Attachment) Descriptor() ([]byte, []int) {
-	return fileDescriptor_transaction_c8a87d91d7888997, []int{27, 0}
+	return fileDescriptor_transaction_4cf31c87b402708a, []int{27, 0}
 }
 func (m *EscrowResult_Attachment) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_EscrowResult_Attachment.Unmarshal(m, b)
@@ -2856,24 +2972,24 @@ func (m *EscrowResult_Attachment) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_EscrowResult_Attachment proto.InternalMessageInfo
 
-func (m *EscrowResult_Attachment) GetEscrowID() uint64 {
+func (m *EscrowResult_Attachment) GetId() uint64 {
 	if m != nil {
-		return m.EscrowID
+		return m.Id
 	}
 	return 0
 }
 
-func (m *EscrowResult_Attachment) GetDecision() uint32 {
+func (m *EscrowResult_Attachment) GetDecision() DeadlineAction {
 	if m != nil {
 		return m.Decision
 	}
-	return 0
+	return DeadlineAction_undecided
 }
 
 type SubscriptionSubscribe struct {
 	Header               *TransactionHeader                `protobuf:"bytes,1,opt,name=header" json:"header,omitempty"`
 	Attachment           *SubscriptionSubscribe_Attachment `protobuf:"bytes,2,opt,name=attachment" json:"attachment,omitempty"`
-	Appendixes           []*Appendix                       `protobuf:"bytes,3,rep,name=appendixes" json:"appendixes,omitempty"`
+	Appendix             *Appendix                         `protobuf:"bytes,3,opt,name=appendix" json:"appendix,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}                          `json:"-"`
 	XXX_unrecognized     []byte                            `json:"-"`
 	XXX_sizecache        int32                             `json:"-"`
@@ -2883,7 +2999,7 @@ func (m *SubscriptionSubscribe) Reset()         { *m = SubscriptionSubscribe{} }
 func (m *SubscriptionSubscribe) String() string { return proto.CompactTextString(m) }
 func (*SubscriptionSubscribe) ProtoMessage()    {}
 func (*SubscriptionSubscribe) Descriptor() ([]byte, []int) {
-	return fileDescriptor_transaction_c8a87d91d7888997, []int{28}
+	return fileDescriptor_transaction_4cf31c87b402708a, []int{28}
 }
 func (m *SubscriptionSubscribe) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_SubscriptionSubscribe.Unmarshal(m, b)
@@ -2917,9 +3033,9 @@ func (m *SubscriptionSubscribe) GetAttachment() *SubscriptionSubscribe_Attachmen
 	return nil
 }
 
-func (m *SubscriptionSubscribe) GetAppendixes() []*Appendix {
+func (m *SubscriptionSubscribe) GetAppendix() *Appendix {
 	if m != nil {
-		return m.Appendixes
+		return m.Appendix
 	}
 	return nil
 }
@@ -2935,7 +3051,7 @@ func (m *SubscriptionSubscribe_Attachment) Reset()         { *m = SubscriptionSu
 func (m *SubscriptionSubscribe_Attachment) String() string { return proto.CompactTextString(m) }
 func (*SubscriptionSubscribe_Attachment) ProtoMessage()    {}
 func (*SubscriptionSubscribe_Attachment) Descriptor() ([]byte, []int) {
-	return fileDescriptor_transaction_c8a87d91d7888997, []int{28, 0}
+	return fileDescriptor_transaction_4cf31c87b402708a, []int{28, 0}
 }
 func (m *SubscriptionSubscribe_Attachment) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_SubscriptionSubscribe_Attachment.Unmarshal(m, b)
@@ -2965,7 +3081,7 @@ func (m *SubscriptionSubscribe_Attachment) GetFrequency() uint32 {
 type SubscriptionCancel struct {
 	Header               *TransactionHeader             `protobuf:"bytes,1,opt,name=header" json:"header,omitempty"`
 	Attachment           *SubscriptionCancel_Attachment `protobuf:"bytes,2,opt,name=attachment" json:"attachment,omitempty"`
-	Appendixes           []*Appendix                    `protobuf:"bytes,3,rep,name=appendixes" json:"appendixes,omitempty"`
+	Appendix             *Appendix                      `protobuf:"bytes,3,opt,name=appendix" json:"appendix,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}                       `json:"-"`
 	XXX_unrecognized     []byte                         `json:"-"`
 	XXX_sizecache        int32                          `json:"-"`
@@ -2975,7 +3091,7 @@ func (m *SubscriptionCancel) Reset()         { *m = SubscriptionCancel{} }
 func (m *SubscriptionCancel) String() string { return proto.CompactTextString(m) }
 func (*SubscriptionCancel) ProtoMessage()    {}
 func (*SubscriptionCancel) Descriptor() ([]byte, []int) {
-	return fileDescriptor_transaction_c8a87d91d7888997, []int{29}
+	return fileDescriptor_transaction_4cf31c87b402708a, []int{29}
 }
 func (m *SubscriptionCancel) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_SubscriptionCancel.Unmarshal(m, b)
@@ -3009,15 +3125,15 @@ func (m *SubscriptionCancel) GetAttachment() *SubscriptionCancel_Attachment {
 	return nil
 }
 
-func (m *SubscriptionCancel) GetAppendixes() []*Appendix {
+func (m *SubscriptionCancel) GetAppendix() *Appendix {
 	if m != nil {
-		return m.Appendixes
+		return m.Appendix
 	}
 	return nil
 }
 
 type SubscriptionCancel_Attachment struct {
-	SubscriptionID       uint64   `protobuf:"varint,1,opt,name=subscriptionID" json:"subscriptionID,omitempty"`
+	Id                   uint64   `protobuf:"varint,1,opt,name=id" json:"id,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -3027,7 +3143,7 @@ func (m *SubscriptionCancel_Attachment) Reset()         { *m = SubscriptionCance
 func (m *SubscriptionCancel_Attachment) String() string { return proto.CompactTextString(m) }
 func (*SubscriptionCancel_Attachment) ProtoMessage()    {}
 func (*SubscriptionCancel_Attachment) Descriptor() ([]byte, []int) {
-	return fileDescriptor_transaction_c8a87d91d7888997, []int{29, 0}
+	return fileDescriptor_transaction_4cf31c87b402708a, []int{29, 0}
 }
 func (m *SubscriptionCancel_Attachment) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_SubscriptionCancel_Attachment.Unmarshal(m, b)
@@ -3047,9 +3163,9 @@ func (m *SubscriptionCancel_Attachment) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_SubscriptionCancel_Attachment proto.InternalMessageInfo
 
-func (m *SubscriptionCancel_Attachment) GetSubscriptionID() uint64 {
+func (m *SubscriptionCancel_Attachment) GetId() uint64 {
 	if m != nil {
-		return m.SubscriptionID
+		return m.Id
 	}
 	return 0
 }
@@ -3057,7 +3173,7 @@ func (m *SubscriptionCancel_Attachment) GetSubscriptionID() uint64 {
 type SubscriptionPayment struct {
 	Header               *TransactionHeader              `protobuf:"bytes,1,opt,name=header" json:"header,omitempty"`
 	Attachment           *SubscriptionPayment_Attachment `protobuf:"bytes,2,opt,name=attachment" json:"attachment,omitempty"`
-	Appendixes           []*Appendix                     `protobuf:"bytes,3,rep,name=appendixes" json:"appendixes,omitempty"`
+	Appendix             *Appendix                       `protobuf:"bytes,3,opt,name=appendix" json:"appendix,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}                        `json:"-"`
 	XXX_unrecognized     []byte                          `json:"-"`
 	XXX_sizecache        int32                           `json:"-"`
@@ -3067,7 +3183,7 @@ func (m *SubscriptionPayment) Reset()         { *m = SubscriptionPayment{} }
 func (m *SubscriptionPayment) String() string { return proto.CompactTextString(m) }
 func (*SubscriptionPayment) ProtoMessage()    {}
 func (*SubscriptionPayment) Descriptor() ([]byte, []int) {
-	return fileDescriptor_transaction_c8a87d91d7888997, []int{30}
+	return fileDescriptor_transaction_4cf31c87b402708a, []int{30}
 }
 func (m *SubscriptionPayment) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_SubscriptionPayment.Unmarshal(m, b)
@@ -3101,15 +3217,15 @@ func (m *SubscriptionPayment) GetAttachment() *SubscriptionPayment_Attachment {
 	return nil
 }
 
-func (m *SubscriptionPayment) GetAppendixes() []*Appendix {
+func (m *SubscriptionPayment) GetAppendix() *Appendix {
 	if m != nil {
-		return m.Appendixes
+		return m.Appendix
 	}
 	return nil
 }
 
 type SubscriptionPayment_Attachment struct {
-	SubscriptionID       []uint64 `protobuf:"varint,1,rep,packed,name=subscriptionID" json:"subscriptionID,omitempty"`
+	Ids                  []uint64 `protobuf:"varint,1,rep,packed,name=ids" json:"ids,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -3119,7 +3235,7 @@ func (m *SubscriptionPayment_Attachment) Reset()         { *m = SubscriptionPaym
 func (m *SubscriptionPayment_Attachment) String() string { return proto.CompactTextString(m) }
 func (*SubscriptionPayment_Attachment) ProtoMessage()    {}
 func (*SubscriptionPayment_Attachment) Descriptor() ([]byte, []int) {
-	return fileDescriptor_transaction_c8a87d91d7888997, []int{30, 0}
+	return fileDescriptor_transaction_4cf31c87b402708a, []int{30, 0}
 }
 func (m *SubscriptionPayment_Attachment) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_SubscriptionPayment_Attachment.Unmarshal(m, b)
@@ -3139,9 +3255,9 @@ func (m *SubscriptionPayment_Attachment) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_SubscriptionPayment_Attachment proto.InternalMessageInfo
 
-func (m *SubscriptionPayment_Attachment) GetSubscriptionID() []uint64 {
+func (m *SubscriptionPayment_Attachment) GetIds() []uint64 {
 	if m != nil {
-		return m.SubscriptionID
+		return m.Ids
 	}
 	return nil
 }
@@ -3149,7 +3265,7 @@ func (m *SubscriptionPayment_Attachment) GetSubscriptionID() []uint64 {
 type AutomatedTransactionsCreation struct {
 	Header               *TransactionHeader                        `protobuf:"bytes,1,opt,name=header" json:"header,omitempty"`
 	Attachment           *AutomatedTransactionsCreation_Attachment `protobuf:"bytes,2,opt,name=attachment" json:"attachment,omitempty"`
-	Appendixes           []*Appendix                               `protobuf:"bytes,3,rep,name=appendixes" json:"appendixes,omitempty"`
+	Appendix             *Appendix                                 `protobuf:"bytes,3,opt,name=appendix" json:"appendix,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}                                  `json:"-"`
 	XXX_unrecognized     []byte                                    `json:"-"`
 	XXX_sizecache        int32                                     `json:"-"`
@@ -3159,7 +3275,7 @@ func (m *AutomatedTransactionsCreation) Reset()         { *m = AutomatedTransact
 func (m *AutomatedTransactionsCreation) String() string { return proto.CompactTextString(m) }
 func (*AutomatedTransactionsCreation) ProtoMessage()    {}
 func (*AutomatedTransactionsCreation) Descriptor() ([]byte, []int) {
-	return fileDescriptor_transaction_c8a87d91d7888997, []int{31}
+	return fileDescriptor_transaction_4cf31c87b402708a, []int{31}
 }
 func (m *AutomatedTransactionsCreation) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_AutomatedTransactionsCreation.Unmarshal(m, b)
@@ -3193,9 +3309,9 @@ func (m *AutomatedTransactionsCreation) GetAttachment() *AutomatedTransactionsCr
 	return nil
 }
 
-func (m *AutomatedTransactionsCreation) GetAppendixes() []*Appendix {
+func (m *AutomatedTransactionsCreation) GetAppendix() *Appendix {
 	if m != nil {
-		return m.Appendixes
+		return m.Appendix
 	}
 	return nil
 }
@@ -3203,7 +3319,7 @@ func (m *AutomatedTransactionsCreation) GetAppendixes() []*Appendix {
 type AutomatedTransactionsCreation_Attachment struct {
 	Name                 string   `protobuf:"bytes,1,opt,name=name" json:"name,omitempty"`
 	Description          string   `protobuf:"bytes,2,opt,name=description" json:"description,omitempty"`
-	CreationBytes        []byte   `protobuf:"bytes,3,opt,name=creationBytes,proto3" json:"creationBytes,omitempty"`
+	Bytes                []byte   `protobuf:"bytes,3,opt,name=bytes,proto3" json:"bytes,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -3215,7 +3331,7 @@ func (m *AutomatedTransactionsCreation_Attachment) Reset() {
 func (m *AutomatedTransactionsCreation_Attachment) String() string { return proto.CompactTextString(m) }
 func (*AutomatedTransactionsCreation_Attachment) ProtoMessage()    {}
 func (*AutomatedTransactionsCreation_Attachment) Descriptor() ([]byte, []int) {
-	return fileDescriptor_transaction_c8a87d91d7888997, []int{31, 0}
+	return fileDescriptor_transaction_4cf31c87b402708a, []int{31, 0}
 }
 func (m *AutomatedTransactionsCreation_Attachment) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_AutomatedTransactionsCreation_Attachment.Unmarshal(m, b)
@@ -3249,317 +3365,101 @@ func (m *AutomatedTransactionsCreation_Attachment) GetDescription() string {
 	return ""
 }
 
-func (m *AutomatedTransactionsCreation_Attachment) GetCreationBytes() []byte {
+func (m *AutomatedTransactionsCreation_Attachment) GetBytes() []byte {
 	if m != nil {
-		return m.CreationBytes
+		return m.Bytes
 	}
 	return nil
 }
 
-type EncryptedMessage struct {
-	Header               *TransactionHeader           `protobuf:"bytes,1,opt,name=header" json:"header,omitempty"`
-	Attachment           *EncryptedMessage_Attachment `protobuf:"bytes,2,opt,name=attachment" json:"attachment,omitempty"`
-	Appendixes           []*Appendix                  `protobuf:"bytes,3,rep,name=appendixes" json:"appendixes,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}                     `json:"-"`
-	XXX_unrecognized     []byte                       `json:"-"`
-	XXX_sizecache        int32                        `json:"-"`
+type AutomatedTransactionsPayment struct {
+	Header               *TransactionHeader `protobuf:"bytes,1,opt,name=header" json:"header,omitempty"`
+	Appendix             *Appendix          `protobuf:"bytes,2,opt,name=appendix" json:"appendix,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}           `json:"-"`
+	XXX_unrecognized     []byte             `json:"-"`
+	XXX_sizecache        int32              `json:"-"`
 }
 
-func (m *EncryptedMessage) Reset()         { *m = EncryptedMessage{} }
-func (m *EncryptedMessage) String() string { return proto.CompactTextString(m) }
-func (*EncryptedMessage) ProtoMessage()    {}
-func (*EncryptedMessage) Descriptor() ([]byte, []int) {
-	return fileDescriptor_transaction_c8a87d91d7888997, []int{32}
+func (m *AutomatedTransactionsPayment) Reset()         { *m = AutomatedTransactionsPayment{} }
+func (m *AutomatedTransactionsPayment) String() string { return proto.CompactTextString(m) }
+func (*AutomatedTransactionsPayment) ProtoMessage()    {}
+func (*AutomatedTransactionsPayment) Descriptor() ([]byte, []int) {
+	return fileDescriptor_transaction_4cf31c87b402708a, []int{32}
 }
-func (m *EncryptedMessage) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_EncryptedMessage.Unmarshal(m, b)
+func (m *AutomatedTransactionsPayment) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_AutomatedTransactionsPayment.Unmarshal(m, b)
 }
-func (m *EncryptedMessage) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_EncryptedMessage.Marshal(b, m, deterministic)
+func (m *AutomatedTransactionsPayment) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_AutomatedTransactionsPayment.Marshal(b, m, deterministic)
 }
-func (dst *EncryptedMessage) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_EncryptedMessage.Merge(dst, src)
+func (dst *AutomatedTransactionsPayment) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_AutomatedTransactionsPayment.Merge(dst, src)
 }
-func (m *EncryptedMessage) XXX_Size() int {
-	return xxx_messageInfo_EncryptedMessage.Size(m)
+func (m *AutomatedTransactionsPayment) XXX_Size() int {
+	return xxx_messageInfo_AutomatedTransactionsPayment.Size(m)
 }
-func (m *EncryptedMessage) XXX_DiscardUnknown() {
-	xxx_messageInfo_EncryptedMessage.DiscardUnknown(m)
+func (m *AutomatedTransactionsPayment) XXX_DiscardUnknown() {
+	xxx_messageInfo_AutomatedTransactionsPayment.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_EncryptedMessage proto.InternalMessageInfo
+var xxx_messageInfo_AutomatedTransactionsPayment proto.InternalMessageInfo
 
-func (m *EncryptedMessage) GetHeader() *TransactionHeader {
+func (m *AutomatedTransactionsPayment) GetHeader() *TransactionHeader {
 	if m != nil {
 		return m.Header
 	}
 	return nil
 }
 
-func (m *EncryptedMessage) GetAttachment() *EncryptedMessage_Attachment {
+func (m *AutomatedTransactionsPayment) GetAppendix() *Appendix {
 	if m != nil {
-		return m.Attachment
+		return m.Appendix
 	}
 	return nil
 }
 
-func (m *EncryptedMessage) GetAppendixes() []*Appendix {
-	if m != nil {
-		return m.Appendixes
-	}
-	return nil
+type OrdinaryPayment struct {
+	Header               *TransactionHeader `protobuf:"bytes,1,opt,name=header" json:"header,omitempty"`
+	Appendix             *Appendix          `protobuf:"bytes,2,opt,name=appendix" json:"appendix,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}           `json:"-"`
+	XXX_unrecognized     []byte             `json:"-"`
+	XXX_sizecache        int32              `json:"-"`
 }
 
-type EncryptedMessage_Attachment struct {
-	IsText               bool     `protobuf:"varint,1,opt,name=isText" json:"isText,omitempty"`
-	Data                 []byte   `protobuf:"bytes,2,opt,name=data,proto3" json:"data,omitempty"`
-	Nonce                []byte   `protobuf:"bytes,3,opt,name=nonce,proto3" json:"nonce,omitempty"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
+func (m *OrdinaryPayment) Reset()         { *m = OrdinaryPayment{} }
+func (m *OrdinaryPayment) String() string { return proto.CompactTextString(m) }
+func (*OrdinaryPayment) ProtoMessage()    {}
+func (*OrdinaryPayment) Descriptor() ([]byte, []int) {
+	return fileDescriptor_transaction_4cf31c87b402708a, []int{33}
+}
+func (m *OrdinaryPayment) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_OrdinaryPayment.Unmarshal(m, b)
+}
+func (m *OrdinaryPayment) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_OrdinaryPayment.Marshal(b, m, deterministic)
+}
+func (dst *OrdinaryPayment) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_OrdinaryPayment.Merge(dst, src)
+}
+func (m *OrdinaryPayment) XXX_Size() int {
+	return xxx_messageInfo_OrdinaryPayment.Size(m)
+}
+func (m *OrdinaryPayment) XXX_DiscardUnknown() {
+	xxx_messageInfo_OrdinaryPayment.DiscardUnknown(m)
 }
 
-func (m *EncryptedMessage_Attachment) Reset()         { *m = EncryptedMessage_Attachment{} }
-func (m *EncryptedMessage_Attachment) String() string { return proto.CompactTextString(m) }
-func (*EncryptedMessage_Attachment) ProtoMessage()    {}
-func (*EncryptedMessage_Attachment) Descriptor() ([]byte, []int) {
-	return fileDescriptor_transaction_c8a87d91d7888997, []int{32, 0}
-}
-func (m *EncryptedMessage_Attachment) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_EncryptedMessage_Attachment.Unmarshal(m, b)
-}
-func (m *EncryptedMessage_Attachment) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_EncryptedMessage_Attachment.Marshal(b, m, deterministic)
-}
-func (dst *EncryptedMessage_Attachment) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_EncryptedMessage_Attachment.Merge(dst, src)
-}
-func (m *EncryptedMessage_Attachment) XXX_Size() int {
-	return xxx_messageInfo_EncryptedMessage_Attachment.Size(m)
-}
-func (m *EncryptedMessage_Attachment) XXX_DiscardUnknown() {
-	xxx_messageInfo_EncryptedMessage_Attachment.DiscardUnknown(m)
-}
+var xxx_messageInfo_OrdinaryPayment proto.InternalMessageInfo
 
-var xxx_messageInfo_EncryptedMessage_Attachment proto.InternalMessageInfo
-
-func (m *EncryptedMessage_Attachment) GetIsText() bool {
-	if m != nil {
-		return m.IsText
-	}
-	return false
-}
-
-func (m *EncryptedMessage_Attachment) GetData() []byte {
-	if m != nil {
-		return m.Data
-	}
-	return nil
-}
-
-func (m *EncryptedMessage_Attachment) GetNonce() []byte {
-	if m != nil {
-		return m.Nonce
-	}
-	return nil
-}
-
-type EncryptedToSelfMessage struct {
-	Header               *TransactionHeader                 `protobuf:"bytes,1,opt,name=header" json:"header,omitempty"`
-	Attachment           *EncryptedToSelfMessage_Attachment `protobuf:"bytes,2,opt,name=attachment" json:"attachment,omitempty"`
-	Appendixes           []*Appendix                        `protobuf:"bytes,3,rep,name=appendixes" json:"appendixes,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}                           `json:"-"`
-	XXX_unrecognized     []byte                             `json:"-"`
-	XXX_sizecache        int32                              `json:"-"`
-}
-
-func (m *EncryptedToSelfMessage) Reset()         { *m = EncryptedToSelfMessage{} }
-func (m *EncryptedToSelfMessage) String() string { return proto.CompactTextString(m) }
-func (*EncryptedToSelfMessage) ProtoMessage()    {}
-func (*EncryptedToSelfMessage) Descriptor() ([]byte, []int) {
-	return fileDescriptor_transaction_c8a87d91d7888997, []int{33}
-}
-func (m *EncryptedToSelfMessage) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_EncryptedToSelfMessage.Unmarshal(m, b)
-}
-func (m *EncryptedToSelfMessage) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_EncryptedToSelfMessage.Marshal(b, m, deterministic)
-}
-func (dst *EncryptedToSelfMessage) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_EncryptedToSelfMessage.Merge(dst, src)
-}
-func (m *EncryptedToSelfMessage) XXX_Size() int {
-	return xxx_messageInfo_EncryptedToSelfMessage.Size(m)
-}
-func (m *EncryptedToSelfMessage) XXX_DiscardUnknown() {
-	xxx_messageInfo_EncryptedToSelfMessage.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_EncryptedToSelfMessage proto.InternalMessageInfo
-
-func (m *EncryptedToSelfMessage) GetHeader() *TransactionHeader {
+func (m *OrdinaryPayment) GetHeader() *TransactionHeader {
 	if m != nil {
 		return m.Header
 	}
 	return nil
 }
 
-func (m *EncryptedToSelfMessage) GetAttachment() *EncryptedToSelfMessage_Attachment {
+func (m *OrdinaryPayment) GetAppendix() *Appendix {
 	if m != nil {
-		return m.Attachment
-	}
-	return nil
-}
-
-func (m *EncryptedToSelfMessage) GetAppendixes() []*Appendix {
-	if m != nil {
-		return m.Appendixes
-	}
-	return nil
-}
-
-type EncryptedToSelfMessage_Attachment struct {
-	IsText               bool     `protobuf:"varint,1,opt,name=isText" json:"isText,omitempty"`
-	Data                 []byte   `protobuf:"bytes,2,opt,name=data,proto3" json:"data,omitempty"`
-	Nonce                []byte   `protobuf:"bytes,3,opt,name=nonce,proto3" json:"nonce,omitempty"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
-}
-
-func (m *EncryptedToSelfMessage_Attachment) Reset()         { *m = EncryptedToSelfMessage_Attachment{} }
-func (m *EncryptedToSelfMessage_Attachment) String() string { return proto.CompactTextString(m) }
-func (*EncryptedToSelfMessage_Attachment) ProtoMessage()    {}
-func (*EncryptedToSelfMessage_Attachment) Descriptor() ([]byte, []int) {
-	return fileDescriptor_transaction_c8a87d91d7888997, []int{33, 0}
-}
-func (m *EncryptedToSelfMessage_Attachment) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_EncryptedToSelfMessage_Attachment.Unmarshal(m, b)
-}
-func (m *EncryptedToSelfMessage_Attachment) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_EncryptedToSelfMessage_Attachment.Marshal(b, m, deterministic)
-}
-func (dst *EncryptedToSelfMessage_Attachment) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_EncryptedToSelfMessage_Attachment.Merge(dst, src)
-}
-func (m *EncryptedToSelfMessage_Attachment) XXX_Size() int {
-	return xxx_messageInfo_EncryptedToSelfMessage_Attachment.Size(m)
-}
-func (m *EncryptedToSelfMessage_Attachment) XXX_DiscardUnknown() {
-	xxx_messageInfo_EncryptedToSelfMessage_Attachment.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_EncryptedToSelfMessage_Attachment proto.InternalMessageInfo
-
-func (m *EncryptedToSelfMessage_Attachment) GetIsText() bool {
-	if m != nil {
-		return m.IsText
-	}
-	return false
-}
-
-func (m *EncryptedToSelfMessage_Attachment) GetData() []byte {
-	if m != nil {
-		return m.Data
-	}
-	return nil
-}
-
-func (m *EncryptedToSelfMessage_Attachment) GetNonce() []byte {
-	if m != nil {
-		return m.Nonce
-	}
-	return nil
-}
-
-type PublicKeyAnnouncement struct {
-	Header               *TransactionHeader                `protobuf:"bytes,1,opt,name=header" json:"header,omitempty"`
-	Attachment           *PublicKeyAnnouncement_Attachment `protobuf:"bytes,2,opt,name=attachment" json:"attachment,omitempty"`
-	Appendixes           []*Appendix                       `protobuf:"bytes,3,rep,name=appendixes" json:"appendixes,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}                          `json:"-"`
-	XXX_unrecognized     []byte                            `json:"-"`
-	XXX_sizecache        int32                             `json:"-"`
-}
-
-func (m *PublicKeyAnnouncement) Reset()         { *m = PublicKeyAnnouncement{} }
-func (m *PublicKeyAnnouncement) String() string { return proto.CompactTextString(m) }
-func (*PublicKeyAnnouncement) ProtoMessage()    {}
-func (*PublicKeyAnnouncement) Descriptor() ([]byte, []int) {
-	return fileDescriptor_transaction_c8a87d91d7888997, []int{34}
-}
-func (m *PublicKeyAnnouncement) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_PublicKeyAnnouncement.Unmarshal(m, b)
-}
-func (m *PublicKeyAnnouncement) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_PublicKeyAnnouncement.Marshal(b, m, deterministic)
-}
-func (dst *PublicKeyAnnouncement) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_PublicKeyAnnouncement.Merge(dst, src)
-}
-func (m *PublicKeyAnnouncement) XXX_Size() int {
-	return xxx_messageInfo_PublicKeyAnnouncement.Size(m)
-}
-func (m *PublicKeyAnnouncement) XXX_DiscardUnknown() {
-	xxx_messageInfo_PublicKeyAnnouncement.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_PublicKeyAnnouncement proto.InternalMessageInfo
-
-func (m *PublicKeyAnnouncement) GetHeader() *TransactionHeader {
-	if m != nil {
-		return m.Header
-	}
-	return nil
-}
-
-func (m *PublicKeyAnnouncement) GetAttachment() *PublicKeyAnnouncement_Attachment {
-	if m != nil {
-		return m.Attachment
-	}
-	return nil
-}
-
-func (m *PublicKeyAnnouncement) GetAppendixes() []*Appendix {
-	if m != nil {
-		return m.Appendixes
-	}
-	return nil
-}
-
-type PublicKeyAnnouncement_Attachment struct {
-	PublicKey            []byte   `protobuf:"bytes,1,opt,name=publicKey,proto3" json:"publicKey,omitempty"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
-}
-
-func (m *PublicKeyAnnouncement_Attachment) Reset()         { *m = PublicKeyAnnouncement_Attachment{} }
-func (m *PublicKeyAnnouncement_Attachment) String() string { return proto.CompactTextString(m) }
-func (*PublicKeyAnnouncement_Attachment) ProtoMessage()    {}
-func (*PublicKeyAnnouncement_Attachment) Descriptor() ([]byte, []int) {
-	return fileDescriptor_transaction_c8a87d91d7888997, []int{34, 0}
-}
-func (m *PublicKeyAnnouncement_Attachment) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_PublicKeyAnnouncement_Attachment.Unmarshal(m, b)
-}
-func (m *PublicKeyAnnouncement_Attachment) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_PublicKeyAnnouncement_Attachment.Marshal(b, m, deterministic)
-}
-func (dst *PublicKeyAnnouncement_Attachment) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_PublicKeyAnnouncement_Attachment.Merge(dst, src)
-}
-func (m *PublicKeyAnnouncement_Attachment) XXX_Size() int {
-	return xxx_messageInfo_PublicKeyAnnouncement_Attachment.Size(m)
-}
-func (m *PublicKeyAnnouncement_Attachment) XXX_DiscardUnknown() {
-	xxx_messageInfo_PublicKeyAnnouncement_Attachment.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_PublicKeyAnnouncement_Attachment proto.InternalMessageInfo
-
-func (m *PublicKeyAnnouncement_Attachment) GetPublicKey() []byte {
-	if m != nil {
-		return m.PublicKey
+		return m.Appendix
 	}
 	return nil
 }
@@ -3567,13 +3467,15 @@ func (m *PublicKeyAnnouncement_Attachment) GetPublicKey() []byte {
 func init() {
 	proto.RegisterType((*TransactionHeader)(nil), "p2p.TransactionHeader")
 	proto.RegisterType((*Appendix)(nil), "p2p.Appendix")
+	proto.RegisterType((*Appendix_Message)(nil), "p2p.Appendix.Message")
+	proto.RegisterType((*Appendix_EncryptedMessage)(nil), "p2p.Appendix.EncryptedMessage")
+	proto.RegisterType((*Appendix_PublicKeyAnnouncement)(nil), "p2p.Appendix.PublicKeyAnnouncement")
 	proto.RegisterType((*MultiOutCreation)(nil), "p2p.MultiOutCreation")
 	proto.RegisterType((*MultiOutCreation_Attachment)(nil), "p2p.MultiOutCreation.Attachment")
 	proto.RegisterType((*MultiOutCreation_Attachment_Recipients)(nil), "p2p.MultiOutCreation.Attachment.Recipients")
 	proto.RegisterType((*MultiSameOutCreation)(nil), "p2p.MultiSameOutCreation")
 	proto.RegisterType((*MultiSameOutCreation_Attachment)(nil), "p2p.MultiSameOutCreation.Attachment")
 	proto.RegisterType((*ArbitaryMessage)(nil), "p2p.ArbitaryMessage")
-	proto.RegisterType((*ArbitaryMessage_Attachment)(nil), "p2p.ArbitaryMessage.Attachment")
 	proto.RegisterType((*AliasAssignment)(nil), "p2p.AliasAssignment")
 	proto.RegisterType((*AliasAssignment_Attachment)(nil), "p2p.AliasAssignment.Attachment")
 	proto.RegisterType((*AccountInfo)(nil), "p2p.AccountInfo")
@@ -3627,130 +3529,124 @@ func init() {
 	proto.RegisterType((*SubscriptionPayment_Attachment)(nil), "p2p.SubscriptionPayment.Attachment")
 	proto.RegisterType((*AutomatedTransactionsCreation)(nil), "p2p.AutomatedTransactionsCreation")
 	proto.RegisterType((*AutomatedTransactionsCreation_Attachment)(nil), "p2p.AutomatedTransactionsCreation.Attachment")
-	proto.RegisterType((*EncryptedMessage)(nil), "p2p.EncryptedMessage")
-	proto.RegisterType((*EncryptedMessage_Attachment)(nil), "p2p.EncryptedMessage.Attachment")
-	proto.RegisterType((*EncryptedToSelfMessage)(nil), "p2p.EncryptedToSelfMessage")
-	proto.RegisterType((*EncryptedToSelfMessage_Attachment)(nil), "p2p.EncryptedToSelfMessage.Attachment")
-	proto.RegisterType((*PublicKeyAnnouncement)(nil), "p2p.PublicKeyAnnouncement")
-	proto.RegisterType((*PublicKeyAnnouncement_Attachment)(nil), "p2p.PublicKeyAnnouncement.Attachment")
-	proto.RegisterEnum("p2p.EscrowCreation_Attachment_DeadlineAction", EscrowCreation_Attachment_DeadlineAction_name, EscrowCreation_Attachment_DeadlineAction_value)
+	proto.RegisterType((*AutomatedTransactionsPayment)(nil), "p2p.AutomatedTransactionsPayment")
+	proto.RegisterType((*OrdinaryPayment)(nil), "p2p.OrdinaryPayment")
+	proto.RegisterEnum("p2p.DeadlineAction", DeadlineAction_name, DeadlineAction_value)
 }
 
-func init() { proto.RegisterFile("transaction.proto", fileDescriptor_transaction_c8a87d91d7888997) }
+func init() { proto.RegisterFile("transaction.proto", fileDescriptor_transaction_4cf31c87b402708a) }
 
-var fileDescriptor_transaction_c8a87d91d7888997 = []byte{
-	// 1797 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xcc, 0x5a, 0x4f, 0x6f, 0xdb, 0x46,
-	0x16, 0x5f, 0x52, 0x92, 0x63, 0x3d, 0x5b, 0x8e, 0xcd, 0x38, 0x8e, 0xec, 0x75, 0xb2, 0x5e, 0xae,
-	0x37, 0x2b, 0x64, 0x37, 0x0a, 0xe0, 0xcd, 0x21, 0xbb, 0x9b, 0xcd, 0xae, 0x64, 0xc9, 0xb1, 0x13,
-	0xc7, 0x71, 0x68, 0xe7, 0x03, 0x8c, 0xc9, 0x91, 0x3c, 0x08, 0x45, 0x2a, 0x1c, 0x32, 0x89, 0x7a,
-	0xe8, 0x25, 0x3d, 0x14, 0xe8, 0x21, 0x68, 0xd1, 0x8f, 0xd0, 0xaf, 0xd0, 0xf6, 0x0b, 0xa4, 0xe8,
-	0xb5, 0xdf, 0xa0, 0x68, 0x81, 0x22, 0xc8, 0x21, 0x28, 0x72, 0xee, 0xa5, 0x98, 0xe1, 0x1f, 0x71,
-	0x28, 0xfa, 0x8f, 0x14, 0x2a, 0xc8, 0x4d, 0xef, 0x91, 0xfc, 0xcd, 0xfb, 0xfd, 0x66, 0xe6, 0xcd,
-	0x9b, 0x19, 0xc1, 0x9c, 0xeb, 0x20, 0x8b, 0x22, 0xdd, 0x25, 0xb6, 0x55, 0xed, 0x3a, 0xb6, 0x6b,
-	0x2b, 0xb9, 0xee, 0x5a, 0x77, 0x69, 0xb1, 0x6d, 0xdb, 0x6d, 0x13, 0x5f, 0xe3, 0xae, 0x03, 0xaf,
-	0x75, 0x0d, 0x59, 0x3d, 0xff, 0xb9, 0xfa, 0x3c, 0x07, 0x73, 0xfb, 0xfd, 0xaf, 0x36, 0x31, 0x32,
-	0xb0, 0xa3, 0x94, 0xe1, 0xcc, 0x13, 0xec, 0x50, 0x62, 0x5b, 0x65, 0x69, 0x45, 0xaa, 0x94, 0xb4,
-	0xd0, 0x54, 0x96, 0xa1, 0xe8, 0x92, 0x0e, 0xa6, 0x2e, 0xea, 0x74, 0xcb, 0x32, 0x7f, 0xd6, 0x77,
-	0x28, 0x4b, 0x30, 0x69, 0x60, 0x64, 0x98, 0xc4, 0xc2, 0xe5, 0x1c, 0x7f, 0x18, 0xd9, 0x4a, 0x05,
-	0xce, 0x52, 0x6c, 0x19, 0xd8, 0xd9, 0xf5, 0x0e, 0x4c, 0xa2, 0xdf, 0xc5, 0xbd, 0x72, 0x7e, 0x45,
-	0xaa, 0x4c, 0x6b, 0x49, 0xb7, 0x72, 0x09, 0xc0, 0xc1, 0x3a, 0xe9, 0x12, 0x6c, 0xb9, 0xb4, 0x5c,
-	0x58, 0x91, 0x2a, 0x79, 0x2d, 0xe6, 0x51, 0x16, 0x60, 0x02, 0x75, 0x6c, 0xcf, 0x72, 0xcb, 0x13,
-	0xfc, 0x59, 0x60, 0x29, 0xb3, 0x90, 0x6b, 0x61, 0x5c, 0x3e, 0xc3, 0x9d, 0xec, 0xa7, 0xd2, 0x80,
-	0x8b, 0x0e, 0x6e, 0x61, 0x07, 0x5b, 0x3a, 0x36, 0x62, 0x34, 0x37, 0x3c, 0xd3, 0xdc, 0x44, 0xf4,
-	0xb0, 0x3c, 0xc9, 0x23, 0x38, 0xfe, 0x25, 0xc6, 0x99, 0x92, 0xb6, 0x85, 0x5c, 0xcf, 0xc1, 0xe5,
-	0x22, 0xff, 0xa2, 0xef, 0x50, 0x56, 0xa1, 0x84, 0xf5, 0xba, 0x69, 0xeb, 0x8f, 0x36, 0x31, 0x69,
-	0x1f, 0xba, 0x65, 0xe0, 0xc4, 0x45, 0x27, 0xc3, 0x08, 0x1c, 0x5b, 0x46, 0x79, 0x8a, 0x47, 0xd8,
-	0x77, 0xa8, 0x3b, 0x30, 0x59, 0xeb, 0x76, 0xb1, 0x65, 0x90, 0x67, 0xc7, 0x68, 0x5f, 0x81, 0xbc,
-	0x81, 0x5c, 0xc4, 0x65, 0x9f, 0x5a, 0x9b, 0xaf, 0xfa, 0xbd, 0x5a, 0x0d, 0x7b, 0xb5, 0x5a, 0xb3,
-	0x7a, 0x1a, 0x7f, 0x43, 0xfd, 0x4e, 0x86, 0xd9, 0x7b, 0x9e, 0xe9, 0x92, 0xfb, 0x9e, 0xbb, 0xee,
-	0x60, 0xc4, 0xe8, 0x28, 0x55, 0x98, 0x38, 0xe4, 0xdd, 0xcb, 0x71, 0xa7, 0xd6, 0x16, 0xaa, 0xdd,
-	0xb5, 0x6e, 0x75, 0xa0, 0xf3, 0xb5, 0xe0, 0x2d, 0xe5, 0xff, 0x00, 0xc8, 0x75, 0x91, 0x7e, 0xd8,
-	0xc1, 0x96, 0x1b, 0x34, 0xba, 0xc2, 0xbf, 0x49, 0x42, 0x57, 0x6b, 0xd1, 0x7b, 0x5a, 0xec, 0x1b,
-	0xe5, 0x2a, 0x00, 0x0a, 0x68, 0x61, 0x5a, 0xce, 0xad, 0xe4, 0x2a, 0x53, 0x6b, 0x25, 0x8e, 0x10,
-	0xb2, 0xd5, 0x62, 0x2f, 0x2c, 0xbd, 0x90, 0x00, 0xfa, 0x48, 0xca, 0x5d, 0x61, 0x18, 0xc8, 0xfc,
-	0xeb, 0xbf, 0x9f, 0xd4, 0x7e, 0x55, 0x8b, 0x3e, 0x89, 0x8f, 0x99, 0xa5, 0xeb, 0x00, 0xfd, 0x27,
-	0xca, 0x0c, 0xc8, 0xc4, 0xe0, 0x32, 0xe4, 0x35, 0x99, 0x18, 0xb1, 0x11, 0x25, 0xc7, 0x47, 0x94,
-	0xfa, 0x5a, 0x82, 0x79, 0xde, 0xd8, 0x1e, 0xea, 0xe0, 0x77, 0xd1, 0xb2, 0x91, 0xa2, 0xe5, 0x6a,
-	0x9f, 0x4b, 0x02, 0x3e, 0x23, 0x3d, 0xff, 0x21, 0xc8, 0x29, 0xce, 0x2a, 0x69, 0x25, 0x27, 0xce,
-	0x2a, 0xf5, 0xad, 0x04, 0x67, 0x6b, 0xce, 0x01, 0x71, 0x91, 0xd3, 0xbb, 0x87, 0x29, 0x45, 0x6d,
-	0x3c, 0x34, 0xcd, 0xff, 0xa5, 0xd0, 0xfc, 0x93, 0x1f, 0xa0, 0x88, 0x9c, 0x11, 0xc3, 0x5b, 0x02,
-	0xc3, 0x05, 0x98, 0x20, 0x74, 0x1f, 0x3f, 0x73, 0x79, 0xb4, 0x93, 0x5a, 0x60, 0xb1, 0x19, 0xa5,
-	0xdb, 0x96, 0x1b, 0x86, 0x54, 0xd4, 0x42, 0x53, 0x7d, 0xc5, 0x38, 0x9b, 0x04, 0xd1, 0x1a, 0x65,
-	0x13, 0x9a, 0xa3, 0x64, 0xc8, 0x59, 0x44, 0xce, 0x88, 0xf3, 0x75, 0x81, 0xf3, 0x3c, 0x14, 0x10,
-	0x6b, 0x86, 0x07, 0x5b, 0xd4, 0x7c, 0x83, 0x65, 0x42, 0xcf, 0x21, 0x01, 0x5b, 0xf6, 0x53, 0x7d,
-	0x23, 0xc1, 0x54, 0x4d, 0xd7, 0xd9, 0xa8, 0xde, 0xb2, 0x5a, 0xf6, 0xd0, 0x2c, 0xff, 0x93, 0xc2,
-	0xf2, 0x8f, 0x7e, 0x90, 0x7d, 0xd4, 0x8c, 0x18, 0xd6, 0x05, 0x86, 0x0a, 0xe4, 0x2d, 0xd4, 0xc1,
-	0x01, 0x41, 0xfe, 0x5b, 0x59, 0x81, 0x29, 0x03, 0x53, 0xdd, 0x21, 0x5d, 0x16, 0x6a, 0xc0, 0x33,
-	0xee, 0x52, 0x7f, 0x94, 0xa0, 0xc8, 0xf5, 0xdf, 0xc3, 0xa6, 0x39, 0x34, 0xdb, 0x7f, 0xa5, 0xb0,
-	0x5d, 0xec, 0xf7, 0x29, 0xc3, 0xcc, 0x88, 0xeb, 0x8d, 0x53, 0xf4, 0xe6, 0x3c, 0x14, 0xba, 0x0e,
-	0xd1, 0x31, 0x0f, 0x24, 0xa7, 0xf9, 0x86, 0xfa, 0xbd, 0x04, 0x93, 0x3c, 0x9a, 0xba, 0xd7, 0x1b,
-	0x9a, 0xe0, 0x8d, 0x14, 0x82, 0xe5, 0x3e, 0xc1, 0xba, 0xd7, 0xcb, 0x88, 0x9f, 0x7a, 0x32, 0x3f,
-	0xf5, 0xa5, 0x0c, 0xa5, 0x1a, 0xa5, 0xd8, 0xdd, 0xa2, 0xd4, 0x43, 0x96, 0x3e, 0x7c, 0xde, 0xf9,
-	0x6f, 0x0a, 0x9d, 0x8b, 0x7e, 0x50, 0x71, 0xdc, 0x8c, 0x38, 0x7d, 0x29, 0xbd, 0xfb, 0x00, 0x65,
-	0xa5, 0xd2, 0x63, 0x0f, 0x59, 0x2e, 0x71, 0x7b, 0xbc, 0x54, 0xca, 0x6b, 0x91, 0xed, 0x97, 0x51,
-	0x3a, 0xe9, 0x20, 0x93, 0xf2, 0x1a, 0x89, 0x97, 0x51, 0xbe, 0xed, 0x27, 0xb3, 0x0e, 0xe7, 0x59,
-	0x08, 0x93, 0x19, 0x37, 0x59, 0x02, 0xf7, 0x65, 0xe4, 0x3a, 0xb5, 0xb0, 0x93, 0xb5, 0x8c, 0x21,
-	0xee, 0x58, 0xa6, 0x79, 0x5c, 0x0f, 0x29, 0xa1, 0x47, 0x8c, 0xb3, 0x2c, 0x72, 0xfe, 0x5a, 0x86,
-	0xb9, 0x1a, 0x7d, 0x74, 0xdf, 0x61, 0x05, 0xa4, 0x89, 0x74, 0x3c, 0x52, 0x0a, 0xaf, 0xa5, 0xf0,
-	0xfe, 0x73, 0xc0, 0x3b, 0x81, 0x9d, 0x11, 0xf7, 0x8f, 0x05, 0xee, 0xab, 0x50, 0x42, 0x71, 0x81,
-	0x03, 0x01, 0x44, 0xa7, 0xa0, 0x90, 0x9c, 0x50, 0x28, 0x4a, 0x11, 0xfe, 0x50, 0xf2, 0x8d, 0xb8,
-	0x6e, 0x79, 0x51, 0xb7, 0xcf, 0x64, 0x98, 0xab, 0x13, 0x63, 0x6c, 0xba, 0x0d, 0x60, 0x67, 0xa4,
-	0xdb, 0xfe, 0x40, 0x3a, 0x61, 0x12, 0x05, 0x7a, 0xf9, 0xc6, 0xf0, 0x3a, 0xb1, 0xc5, 0x62, 0x3e,
-	0xec, 0xe9, 0x75, 0x96, 0x28, 0x4c, 0x33, 0xeb, 0x32, 0x2f, 0x0d, 0x7e, 0x5c, 0x29, 0xd6, 0x76,
-	0x8c, 0x68, 0x0c, 0xf9, 0x06, 0x67, 0x18, 0xf6, 0xc9, 0x98, 0x18, 0xa6, 0xc1, 0xbf, 0x47, 0x86,
-	0x2f, 0x65, 0x38, 0xd7, 0x20, 0x6d, 0xe2, 0x22, 0xf3, 0xb6, 0x6d, 0x1b, 0x74, 0x9b, 0x50, 0x97,
-	0x58, 0xed, 0xa1, 0x09, 0xae, 0xa7, 0x10, 0xfc, 0x0b, 0xff, 0x26, 0x05, 0x3d, 0x23, 0x7e, 0x9f,
-	0x66, 0xb1, 0xa0, 0x28, 0x90, 0x77, 0x51, 0x9b, 0xf2, 0x91, 0x5d, 0xd4, 0xf8, 0x6f, 0x61, 0x2a,
-	0x04, 0x0b, 0xc9, 0xe0, 0x54, 0x28, 0xc4, 0xa7, 0xc2, 0x4f, 0x12, 0x9c, 0x8f, 0x13, 0x6d, 0x60,
-	0x73, 0x44, 0x21, 0x9b, 0x29, 0x42, 0xfe, 0x75, 0x40, 0xc8, 0x08, 0x7f, 0x5c, 0x43, 0xa5, 0xcd,
-	0x5a, 0x09, 0xeb, 0x0d, 0x6e, 0xa8, 0xbf, 0x49, 0x70, 0x21, 0x1e, 0xc3, 0x2e, 0x63, 0xbe, 0x7e,
-	0x88, 0xac, 0x11, 0x76, 0x3c, 0xb7, 0x53, 0x58, 0xfe, 0x6d, 0x80, 0x65, 0xac, 0x85, 0x71, 0xd5,
-	0x8d, 0x7d, 0x9e, 0xf9, 0x80, 0xa7, 0x58, 0x37, 0x46, 0x3d, 0xfc, 0xb9, 0x0c, 0x4b, 0xf1, 0xd8,
-	0x1e, 0x04, 0x03, 0x62, 0x44, 0x01, 0xee, 0xa4, 0x08, 0x70, 0x65, 0x40, 0x00, 0xb1, 0x91, 0x8c,
-	0x34, 0xd8, 0x3c, 0x85, 0x06, 0xab, 0x50, 0x32, 0xb0, 0xe9, 0xa2, 0x07, 0xf1, 0x15, 0xa1, 0xa0,
-	0x89, 0x4e, 0xf5, 0x07, 0x19, 0xe6, 0x85, 0xfe, 0xf2, 0x1c, 0xfd, 0x10, 0x51, 0x9c, 0x61, 0x7a,
-	0x4c, 0x83, 0xcf, 0x48, 0x87, 0x2f, 0xa4, 0x53, 0x08, 0x91, 0x5c, 0x15, 0x4b, 0x27, 0x56, 0x0f,
-	0x37, 0x61, 0xd1, 0xc0, 0x26, 0x79, 0x82, 0x9d, 0x5e, 0x23, 0x38, 0xc4, 0xdb, 0x8f, 0x8e, 0xfe,
-	0xfc, 0x6c, 0x72, 0xf4, 0x0b, 0xea, 0xcf, 0x09, 0x49, 0x1b, 0xc1, 0x9b, 0x63, 0x92, 0x34, 0x84,
-	0xcf, 0x48, 0xd2, 0xaf, 0xa4, 0x64, 0x71, 0xda, 0x0d, 0xfa, 0x2c, 0x2c, 0x4e, 0x43, 0x9b, 0x65,
-	0x66, 0xae, 0xf0, 0x96, 0x7f, 0xf4, 0x20, 0xf3, 0xa3, 0x87, 0xb8, 0x4b, 0x59, 0x86, 0x22, 0x37,
-	0x1b, 0xc8, 0x45, 0x5c, 0xe2, 0x69, 0xad, 0xef, 0x50, 0x2e, 0x01, 0x70, 0x63, 0xc7, 0xb6, 0x74,
-	0x1c, 0x1c, 0x89, 0xc6, 0x3c, 0x7c, 0x33, 0x40, 0x28, 0xdf, 0x63, 0x07, 0xa9, 0x3a, 0xb2, 0xd5,
-	0x5f, 0x24, 0x51, 0xe4, 0x0d, 0x8c, 0x8d, 0x03, 0xa4, 0x3f, 0x1a, 0x93, 0xc8, 0x21, 0x7c, 0x46,
-	0x22, 0x57, 0x4e, 0xab, 0xb1, 0xfa, 0x5c, 0x06, 0x25, 0x1e, 0x88, 0x86, 0x5b, 0x9e, 0x65, 0x0c,
-	0xcd, 0xb2, 0x9e, 0xc2, 0x52, 0x1d, 0x60, 0xe9, 0x83, 0x67, 0xc4, 0xf1, 0xce, 0x30, 0xe3, 0xc8,
-	0xe1, 0x2d, 0xef, 0xc6, 0x72, 0x76, 0xdc, 0xa5, 0xbe, 0x92, 0xe0, 0x42, 0xb3, 0xd5, 0xc2, 0xba,
-	0x4b, 0x9e, 0xe0, 0x3a, 0x32, 0x59, 0xa1, 0xb5, 0x8d, 0x11, 0x1d, 0x65, 0x75, 0x3e, 0x7a, 0xdd,
-	0x3a, 0xa2, 0x85, 0x8c, 0xf4, 0x58, 0x4d, 0x9e, 0xd8, 0x75, 0xb1, 0x43, 0x6c, 0x23, 0x38, 0xea,
-	0x0e, 0x2c, 0xf5, 0x23, 0x58, 0xd4, 0xf0, 0x53, 0xe4, 0x18, 0xd1, 0x99, 0xed, 0x3b, 0x1c, 0xd0,
-	0x89, 0x11, 0xca, 0x27, 0x44, 0xa8, 0x7e, 0x93, 0x83, 0x99, 0x26, 0xd5, 0x1d, 0xfb, 0xe9, 0xc8,
-	0xa7, 0xbd, 0xb7, 0x52, 0xc4, 0xbd, 0xe4, 0x8b, 0x2b, 0x00, 0x67, 0xa4, 0xe9, 0x27, 0x72, 0x52,
-	0xd4, 0xe0, 0x30, 0x5b, 0x12, 0xae, 0x47, 0x1e, 0xc2, 0x4c, 0x78, 0x19, 0x53, 0xd3, 0xa3, 0x2a,
-	0x72, 0x66, 0xed, 0xea, 0xf1, 0x91, 0x55, 0x1b, 0xc2, 0x47, 0x5a, 0x02, 0x44, 0xa9, 0xc0, 0x59,
-	0x07, 0x3f, 0xf6, 0x88, 0x83, 0x8d, 0x3d, 0xd2, 0xb6, 0xb0, 0xe3, 0x97, 0xa0, 0x05, 0x2d, 0xe9,
-	0x66, 0xdb, 0x51, 0x1a, 0xbc, 0x91, 0xe7, 0xc7, 0xcf, 0xa1, 0xa9, 0xae, 0xc3, 0x8c, 0xd8, 0x8a,
-	0x52, 0x82, 0xe2, 0xc3, 0x9d, 0x46, 0x73, 0x7d, 0xab, 0xd1, 0x6c, 0xcc, 0xfe, 0x41, 0x99, 0x82,
-	0x33, 0x5a, 0x73, 0xbb, 0x59, 0xdb, 0x6b, 0xce, 0x4a, 0x0a, 0xc0, 0x84, 0xd6, 0xdc, 0x78, 0xb8,
-	0xd3, 0x98, 0x95, 0x95, 0x22, 0x14, 0xf6, 0x76, 0xb7, 0xb7, 0xf6, 0x67, 0x73, 0xea, 0x1b, 0x09,
-	0xc0, 0x67, 0xc1, 0x1a, 0x1c, 0xba, 0xd3, 0xfe, 0x9d, 0xd2, 0x69, 0x4b, 0x31, 0x69, 0x18, 0x68,
-	0x46, 0x1d, 0xd6, 0x48, 0x26, 0x05, 0xcc, 0x5b, 0xd8, 0x6a, 0x84, 0x49, 0x21, 0xb4, 0xc3, 0x93,
-	0x20, 0x1a, 0xf6, 0x56, 0x70, 0x12, 0xc4, 0x6c, 0xf5, 0xad, 0x04, 0xd3, 0x7e, 0x68, 0x1a, 0xa6,
-	0x9e, 0x39, 0xfc, 0xc4, 0xb8, 0x99, 0xc2, 0x78, 0x39, 0xc6, 0xd8, 0x87, 0xfd, 0xa0, 0x38, 0xbf,
-	0x96, 0xe0, 0xfc, 0x9e, 0x77, 0x10, 0xed, 0x7a, 0x82, 0xdf, 0x07, 0x38, 0xc3, 0xed, 0x49, 0x2a,
-	0x7e, 0x46, 0x2a, 0x5c, 0x11, 0x54, 0x58, 0x86, 0x62, 0x8b, 0x4d, 0x12, 0x6c, 0xe9, 0xbd, 0x20,
-	0x03, 0xf6, 0x1d, 0x6c, 0x3c, 0x2b, 0xf1, 0x58, 0xfc, 0x8d, 0x75, 0x86, 0x8b, 0xde, 0x20, 0xf8,
-	0x58, 0xae, 0x28, 0x2e, 0xc3, 0x0c, 0x8d, 0xb5, 0x14, 0xf5, 0x78, 0xc2, 0xab, 0xfe, 0x2a, 0xc1,
-	0xb9, 0x78, 0x48, 0xbb, 0xa8, 0x37, 0x52, 0xbe, 0x3f, 0x7a, 0x07, 0x9f, 0x82, 0xfe, 0xde, 0x18,
-	0xe7, 0x52, 0x18, 0x7f, 0x2b, 0xc3, 0xc5, 0x9a, 0xe7, 0xda, 0x1d, 0xe4, 0x0a, 0x37, 0xcf, 0x74,
-	0xe4, 0x95, 0xe7, 0x5e, 0x0a, 0x77, 0x3f, 0xbf, 0x1f, 0xdb, 0x4e, 0x46, 0x2a, 0x1c, 0x66, 0x70,
-	0x8c, 0xb1, 0x0a, 0x25, 0x3d, 0x88, 0xaa, 0xde, 0x73, 0x31, 0x0d, 0x0a, 0x66, 0xd1, 0xc9, 0x0a,
-	0xc2, 0xd9, 0xa6, 0xa5, 0x3b, 0xbd, 0xae, 0x8b, 0x8d, 0x51, 0x6f, 0x2b, 0x8f, 0xbe, 0xe0, 0x4e,
-	0x42, 0x67, 0xa4, 0xcf, 0xce, 0xa9, 0xae, 0x2b, 0x95, 0xd8, 0x35, 0xff, 0xb4, 0x7f, 0xa1, 0xcf,
-	0x76, 0x68, 0x16, 0xdf, 0x1f, 0xf8, 0x6a, 0xf8, 0x86, 0xfa, 0x42, 0x86, 0x85, 0x28, 0xd4, 0x7d,
-	0x7b, 0x0f, 0x9b, 0xad, 0x51, 0xb5, 0xd8, 0x48, 0xd1, 0xe2, 0xb2, 0xa8, 0x85, 0xd0, 0xc0, 0x07,
-	0xaa, 0x08, 0x5b, 0x1f, 0xa2, 0x3f, 0x92, 0xd4, 0x2c, 0xcb, 0xf6, 0xac, 0x11, 0xcf, 0xb6, 0x8f,
-	0x5e, 0x1f, 0x52, 0xf1, 0xc7, 0xb5, 0x3e, 0x74, 0xa3, 0x3f, 0xcb, 0x48, 0xfe, 0xc6, 0x31, 0x72,
-	0x1c, 0x4c, 0xf0, 0x3f, 0x7e, 0xfc, 0xf3, 0xf7, 0x00, 0x00, 0x00, 0xff, 0xff, 0xe8, 0xd7, 0x09,
-	0x54, 0xf6, 0x23, 0x00, 0x00,
+var fileDescriptor_transaction_4cf31c87b402708a = []byte{
+	// 1768 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xcc, 0x5a, 0xcd, 0x6f, 0xdb, 0x46,
+	0x16, 0x5f, 0x52, 0x92, 0x6d, 0x3d, 0xf9, 0x43, 0x66, 0x64, 0x47, 0xd6, 0x3a, 0x59, 0x2d, 0x37,
+	0x8b, 0xd5, 0x66, 0x77, 0x6d, 0x40, 0x9b, 0x16, 0x6d, 0x93, 0xb6, 0x91, 0x3f, 0xf2, 0x6d, 0xc4,
+	0xa5, 0x7d, 0x68, 0x8f, 0x23, 0x72, 0x24, 0x0f, 0x42, 0x91, 0x0c, 0x87, 0x74, 0xa2, 0x5b, 0x8b,
+	0x02, 0x6d, 0x0f, 0x05, 0x7a, 0xe9, 0x3f, 0x50, 0xf4, 0x1f, 0x49, 0x2e, 0xbd, 0xf7, 0x50, 0x14,
+	0x45, 0x4f, 0x45, 0x90, 0x43, 0x4f, 0x45, 0x0b, 0xb4, 0xbd, 0x16, 0x33, 0x43, 0x52, 0xa4, 0x44,
+	0xdb, 0x91, 0x4c, 0x07, 0xbd, 0xcd, 0x9b, 0x8f, 0xdf, 0x9b, 0xdf, 0x6f, 0x46, 0x6f, 0x66, 0x1e,
+	0x05, 0x8b, 0x9e, 0x8b, 0x2c, 0x8a, 0x74, 0x8f, 0xd8, 0xd6, 0x9a, 0xe3, 0xda, 0x9e, 0xad, 0xe4,
+	0x9c, 0xa6, 0x53, 0x5b, 0xe9, 0xda, 0x76, 0xd7, 0xc4, 0xeb, 0xbc, 0xaa, 0xed, 0x77, 0xd6, 0x91,
+	0xd5, 0x17, 0xed, 0xea, 0x07, 0x39, 0x58, 0xdc, 0x1f, 0x8c, 0xba, 0x85, 0x91, 0x81, 0x5d, 0xa5,
+	0x0a, 0xd3, 0x87, 0xd8, 0xa5, 0xc4, 0xb6, 0xaa, 0x52, 0x5d, 0x6a, 0xcc, 0x69, 0xa1, 0xa9, 0xac,
+	0x42, 0xd1, 0x23, 0x3d, 0x4c, 0x3d, 0xd4, 0x73, 0xaa, 0x32, 0x6f, 0x1b, 0x54, 0x28, 0x35, 0x98,
+	0x31, 0x30, 0x32, 0x4c, 0x62, 0xe1, 0x6a, 0x8e, 0x37, 0x46, 0xb6, 0xd2, 0x80, 0x05, 0x8a, 0x2d,
+	0x03, 0xbb, 0xbb, 0x7e, 0xdb, 0x24, 0xfa, 0x5d, 0xdc, 0xaf, 0xe6, 0xeb, 0x52, 0x63, 0x56, 0x1b,
+	0xae, 0x66, 0x3e, 0x5c, 0xac, 0x13, 0x87, 0x60, 0xcb, 0xab, 0x16, 0xea, 0x52, 0x23, 0xaf, 0x0d,
+	0x2a, 0x94, 0x65, 0x98, 0x42, 0x3d, 0xdb, 0xb7, 0xbc, 0xea, 0x14, 0x6f, 0x0a, 0x2c, 0xa5, 0x0c,
+	0xb9, 0x0e, 0xc6, 0xd5, 0x69, 0x5e, 0xc9, 0x8a, 0xca, 0x16, 0x5c, 0x70, 0x71, 0x07, 0xbb, 0xd8,
+	0xd2, 0xb1, 0x11, 0x23, 0x79, 0xc3, 0x37, 0xcd, 0x5b, 0x88, 0x1e, 0x54, 0x67, 0xb8, 0xff, 0xe3,
+	0x3b, 0xb1, 0xd9, 0x50, 0xd2, 0xb5, 0x90, 0xe7, 0xbb, 0xb8, 0x5a, 0xe4, 0x23, 0x06, 0x15, 0xca,
+	0x25, 0x98, 0xc3, 0xfa, 0x86, 0x69, 0xeb, 0x0f, 0x6e, 0x61, 0xd2, 0x3d, 0xf0, 0xaa, 0xc0, 0x69,
+	0x27, 0x2b, 0x19, 0x46, 0x50, 0x71, 0xdb, 0xa8, 0x96, 0x04, 0xa3, 0xa8, 0x42, 0x7d, 0x3f, 0x0f,
+	0x33, 0x2d, 0xc7, 0xc1, 0x96, 0x41, 0x1e, 0x2b, 0xeb, 0x30, 0xdd, 0xc3, 0x94, 0xa2, 0x2e, 0xe6,
+	0xd2, 0x97, 0x9a, 0x4b, 0x6b, 0x4e, 0xd3, 0x59, 0x0b, 0xdb, 0xd7, 0x76, 0x44, 0xa3, 0x16, 0xf6,
+	0x52, 0xee, 0x40, 0x19, 0x5b, 0xba, 0xdb, 0x77, 0x3c, 0x6c, 0x04, 0x8d, 0x7c, 0x61, 0x4a, 0xcd,
+	0x8b, 0xc9, 0x91, 0xdb, 0x43, 0xbd, 0xb4, 0x91, 0x71, 0x8a, 0x06, 0x95, 0xa0, 0x6e, 0xdf, 0xde,
+	0xc3, 0x66, 0x27, 0xc4, 0xcb, 0xbd, 0x10, 0x5e, 0xea, 0x58, 0xe5, 0x3d, 0x58, 0x72, 0xc2, 0xa5,
+	0x6d, 0x59, 0x96, 0xed, 0x5b, 0x3a, 0xee, 0xb1, 0x95, 0xcd, 0x73, 0xd0, 0x7f, 0x24, 0x41, 0x77,
+	0xd3, 0xba, 0x6a, 0xe9, 0x08, 0xb5, 0xab, 0x30, 0x1d, 0x7a, 0x59, 0x86, 0x29, 0x42, 0xf7, 0xf1,
+	0x63, 0x8f, 0xab, 0x36, 0xa3, 0x05, 0x16, 0xdb, 0xc9, 0xba, 0x6d, 0x79, 0xcc, 0x1f, 0x13, 0xa5,
+	0xa8, 0x85, 0x66, 0x6d, 0x1f, 0xca, 0xc3, 0x0c, 0x8e, 0x44, 0x51, 0x20, 0x6f, 0x20, 0x0f, 0x71,
+	0x88, 0x59, 0x8d, 0x97, 0x95, 0x0a, 0x14, 0x2c, 0xdb, 0xd2, 0x85, 0x38, 0xb3, 0x9a, 0x30, 0x6a,
+	0xaf, 0xc0, 0x52, 0x2a, 0x05, 0xb6, 0x05, 0x22, 0x12, 0x1c, 0x7d, 0x56, 0x1b, 0x54, 0xa8, 0x4f,
+	0x65, 0x28, 0xef, 0xf8, 0xa6, 0x47, 0xee, 0xfb, 0xde, 0xa6, 0x8b, 0x11, 0xdb, 0x81, 0xca, 0x1a,
+	0x4c, 0x1d, 0xf0, 0xdf, 0x63, 0xb0, 0x13, 0x96, 0xb9, 0x54, 0x23, 0xbf, 0x56, 0x2d, 0xe8, 0xa5,
+	0x5c, 0x07, 0x40, 0x9e, 0x87, 0xf4, 0x83, 0x5e, 0x48, 0xb7, 0xd4, 0xac, 0xf3, 0x31, 0xc3, 0xd0,
+	0x6b, 0xad, 0xa8, 0x9f, 0x16, 0x1b, 0xa3, 0xfc, 0x1b, 0x66, 0x50, 0xb0, 0x12, 0xc1, 0x9a, 0xcf,
+	0x25, 0x96, 0x47, 0x8b, 0x9a, 0x6b, 0x9f, 0x49, 0x00, 0x03, 0x14, 0xe5, 0x2e, 0x40, 0xf4, 0x13,
+	0xa5, 0x55, 0xb9, 0x9e, 0x6b, 0x94, 0x9a, 0xff, 0x39, 0xc9, 0xf7, 0x9a, 0x16, 0x0d, 0xd1, 0x62,
+	0xc3, 0x6b, 0x57, 0x00, 0x06, 0x2d, 0xca, 0x3c, 0xc8, 0xc4, 0xe0, 0x12, 0xe4, 0x35, 0x99, 0x18,
+	0xb1, 0x00, 0x20, 0xc7, 0x03, 0x80, 0xfa, 0x5c, 0x82, 0x0a, 0x77, 0xb6, 0x87, 0x7a, 0xf8, 0x34,
+	0x3a, 0x6e, 0xa5, 0xe8, 0x78, 0x69, 0xc0, 0x65, 0x08, 0x3e, 0x03, 0x2d, 0xff, 0x9b, 0x90, 0xf2,
+	0x62, 0x42, 0x4a, 0xa9, 0x9e, 0x6b, 0xe4, 0xe3, 0xea, 0xa8, 0x26, 0x2c, 0xb4, 0xdc, 0x36, 0xf1,
+	0x90, 0xdb, 0x0f, 0xf7, 0xed, 0xb8, 0x0c, 0xe3, 0x73, 0x93, 0x8f, 0x9d, 0x9b, 0xfa, 0x4c, 0x82,
+	0x85, 0x96, 0x49, 0x10, 0x6d, 0x51, 0x16, 0xf5, 0xf8, 0x0c, 0xc7, 0x75, 0xf7, 0x76, 0x8a, 0xa0,
+	0x7f, 0x13, 0x0e, 0x93, 0xc8, 0x19, 0x68, 0x79, 0x25, 0xa1, 0x65, 0x05, 0x0a, 0x88, 0xb9, 0xe0,
+	0x13, 0x2d, 0x6a, 0xc2, 0x60, 0x47, 0x85, 0xef, 0x92, 0x20, 0x20, 0xb0, 0xa2, 0xfa, 0xa3, 0x04,
+	0xa5, 0x96, 0xae, 0xb3, 0x7d, 0x74, 0xdb, 0xea, 0xd8, 0x63, 0x33, 0xbc, 0x9a, 0xc2, 0xf0, 0xaf,
+	0x62, 0x8a, 0x03, 0xd4, 0x0c, 0xd8, 0x6d, 0x24, 0xd8, 0x29, 0x90, 0xb7, 0x50, 0x0f, 0x07, 0xe4,
+	0x78, 0x59, 0xa9, 0x43, 0xc9, 0xc0, 0x54, 0x77, 0x89, 0xc3, 0xa6, 0x19, 0x70, 0x8c, 0x57, 0xa9,
+	0xdf, 0x49, 0x50, 0xe4, 0xba, 0xef, 0x61, 0xd3, 0x1c, 0x9b, 0xe9, 0xeb, 0x29, 0x4c, 0x57, 0x06,
+	0x6b, 0xc9, 0x30, 0x33, 0xe0, 0xf9, 0xea, 0x89, 0x3c, 0x2b, 0x50, 0x70, 0x5c, 0xa2, 0x8b, 0xb3,
+	0x2e, 0xa7, 0x09, 0x43, 0x7d, 0x2a, 0xc1, 0x0c, 0x9f, 0xc7, 0x86, 0xdf, 0x1f, 0x9b, 0xda, 0x6b,
+	0x29, 0xd4, 0xaa, 0x03, 0x6a, 0x1b, 0x7e, 0x3f, 0x03, 0x66, 0xf5, 0x93, 0x98, 0xa9, 0x4f, 0x64,
+	0x98, 0x6b, 0x51, 0x8a, 0xbd, 0xdb, 0x94, 0xfa, 0xc8, 0xd2, 0xc7, 0xff, 0x79, 0xbf, 0x99, 0x42,
+	0xe4, 0x82, 0x98, 0x50, 0x1c, 0x37, 0x03, 0x36, 0x9f, 0x4b, 0xa7, 0xdf, 0x90, 0xec, 0xd6, 0xf8,
+	0xd0, 0x47, 0x96, 0x47, 0xbc, 0x3e, 0xf7, 0x97, 0xd7, 0x22, 0x5b, 0xdc, 0x28, 0x75, 0xd2, 0x43,
+	0x26, 0xe5, 0x17, 0x06, 0x7e, 0xa3, 0x14, 0xb6, 0x38, 0xdb, 0x7b, 0xbd, 0xf0, 0x96, 0xc8, 0xcf,
+	0x76, 0x6e, 0xaa, 0x1f, 0x86, 0x12, 0x72, 0x8d, 0x3a, 0xd8, 0xcd, 0x5a, 0xc2, 0x10, 0x37, 0x03,
+	0x09, 0xdf, 0x1d, 0x09, 0x58, 0xcc, 0x41, 0x70, 0xde, 0x09, 0x23, 0xa1, 0x90, 0x3c, 0xa4, 0x50,
+	0x4c, 0x85, 0x5c, 0x52, 0x85, 0x2f, 0x64, 0x58, 0x6c, 0xd1, 0x07, 0xf7, 0x5d, 0x76, 0xbb, 0x36,
+	0x51, 0x70, 0x11, 0x19, 0x57, 0x89, 0x56, 0x8a, 0x12, 0x7f, 0x0f, 0x94, 0x18, 0xc2, 0xce, 0x40,
+	0x0d, 0xeb, 0x94, 0x6a, 0x44, 0x61, 0x41, 0x6c, 0x24, 0x61, 0xc4, 0x35, 0xca, 0x27, 0x35, 0xfa,
+	0x58, 0x86, 0xc5, 0x0d, 0x62, 0x9c, 0x99, 0x46, 0x23, 0xd8, 0x19, 0x68, 0xb4, 0x7f, 0x16, 0x1a,
+	0xa9, 0xdf, 0x4b, 0x50, 0x09, 0x57, 0x74, 0x93, 0x85, 0x07, 0xd3, 0xcc, 0xfa, 0xfa, 0x94, 0x06,
+	0x9f, 0x81, 0x1e, 0xea, 0xb0, 0x1e, 0xb6, 0x1b, 0xce, 0x36, 0xaf, 0x09, 0x83, 0xb3, 0x0b, 0xd7,
+	0xe2, 0x8c, 0xd8, 0xa5, 0xc1, 0xbf, 0x24, 0x76, 0x4f, 0x64, 0x38, 0xb7, 0x45, 0xba, 0xc4, 0x43,
+	0xe6, 0x4d, 0xdb, 0x36, 0xe8, 0x3d, 0x42, 0x3d, 0x62, 0x75, 0xc7, 0x26, 0xb7, 0x99, 0x42, 0x4e,
+	0x3c, 0xd0, 0x52, 0xd0, 0x33, 0xe0, 0xf6, 0x49, 0x16, 0xc7, 0x87, 0x02, 0x79, 0x0f, 0x75, 0x69,
+	0x10, 0xfd, 0x78, 0x39, 0xb1, 0xfd, 0x83, 0x63, 0x63, 0x74, 0xfb, 0x17, 0xe2, 0xdb, 0xff, 0x5b,
+	0x09, 0x96, 0xe2, 0x24, 0xb7, 0xb0, 0x39, 0xa1, 0x88, 0xdb, 0x29, 0x22, 0xfe, 0x73, 0x44, 0xc4,
+	0x08, 0x3f, 0x03, 0x19, 0x57, 0x13, 0x2a, 0x0e, 0xbd, 0x97, 0xd4, 0x9f, 0x25, 0x38, 0x1f, 0xf7,
+	0xbc, 0xcb, 0xf8, 0x6e, 0x1e, 0x20, 0x6b, 0x82, 0x87, 0xc3, 0xcd, 0x14, 0x6e, 0xff, 0x1a, 0xe1,
+	0x16, 0xf3, 0x90, 0x01, 0xbb, 0xe6, 0x71, 0xec, 0x92, 0xf7, 0xc0, 0x68, 0x35, 0x7f, 0x97, 0xa0,
+	0x16, 0x9f, 0xd1, 0x3b, 0xc1, 0xe2, 0x4f, 0x48, 0xfb, 0x4e, 0x0a, 0xed, 0xcb, 0x23, 0xb4, 0x93,
+	0x4e, 0x5e, 0x06, 0x73, 0x03, 0x9b, 0x41, 0x56, 0xa2, 0xa0, 0x09, 0x43, 0xfd, 0x4a, 0x86, 0x4a,
+	0x62, 0x2d, 0x7c, 0x57, 0x3f, 0x40, 0x14, 0x67, 0x18, 0xe8, 0xd2, 0xe0, 0x33, 0x60, 0xfb, 0xa9,
+	0x74, 0x2c, 0xdd, 0xe1, 0x13, 0x6d, 0xee, 0xc4, 0x53, 0xff, 0x1a, 0xac, 0x18, 0xd8, 0x24, 0x87,
+	0xd8, 0xed, 0x6f, 0x05, 0x59, 0xc8, 0xfd, 0x28, 0x77, 0x29, 0xa2, 0xc2, 0xd1, 0x1d, 0x58, 0x4c,
+	0xad, 0x0c, 0xff, 0x60, 0x59, 0xcf, 0x33, 0x12, 0x32, 0x84, 0xcf, 0x40, 0xc8, 0x8f, 0x92, 0x42,
+	0xd6, 0x60, 0xc6, 0x09, 0x56, 0x29, 0x90, 0x33, 0xb2, 0x63, 0x09, 0x2f, 0x39, 0x35, 0xe1, 0x95,
+	0x4b, 0x4b, 0x78, 0xe5, 0x63, 0x09, 0x2f, 0x7e, 0x41, 0x27, 0x94, 0xbf, 0x71, 0x83, 0x80, 0x1a,
+	0xd9, 0xea, 0x0f, 0x52, 0x52, 0xc2, 0x1b, 0x18, 0x1b, 0x6d, 0xa4, 0x3f, 0x38, 0x23, 0x09, 0x43,
+	0xf8, 0x0c, 0x24, 0x6c, 0xbc, 0xa8, 0x82, 0xea, 0xaf, 0x12, 0x28, 0xf1, 0x49, 0x68, 0xb8, 0xe3,
+	0x5b, 0xc6, 0xd8, 0x0c, 0x37, 0x52, 0x18, 0xaa, 0x23, 0x0c, 0x05, 0x78, 0x06, 0xfc, 0xae, 0x8f,
+	0xb3, 0x43, 0x5c, 0xee, 0x35, 0xcc, 0xb6, 0x09, 0x4b, 0x7d, 0x26, 0xc1, 0xf9, 0xed, 0x4e, 0x07,
+	0xeb, 0x1e, 0x39, 0xc4, 0x1b, 0xc8, 0x64, 0x97, 0x9e, 0x7b, 0x18, 0xd1, 0x49, 0x4e, 0xcc, 0xa3,
+	0x4f, 0x95, 0x23, 0x3c, 0x64, 0xa0, 0xc0, 0xa5, 0x84, 0x02, 0xcb, 0x30, 0xe5, 0x60, 0x97, 0xd8,
+	0x46, 0xf0, 0xbd, 0x23, 0xb0, 0xd4, 0x43, 0x58, 0xd1, 0xf0, 0x23, 0xe4, 0x1a, 0x51, 0x3e, 0xf2,
+	0x14, 0x69, 0xb0, 0x31, 0xb2, 0x6e, 0x3f, 0xc9, 0x30, 0xbf, 0x4d, 0x75, 0xd7, 0x7e, 0x34, 0x71,
+	0x16, 0xf3, 0xad, 0x14, 0x51, 0x45, 0x06, 0x3f, 0x09, 0x9c, 0x81, 0x96, 0x4f, 0xa5, 0x61, 0x31,
+	0x83, 0x04, 0xad, 0x94, 0xf8, 0x42, 0x13, 0xff, 0x3a, 0x24, 0x0f, 0x7d, 0x1d, 0xba, 0x0a, 0xf3,
+	0x61, 0xb9, 0xc5, 0xd9, 0x70, 0x9f, 0xf3, 0xcd, 0x73, 0xe2, 0x37, 0x90, 0x68, 0xd2, 0x86, 0xba,
+	0x2a, 0x0d, 0x58, 0x70, 0xf1, 0x43, 0x9f, 0xb8, 0xd8, 0xd8, 0x23, 0x5d, 0x0b, 0xbb, 0x22, 0x57,
+	0x50, 0xd0, 0x86, 0xab, 0xd9, 0x43, 0x90, 0x06, 0x3d, 0x0a, 0x3c, 0xb1, 0x1a, 0x9a, 0xea, 0x2f,
+	0x12, 0x80, 0x10, 0x86, 0xf5, 0x1d, 0x5b, 0xed, 0x37, 0x52, 0xd4, 0xae, 0xc5, 0xd4, 0x66, 0xa0,
+	0x19, 0x28, 0xbd, 0x73, 0xec, 0x11, 0xb9, 0x2e, 0x92, 0x25, 0x34, 0xbc, 0x28, 0x1f, 0x21, 0x5f,
+	0xd4, 0x49, 0xfd, 0x4d, 0x82, 0x59, 0x31, 0x3f, 0x0d, 0x53, 0xdf, 0x1c, 0x7f, 0x4b, 0x5f, 0x4b,
+	0xa1, 0xbd, 0x1a, 0xa3, 0x2d, 0x60, 0xff, 0x7c, 0xc4, 0x9f, 0x4b, 0xb0, 0xb4, 0xe7, 0xb7, 0xa3,
+	0x47, 0x44, 0x50, 0x6e, 0xe3, 0x0c, 0x6f, 0xfb, 0xa9, 0xf8, 0x19, 0x48, 0x71, 0x39, 0x21, 0xc5,
+	0x2a, 0x14, 0x3b, 0x6c, 0x97, 0x63, 0x4b, 0xef, 0x07, 0xc1, 0x6b, 0x50, 0xa1, 0x7e, 0x2d, 0x81,
+	0x12, 0x9f, 0x87, 0x78, 0x9b, 0x66, 0x78, 0x3a, 0x8d, 0x82, 0x9f, 0xf9, 0x7b, 0xe6, 0x1b, 0x09,
+	0xce, 0xc5, 0xdd, 0xee, 0xa2, 0xfe, 0x44, 0xe1, 0xf8, 0xe8, 0xc7, 0x6e, 0x0a, 0x7a, 0x06, 0xac,
+	0x2e, 0x26, 0x58, 0x95, 0x21, 0x47, 0x8c, 0xf0, 0xf3, 0x0e, 0x2b, 0xaa, 0x5f, 0xca, 0x70, 0xa1,
+	0xe5, 0x7b, 0x76, 0x0f, 0x79, 0x89, 0x2f, 0xd1, 0x74, 0xe2, 0x23, 0x60, 0x27, 0x85, 0xe1, 0xff,
+	0xc4, 0xf4, 0x8e, 0xf3, 0x93, 0x79, 0x52, 0x73, 0xb2, 0x77, 0x7d, 0x05, 0x0a, 0xed, 0xbe, 0x87,
+	0x69, 0xf8, 0x81, 0x95, 0x1b, 0x6a, 0x1f, 0x56, 0x53, 0x27, 0x3f, 0xe9, 0x2e, 0x18, 0xe3, 0x50,
+	0x36, 0x61, 0xe1, 0xbe, 0x6b, 0x10, 0x0b, 0xb9, 0xfd, 0xb3, 0xf7, 0x76, 0x79, 0x13, 0xe6, 0x93,
+	0xe1, 0x4b, 0x99, 0x83, 0xa2, 0x6f, 0xb1, 0x10, 0x66, 0x60, 0xa3, 0xfc, 0x17, 0xa5, 0x04, 0xd3,
+	0x2e, 0x36, 0x31, 0xa2, 0xb8, 0x2c, 0x29, 0x10, 0x5e, 0xd3, 0xca, 0xb2, 0x52, 0x84, 0x02, 0x75,
+	0x4c, 0xe2, 0x95, 0x73, 0xed, 0x29, 0xfe, 0x2f, 0x8f, 0xff, 0xff, 0x11, 0x00, 0x00, 0xff, 0xff,
+	0x86, 0x31, 0xe0, 0xd7, 0x1a, 0x22, 0x00, 0x00,
 }

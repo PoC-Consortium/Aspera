@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"testing"
 
-	//"fmt"
+	"fmt"
 	//"github.com/json-iterator/go"
 	//"encoding/json"
 	"github.com/Jeffail/gabs"
@@ -21,12 +21,12 @@ func TestParseBlocks(t *testing.T) {
 	for _, parseTest := range ParseTests {
 		data := []byte(parseTest.JSON)
 		data, _ = Upgrade(data)
-		//panic(string(data))
+
 		msg := new(api.GetNextBlocksResponse)
-		assert.NoError(
-			t,
-			unmarshaler.Unmarshal(bytes.NewReader(data), msg),
-		)
+		if !assert.NoError(t, unmarshaler.Unmarshal(bytes.NewReader(data), msg)) {
+			fmt.Println(string(data))
+			panic(1)
+		}
 		//panic(string(data))
 		/*
 			// convert from JSON -> go type
