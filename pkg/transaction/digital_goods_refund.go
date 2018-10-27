@@ -12,12 +12,14 @@ type DigitalGoodsRefund struct {
 func (tx *DigitalGoodsRefund) ToBytes() []byte {
 	e := encoding.NewEncoder([]byte{})
 
-	WriteHeader(e, tx.TransactionHeader)
+	WriteHeader(e, tx.Header)
 
 	e.WriteUint64(tx.Attachment.Purchase)
-	e.WriteUint64(tx.Attachment.RefundPrice)
+	e.WriteUint64(tx.Attachment.Refund)
+
+	return e.Bytes()
 }
 
 func (tx *DigitalGoodsRefund) SizeInBytes() int {
-	return HeaderSize(tx.TransactionHeader) + 8 + 8
+	return HeaderSize(tx.Header) + 8 + 8
 }

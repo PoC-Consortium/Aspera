@@ -12,11 +12,13 @@ type EffectiveBalanceLeasing struct {
 func (tx *EffectiveBalanceLeasing) ToBytes() []byte {
 	e := encoding.NewEncoder([]byte{})
 
-	WriteHeader(e, tx.TransactionHeader)
+	WriteHeader(e, tx.Header)
 
 	e.WriteUint32(tx.Attachment.Period)
+
+	return e.Bytes()
 }
 
 func (tx *EffectiveBalanceLeasing) SizeInBytes() int {
-	return HeaderSize(tx.TransactionHeader) + 4
+	return HeaderSize(tx.Header) + 4
 }

@@ -12,11 +12,13 @@ type AskOrderCancellation struct {
 func (tx *AskOrderCancellation) ToBytes() []byte {
 	e := encoding.NewEncoder([]byte{})
 
-	WriteHeader(e, tx.TransactionHeader)
+	WriteHeader(e, tx.Header)
 
 	e.WriteUint64(tx.Attachment.Order)
+
+	return e.Bytes()
 }
 
 func (tx *AskOrderCancellation) SizeInBytes() int {
-	return HeaderSize(tx.TransactionHeader) + 8
+	return HeaderSize(tx.Header) + 8
 }

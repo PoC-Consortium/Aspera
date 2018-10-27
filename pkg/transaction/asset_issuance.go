@@ -6,26 +6,24 @@ import (
 )
 
 type AssetIssuence struct {
-	*pb.AssetIssuence
+	*pb.AssetIssuance
 }
 
 func (tx *AssetIssuence) ToBytes() []byte {
 	e := encoding.NewEncoder([]byte{})
 
-	WriteHeader(e, tx.TransactionHeader)
+	WriteHeader(e, tx.Header)
 
-	e.WriteUint64(tx.Attachment.AssetTransfer)
-	e.WriteUint64(tx.Attachment.Qantity)
-	e.WriteUint64(tx.Attachment.Price)
 	e.WriteUint8(uint8(len(tx.Attachment.Name)))
 	e.WriteBytes([]byte(tx.Attachment.Name))
 	e.WriteUint16(uint16(len(tx.Attachment.Description)))
 	e.WriteBytes([]byte(tx.Attachment.Description))
 	e.WriteUint64(tx.Attachment.Quantity)
-	e.WriteUint8(tx.Attachment.Decimals)
+	e.WriteUint8(uint8(tx.Attachment.Decimals))
+
+	return e.Bytes()
 }
 
 func (tx *AssetIssuence) SizeInBytes() int {
-	return HeaderSize(tx.TransactionHeader) + 8 + 8 + 8 + 1 + len(tx.Attachment.Name) + 2 +
-		len(tx.Attachment.Description) + 8 + 1
+	return HeaderSize(tx.Header) + 1 + len(tx.Attachment.Name) + 2 + len(tx.Attachment.Description) + 8 + 1
 }

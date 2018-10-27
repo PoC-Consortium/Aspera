@@ -12,14 +12,16 @@ type DigitalGoodsPurchase struct {
 func (tx *DigitalGoodsPurchase) ToBytes() []byte {
 	e := encoding.NewEncoder([]byte{})
 
-	WriteHeader(e, tx.TransactionHeader)
+	WriteHeader(e, tx.Header)
 
-	e.WriteUint64(tx.Attachment.Goods)
+	e.WriteUint64(tx.Attachment.Id)
 	e.WriteUint32(tx.Attachment.Quantity)
 	e.WriteUint64(tx.Attachment.Price)
 	e.WriteUint32(tx.Attachment.DeliveryDeadlineTimestamp)
+
+	return e.Bytes()
 }
 
 func (tx *DigitalGoodsPurchase) SizeInBytes() int {
-	return HeaderSize(tx.TransactionHeader) + 8 + 4 + 8 + 4
+	return HeaderSize(tx.Header) + 8 + 4 + 8 + 4
 }

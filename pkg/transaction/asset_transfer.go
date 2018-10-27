@@ -12,12 +12,14 @@ type AssetTransfer struct {
 func (tx *AssetTransfer) ToBytes() []byte {
 	e := encoding.NewEncoder([]byte{})
 
-	WriteHeader(e, tx.TransactionHeader)
+	WriteHeader(e, tx.Header)
 
 	e.WriteUint64(tx.Attachment.Asset)
 	e.WriteUint64(tx.Attachment.Quantity)
+
+	return e.Bytes()
 }
 
 func (tx *AssetTransfer) SizeInBytes() int {
-	return HeaderSize(tx.TransactionHeader) + 8 + 8
+	return HeaderSize(tx.Header) + 8 + 8
 }

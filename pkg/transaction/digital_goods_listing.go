@@ -12,7 +12,7 @@ type DigitalGoodsListing struct {
 func (tx *DigitalGoodsListing) ToBytes() []byte {
 	e := encoding.NewEncoder([]byte{})
 
-	WriteHeader(e, tx.TransactionHeader)
+	WriteHeader(e, tx.Header)
 
 	e.WriteUint16(uint16(len(tx.Attachment.Name)))
 	e.WriteBytes([]byte(tx.Attachment.Name))
@@ -22,9 +22,11 @@ func (tx *DigitalGoodsListing) ToBytes() []byte {
 	e.WriteBytes([]byte(tx.Attachment.Tags))
 	e.WriteUint32(tx.Attachment.Quantity)
 	e.WriteUint64(tx.Attachment.Price)
+
+	return e.Bytes()
 }
 
 func (tx *DigitalGoodsListing) SizeInBytes() int {
-	return HeaderSize(tx.TransactionHeader) + 2 + len(tx.Attachment.Name) + 2 + len(tx.Attachment.Description) +
+	return HeaderSize(tx.Header) + 2 + len(tx.Attachment.Name) + 2 + len(tx.Attachment.Description) +
 		2 + len(tx.Attachment.Tags) + 4 + 8
 }

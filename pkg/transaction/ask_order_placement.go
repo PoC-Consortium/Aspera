@@ -12,13 +12,15 @@ type AskOrderPlacement struct {
 func (tx *AskOrderPlacement) ToBytes() []byte {
 	e := encoding.NewEncoder([]byte{})
 
-	WriteHeader(e, tx.TransactionHeader)
+	WriteHeader(e, tx.Header)
 
-	e.WriteUint64(tx.Attachment.AssetTransfer)
-	e.WriteUint64(tx.Attachment.Qantity)
+	e.WriteUint64(tx.Attachment.Asset)
+	e.WriteUint64(tx.Attachment.Quantity)
 	e.WriteUint64(tx.Attachment.Price)
+
+	return e.Bytes()
 }
 
 func (tx *AskOrderPlacement) SizeInBytes() int {
-	return HeaderSize(tx.TransactionHeader) + 8 + 8 + 8
+	return HeaderSize(tx.Header) + 8 + 8 + 8
 }

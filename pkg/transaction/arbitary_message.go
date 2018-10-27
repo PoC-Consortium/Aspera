@@ -12,9 +12,11 @@ type ArbitaryMessage struct {
 func (tx *ArbitaryMessage) ToBytes() []byte {
 	e := encoding.NewEncoder([]byte{})
 
-	WriteHeader(e, tx.TransactionHeader)
+	WriteHeader(e, tx.Header)
+
+	return e.Bytes()
 }
 
 func (tx *ArbitaryMessage) SizeInBytes() int {
-	return HeaderSize(tx.TransactionHeader)
+	return HeaderSize(tx.Header)
 }

@@ -1,8 +1,6 @@
 package transaction
 
 import (
-	"encoding/binary"
-
 	pb "github.com/ac0v/aspera/pkg/api/p2p"
 	"github.com/ac0v/aspera/pkg/encoding"
 )
@@ -14,7 +12,7 @@ type Transaction interface {
 
 func WriteHeader(e encoding.Encoder, h *pb.TransactionHeader) {
 	e.WriteUint32(h.Timestamp)
-	e.WriteUint16(h.Deadline)
+	e.WriteUint16(uint16(h.Deadline))
 	e.WriteBytes(h.SenderPublicKey)
 	e.WriteUint64(h.Recipient)
 	e.WriteUint64(h.Amount)
@@ -22,7 +20,8 @@ func WriteHeader(e encoding.Encoder, h *pb.TransactionHeader) {
 	e.WriteBytes(h.ReferencedTransactionFullHash)
 	e.WriteBytes(h.Signature)
 	if h.Version > 0 {
-		e.WriteUint32(h.Flags)
+		// TODO: calc flags
+		// e.WriteUint32(h.Flags)
 		e.WriteUint32(h.EcBlockHeight)
 		e.WriteUint64(h.EcBlockId)
 	}

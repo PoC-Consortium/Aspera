@@ -12,12 +12,14 @@ type DigitalGoodsQuantityChange struct {
 func (tx *DigitalGoodsQuantityChange) ToBytes() []byte {
 	e := encoding.NewEncoder([]byte{})
 
-	WriteHeader(e, tx.TransactionHeader)
+	WriteHeader(e, tx.Header)
 
-	e.WriteUint64(tx.Attachment.Goods)
-	e.WriteInt32(tx.Attachment.DeltaQuantity)
+	e.WriteUint64(tx.Attachment.Id)
+	e.WriteInt32(tx.Attachment.Delta)
+
+	return e.Bytes()
 }
 
 func (tx *DigitalGoodsQuantityChange) SizeInBytes() int {
-	return HeaderSize(tx.TransactionHeader) + 8 + 4
+	return HeaderSize(tx.Header) + 8 + 4
 }

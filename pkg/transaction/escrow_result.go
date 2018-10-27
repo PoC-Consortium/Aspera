@@ -12,12 +12,14 @@ type EscrowResult struct {
 func (tx *EscrowResult) ToBytes() []byte {
 	e := encoding.NewEncoder([]byte{})
 
-	WriteHeader(e, tx.TransactionHeader)
+	WriteHeader(e, tx.Header)
 
-	e.WriteUint64(tx.Attachmet.EscrowID)
-	e.WriteUint8(tx.Attachmet.Decision)
+	e.WriteUint64(tx.Attachment.Id)
+	e.WriteUint8(uint8(tx.Attachment.Decision))
+
+	return e.Bytes()
 }
 
 func (tx *EscrowResult) SizeInBytes() int {
-	return HeaderSize(tx.TransactionHeader) + 8 + 1
+	return HeaderSize(tx.Header) + 8 + 1
 }

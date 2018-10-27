@@ -12,11 +12,13 @@ type DigitalGoodsDelisting struct {
 func (tx *DigitalGoodsDelisting) ToBytes() []byte {
 	e := encoding.NewEncoder([]byte{})
 
-	WriteHeader(e, tx.TransactionHeader)
+	WriteHeader(e, tx.Header)
 
-	e.WriteUint64(tx.Attachment.Attachment.Goods)
+	e.WriteUint64(tx.Attachment.Id)
+
+	return e.Bytes()
 }
 
 func (tx *DigitalGoodsDelisting) SizeInBytes() int {
-	return HeaderSize(tx.TransactionHeader) + 8
+	return HeaderSize(tx.Header) + 8
 }

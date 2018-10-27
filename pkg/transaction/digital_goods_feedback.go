@@ -12,11 +12,13 @@ type DigitalGoodsFeedback struct {
 func (tx *DigitalGoodsFeedback) ToBytes() []byte {
 	e := encoding.NewEncoder([]byte{})
 
-	WriteHeader(e, tx.TransactionHeader)
+	WriteHeader(e, tx.Header)
 
 	e.WriteUint64(tx.Attachment.Purchase)
+
+	return e.Bytes()
 }
 
 func (tx *DigitalGoodsFeedback) SizeInBytes() int {
-	return HeaderSize(tx.TransactionHeader) + 8
+	return HeaderSize(tx.Header) + 8
 }

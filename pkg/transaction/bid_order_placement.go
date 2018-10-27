@@ -6,19 +6,21 @@ import (
 )
 
 type BidOrderPlacement struct {
-	*pb.AskOrderPlacement
+	*pb.BidOrderPlacement
 }
 
 func (tx *BidOrderPlacement) ToBytes() []byte {
 	e := encoding.NewEncoder([]byte{})
 
-	WriteHeader(e, tx.TransactionHeader)
+	WriteHeader(e, tx.Header)
 
 	e.WriteUint64(tx.Attachment.Asset)
 	e.WriteUint64(tx.Attachment.Quantity)
 	e.WriteUint64(tx.Attachment.Price)
+
+	return e.Bytes()
 }
 
 func (tx *BidOrderPlacement) SizeInBytes() int {
-	return HeaderSize(tx.TransactionHeader) + 8 + 8 + 8
+	return HeaderSize(tx.Header) + 8 + 8 + 8
 }

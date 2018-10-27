@@ -5,20 +5,22 @@ import (
 	"github.com/ac0v/aspera/pkg/encoding"
 )
 
-type AccountInfo struct {
-	*pb.AccountInfo
+type AliasSell struct {
+	*pb.AliasSell
 }
 
-func (tx *AccountInfo) ToBytes() []byte {
+func (tx *AliasSell) ToBytes() []byte {
 	e := encoding.NewEncoder([]byte{})
 
-	WriteHeader(e, tx.TransactionHeader)
+	WriteHeader(e, tx.Header)
 
-	e.WriteUint8(uint8(len(tx.Attachment.Alias)))
-	e.WriteBytes([]byte(tx.Attachment.Alias))
-	e.WriteUint64(tx.Attachment.Price)
+	e.WriteUint8(uint8(len(tx.Attachment.Name)))
+	e.WriteBytes([]byte(tx.Attachment.Name))
+	e.WriteInt64(tx.Attachment.Price)
+
+	return e.Bytes()
 }
 
-func (tx *AccountInfo) SizeInBytes() int {
-	return HeaderSize(tx.TransactionHeader) + 1 + len(tx.Attachment.Alias) + 8
+func (tx *AliasSell) SizeInBytes() int {
+	return HeaderSize(tx.Header) + 1 + len(tx.Attachment.Name) + 8
 }

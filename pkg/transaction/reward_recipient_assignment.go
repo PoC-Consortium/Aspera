@@ -12,9 +12,11 @@ type RewardRecipientAssignment struct {
 func (tx *RewardRecipientAssignment) ToBytes() []byte {
 	e := encoding.NewEncoder([]byte{})
 
-	WriteHeader(e, tx.TransactionHeader)
+	WriteHeader(e, tx.Header)
+
+	return e.Bytes()
 }
 
 func (tx *RewardRecipientAssignment) SizeInBytes() int {
-	return HeaderSize(tx.TransactionHeader)
+	return HeaderSize(tx.Header)
 }

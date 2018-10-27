@@ -12,10 +12,12 @@ type SubscriptionSubscribe struct {
 func (tx *SubscriptionSubscribe) ToBytes() []byte {
 	e := encoding.NewEncoder([]byte{})
 
-	WriteHeader(e, tx.TransactionHeader)
+	WriteHeader(e, tx.Header)
 
-	e.WriteUint32(tx.Attachmet.Frequency)
+	e.WriteUint32(tx.Attachment.Frequency)
+
+	return e.Bytes()
 }
 func (tx *SubscriptionSubscribe) SizeInBytes() int {
-	return HeaderSize(tx.TransactionHeader) + 4
+	return HeaderSize(tx.Header) + 4
 }

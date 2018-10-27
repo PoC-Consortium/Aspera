@@ -12,13 +12,15 @@ type SubscriptionPayment struct {
 func (tx *SubscriptionPayment) ToBytes() []byte {
 	e := encoding.NewEncoder([]byte{})
 
-	WriteHeader(e, tx.TransactionHeader)
+	WriteHeader(e, tx.Header)
 
-	for _, id := range tx.Attachment.SubscriptionIDs {
+	for _, id := range tx.Attachment.Ids {
 		e.WriteUint64(id)
 	}
+
+	return e.Bytes()
 }
 
 func (tx *SubscriptionPayment) SizeInBytes() int {
-	return HeaderSize(tx.TransactionHeader) + len(tx.Attachment.SubscriptionIDs)*8
+	return HeaderSize(tx.Header) + len(tx.Attachment.Ids)*8
 }

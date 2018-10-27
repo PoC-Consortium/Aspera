@@ -9,14 +9,16 @@ type BidOrderCancellation struct {
 	*pb.BidOrderCancellation
 }
 
-func (tx *BidOrderPlacement) ToBytes() []byte {
+func (tx *BidOrderCancellation) ToBytes() []byte {
 	e := encoding.NewEncoder([]byte{})
 
-	WriteHeader(e, tx.TransactionHeader)
+	WriteHeader(e, tx.Header)
 
 	e.WriteUint64(tx.Attachment.Order)
+
+	return e.Bytes()
 }
 
 func (tx *BidOrderCancellation) SizeInBytes() int {
-	return HeaderSize(tx.TransactionHeader) + 8
+	return HeaderSize(tx.Header) + 8
 }

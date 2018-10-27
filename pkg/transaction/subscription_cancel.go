@@ -12,11 +12,13 @@ type SubscriptionCancel struct {
 func (tx *SubscriptionCancel) ToBytes() []byte {
 	e := encoding.NewEncoder([]byte{})
 
-	WriteHeader(e, tx.TransactionHeader)
+	WriteHeader(e, tx.Header)
 
-	e.WriteUint64(tx.Attachmet.SubscriptionID)
+	e.WriteUint64(tx.Attachment.Id)
+
+	return e.Bytes()
 }
 
-func (tx *SubscriptionSubscribe) SizeInBytes() int {
-	return HeaderSize(tx.TransactionHeader) + 8
+func (tx *SubscriptionCancel) SizeInBytes() int {
+	return HeaderSize(tx.Header) + 8
 }

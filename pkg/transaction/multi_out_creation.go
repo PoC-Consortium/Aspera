@@ -9,18 +9,20 @@ type MultiOutCreation struct {
 	*pb.MultiOutCreation
 }
 
-func (tx *MultiOutCreation) ToBytes() {
+func (tx *MultiOutCreation) ToBytes() []byte {
 	e := encoding.NewEncoder([]byte{})
 
-	WriteHeader(e, tx.TransactionHeader)
+	WriteHeader(e, tx.Header)
 
 	e.WriteUint8(uint8(len(tx.Attachment.Recipients)))
 	for _, recipIdAndAmount := range tx.Attachment.Recipients {
-		e.WriteUint64(recipAndId.Id)
-		e.WriteUint64(recipAndId.Amount)
+		e.WriteUint64(recipIdAndAmount.Id)
+		e.WriteUint64(recipIdAndAmount.Amount)
 	}
+
+	return e.Bytes()
 }
 
-func (tx *MultiOutCreation) SizeInBytes() {
-	return HeaderSize(tx.TransactionHeader) + 1 + len(tx.Attachment.Recipients)*(8+8)
+func (tx *MultiOutCreation) SizeInBytes() int {
+	return HeaderSize(tx.Header) + 1 + len(tx.Attachment.Recipients)*(8+8)
 }
