@@ -5,11 +5,11 @@ import (
 	"github.com/ac0v/aspera/pkg/encoding"
 )
 
-type AutomatedTransactionCreation struct {
+type AutomatedTransactionsCreation struct {
 	*pb.AutomatedTransactionsCreation
 }
 
-func (tx *AutomatedTransactionCreation) ToBytes() []byte {
+func (tx *AutomatedTransactionsCreation) ToBytes() []byte {
 	e := encoding.NewEncoder([]byte{})
 
 	WriteHeader(e, tx.Header)
@@ -22,7 +22,7 @@ func (tx *AutomatedTransactionCreation) ToBytes() []byte {
 	return e.Bytes()
 }
 
-func (tx *AutomatedTransactionCreation) SizeInBytes() int {
+func (tx *AutomatedTransactionsCreation) SizeInBytes() int {
 	return HeaderSize(tx.Header) + 1 + len(tx.Attachment.Description) +
 		2 + len(tx.Attachment.Description) + len(tx.Attachment.Bytes)
 }

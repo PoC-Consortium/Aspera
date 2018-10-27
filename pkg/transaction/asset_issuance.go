@@ -5,11 +5,11 @@ import (
 	"github.com/ac0v/aspera/pkg/encoding"
 )
 
-type AssetIssuence struct {
+type AssetIssuance struct {
 	*pb.AssetIssuance
 }
 
-func (tx *AssetIssuence) ToBytes() []byte {
+func (tx *AssetIssuance) ToBytes() []byte {
 	e := encoding.NewEncoder([]byte{})
 
 	WriteHeader(e, tx.Header)
@@ -24,6 +24,6 @@ func (tx *AssetIssuence) ToBytes() []byte {
 	return e.Bytes()
 }
 
-func (tx *AssetIssuence) SizeInBytes() int {
+func (tx *AssetIssuance) SizeInBytes() int {
 	return HeaderSize(tx.Header) + 1 + len(tx.Attachment.Name) + 2 + len(tx.Attachment.Description) + 8 + 1
 }

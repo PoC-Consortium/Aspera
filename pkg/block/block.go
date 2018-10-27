@@ -11,6 +11,7 @@ import (
 	"github.com/ac0v/aspera/pkg/crypto"
 	"github.com/ac0v/aspera/pkg/crypto/shabal256"
 	"github.com/ac0v/aspera/pkg/encoding"
+	"github.com/ac0v/aspera/pkg/transaction"
 
 	"github.com/json-iterator/go"
 )
@@ -35,10 +36,19 @@ var json = jsoniter.ConfigCompatibleWithStandardLibrary
 
 type Block struct {
 	*api.Block
+	transactions []transaction.Transaction
 }
 
-func NewBlock(b *api.Block) *Block {
-	return &Block{b}
+func NewBlock(apiBlock *api.Block) (*Block, error) {
+	transactions := make([]transaction.Transaction, len(apiBlock.Transactions))
+	for i, a := range apiBlock.Transactions {
+		if tx, err := transaction.AnyToTransaction(a); err == nil {
+			transactions[i] = tx
+		} else {
+			return nil, err
+		}
+	}
+	return &Block{apiBlock, transactions}, nil
 }
 
 func (b *Block) CalcScoop() uint32 {

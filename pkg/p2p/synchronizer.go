@@ -115,7 +115,16 @@ func NewSynchronizer(client Client, manager Manager, store *s.Store, milestones 
 	return s
 }
 
+func (s *Synchronizer) refetchBlockRangeAndBlockPeers(blockBatch *blockBatch, err error) {
+	Log.Error("got invalid blocks", zap.Error(err))
+	for _, p := range blockBatch.peers {
+		s.manager.BlockPeer(p, PeerDataIntegrityValidation)
+	}
+	s.blockRanges <- blockBatch.blockRange
+}
+
 func (s *Synchronizer) validateBlocks() {
+ValidateBlocks:
 	for {
 		select {
 		case blockBatch := <-s.blockBatchesFilled:
@@ -130,30 +139,25 @@ func (s *Synchronizer) validateBlocks() {
 			}
 
 			blockWrappers := make([]*block.Block, len(blocks))
+			var err error
 			for i, b := range blocks {
-				blockWrappers[i] = block.NewBlock(b)
+				if blockWrappers[i], err = block.NewBlock(b); err != nil {
+					s.refetchBlockRangeAndBlockPeers(blockBatch, err)
+					continue ValidateBlocks
+				}
 			}
 
-			var err error
 			for i, b := range blockWrappers[1 : len(blockWrappers)-1] {
 				// blocks[i] is the previousBlock .. cause that's a slice above
 				// - starting with element no. 2
 				if err = b.Validate(blockWrappers[i]); err != nil {
-					break
+					s.refetchBlockRangeAndBlockPeers(blockBatch, err)
+					continue ValidateBlocks
 				}
-			}
-
-			if err != nil {
-				Log.Error("got invalid blocks", zap.Error(err))
-				for _, p := range blockBatch.peers {
-					s.manager.BlockPeer(p, PeerDataIntegrityValidation)
-				}
-				s.blockRanges <- blockBatch.blockRange
-				continue
 			}
 
 			// ToDo: may we should hand over the block batch to allow blocking bad peers?
-			s.store.RawStore.StoreAndMaybeConsume(blockBatch.blocks)
+			// s.store.RawStore.StoreAndMaybeConsume(blockBatch.blocks)
 			storedCount := int32(len(blocks) - 1)
 
 			// we need to store only the successor (last block) of a glue result
@@ -161,7 +165,7 @@ func (s *Synchronizer) validateBlocks() {
 			if !blockBatch.isGlueResult {
 				if blocks[0].Height == 0 {
 					// ToDo: may we should hand over the block batch to allow blocking bad peers?
-					s.store.RawStore.StoreAndMaybeConsume(blockBatch.blocks)
+					// s.store.RawStore.StoreAndMaybeConsume(blockBatch.blocks)
 					storedCount++
 				} else {
 					s.blockBatchesGlue <- []*api.Block{
