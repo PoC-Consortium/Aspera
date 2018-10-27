@@ -12,7 +12,6 @@ import (
 	"github.com/ac0v/aspera/pkg/crypto/shabal256"
 	"github.com/ac0v/aspera/pkg/encoding"
 
-	"github.com/davecgh/go-spew/spew"
 	"github.com/json-iterator/go"
 )
 
