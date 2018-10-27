@@ -8,6 +8,7 @@ import (
 	"strconv"
 
 	api "github.com/ac0v/aspera/pkg/api/p2p"
+	compat "github.com/ac0v/aspera/pkg/api/p2p/compat"
 	b "github.com/ac0v/aspera/pkg/block"
 	"github.com/ac0v/aspera/pkg/config"
 	"github.com/golang/protobuf/jsonpb"
@@ -27,7 +28,7 @@ type GetNextBlocksResponse struct {
 
 type Client interface {
 	GetNextBlockIDs(blockID uint64) (*api.GetNextBlockIdsResponse, []string, error)
-	GetNextBlocks(blockID uint64) (*GetNextBlocksResponse, []string, error)
+	GetNextBlocks(blockID uint64) (*api.GetNextBlocksResponse, []string, error)
 	GetPeersOf(apiUrl string) (*api.GetPeers, error)
 
 	SetManager(m Manager)
@@ -155,7 +156,7 @@ func (c *client) GetNextBlockIDs(blockId uint64) (*api.GetNextBlockIdsResponse, 
 	return msg, peers, err
 }
 
-func (c *client) GetNextBlocks(blockId uint64) (*GetNextBlocksResponse, []string, error) {
+func (c *client) GetNextBlocks(blockId uint64) (*api.GetNextBlocksResponse, []string, error) {
 	req := c.buildRequest("getNextBlocks", map[string]interface{}{
 		"blockId": strconv.FormatUint(blockId, 10),
 	})
@@ -164,8 +165,13 @@ func (c *client) GetNextBlocks(blockId uint64) (*GetNextBlocksResponse, []string
 		return nil, nil, err
 	}
 
-	var msg = new(GetNextBlocksResponse)
-	return msg, []string{peers}, json.Unmarshal(res.Body(), msg)
+	var json []byte
+	if json, err = compat.Upgrade(res.Body()); err != nil {
+		return nil, nil, err
+	}
+
+	var msg = new(api.GetNextBlocksResponse)
+	return msg, []string{peers}, c.unmarshaler.Unmarshal(bytes.NewReader(json), msg)
 }
 
 func (c *client) GetPeersOf(apiUrl string) (*api.GetPeers, error) {

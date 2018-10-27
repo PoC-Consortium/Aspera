@@ -7,7 +7,7 @@ import (
 
 	"go.uber.org/zap"
 
-	b "github.com/ac0v/aspera/pkg/block"
+	api "github.com/ac0v/aspera/pkg/api/p2p"
 	"github.com/ac0v/aspera/pkg/config"
 	. "github.com/ac0v/aspera/pkg/log"
 	s "github.com/ac0v/aspera/pkg/store"
@@ -22,7 +22,7 @@ type Synchronizer struct {
 	blockRanges        chan *blockRange
 	blockBatchesEmpty  chan *blockBatch
 	blockBatchesFilled chan *blockBatch
-	blockBatchesGlue   chan []*b.Block
+	blockBatchesGlue   chan []*api.Block
 
 	glueBlockOf *sync.Map
 }
@@ -47,7 +47,7 @@ type blockBatch struct {
 
 	peers  []string
 	ids    []uint64
-	blocks []*b.Block
+	blocks []*api.Block
 
 	isGlueResult bool
 }
@@ -64,7 +64,7 @@ func NewSynchronizer(client Client, manager Manager, store *s.Store, milestones 
 		blockRanges:        make(chan *blockRange, len(milestones)),
 		blockBatchesEmpty:  make(chan *blockBatch, len(milestones)),
 		blockBatchesFilled: make(chan *blockBatch),
-		blockBatchesGlue:   make(chan []*b.Block),
+		blockBatchesGlue:   make(chan []*api.Block),
 		glueBlockOf:        &sync.Map{},
 	}
 
@@ -124,17 +124,18 @@ func (s *Synchronizer) validateBlocks() {
 
 			if len(blocks) < 2 {
 				// can't validate a single block without any previous
-				s.blockBatchesGlue <- []*b.Block{blockBatch.blocks[0]}
+				s.blockBatchesGlue <- []*api.Block{blockBatch.blocks[0]}
 				continue
 			}
 			var err error
-			for i, b := range blocks[1 : len(blocks)-1] {
-				// blocks[i] is the previousBlock .. cause that's a slice above
-				// - starting with element no. 2
-				if err = b.Validate(blocks[i]); err != nil {
-					break
-				}
-			}
+			//for i, b := range blocks[1 : len(blocks)-1] {
+			// blocks[i] is the previousBlock .. cause that's a slice above
+			// - starting with element no. 2
+			// ToDo:
+			// if err = b.Validate(blocks[i]); err != nil {
+			// 	break
+			// }
+			//}
 
 			if err != nil {
 				Log.Error("got invalid blocks", zap.Error(err))
@@ -157,7 +158,7 @@ func (s *Synchronizer) validateBlocks() {
 					s.store.RawStore.StoreAndMaybeConsume(blockBatch.blocks)
 					storedCount++
 				} else {
-					s.blockBatchesGlue <- []*b.Block{
+					s.blockBatchesGlue <- []*api.Block{
 						blocks[0],
 						blocks[len(blocks)-1],
 					}
@@ -178,20 +179,20 @@ func (s *Synchronizer) validateBlocks() {
 			// cause this matching pair will not be handled by someone else
 			if previousBlock, ok := s.glueBlockOf.Load(orphanedBlock.Height - 1); ok {
 				s.glueBlockOf.Delete(orphanedBlock.Height)
-				previousBlock := previousBlock.(*b.Block)
+				previousBlock := previousBlock.(*api.Block)
 				s.blockBatchesFilled <- &blockBatch{
 					blockRange: &blockRange{
 						from: blockMeta{
-							id:     previousBlock.Block,
+							id:     previousBlock.Id,
 							height: previousBlock.Height,
 						},
 						to: &blockMeta{
-							id:     orphanedBlock.Block,
+							id:     orphanedBlock.Id,
 							height: orphanedBlock.Height,
 						},
 					},
-					blocks:       []*b.Block{previousBlock, orphanedBlock},
-					ids:          []uint64{previousBlock.Block, orphanedBlock.Block},
+					blocks:       []*api.Block{previousBlock, orphanedBlock},
+					ids:          []uint64{previousBlock.Id, orphanedBlock.Id},
 					isGlueResult: true,
 				}
 				Log.Info("glue pair found", zap.Int32("leftHeight", previousBlock.Height), zap.Int32("rightHeight", orphanedBlock.Height))

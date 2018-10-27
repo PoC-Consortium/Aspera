@@ -11,7 +11,7 @@ import (
 	"strings"
 	"sync"
 
-	b "github.com/ac0v/aspera/pkg/block"
+	api "github.com/ac0v/aspera/pkg/api/p2p"
 	"github.com/ac0v/aspera/pkg/config"
 	. "github.com/ac0v/aspera/pkg/log"
 
@@ -30,7 +30,7 @@ type RawStore struct {
 
 type RawCurrent struct {
 	Height int32
-	Block  *b.Block
+	Block  *api.Block
 }
 
 type LookupWorker struct {
@@ -94,7 +94,7 @@ func NewRawStore(path string, genesisMilestone config.Milestone) *RawStore {
 	rawStore.Current = &RawCurrent{Height: int32(height)}
 
 	if height == -1 {
-		block := &b.Block{Block: genesisMilestone.Id}
+		block := &api.Block{Id: genesisMilestone.Id}
 		rawStore.Store(block, genesisMilestone.Height)
 	} else {
 		rawStore.Current.Block = rawStore.load(rawStore.Current.Height)
@@ -104,7 +104,7 @@ func NewRawStore(path string, genesisMilestone config.Milestone) *RawStore {
 	return &rawStore
 }
 
-func (rawStore *RawStore) Push(block *b.Block) {
+func (rawStore *RawStore) Push(block *api.Block) {
 	rawStore.Store(block, rawStore.Current.Height+1)
 }
 
@@ -117,7 +117,7 @@ func (rawStore *RawStore) convertHeightToPathInfo(height int32) string {
 	return filepath.Join(rawStore.BasePath, path+".bin")
 }
 
-func (rawStore *RawStore) Store(block *b.Block, height int32) {
+func (rawStore *RawStore) Store(block *api.Block, height int32) {
 	path := rawStore.convertHeightToPathInfo(height)
 	if _, err := os.Stat(filepath.Dir(path)); os.IsNotExist(err) {
 		os.MkdirAll(filepath.Dir(path), os.ModePerm)
@@ -130,7 +130,7 @@ func (rawStore *RawStore) Store(block *b.Block, height int32) {
 	rawStore.Current.Block = block
 }
 
-func (rawStore *RawStore) load(height int32) *b.Block {
+func (rawStore *RawStore) load(height int32) *api.Block {
 	path := rawStore.convertHeightToPathInfo(height)
 	if _, err := os.Stat(path); os.IsNotExist(err) {
 		return nil
@@ -139,7 +139,7 @@ func (rawStore *RawStore) load(height int32) *b.Block {
 	if err != nil {
 		Log.Fatal("Error reading file:", zap.Error(err))
 	}
-	block := &b.Block{}
+	block := &api.Block{}
 	if err := json.Unmarshal(in, block); err != nil {
 		Log.Fatal("Error parse block file:", zap.Error(err))
 	}
@@ -147,7 +147,7 @@ func (rawStore *RawStore) load(height int32) *b.Block {
 	return block
 }
 
-func (rawStore *RawStore) StoreAndMaybeConsume(blocks []*b.Block) error {
+func (rawStore *RawStore) StoreAndMaybeConsume(blocks []*api.Block) error {
 	readyToConsume := false
 	waitForHeight := int(rawStore.Current.Height + 1)
 
@@ -167,7 +167,7 @@ func (rawStore *RawStore) StoreAndMaybeConsume(blocks []*b.Block) error {
 					switch err {
 					case badger.ErrTxnTooBig:
 						// split up big transactions
-						_ = txn.Commit(nil)
+						_ = txn.Commit()
 						txn = rawStore.queue.NewTransaction(true)
 						continue
 					default:
@@ -177,7 +177,7 @@ func (rawStore *RawStore) StoreAndMaybeConsume(blocks []*b.Block) error {
 			}
 		}
 	}
-	_ = txn.Commit(nil)
+	_ = txn.Commit()
 
 	if !readyToConsume {
 		return nil
@@ -199,10 +199,11 @@ func (rawStore *RawStore) StoreAndMaybeConsume(blocks []*b.Block) error {
 				return err
 			}
 		} else {
-			if blockBs, err := blockItem.Value(); err != nil {
+			var blockBs []byte
+			if err := blockItem.Value(func(v []byte) error { blockBs = v; return nil }); err != nil {
 				return err
 			} else {
-				var block *b.Block
+				var block *api.Block
 				if err := json.Unmarshal(blockBs, block); err != nil {
 					return err
 				} else {
@@ -212,7 +213,7 @@ func (rawStore *RawStore) StoreAndMaybeConsume(blocks []*b.Block) error {
 						switch err {
 						case badger.ErrTxnTooBig:
 							// split up big transactions
-							_ = txn.Commit(nil)
+							_ = txn.Commit()
 							txn = rawStore.queue.NewTransaction(true)
 							goto RETRY_DELETE
 						default:
