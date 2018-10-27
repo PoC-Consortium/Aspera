@@ -264,6 +264,14 @@
   revision = "37952265e1c05c1765a0b8d01efbde0b5b4e3913"
 
 [[projects]]
+  digest = "1:9afc648e7c99fee142c81969af7fd6f7f150069296fd262cc4ab55e231093140"
+  name = "github.com/valyala/quicktemplate"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "de41ba48f1d9953aca12983c953532f3776b4347"
+  version = "v20160617"
+
+[[projects]]
   digest = "1:777e729b475d3895c7229552aa10076f0d177daf37c0a72258006d046d329960"
   name = "go.uber.org/atomic"
   packages = ["."]
@@ -380,6 +388,7 @@
     "github.com/spf13/viper",
     "github.com/stretchr/testify/assert",
     "github.com/valyala/fastjson",
+    "github.com/valyala/quicktemplate",
     "go.uber.org/zap",
     "golang.org/x/crypto/ripemd160",
     "gopkg.in/resty.v1",
