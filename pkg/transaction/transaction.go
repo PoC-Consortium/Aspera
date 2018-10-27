@@ -19,6 +19,7 @@ type Transaction interface {
 }
 
 var typeNameToTransaction = map[string]func() Transaction{
+	"p2p.OrdinaryPayment":               func() Transaction { return &OrdinaryPayment{new(pb.OrdinaryPayment)} },
 	"p2p.AccountInfo":                   func() Transaction { return &AliasBuy{new(pb.AliasBuy)} },
 	"p2p.AliasAssignment":               func() Transaction { return &AliasAssignment{new(pb.AliasAssignment)} },
 	"p2p.AliasBuy":                      func() Transaction { return &AliasBuy{new(pb.AliasBuy)} },
