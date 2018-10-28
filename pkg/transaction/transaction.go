@@ -105,7 +105,7 @@ func ToBytes(tx Transaction) []byte {
 }
 
 func VerifySignature(tx Transaction) error {
-	var sig [32]byte
+	var sig [64]byte
 	bs := ToBytes(tx)
 	for i := range sig {
 		sig[i] = bs[i+signatureOffset]
@@ -124,7 +124,11 @@ func WriteHeader(e encoding.Encoder, h *pb.TransactionHeader, flags uint32) {
 	e.WriteUint64(h.Recipient)
 	e.WriteUint64(h.Amount)
 	e.WriteUint64(h.Fee)
-	e.WriteBytes(h.ReferencedTransactionFullHash)
+	if len(h.ReferencedTransactionFullHash) == 0 {
+		e.WriteZeros(32)
+	} else {
+		e.WriteBytes(h.ReferencedTransactionFullHash)
+	}
 	e.WriteBytes(h.Signature)
 	if h.Version > 0 {
 		e.WriteUint32(flags)
@@ -134,7 +138,7 @@ func WriteHeader(e encoding.Encoder, h *pb.TransactionHeader, flags uint32) {
 }
 
 func HeaderSizeInBytes(h *pb.TransactionHeader) int {
-	l := 4 + 2 + 32 + 8 + 8 + 8 + 64 + 32 + 4 + 4 + 8
+	l := 4 + 2 + 32 + 8 + 8 + 8 + 32 + 64
 	if h.Version > 0 {
 		l += 4 + 4 + 8
 	}

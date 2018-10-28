@@ -24,6 +24,8 @@ type Encoder interface {
 	WriteBytesWithInt32Len(isText bool, val []byte)
 
 	Bytes() []byte
+
+	WriteZeros(l int)
 }
 
 type encoder struct {
@@ -119,4 +121,8 @@ func (e *encoder) WriteBytesWithInt32Len(isText bool, val []byte) {
 
 func (e *encoder) Bytes() []byte {
 	return e.bs
+}
+
+func (e *encoder) WriteZeros(l int) {
+	e.i += l
 }
