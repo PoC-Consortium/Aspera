@@ -7,7 +7,7 @@ import (
 
 const (
 	AssetTransferType    = 2
-	AssetTransferSubType = 2
+	AssetTransferSubType = 1
 )
 
 type AssetTransfer struct {
@@ -17,10 +17,18 @@ type AssetTransfer struct {
 func (tx *AssetTransfer) WriteAttachmentBytes(e encoding.Encoder) {
 	e.WriteUint64(tx.Attachment.Asset)
 	e.WriteUint64(tx.Attachment.Quantity)
+	if tx.Header.Version == 0 {
+		e.WriteUint16(uint16(len(tx.Attachment.Comment)))
+		e.WriteBytes([]byte(tx.Attachment.Comment))
+	}
 }
 
 func (tx *AssetTransfer) AttachmentSizeInBytes() int {
-	return 8 + 8
+	if tx.Header.Version == 0 {
+		return 8 + 8 + 2 + len(tx.Attachment.Comment)
+	} else {
+		return 8 + 8
+	}
 }
 
 func (tx *AssetTransfer) GetType() uint16 {
