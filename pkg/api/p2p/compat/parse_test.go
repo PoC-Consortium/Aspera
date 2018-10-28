@@ -26,32 +26,13 @@ func TestParseBlocks(t *testing.T) {
 		if assert.NoError(t, unmarshaler.Unmarshal(bytes.NewReader(data), msg)) {
 			unmarshaler.Unmarshal(bytes.NewReader(data), msg)
 			dst := Downgrade(msg)
-			panic(string(dst))
+			//fmt.Println(string(dst))
+			compareJSON(t, string(dst), parseTest.JSON)
+			//panic(string(dst))
+			//fmt.Println(string(dst))
 		} else {
 			fmt.Println(string(data))
 		}
-
-		//panic(string(data))
-		/*
-			// convert from JSON -> go type
-			err := json.Unmarshal([]byte(parseTest.JSON), &blockMsg)
-			assert.Nil(t, err, "parse block with id", parseTest.BlockID)
-			if err != nil {
-				panic(err)
-			}
-
-			marshalled, _ := json.Marshal(blockMsg)
-
-			compareJSON(t, string(marshalled), parseTest.JSON)
-
-			for i, tx := range blockMsg.Transactions {
-				bs, _ := tx.ToBytes()
-				blockMsg.Transactions[i], _ = transaction.FromBytes(bs)
-			}
-
-			marshalled, _ = json.Marshal(blockMsg)
-			compareJSON(t, string(marshalled), parseTest.JSON)
-		*/
 	}
 }
 

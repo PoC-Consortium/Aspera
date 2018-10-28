@@ -1,7 +1,13 @@
-{% import "github.com/valyala/fastjson" %}
-{% import "encoding/base64" %}
-{% import "github.com/ac0v/aspera/pkg/encoding" %}
-{% import api "github.com/ac0v/aspera/pkg/api/p2p" %}
+{% import (
+    "strings"
+    "encoding/base64"
+
+    "github.com/ac0v/aspera/pkg/encoding"
+    "github.com/ac0v/aspera/pkg/api/p2p"
+
+    "github.com/valyala/fastjson"
+    proto "github.com/golang/protobuf/proto"
+) %}
 {% func Upgrade(src *fastjson.Value) %}
 {
     "nextBlocks": [
@@ -147,7 +153,7 @@
                                     "name": {%qz= attachment.GetStringBytes("name") %},
                                     "description": {%qz= attachment.GetStringBytes("description") %},
                                     "tags": {%qz= attachment.GetStringBytes("tags") %},
-                                    "quantity": {%d attachment.GetInt("quantityQNT") %},
+                                    "quantity": {%d attachment.GetInt("quantity") %},
                                     "price": "{%d attachment.GetInt("priceNQT") %}"
                                 },
                                 {% case 1 %}
@@ -165,13 +171,13 @@
                                 "@type":"type.googleapis.com/p2p.DigitalGoodsQuantityChange",
                                 "attachment": {
                                     "id": {%qz= attachment.GetStringBytes("goods") %},
-                                    "delta": {%d attachment.GetInt("deltaQuantityQNT") %}
+                                    "delta": {%d attachment.GetInt("deltaQuantity") %}
                                 },
                                 {% case 4 %}
                                 "@type":"type.googleapis.com/p2p.DigitalGoodsPurchase",
                                 "attachment": {
                                     "id": {%qz= attachment.GetStringBytes("goods") %},
-                                    "quantity": {%d attachment.GetInt("quantityQNT") %},
+                                    "quantity": {%d attachment.GetInt("quantity") %},
                                     "price": "{%d attachment.GetInt("priceNQT") %}",
                                     "deliveryDeadlineTimestamp": {%d attachment.GetInt("deliveryDeadlineTimestamp") %}
                                 },
@@ -180,8 +186,8 @@
                                 "attachment": {
                                     "purchase": {%qz= attachment.GetStringBytes("purchase") %},
                                     "isText": {% if attachment.GetBool("goodsIsText") %}true{% else %}false{% endif %},
-                                    "data": {%qz= attachment.GetStringBytes("goodsData") %},
-                                    "nonce": {%qz= attachment.GetStringBytes("goodsNonce") %},
+                                    "data": {%qz= encoding.HexStringBytesToBase64Bytes(attachment.GetStringBytes("goodsData")) %},
+                                    "nonce": {%qz= encoding.HexStringBytesToBase64Bytes(attachment.GetStringBytes("goodsNonce")) %},
                                     "discount": "{%d attachment.GetInt("discountNQT") %}"
                                 },
                                 {% case 6 %}
@@ -283,14 +289,14 @@
                                 {% if tx.Exists("recipient") %}
                                 "recipient":       {%qz= tx.GetStringBytes("recipient") %},
                                 {% endif %}
-                                "senderPublicKey": {%qz= tx.GetStringBytes("senderPublicKey") %},
+                                "senderPublicKey": {%qz= encoding.HexStringBytesToBase64Bytes(tx.GetStringBytes("senderPublicKey")) %},
                                 "deadline":        {%d tx.GetInt("deadline") %},
                                 "ecBlockId":       {%qz= tx.GetStringBytes("ecBlockId") %},
                                 "ecBlockHeight":   {%d tx.GetInt("ecBlockHeight") %},
-                                "signature":       {%qz= tx.GetStringBytes("signature") %}
+                                "signature":       {%qz= encoding.HexStringBytesToBase64Bytes(tx.GetStringBytes("signature")) %}
                             }
                             {% code
-                               hasMessage               :=  attachment.Exists("version.Message")
+                               hasMessage               :=  attachment.Exists("version.Message") || attachment.Exists("message")
                                hasEncryptedMessage      :=  attachment.Exists("version.EncryptedMessage")
                                hasPublicKeyAnnouncement :=  attachment.Exists("version.PublicKeyAnnouncement")
                                hasEncryptToSelfMessage  :=  attachment.Exists("version.EncryptToSelfMessage")
@@ -306,9 +312,9 @@
                                 {% endif %}
                                 {% if hasEncryptedMessage %}
                                 "encryptedMessage": {
-                                    "data":   {%qz= attachment.GetStringBytes("encryptedMessage", "data") %},
+                                    "data":   {%qz= encoding.HexStringBytesToBase64Bytes(attachment.GetStringBytes("encryptedMessage", "data")) %},
                                     "isText": {% if attachment.GetBool("encryptedMessage", "isText") %}true{% else %}false{% endif %},
-                                    "nonce":  {%qz= attachment.GetStringBytes("encryptedMessage", "nonce") %}
+                                    "nonce":  {%qz= encoding.HexStringBytesToBase64Bytes(attachment.GetStringBytes("encryptedMessage", "nonce")) %}
                                 }{% if hasPublicKeyAnnouncement || hasEncryptToSelfMessage %},{% endif %}
                                 {% endif %}
                                 {% if hasPublicKeyAnnouncement %}
@@ -318,9 +324,9 @@
                                 {% endif %}
                                 {% if hasEncryptToSelfMessage %}    
                                 "encryptToSelfMessage": {
-                                    "data":   {%qz= attachment.GetStringBytes("encryptToSelfMessage", "data") %},
+                                    "data":   {%qz= encoding.HexStringBytesToBase64Bytes(attachment.GetStringBytes("encryptToSelfMessage", "data")) %},
                                     "isText": {% if attachment.GetBool("encryptToSelfMessage", "isText") %}true{% else %}false{% endif %},
-                                    "nonce":  {%qz= attachment.GetStringBytes("encryptToSelfMessage", "nonce") %}
+                                    "nonce":  {%qz= encoding.HexStringBytesToBase64Bytes(attachment.GetStringBytes("encryptToSelfMessage", "nonce")) %}
                                 }
                                 {% endif %}
                             }
@@ -333,7 +339,7 @@
     ]
 }
 {% endfunc %}
-{% func Downgrade(pb *api.GetNextBlocksResponse) %}
+{% func Downgrade(pb *p2p.GetNextBlocksResponse) %}
 {
     "nextBlocks": [
         {% code
@@ -342,10 +348,10 @@
         {% for blockId, block := range blocks %}
         {
             "timestamp":           {%v block.Timestamp %},
-            "previousBlock":       {%v block.PreviousBlock %},
-            "blockATs":            {%qz= block.BlockATs %},
+            "previousBlock":       "{%v block.PreviousBlock %}",
+            "blockATs":            {% if string(block.BlockATs) == "" %}null{% else %}{%qz= block.BlockATs %}{% endif %},
             "totalFeeNQT":         {%v block.TotalFee %},
-            "nonce":               {%v block.Nonce %},
+            "nonce":               "{%v block.Nonce %}",
             "version":             {%v block.Version %},
             "blockSignature":      {%qz= encoding.BytesToHexStringBytes(block.BlockSignature) %},
             "payloadHash":         {%qz= encoding.BytesToHexStringBytes(block.PayloadHash) %},
@@ -355,7 +361,519 @@
             "payloadLength":       {%v block.PayloadLength %},
             "previousBlockHash":   {%qz= encoding.BytesToHexStringBytes(block.PreviousBlockHash) %},
             "transactions": [
+                {% code
+                   transactions := block.Transactions
+                 %}
+                {% for txId, transaction := range transactions %}
+                {
+                    {% code
+                       txType := transaction.GetTypeUrl()
+                       if slash := strings.LastIndex(txType, "/"); slash >= 0 {
+                           txType = txType[slash+1:]
+                       }
 
+                       hasAttachmentData := false
+                       var header *p2p.TransactionHeader
+                       var appendix *p2p.Appendix
+                     %}
+                    {% switch txType %}
+                        {% case "p2p.OrdinaryPayment" %}
+                        {% code
+                           tx := new(p2p.OrdinaryPayment)
+                           proto.Unmarshal(transaction.Value, tx)
+                           header = tx.Header
+                           appendix = tx.Appendix
+                         %}
+                            "type":       0,
+                            "subtype":    0,
+                            "attachment": {
+                        {% case "p2p.MultiOutCreation" %}
+                        {% code
+                           tx := new(p2p.MultiOutCreation)
+                           proto.Unmarshal(transaction.Value, tx)
+                           header = tx.Header
+                           appendix = tx.Appendix
+                           hasAttachmentData = true
+                         %}
+                            "type":       0,
+                            "subtype":    1,
+                            "attachment": {
+                                "recipients": [
+                                    {% code
+                                       recipients := tx.Attachment.Recipients
+                                     %}
+                                    {% for recipientId, recipient := range recipients %}
+                                    [
+                                        "{%v recipient.Id %}",
+                                        "{%v recipient.Amount %}"
+                                    ]
+                                    {% if recipientId + 1 < len(recipients) %},{% endif %}
+                                    {% endfor %}
+                                ]
+                        {% case "p2p.MultiSameOutCreation" %}
+                        {% code
+                           tx := new(p2p.MultiSameOutCreation)
+                           proto.Unmarshal(transaction.Value, tx)
+                           header = tx.Header
+                           appendix = tx.Appendix
+                           hasAttachmentData = true
+                         %}
+                            "type":       0,
+                            "subtype":    2,
+                            "attachment": {
+                                "recipients": [
+                                    {% code
+                                       recipients := tx.Attachment.Recipients
+                                     %}
+                                    {% for recipientId, recipient := range recipients %}
+                                    "{%v recipient %}"
+                                    {% if recipientId + 1 < len(recipients) %},{% endif %}
+                                    {% endfor %}
+                                ]
+                        {% case "p2p.ArbitaryMessage" %}
+                        {% code
+                           tx := new(p2p.ArbitaryMessage)
+                           proto.Unmarshal(transaction.Value, tx)
+                           header = tx.Header
+                           appendix = tx.Appendix
+                         %}
+                            "type":       1,
+                            "subtype":    0,
+                            "attachment": {
+                        {% case "p2p.AliasAssignment" %}
+                        {% code
+                           tx := new(p2p.AliasAssignment)
+                           proto.Unmarshal(transaction.Value, tx)
+                           header = tx.Header
+                           appendix = tx.Appendix
+                           hasAttachmentData = true
+                         %}
+                            "type":       1,
+                            "subtype":    1,
+                            "attachment": {
+                                "alias": {%q= tx.Attachment.Alias %},
+                                "uri": {%q= tx.Attachment.Uri %}
+                        {% case "p2p.AccountInfo" %}
+                        {% code
+                           tx := new(p2p.AccountInfo)
+                           proto.Unmarshal(transaction.Value, tx)
+                           header = tx.Header
+                           appendix = tx.Appendix
+                           hasAttachmentData = true
+                         %}
+                            "type":       1,
+                            "subtype":    5,
+                            "attachment": {
+                                "name": {%q= tx.Attachment.Name %},
+                                "description": {%q= tx.Attachment.Description %}
+                        {% case "p2p.AliasSell" %}
+                        {% code
+                           tx := new(p2p.AliasSell)
+                           proto.Unmarshal(transaction.Value, tx)
+                           header = tx.Header
+                           appendix = tx.Appendix
+                           hasAttachmentData = true
+                         %}
+                            "type":       1,
+                            "subtype":    6,
+                            {% if header.Recipient == 0 %}"recipient":"0",{% endif %}
+                            "attachment": {
+                                "alias":     {%q= tx.Attachment.Name %},
+                                "priceNQT": {%v tx.Attachment.Price %}
+                        {% case "p2p.AliasBuy" %}
+                        {% code
+                           tx := new(p2p.AliasBuy)
+                           proto.Unmarshal(transaction.Value, tx)
+                           header = tx.Header
+                           appendix = tx.Appendix
+                           hasAttachmentData = true
+                         %}
+                            "type":       1,
+                            "subtype":    7,
+                            "attachment": {
+                                "alias": {%q= tx.Attachment.Name %}
+                        {% case "p2p.AssetIssuance" %}
+                        {% code
+                           tx := new(p2p.AssetIssuance)
+                           proto.Unmarshal(transaction.Value, tx)
+                           header = tx.Header
+                           appendix = tx.Appendix
+                           hasAttachmentData = true
+                         %}
+                            "type":       2,
+                            "subtype":    0,
+                            "attachment": {
+                                "name": {%q= tx.Attachment.Name %},
+                                "description": {%q= tx.Attachment.Description %},
+                                "quantityQNT": {%v tx.Attachment.Quantity %},
+                                "decimals": {%v tx.Attachment.Decimals %}
+                                {% if len(tx.Attachment.Comment) > 0 %}, "comment": {%q= tx.Attachment.Comment %}{% endif %}
+                        {% case "p2p.AssetTransfer" %}
+                        {% code
+                           tx := new(p2p.AssetTransfer)
+                           proto.Unmarshal(transaction.Value, tx)
+                           header = tx.Header
+                           appendix = tx.Appendix
+                           hasAttachmentData = true
+                         %}
+                            "type":       2,
+                            "subtype":    1,
+                            "attachment": {
+                                "asset": "{%v tx.Attachment.Asset %}",
+                                "quantityQNT": {%v tx.Attachment.Quantity %}
+                                {% if len(tx.Attachment.Comment) > 0 %}, "comment": {%q= tx.Attachment.Comment %}{% endif %}
+                        {% case "p2p.AskOrderPlacement" %}
+                        {% code
+                           tx := new(p2p.AskOrderPlacement)
+                           proto.Unmarshal(transaction.Value, tx)
+                           header = tx.Header
+                           appendix = tx.Appendix
+                           hasAttachmentData = true
+                         %}
+                            "type":       2,
+                            "subtype":    2,
+                            "attachment": {
+                                "asset": "{%v tx.Attachment.Asset %}",
+                                "quantityQNT": {%v tx.Attachment.Quantity %},
+                                "priceNQT": {%v tx.Attachment.Price %}
+                                {% if len(tx.Attachment.Comment) > 0 %}, "comment": {%q= tx.Attachment.Comment %}{% endif %}
+                        {% case "p2p.BidOrderPlacement" %}
+                        {% code
+                           tx := new(p2p.BidOrderPlacement)
+                           proto.Unmarshal(transaction.Value, tx)
+                           header = tx.Header
+                           appendix = tx.Appendix
+                           hasAttachmentData = true
+                         %}
+                            "type":       2,
+                            "subtype":    3,
+                            "attachment": {
+                                "asset": "{%v tx.Attachment.Asset %}",
+                                "quantityQNT": {%v tx.Attachment.Quantity %},
+                                "priceNQT": {%v tx.Attachment.Price %}
+                        {% case "p2p.AskOrderCancellation" %}
+                        {% code
+                           tx := new(p2p.AskOrderCancellation)
+                           proto.Unmarshal(transaction.Value, tx)
+                           header = tx.Header
+                           appendix = tx.Appendix
+                           hasAttachmentData = true
+                         %}
+                            "type":       2,
+                            "subtype":    4,
+                            "attachment": {
+                                "order": "{%v tx.Attachment.Order %}"
+                        {% case "p2p.BidOrderCancellation" %}
+                        {% code
+                           tx := new(p2p.BidOrderCancellation)
+                           proto.Unmarshal(transaction.Value, tx)
+                           header = tx.Header
+                           appendix = tx.Appendix
+                           hasAttachmentData = true
+                         %}
+                            "type":       2,
+                            "subtype":    5,
+                            "attachment": {
+                                "order": "{%v tx.Attachment.Order %}"
+                        {% case "p2p.DigitalGoodsListing" %}
+                        {% code
+                           tx := new(p2p.DigitalGoodsListing)
+                           proto.Unmarshal(transaction.Value, tx)
+                           header = tx.Header
+                           appendix = tx.Appendix
+                           hasAttachmentData = true
+                         %}
+                            "type":       3,
+                            "subtype":    0,
+                            "attachment": {
+                                "name": {%q= tx.Attachment.Name %},
+                                "description": {%q= tx.Attachment.Description %},
+                                "tags": {%q= tx.Attachment.Tags %},
+                                "quantity": {%v tx.Attachment.Quantity %},
+                                "priceNQT": {%v tx.Attachment.Price %}
+                        {% case "p2p.DigitalGoodsDelisting" %}
+                        {% code
+                           tx := new(p2p.DigitalGoodsDelisting)
+                           proto.Unmarshal(transaction.Value, tx)
+                           header = tx.Header
+                           appendix = tx.Appendix
+                           hasAttachmentData = true
+                         %}
+                            "type":       3,
+                            "subtype":    1,
+                            "attachment": {
+                                "goods": "{%v tx.Attachment.Id %}"
+                        {% case "p2p.DigitalGoodsPriceChange" %}
+                        {% code
+                           tx := new(p2p.DigitalGoodsPriceChange)
+                           proto.Unmarshal(transaction.Value, tx)
+                           header = tx.Header
+                           appendix = tx.Appendix
+                           hasAttachmentData = true
+                         %}
+                            "type":       3,
+                            "subtype":    2,
+                            "attachment": {
+                                "goods": "{%v tx.Attachment.Id %}",
+                                "priceNQT": {%v tx.Attachment.Price %}
+                        {% case "p2p.DigitalGoodsQuantityChange" %}
+                        {% code
+                           tx := new(p2p.DigitalGoodsQuantityChange)
+                           proto.Unmarshal(transaction.Value, tx)
+                           header = tx.Header
+                           appendix = tx.Appendix
+                           hasAttachmentData = true
+                         %}
+                            "type":       3,
+                            "subtype":    3,
+                            "attachment": {
+                                "goods": "{%v tx.Attachment.Id %}",
+                                "deltaQuantity": {%v tx.Attachment.Delta %}
+                        {% case "p2p.DigitalGoodsPurchase" %}
+                        {% code
+                           tx := new(p2p.DigitalGoodsPurchase)
+                           proto.Unmarshal(transaction.Value, tx)
+                           header = tx.Header
+                           appendix = tx.Appendix
+                           hasAttachmentData = true
+                         %}
+                            "type":       3,
+                            "subtype":    4,
+                            "attachment": {
+                                "goods": "{%v tx.Attachment.Id %}",
+                                "quantity": {%v tx.Attachment.Quantity %},
+                                "priceNQT": {%v tx.Attachment.Price %},
+                                "deliveryDeadlineTimestamp": {%v tx.Attachment.DeliveryDeadlineTimestamp %}
+                        {% case "p2p.DigitalGoodsDelivery" %}
+                        {% code
+                           tx := new(p2p.DigitalGoodsDelivery)
+                           proto.Unmarshal(transaction.Value, tx)
+                           header = tx.Header
+                           appendix = tx.Appendix
+                           hasAttachmentData = true
+                         %}
+                            "type":       3,
+                            "subtype":    5,
+                            "attachment": {
+                                "purchase": "{%v tx.Attachment.Purchase %}",
+                                "goodsIsText": {% if tx.Attachment.IsText %}true{% else %}false{% endif %},
+                                "goodsData": {%qz= encoding.BytesToHexStringBytes(tx.Attachment.Data) %},
+                                "goodsNonce": {%qz= encoding.BytesToHexStringBytes(tx.Attachment.Nonce) %},
+                                "discountNQT": {%v tx.Attachment.Discount %}
+                        {% case "p2p.DigitalGoodsFeedback" %}
+                        {% code
+                           tx := new(p2p.DigitalGoodsFeedback)
+                           proto.Unmarshal(transaction.Value, tx)
+                           header = tx.Header
+                           appendix = tx.Appendix
+                           hasAttachmentData = true
+                         %}
+                            "type":       3,
+                            "subtype":    6,
+                            "attachment": {
+                                "purchase": "{%v tx.Attachment.Purchase %}"
+                        {% case "p2p.DigitalGoodsRefund" %}
+                        {% code
+                           tx := new(p2p.DigitalGoodsRefund)
+                           proto.Unmarshal(transaction.Value, tx)
+                           header = tx.Header
+                           appendix = tx.Appendix
+                           hasAttachmentData = true
+                         %}
+                            "type":       3,
+                            "subtype":    7,
+                            "attachment": {
+                                "purchase": "{%v tx.Attachment.Purchase %}",
+                                "refundNQT": {%v tx.Attachment.Refund %}
+                        {% case "p2p.EffectiveBalanceLeasing" %}
+                        {% code
+                           tx := new(p2p.EffectiveBalanceLeasing)
+                           proto.Unmarshal(transaction.Value, tx)
+                           header = tx.Header
+                           appendix = tx.Appendix
+                           hasAttachmentData = true
+                         %}
+                            "type":       4,
+                            "subtype":    0,
+                            "attachment": {
+                                "period": {%v tx.Attachment.Period %}
+                        {% case "p2p.RewardRecipientAssignment" %}
+                        {% code
+                           tx := new(p2p.RewardRecipientAssignment)
+                           proto.Unmarshal(transaction.Value, tx)
+                           header = tx.Header
+                           appendix = tx.Appendix
+                         %}
+                            "type":       20,
+                            "subtype":    0,
+                            "attachment": {
+                        {% case "p2p.EscrowCreation" %}
+                        {% code
+                           tx := new(p2p.EscrowCreation)
+                           proto.Unmarshal(transaction.Value, tx)
+                           header = tx.Header
+                           appendix = tx.Appendix
+                           hasAttachmentData = true
+                         %}
+                            "type":       21,
+                            "subtype":    0,
+                            "attachment": {
+                                "amountNQT": "{%v tx.Attachment.Amount %}",
+                                "deadline": {%v tx.Attachment.Deadline %},
+                                "deadlineAction": "{%v tx.Attachment.DeadlineAction %}",
+                                "requiredSigners": {%v tx.Attachment.RequiredSigners %},
+                                "signers": [
+                                    {% code
+                                       signers := tx.Attachment.Signers
+                                     %}
+                                    {% for signerId, signer := range signers %}
+                                        "{%v signer %}"{% if signerId + 1 < len(signers) %},{% endif %}
+                                    {% endfor %}
+                                ]
+                        {% case "p2p.EscrowSign" %}
+                        {% code
+                           tx := new(p2p.EscrowSign)
+                           proto.Unmarshal(transaction.Value, tx)
+                           header = tx.Header
+                           appendix = tx.Appendix
+                           hasAttachmentData = true
+                         %}
+                            "type":       21,
+                            "subtype":    1,
+                            "attachment": {
+                                "escrowID": "{%v tx.Attachment.Id %}",
+                                "decision": "{%v tx.Attachment.Decision %}"
+                        {% case "p2p.EscrowResult" %}
+                        {% code
+                           tx := new(p2p.EscrowResult)
+                           proto.Unmarshal(transaction.Value, tx)
+                           header = tx.Header
+                           appendix = tx.Appendix
+                           hasAttachmentData = true
+                         %}
+                            "type":       21,
+                            "subtype":    2,
+                            "attachment": {
+                                "escrowID": "{%v tx.Attachment.Id %}",
+                                "decision": "{%v tx.Attachment.Decision %}"
+                        {% case "p2p.SubscriptionSubscribe" %}
+                        {% code
+                           tx := new(p2p.SubscriptionSubscribe)
+                           proto.Unmarshal(transaction.Value, tx)
+                           header = tx.Header
+                           appendix = tx.Appendix
+                           hasAttachmentData = true
+                         %}
+                            "type":       21,
+                            "subtype":    3,
+                            "attachment": {
+                                "frequency": {%v tx.Attachment.Frequency %}
+                        {% case "p2p.SubscriptionCancel" %}
+                        {% code
+                           tx := new(p2p.SubscriptionCancel)
+                           proto.Unmarshal(transaction.Value, tx)
+                           header = tx.Header
+                           appendix = tx.Appendix
+                           hasAttachmentData = true
+                         %}
+                            "type":       21,
+                            "subtype":    4,
+                            "attachment": {
+                                "subscriptionId": "{%v tx.Attachment.Id %}"
+                        {% case "p2p.SubscriptionPayment" %}
+                        {% code
+                           tx := new(p2p.SubscriptionPayment)
+                           proto.Unmarshal(transaction.Value, tx)
+                           header = tx.Header
+                           appendix = tx.Appendix
+                           hasAttachmentData = true
+                         %}
+                            "type":       21,
+                            "subtype":    5,
+                            "attachment": {
+                                "subscriptionIDs": [
+                                    {% code
+                                       subscribers := tx.Attachment.Ids
+                                     %}
+                                    {% for subscriberId, subscriber := range subscribers %}
+                                        "{%v subscriber %}"{% if subscriberId + 1 < len(subscribers) %},{% endif %}
+                                    {% endfor %}
+                                ]
+                        {% case "p2p.AutomatedTransactionsCreation" %}
+                        {% code
+                           tx := new(p2p.AutomatedTransactionsCreation)
+                           proto.Unmarshal(transaction.Value, tx)
+                           header = tx.Header
+                           appendix = tx.Appendix
+                           hasAttachmentData = true
+                         %}
+                            "type":       22,
+                            "subtype":    0,
+                            "attachment": {
+                                "name": {%q= tx.Attachment.Name %},
+                                "description": {%q= tx.Attachment.Description %},
+                                "creationBytes": {%qz= tx.Attachment.Bytes %}
+                        {% case "p2p.AutomatedTransactionsPayment" %}
+                        {% code
+                           tx := new(p2p.AutomatedTransactionsPayment)
+                           proto.Unmarshal(transaction.Value, tx)
+                           header = tx.Header
+                           appendix = tx.Appendix
+                         %}
+                            "type":       22,
+                            "subtype":    1,
+                            "attachment": {
+                     {% endswitch %}
+                     {% if appendix != nil %}
+                            {% if hasAttachmentData %},{% endif %}
+                            {% if appendix.Message != nil %}
+                                "messageIsText": {% if appendix.Message.IsText %}true{% else %}false{% endif %},
+                                "message": {%q= appendix.Message.Content %}
+                                {% if header.Version > 0 %}, "version.Message": {%v header.Version %}{% endif %}
+                                {% if appendix.EncryptedMessage != nil || appendix.EncryptToSelfMessage != nil || appendix.PublicKeyAnnouncement != nil %},{% endif %}
+                            {% endif %}
+                            {% if appendix.EncryptedMessage != nil %}
+                                "encryptedMessage": {
+                                    "isText": {% if appendix.EncryptedMessage.IsText %}true{% else %}false{% endif %},
+                                    "data": {%qz= encoding.BytesToHexStringBytes(appendix.EncryptedMessage.Data) %},
+                                    "nonce": {%qz= encoding.BytesToHexStringBytes(appendix.EncryptedMessage.Nonce) %}
+                                }
+                                {% if header.Version > 0 %}, "version.EncryptedMessage": {%v header.Version %}{% endif %}
+                                {% if appendix.EncryptToSelfMessage != nil || appendix.PublicKeyAnnouncement != nil %},{% endif %}
+                            {% endif %}
+                            {% if appendix.EncryptToSelfMessage != nil %}
+                                "encryptToSelfMessage": {   
+                                    "isText": {% if appendix.EncryptToSelfMessage.IsText %}true{% else %}false{% endif %},
+                                    "data": {%qz= encoding.BytesToHexStringBytes(appendix.EncryptToSelfMessage.Data) %},
+                                    "nonce": {%qz= encoding.BytesToHexStringBytes(appendix.EncryptToSelfMessage.Nonce) %}
+                                }
+                                {% if header.Version > 0 %}, "version.EncryptToSelfMessage": {%v header.Version %}{% endif %}
+                                {% if appendix.PublicKeyAnnouncement != nil %},{% endif %}
+                            {% endif %}
+                            {% if appendix.PublicKeyAnnouncement != nil %}
+                                "recipientPublicKey": {%qz= appendix.PublicKeyAnnouncement.PublicKey %}
+                                {% if header.Version > 0 %}, "version.PublicKeyAnnouncement": {%v header.Version %}{% endif %}
+                            {% endif %}
+                     {% endif %}
+                     {% if header.Version > 0 && txType != "p2p.OrdinaryPayment" && txType != "p2p.ArbitaryMessage" %}
+                            {% if appendix != nil || hasAttachmentData %},{% endif %}
+                            "version.{%v txType[4:] %}": {%v header.Version %}
+                     {% endif %}
+                     },
+                     "version":         {%v header.Version %},
+                     "timestamp":       {%v header.Timestamp %},
+                     "amountNQT":       {%v header.Amount %},
+                     "feeNQT":          {%v header.Fee %},
+                     {% if header.Recipient != 0 %}
+                                "recipient":       "{%v header.Recipient %}",
+                     {% endif %}
+                     "senderPublicKey": {%qz= encoding.BytesToHexStringBytes(header.SenderPublicKey) %},
+                     "deadline":        {%v header.Deadline %},
+                     "ecBlockId":       "{%v header.EcBlockId %}",
+                     "ecBlockHeight":   {%v header.EcBlockHeight %},
+                     "signature":       {%qz= encoding.BytesToHexStringBytes(header.Signature) %}
+                 }{% if txId + 1 < len(transactions) %},{% endif %}
+                 {% endfor %}
             ]
             
         }{% if blockId + 1 < len(blocks) %},{% endif %}
