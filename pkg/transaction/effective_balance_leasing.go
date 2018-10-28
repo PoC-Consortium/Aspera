@@ -15,11 +15,11 @@ type EffectiveBalanceLeasing struct {
 }
 
 func (tx *EffectiveBalanceLeasing) WriteAttachmentBytes(e encoding.Encoder) {
-	e.WriteUint32(tx.Attachment.Period)
+	e.WriteUint16(uint16(tx.Attachment.Period))
 }
 
 func (tx *EffectiveBalanceLeasing) AttachmentSizeInBytes() int {
-	return 4
+	return 2
 }
 
 func (tx *EffectiveBalanceLeasing) GetType() uint16 {
