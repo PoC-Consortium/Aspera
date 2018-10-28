@@ -81,24 +81,23 @@ func AnyToTransaction(a *any.Any) (Transaction, error) {
 
 func ToBytes(tx Transaction) []byte {
 	a := tx.GetAppendix()
+	h := tx.GetHeader()
 	hasAppendix := a != nil
 	var flags uint32
 	var appendixSize int
 	if hasAppendix {
-		appendixSize = AppendixSizeInBytes(a)
+		appendixSize = AppendixSizeInBytes(a, h.Version)
 		flags = AppendixFlags(a)
 	}
 
-	h := tx.GetHeader()
-	e := encoding.NewEncoder(2 + HeaderSizeInBytes(h) + tx.AttachmentSizeInBytes() + appendixSize)
+	txType := tx.GetType()
+	e := encoding.NewEncoder(HeaderSizeInBytes(h, txType) + tx.AttachmentSizeInBytes() + appendixSize)
 
-	e.WriteUint16(tx.GetType() | uint16(h.Version)<<12)
-
-	WriteHeader(e, h, flags)
+	WriteHeader(e, h, flags, txType)
 	tx.WriteAttachmentBytes(e)
 
 	if hasAppendix {
-		WriteAppendix(e, a)
+		WriteAppendix(e, a, h.Version)
 	}
 
 	return e.Bytes()
@@ -117,7 +116,8 @@ func VerifySignature(tx Transaction) error {
 	return ErrTransactionSignatureMismatch
 }
 
-func WriteHeader(e encoding.Encoder, h *pb.TransactionHeader, flags uint32) {
+func WriteHeader(e encoding.Encoder, h *pb.TransactionHeader, flags uint32, txType uint16) {
+	e.WriteUint16(txType | uint16(h.Version)<<12)
 	e.WriteUint32(h.Timestamp)
 	e.WriteUint16(uint16(h.Deadline))
 	e.WriteBytes(h.SenderPublicKey)
@@ -134,41 +134,66 @@ func WriteHeader(e encoding.Encoder, h *pb.TransactionHeader, flags uint32) {
 		e.WriteUint32(flags)
 		e.WriteUint32(h.EcBlockHeight)
 		e.WriteUint64(h.EcBlockId)
+
+		// TODO: not an ordinary payment or arbitary message
+		if txType != 0 && txType != 1 {
+			e.WriteUint8(uint8(h.Version))
+		}
 	}
 }
 
-func HeaderSizeInBytes(h *pb.TransactionHeader) int {
-	l := 4 + 2 + 32 + 8 + 8 + 8 + 32 + 64
+func HeaderSizeInBytes(h *pb.TransactionHeader, txType uint16) int {
+	l := 2 + 4 + 2 + 32 + 8 + 8 + 8 + 32 + 64
 	if h.Version > 0 {
 		l += 4 + 4 + 8
+
+		// TODO: not an ordinary payment or arbitary message
+		if txType != 0 && txType != 1 {
+			l++
+		}
 	}
 	return l
 }
 
-func WriteAppendix(e encoding.Encoder, a *pb.Appendix) {
+func WriteAppendix(e encoding.Encoder, a *pb.Appendix, version uint32) {
 	if a.Message != nil {
+		if version > 0 {
+			e.WriteUint8(uint8(version))
+		}
 		e.WriteStringWithInt32Len(a.Message.IsText, a.Message.Content)
 	}
 	if a.EncryptedMessage != nil {
+		if version > 0 {
+			e.WriteUint8(uint8(version))
+		}
 		e.WriteBytesWithInt32Len(a.EncryptedMessage.IsText, a.EncryptedMessage.Data)
 		e.WriteBytes(a.EncryptedMessage.Nonce)
 	}
 	if a.PublicKeyAnnouncement != nil {
+		if version > 0 {
+			e.WriteUint8(uint8(version))
+		}
 		e.WriteBytes(a.PublicKeyAnnouncement.PublicKey)
 	}
 	if a.EncryptToSelfMessage != nil {
+		if version > 0 {
+			e.WriteUint8(uint8(version))
+		}
 		e.WriteBytesWithInt32Len(a.EncryptToSelfMessage.IsText, []byte(a.EncryptedMessage.Data))
 		e.WriteBytes(a.EncryptedMessage.Nonce)
 	}
 }
 
-func AppendixSizeInBytes(a *pb.Appendix) int {
+func AppendixSizeInBytes(a *pb.Appendix, version uint32) int {
 	var l int
 	if a.Message != nil {
 		if a.Message.IsText {
 			l += 4 + len(a.Message.Content)
 		} else {
 			l += 4 + len(a.Message.Content)/2
+		}
+		if version > 0 {
+			l++
 		}
 	}
 	if a.EncryptedMessage != nil {
@@ -177,15 +202,24 @@ func AppendixSizeInBytes(a *pb.Appendix) int {
 		} else {
 			l += 4 + len(a.EncryptedMessage.Data)/2 + len(a.EncryptedMessage.Nonce)
 		}
+		if version > 0 {
+			l++
+		}
 	}
 	if a.PublicKeyAnnouncement != nil {
 		l += len(a.PublicKeyAnnouncement.PublicKey)
+		if version > 0 {
+			l++
+		}
 	}
 	if a.EncryptToSelfMessage != nil {
 		if a.EncryptToSelfMessage.IsText {
 			l += 4 + len(a.EncryptToSelfMessage.Data) + len(a.EncryptToSelfMessage.Nonce)
 		} else {
 			l += 4 + len(a.EncryptToSelfMessage.Data)/2 + len(a.EncryptToSelfMessage.Nonce)
+		}
+		if version > 0 {
+			l++
 		}
 	}
 	return l

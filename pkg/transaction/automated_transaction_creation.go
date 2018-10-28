@@ -23,7 +23,7 @@ func (tx *AutomatedTransactionsCreation) WriteAttachmentBytes(e encoding.Encoder
 }
 
 func (tx *AutomatedTransactionsCreation) AttachmentSizeInBytes() int {
-	return 1 + len(tx.Attachment.Description) + 2 + len(tx.Attachment.Description) + len(tx.Attachment.Bytes)
+	return 1 + len(tx.Attachment.Name) + 2 + len(tx.Attachment.Description) + len(tx.Attachment.Bytes)
 }
 
 func (tx *AutomatedTransactionsCreation) GetType() uint16 {

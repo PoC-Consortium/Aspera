@@ -1,6 +1,5 @@
 {% import (
     "strings"
-    "encoding/base64"
 
     "github.com/ac0v/aspera/pkg/encoding"
     "github.com/ac0v/aspera/pkg/api/p2p"
@@ -275,7 +274,7 @@
                                 "attachment": {
                                     "name": {%qz= attachment.GetStringBytes("name") %},
                                     "description": {%qz= attachment.GetStringBytes("description") %},
-                                    "bytes": {%qz= []byte(base64.StdEncoding.EncodeToString(attachment.GetStringBytes("creationBytes"))) %}
+                                    "bytes": {%qz= encoding.HexStringBytesToBase64Bytes(block.GetStringBytes("creationBytes")) %}
                                 },
                                 {% case 1%}
                                 "@type":"type.googleapis.com/p2p.AutomatedTransactionsPayment",
