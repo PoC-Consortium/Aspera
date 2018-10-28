@@ -147,34 +147,46 @@ func HeaderSizeInBytes(h *pb.TransactionHeader) int {
 
 func WriteAppendix(e encoding.Encoder, a *pb.Appendix) {
 	if a.Message != nil {
-		e.WriteBytesWithInt32Len(a.Message.IsText, []byte(a.Message.Content))
+		e.WriteStringWithInt32Len(a.Message.IsText, a.Message.Content)
 	}
 	if a.EncryptedMessage != nil {
-		e.WriteBytesWithInt32Len(a.EncryptedMessage.IsText, []byte(a.EncryptedMessage.Data))
-		e.WriteBytesWithInt32Len(a.EncryptedMessage.IsText, []byte(a.EncryptedMessage.Nonce))
+		e.WriteBytesWithInt32Len(a.EncryptedMessage.IsText, a.EncryptedMessage.Data)
+		e.WriteBytes(a.EncryptedMessage.Nonce)
 	}
 	if a.PublicKeyAnnouncement != nil {
 		e.WriteBytes(a.PublicKeyAnnouncement.PublicKey)
 	}
 	if a.EncryptToSelfMessage != nil {
 		e.WriteBytesWithInt32Len(a.EncryptToSelfMessage.IsText, []byte(a.EncryptedMessage.Data))
-		e.WriteBytesWithInt32Len(a.EncryptToSelfMessage.IsText, []byte(a.EncryptedMessage.Nonce))
+		e.WriteBytes(a.EncryptedMessage.Nonce)
 	}
 }
 
 func AppendixSizeInBytes(a *pb.Appendix) int {
 	var l int
 	if a.Message != nil {
-		l += 4 + len(a.Message.Content)
+		if a.Message.IsText {
+			l += 4 + len(a.Message.Content)
+		} else {
+			l += 4 + len(a.Message.Content)/2
+		}
 	}
 	if a.EncryptedMessage != nil {
-		l += 4 + len(a.EncryptedMessage.Data) + len(a.EncryptedMessage.Nonce)
+		if a.EncryptedMessage.IsText {
+			l += 4 + len(a.EncryptedMessage.Data) + len(a.EncryptedMessage.Nonce)
+		} else {
+			l += 4 + len(a.EncryptedMessage.Data)/2 + len(a.EncryptedMessage.Nonce)
+		}
 	}
 	if a.PublicKeyAnnouncement != nil {
 		l += len(a.PublicKeyAnnouncement.PublicKey)
 	}
 	if a.EncryptToSelfMessage != nil {
-		l += 4 + len(a.EncryptToSelfMessage.Data) + len(a.EncryptToSelfMessage.Nonce)
+		if a.EncryptToSelfMessage.IsText {
+			l += 4 + len(a.EncryptToSelfMessage.Data) + len(a.EncryptToSelfMessage.Nonce)
+		} else {
+			l += 4 + len(a.EncryptToSelfMessage.Data)/2 + len(a.EncryptToSelfMessage.Nonce)
+		}
 	}
 	return l
 }

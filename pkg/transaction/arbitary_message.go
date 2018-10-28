@@ -6,8 +6,8 @@ import (
 )
 
 const (
-	ArbitaryMessageType     = 1
-	ArbitaryMessageSubyType = 0
+	ArbitaryMessageType    = 1
+	ArbitaryMessageSubType = 0
 )
 
 type ArbitaryMessage struct {
@@ -21,5 +21,5 @@ func (tx *ArbitaryMessage) AttachmentSizeInBytes() int {
 }
 
 func (tx *ArbitaryMessage) GetType() uint16 {
-	return ArbitaryMessageType<<8 | ArbitaryMessageSubyType
+	return ArbitaryMessageSubType<<8 | ArbitaryMessageType
 }
