@@ -5,20 +5,23 @@ import (
 	"github.com/ac0v/aspera/pkg/encoding"
 )
 
+const (
+	BidOrderCancellationType    = 2
+	BidOrderCancellationSubType = 5
+)
+
 type BidOrderCancellation struct {
 	*pb.BidOrderCancellation
 }
 
-func (tx *BidOrderCancellation) ToBytes() []byte {
-	e := encoding.NewEncoder([]byte{})
-
-	WriteHeader(e, tx.Header)
-
+func (tx *BidOrderCancellation) WriteAttachmentBytes(e encoding.Encoder) {
 	e.WriteUint64(tx.Attachment.Order)
-
-	return e.Bytes()
 }
 
-func (tx *BidOrderCancellation) SizeInBytes() int {
-	return HeaderSize(tx.Header) + 8
+func (tx *BidOrderCancellation) AttachmentSizeInBytes() int {
+	return 8
+}
+
+func (tx *BidOrderCancellation) GetType() uint16 {
+	return BidOrderCancellationSubType<<8 | BidOrderCancellationType
 }

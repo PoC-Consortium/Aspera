@@ -5,23 +5,26 @@ import (
 	"github.com/ac0v/aspera/pkg/encoding"
 )
 
+const (
+	MultiSameOutCreationType    = 0
+	MultiSameOutCreationSubType = 2
+)
+
 type MultiSameOutCreation struct {
 	*pb.MultiSameOutCreation
 }
 
-func (tx *MultiSameOutCreation) ToBytes() []byte {
-	e := encoding.NewEncoder([]byte{})
-
-	WriteHeader(e, tx.Header)
-
+func (tx *MultiSameOutCreation) WriteAttachmentBytes(e encoding.Encoder) {
 	e.WriteUint8(uint8(len(tx.Attachment.Recipients)))
 	for _, recip := range tx.Attachment.Recipients {
 		e.WriteUint64(recip)
 	}
-
-	return e.Bytes()
 }
 
-func (tx *MultiSameOutCreation) SizeInBytes() int {
-	return HeaderSize(tx.Header) + 1 + len(tx.Attachment.Recipients)*8
+func (tx *MultiSameOutCreation) AttachmentSizeInBytes() int {
+	return 1 + len(tx.Attachment.Recipients)*8
+}
+
+func (tx *MultiSameOutCreation) GetType() uint16 {
+	return MultiSameOutCreationSubType<<8 | MultiSameOutCreationType
 }

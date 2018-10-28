@@ -5,21 +5,24 @@ import (
 	"github.com/ac0v/aspera/pkg/encoding"
 )
 
+const (
+	DigitalGoodsQuantityChangeType    = 3
+	DigitalGoodsQuantityChangeSubType = 4
+)
+
 type DigitalGoodsQuantityChange struct {
 	*pb.DigitalGoodsQuantityChange
 }
 
-func (tx *DigitalGoodsQuantityChange) ToBytes() []byte {
-	e := encoding.NewEncoder([]byte{})
-
-	WriteHeader(e, tx.Header)
-
+func (tx *DigitalGoodsQuantityChange) WriteAttachmentBytes(e encoding.Encoder) {
 	e.WriteUint64(tx.Attachment.Id)
 	e.WriteInt32(tx.Attachment.Delta)
-
-	return e.Bytes()
 }
 
-func (tx *DigitalGoodsQuantityChange) SizeInBytes() int {
-	return HeaderSize(tx.Header) + 8 + 4
+func (tx *DigitalGoodsQuantityChange) AttachmentSizeInBytes() int {
+	return 8 + 4
+}
+
+func (tx *DigitalGoodsQuantityChange) GetType() uint16 {
+	return DigitalGoodsQuantityChangeSubType<<8 | DigitalGoodsQuantityChangeType
 }

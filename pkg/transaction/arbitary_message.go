@@ -5,18 +5,21 @@ import (
 	"github.com/ac0v/aspera/pkg/encoding"
 )
 
+const (
+	ArbitaryMessageType     = 1
+	ArbitaryMessageSubyType = 0
+)
+
 type ArbitaryMessage struct {
 	*pb.ArbitaryMessage
 }
 
-func (tx *ArbitaryMessage) ToBytes() []byte {
-	e := encoding.NewEncoder([]byte{})
+func (tx *ArbitaryMessage) WriteAttachmentBytes(e encoding.Encoder) {}
 
-	WriteHeader(e, tx.Header)
-
-	return e.Bytes()
+func (tx *ArbitaryMessage) AttachmentSizeInBytes() int {
+	return 0
 }
 
-func (tx *ArbitaryMessage) SizeInBytes() int {
-	return HeaderSize(tx.Header)
+func (tx *ArbitaryMessage) GetType() uint16 {
+	return ArbitaryMessageType<<8 | ArbitaryMessageSubyType
 }

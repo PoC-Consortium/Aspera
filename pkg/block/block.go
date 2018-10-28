@@ -56,7 +56,7 @@ func (b *Block) CalcScoop() uint32 {
 }
 
 func (b *Block) ToBytes() []byte {
-	e := encoding.NewEncoder(make([]byte, b.SizeInBytes()))
+	e := encoding.NewEncoder(b.SizeInBytes())
 
 	e.WriteInt32(b.Version)
 	e.WriteUint32(b.Timestamp)
@@ -128,11 +128,11 @@ func (b *Block) Validate(previous *Block) error {
 	// ToDo: check for duplicte blocks - may this should go to the raw storage stuff
 	// throw new BlockNotAcceptedException("Duplicate block or invalid id for block " + block.getHeight());
 
-	// for _, t := range b.Transactions {
-	// 	if err := t.VerifySignature(); err != nil {
-	// 		return err
-	// 	}
-	// }
+	for _, tx := range b.transactions {
+		if err := transaction.VerifySignature(tx); err != nil {
+			return err
+		}
+	}
 
 	generationSignatureExp := CalculateGenerationSignature(previous)
 	for i := range b.GenerationSignature {

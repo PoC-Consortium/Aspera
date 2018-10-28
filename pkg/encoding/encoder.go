@@ -31,8 +31,8 @@ type encoder struct {
 	i  int
 }
 
-func NewEncoder(bs []byte) Encoder {
-	return &encoder{bs: bs}
+func NewEncoder(l int) Encoder {
+	return &encoder{bs: make([]byte, l)}
 }
 
 func (e *encoder) WriteUint64(val uint64) {

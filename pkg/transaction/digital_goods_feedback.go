@@ -5,20 +5,23 @@ import (
 	"github.com/ac0v/aspera/pkg/encoding"
 )
 
+const (
+	DigitalGoodsFeedbackType    = 3
+	DigitalGoodsFeedbackSubType = 6
+)
+
 type DigitalGoodsFeedback struct {
 	*pb.DigitalGoodsFeedback
 }
 
-func (tx *DigitalGoodsFeedback) ToBytes() []byte {
-	e := encoding.NewEncoder([]byte{})
-
-	WriteHeader(e, tx.Header)
-
+func (tx *DigitalGoodsFeedback) WriteAttachmentBytes(e encoding.Encoder) {
 	e.WriteUint64(tx.Attachment.Purchase)
-
-	return e.Bytes()
 }
 
-func (tx *DigitalGoodsFeedback) SizeInBytes() int {
-	return HeaderSize(tx.Header) + 8
+func (tx *DigitalGoodsFeedback) AttachmentSizeInBytes() int {
+	return 8
+}
+
+func (tx *DigitalGoodsFeedback) GetType() uint16 {
+	return DigitalGoodsFeedbackSubType<<8 | DigitalGoodsFeedbackType
 }

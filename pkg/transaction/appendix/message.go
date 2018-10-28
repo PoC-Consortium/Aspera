@@ -9,7 +9,7 @@ type Message struct {
 	*pb.Message
 }
 
-func (a *Messgae) WriteBytes(e encoding.Encoder) {
+func (a *Message) WriteBytes(e encoding.Encoder) {
 	e.WriteBytesWithInt32Len(a.IsText, []byte(a.Content))
 }
 

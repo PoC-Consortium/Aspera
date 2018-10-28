@@ -5,21 +5,24 @@ import (
 	"github.com/ac0v/aspera/pkg/encoding"
 )
 
+const (
+	DigitalGoodsRefundType    = 3
+	DigitalGoodsRefundSubType = 7
+)
+
 type DigitalGoodsRefund struct {
 	*pb.DigitalGoodsRefund
 }
 
-func (tx *DigitalGoodsRefund) ToBytes() []byte {
-	e := encoding.NewEncoder([]byte{})
-
-	WriteHeader(e, tx.Header)
-
+func (tx *DigitalGoodsRefund) WriteAttachmentBytes(e encoding.Encoder) {
 	e.WriteUint64(tx.Attachment.Purchase)
 	e.WriteUint64(tx.Attachment.Refund)
-
-	return e.Bytes()
 }
 
-func (tx *DigitalGoodsRefund) SizeInBytes() int {
-	return HeaderSize(tx.Header) + 8 + 8
+func (tx *DigitalGoodsRefund) AttachmentSizeInBytes() int {
+	return 8 + 8
+}
+
+func (tx *DigitalGoodsRefund) GetType() uint16 {
+	return DigitalGoodsRefundSubType<<8 | DigitalGoodsRefundType
 }

@@ -5,21 +5,24 @@ import (
 	"github.com/ac0v/aspera/pkg/encoding"
 )
 
+const (
+	AssetTransferType    = 2
+	AssetTransferSubType = 2
+)
+
 type AssetTransfer struct {
 	*pb.AssetTransfer
 }
 
-func (tx *AssetTransfer) ToBytes() []byte {
-	e := encoding.NewEncoder([]byte{})
-
-	WriteHeader(e, tx.Header)
-
+func (tx *AssetTransfer) WriteAttachmentBytes(e encoding.Encoder) {
 	e.WriteUint64(tx.Attachment.Asset)
 	e.WriteUint64(tx.Attachment.Quantity)
-
-	return e.Bytes()
 }
 
-func (tx *AssetTransfer) SizeInBytes() int {
-	return HeaderSize(tx.Header) + 8 + 8
+func (tx *AssetTransfer) AttachmentSizeInBytes() int {
+	return 8 + 8
+}
+
+func (tx *AssetTransfer) GetType() uint16 {
+	return AssetTransferSubType<<8 | AssetTransferType
 }

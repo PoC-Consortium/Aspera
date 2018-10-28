@@ -5,25 +5,28 @@ import (
 	"github.com/ac0v/aspera/pkg/encoding"
 )
 
+const (
+	AssetIssuanceType    = 2
+	AssetIssuanceSubType = 0
+)
+
 type AssetIssuance struct {
 	*pb.AssetIssuance
 }
 
-func (tx *AssetIssuance) ToBytes() []byte {
-	e := encoding.NewEncoder([]byte{})
-
-	WriteHeader(e, tx.Header)
-
+func (tx *AssetIssuance) WriteAttachmentBytes(e encoding.Encoder) {
 	e.WriteUint8(uint8(len(tx.Attachment.Name)))
 	e.WriteBytes([]byte(tx.Attachment.Name))
 	e.WriteUint16(uint16(len(tx.Attachment.Description)))
 	e.WriteBytes([]byte(tx.Attachment.Description))
 	e.WriteUint64(tx.Attachment.Quantity)
 	e.WriteUint8(uint8(tx.Attachment.Decimals))
-
-	return e.Bytes()
 }
 
-func (tx *AssetIssuance) SizeInBytes() int {
-	return HeaderSize(tx.Header) + 1 + len(tx.Attachment.Name) + 2 + len(tx.Attachment.Description) + 8 + 1
+func (tx *AssetIssuance) AttachmentSizeInBytes() int {
+	return 1 + len(tx.Attachment.Name) + 2 + len(tx.Attachment.Description) + 8 + 1
+}
+
+func (tx *AssetIssuance) GetType() uint16 {
+	return AssetIssuanceSubType<<8 | AssetIssuanceType
 }

@@ -5,23 +5,26 @@ import (
 	"github.com/ac0v/aspera/pkg/encoding"
 )
 
+const (
+	AccountInfoType    = 1
+	AccountInfoSubType = 5
+)
+
 type AccountInfo struct {
 	*pb.AccountInfo
 }
 
-func (tx *AccountInfo) ToBytes() []byte {
-	e := encoding.NewEncoder([]byte{})
-
-	WriteHeader(e, tx.Header)
-
+func (tx *AccountInfo) WriteAttachmentBytes(e encoding.Encoder) {
 	e.WriteUint8(uint8(len(tx.Attachment.Name)))
 	e.WriteBytes([]byte(tx.Attachment.Name))
 	e.WriteUint16(uint16(len(tx.Attachment.Description)))
 	e.WriteBytes([]byte(tx.Attachment.Description))
-
-	return e.Bytes()
 }
 
-func (tx *AccountInfo) SizeInBytes() int {
-	return HeaderSize(tx.Header) + 1 + len(tx.Attachment.Name) + 2 + len(tx.Attachment.Description)
+func (tx *AccountInfo) AttachmentSizeInBytes() int {
+	return 1 + len(tx.Attachment.Name) + 2 + len(tx.Attachment.Description)
+}
+
+func (tx *AccountInfo) GetType() uint16 {
+	return AccountInfoSubType<<8 | AccountInfoType
 }

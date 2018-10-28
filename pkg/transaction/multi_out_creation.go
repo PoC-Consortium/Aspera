@@ -5,24 +5,27 @@ import (
 	"github.com/ac0v/aspera/pkg/encoding"
 )
 
+const (
+	MultiOutCreationType    = 0
+	MultiOutCreationSubType = 1
+)
+
 type MultiOutCreation struct {
 	*pb.MultiOutCreation
 }
 
-func (tx *MultiOutCreation) ToBytes() []byte {
-	e := encoding.NewEncoder([]byte{})
-
-	WriteHeader(e, tx.Header)
-
+func (tx *MultiOutCreation) WriteAttachmentBytes(e encoding.Encoder) {
 	e.WriteUint8(uint8(len(tx.Attachment.Recipients)))
 	for _, recipIdAndAmount := range tx.Attachment.Recipients {
 		e.WriteUint64(recipIdAndAmount.Id)
 		e.WriteUint64(recipIdAndAmount.Amount)
 	}
-
-	return e.Bytes()
 }
 
-func (tx *MultiOutCreation) SizeInBytes() int {
-	return HeaderSize(tx.Header) + 1 + len(tx.Attachment.Recipients)*(8+8)
+func (tx *MultiOutCreation) AttachmentSizeInBytes() int {
+	return 1 + len(tx.Attachment.Recipients)*(8+8)
+}
+
+func (tx *MultiOutCreation) GetType() uint16 {
+	return MultiOutCreationSubType<<8 | MultiOutCreationType
 }

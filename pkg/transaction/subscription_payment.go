@@ -5,22 +5,25 @@ import (
 	"github.com/ac0v/aspera/pkg/encoding"
 )
 
+const (
+	SubscriptionPaymentType    = 21
+	SubscriptionPaymentSubType = 5
+)
+
 type SubscriptionPayment struct {
 	*pb.SubscriptionPayment
 }
 
-func (tx *SubscriptionPayment) ToBytes() []byte {
-	e := encoding.NewEncoder([]byte{})
-
-	WriteHeader(e, tx.Header)
-
+func (tx *SubscriptionPayment) WriteAttachmentBytes(e encoding.Encoder) {
 	for _, id := range tx.Attachment.Ids {
 		e.WriteUint64(id)
 	}
-
-	return e.Bytes()
 }
 
-func (tx *SubscriptionPayment) SizeInBytes() int {
-	return HeaderSize(tx.Header) + len(tx.Attachment.Ids)*8
+func (tx *SubscriptionPayment) AttachmentSizeInBytes() int {
+	return len(tx.Attachment.Ids) * 8
+}
+
+func (tx *SubscriptionPayment) GetType() uint16 {
+	return SubscriptionPaymentSubType<<8 | SubscriptionPaymentType
 }

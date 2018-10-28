@@ -5,18 +5,21 @@ import (
 	"github.com/ac0v/aspera/pkg/encoding"
 )
 
+const (
+	OrdinaryPaymentType    = 0
+	OrdinaryPaymentSubType = 0
+)
+
 type OrdinaryPayment struct {
 	*pb.OrdinaryPayment
 }
 
-func (tx *OrdinaryPayment) ToBytes() []byte {
-	e := encoding.NewEncoder([]byte{})
+func (tx *OrdinaryPayment) WriteAttachmentBytes(e encoding.Encoder) {}
 
-	WriteHeader(e, tx.Header)
-
-	return e.Bytes()
+func (tx *OrdinaryPayment) AttachmentSizeInBytes() int {
+	return 0
 }
 
-func (tx *OrdinaryPayment) SizeInBytes() int {
-	return HeaderSize(tx.Header)
+func (tx *OrdinaryPayment) GetType() uint16 {
+	return OrdinaryPaymentSubType<<8 | OrdinaryPaymentType
 }
