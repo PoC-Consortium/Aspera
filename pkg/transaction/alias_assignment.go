@@ -16,9 +16,9 @@ type AliasAssignment struct {
 
 func (tx *AliasAssignment) WriteAttachmentBytes(e encoding.Encoder) {
 	e.WriteUint8(uint8(len(tx.Attachment.Alias)))
-	e.WriteBytes([]byte(tx.Attachment.Alias))
+	e.WriteBytes(tx.Attachment.Alias)
 	e.WriteUint16(uint16(len(tx.Attachment.Uri)))
-	e.WriteBytes([]byte(tx.Attachment.Uri))
+	e.WriteBytes(tx.Attachment.Uri)
 }
 
 func (tx *AliasAssignment) AttachmentSizeInBytes() int {

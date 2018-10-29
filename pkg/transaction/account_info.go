@@ -16,9 +16,9 @@ type AccountInfo struct {
 
 func (tx *AccountInfo) WriteAttachmentBytes(e encoding.Encoder) {
 	e.WriteUint8(uint8(len(tx.Attachment.Name)))
-	e.WriteBytes([]byte(tx.Attachment.Name))
+	e.WriteBytes(tx.Attachment.Name)
 	e.WriteUint16(uint16(len(tx.Attachment.Description)))
-	e.WriteBytes([]byte(tx.Attachment.Description))
+	e.WriteBytes(tx.Attachment.Description)
 }
 
 func (tx *AccountInfo) AttachmentSizeInBytes() int {

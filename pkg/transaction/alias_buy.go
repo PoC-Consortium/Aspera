@@ -16,7 +16,7 @@ type AliasBuy struct {
 
 func (tx *AliasBuy) WriteAttachmentBytes(e encoding.Encoder) {
 	e.WriteUint8(uint8(len(tx.Attachment.Name)))
-	e.WriteBytes([]byte(tx.Attachment.Name))
+	e.WriteBytes(tx.Attachment.Name)
 }
 
 func (tx *AliasBuy) AttachmentSizeInBytes() int {

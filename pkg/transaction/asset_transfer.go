@@ -19,7 +19,7 @@ func (tx *AssetTransfer) WriteAttachmentBytes(e encoding.Encoder) {
 	e.WriteUint64(tx.Attachment.Quantity)
 	if tx.Header.Version == 0 {
 		e.WriteUint16(uint16(len(tx.Attachment.Comment)))
-		e.WriteBytes([]byte(tx.Attachment.Comment))
+		e.WriteBytes(tx.Attachment.Comment)
 	}
 }
 

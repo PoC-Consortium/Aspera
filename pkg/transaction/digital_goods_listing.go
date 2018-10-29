@@ -16,11 +16,11 @@ type DigitalGoodsListing struct {
 
 func (tx *DigitalGoodsListing) WriteAttachmentBytes(e encoding.Encoder) {
 	e.WriteUint16(uint16(len(tx.Attachment.Name)))
-	e.WriteBytes([]byte(tx.Attachment.Name))
+	e.WriteBytes(tx.Attachment.Name)
 	e.WriteUint16(uint16(len(tx.Attachment.Description)))
-	e.WriteBytes([]byte(tx.Attachment.Description))
+	e.WriteBytes(tx.Attachment.Description)
 	e.WriteUint16(uint16(len(tx.Attachment.Tags)))
-	e.WriteBytes([]byte(tx.Attachment.Tags))
+	e.WriteBytes(tx.Attachment.Tags)
 	e.WriteUint32(tx.Attachment.Quantity)
 	e.WriteUint64(tx.Attachment.Price)
 }
