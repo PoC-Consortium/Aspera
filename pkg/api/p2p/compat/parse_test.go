@@ -2,11 +2,9 @@ package compat
 
 import (
 	"bytes"
+	"io/ioutil"
 	"testing"
 
-	"fmt"
-	//"github.com/json-iterator/go"
-	//"encoding/json"
 	"github.com/Jeffail/gabs"
 	"github.com/stretchr/testify/assert"
 
@@ -16,31 +14,41 @@ import (
 )
 
 func TestParseBlocks(t *testing.T) {
-	unmarshaler := &jsonpb.Unmarshaler{AllowUnknownFields: false}
-	//var json = jsoniter.ConfigCompatibleWithStandardLibrary
-	for _, parseTest := range ParseTests {
-		data := []byte(parseTest.JSON)
-		data, _ = Upgrade(data)
+	files, err := ioutil.ReadDir("test_files")
+	if err != nil {
+		t.Fatal("failed to open test files")
+	}
 
+	var failed int
+	unmarshaler := &jsonpb.Unmarshaler{AllowUnknownFields: false}
+	for _, f := range files {
+		t.Log("parsing ", f.Name())
+		javaWalletBs, err := ioutil.ReadFile("test_files/" + f.Name())
+		if err != nil {
+			t.Fatalf("failed to open file %s", "test_files/"+f.Name())
+		}
+
+		protoJSONBs, _ := Upgrade(javaWalletBs)
 		msg := new(api.GetNextBlocksResponse)
-		if assert.NoError(t, unmarshaler.Unmarshal(bytes.NewReader(data), msg)) {
-			unmarshaler.Unmarshal(bytes.NewReader(data), msg)
-			dst := Downgrade(msg)
+		if assert.NoError(t, unmarshaler.Unmarshal(bytes.NewReader(protoJSONBs), msg)) {
+			javaWalletBsRebuilt := Downgrade(msg)
 			//fmt.Println(string(dst))
-			compareJSON(t, string(dst), parseTest.JSON)
+			if !compareJSON(t, string(javaWalletBsRebuilt), string(javaWalletBs)) {
+				failed++
+			}
 			//panic(string(dst))
-			//fmt.Println(string(dst))
+			// fmt.Println(string(dst))
 		} else {
-			fmt.Println(string(data))
+			t.Log(string(protoJSONBs))
 		}
 	}
 }
 
-func compareJSON(t *testing.T, left string, right string) {
+func compareJSON(t *testing.T, left string, right string) bool {
 	comperands := []string{left, right}
 	for i, comperand := range comperands {
 		jsonParsed, _ := gabs.ParseJSON([]byte(comperand))
 		comperands[i] = string(jsonParsed.StringIndent("", "  "))
 	}
-	assert.EqualValues(t, comperands[1], comperands[0])
+	return assert.EqualValues(t, comperands[1], comperands[0])
 }
