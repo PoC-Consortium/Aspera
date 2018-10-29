@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"testing"
 
+	_ "fmt"
 	"github.com/Jeffail/gabs"
 	"github.com/stretchr/testify/assert"
 
@@ -32,8 +33,16 @@ func TestParseBlocks(t *testing.T) {
 		msg := new(api.GetNextBlocksResponse)
 		if assert.NoError(t, unmarshaler.Unmarshal(bytes.NewReader(protoJSONBs), msg)) {
 			javaWalletBsRebuilt := Downgrade(msg)
-			//fmt.Println(string(dst))
+			//fmt.Println(string(javaWalletBsRebuilt))
 			if !compareJSON(t, string(javaWalletBsRebuilt), string(javaWalletBs)) {
+				comperands := []string{string(javaWalletBsRebuilt), string(javaWalletBs)}
+				for i, comperand := range comperands {
+					jsonParsed, _ := gabs.ParseJSON([]byte(comperand))
+					comperands[i] = string(jsonParsed.StringIndent("", "  "))
+				}
+
+				//ioutil.WriteFile("/tmp/a."+f.Name(), []byte(comperands[0]), 0644)
+				//ioutil.WriteFile("/tmp/b."+f.Name(), []byte(comperands[1]), 0644)
 				failed++
 			}
 			//panic(string(dst))

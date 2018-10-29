@@ -115,8 +115,8 @@
                                 "@type":"type.googleapis.com/p2p.AssetTransfer",
                                 "attachment": {
                                     "asset": {%qz= attachment.GetStringBytes("asset") %},
-                                    "quantity": {%d attachment.GetInt("quantityQNT") %},
-                                    "comment": {%qz= attachment.GetStringBytes("comment") %}
+                                    "quantity": {%d attachment.GetInt("quantityQNT") %}
+                                    {% if tx.GetInt("version") == 0 %}, "comment": {%qz= attachment.GetStringBytes("comment") %}{% endif %}
                                 },
                                 {% case 2 %}
                                 "@type":"type.googleapis.com/p2p.AskOrderPlacement",
@@ -235,13 +235,13 @@
                                 {% case 1 %}
                                 "@type":"type.googleapis.com/p2p.EscrowSign",
                                 "attachment": {
-                                    "id": {%qz= attachment.GetStringBytes("escrowID") %},
-                                    "decision": {%d attachment.GetInt("decision") %}
+                                    "id": {%qz= attachment.GetStringBytes("escrowId") %},
+                                    "decision": {%qz= attachment.GetStringBytes("decision") %}
                                 },
                                 {% case 2 %}
                                 "@type":"type.googleapis.com/p2p.EscrowResult",
                                 "attachment": {
-                                    "id": {%qz= attachment.GetStringBytes("escrowID") %},
+                                    "id": {%qz= attachment.GetStringBytes("escrowId") %},
                                     "decision": {%d attachment.GetInt("decision") %}
                                 },
                                 {% case 3 %}
@@ -292,6 +292,9 @@
                                 "deadline":        {%d tx.GetInt("deadline") %},
                                 "ecBlockId":       {%qz= tx.GetStringBytes("ecBlockId") %},
                                 "ecBlockHeight":   {%d tx.GetInt("ecBlockHeight") %},
+                                {% if tx.Exists("referencedTransactionFullHash") && len(tx.GetStringBytes("referencedTransactionFullHash")) > 0 %}
+                                "referencedTransactionFullHash": {%qz= encoding.HexStringBytesToBase64Bytes(tx.GetStringBytes("referencedTransactionFullHash")) %},
+                                {% endif %}
                                 "signature":       {%qz= encoding.HexStringBytesToBase64Bytes(tx.GetStringBytes("signature")) %}
                             }
                             {% code
@@ -348,7 +351,7 @@
         {
             "timestamp":           {%v block.Timestamp %},
             "previousBlock":       "{%v block.PreviousBlock %}",
-            "blockATs":            {% if string(block.BlockATs) == "" %}null{% else %}{%qz= block.BlockATs %}{% endif %},
+            "blockATs":            {% if string(block.BlockATs) == "" %}null{% else %}{%qz= encoding.BytesToHexStringBytes(block.BlockATs) %}{% endif %},
             "totalFeeNQT":         {%v block.TotalFee %},
             "nonce":               "{%v block.Nonce %}",
             "version":             {%v block.Version %},
@@ -520,7 +523,7 @@
                             "attachment": {
                                 "asset": "{%v tx.Attachment.Asset %}",
                                 "quantityQNT": {%v tx.Attachment.Quantity %}
-                                {% if len(tx.Attachment.Comment) > 0 %}, "comment": {%q= tx.Attachment.Comment %}{% endif %}
+                                {% if header.Version == 0 %}, "comment": {%q= tx.Attachment.Comment %}{% endif %}
                         {% case "p2p.AskOrderPlacement" %}
                         {% code
                            tx := new(p2p.AskOrderPlacement)
@@ -740,8 +743,8 @@
                             "type":       21,
                             "subtype":    1,
                             "attachment": {
-                                "escrowID": "{%v tx.Attachment.Id %}",
-                                "decision": "{%v tx.Attachment.Decision %}"
+                                "escrowId": "{%v tx.Attachment.Id %}",
+                                "decision": "{%v tx.Attachment.Decision.String() %}"
                         {% case "p2p.EscrowResult" %}
                         {% code
                            tx := new(p2p.EscrowResult)
@@ -753,7 +756,7 @@
                             "type":       21,
                             "subtype":    2,
                             "attachment": {
-                                "escrowID": "{%v tx.Attachment.Id %}",
+                                "escrowId": "{%v tx.Attachment.Id %}",
                                 "decision": "{%v tx.Attachment.Decision %}"
                         {% case "p2p.SubscriptionSubscribe" %}
                         {% code
@@ -870,7 +873,11 @@
                      "deadline":        {%v header.Deadline %},
                      "ecBlockId":       "{%v header.EcBlockId %}",
                      "ecBlockHeight":   {%v header.EcBlockHeight %},
+                     {% if len(header.ReferencedTransactionFullHash) > 0 %}
+                         "referencedTransactionFullHash": {%qz= encoding.BytesToHexStringBytes(header.ReferencedTransactionFullHash) %},
+                     {% endif %}
                      "signature":       {%qz= encoding.BytesToHexStringBytes(header.Signature) %}
+
                  }{% if txId + 1 < len(transactions) %},{% endif %}
                  {% endfor %}
             ]
