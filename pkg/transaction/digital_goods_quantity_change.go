@@ -7,7 +7,7 @@ import (
 
 const (
 	DigitalGoodsQuantityChangeType    = 3
-	DigitalGoodsQuantityChangeSubType = 4
+	DigitalGoodsQuantityChangeSubType = 3
 )
 
 type DigitalGoodsQuantityChange struct {
