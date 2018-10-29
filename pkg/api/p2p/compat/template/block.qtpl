@@ -1,6 +1,5 @@
 {% import (
     "strings"
-
     "github.com/ac0v/aspera/pkg/encoding"
     "github.com/ac0v/aspera/pkg/api/p2p"
 
@@ -79,25 +78,25 @@
                                 {% case 1 %}
                                 "@type":"type.googleapis.com/p2p.AliasAssignment",
                                 "attachment": {
-                                    "alias": {%qz= attachment.GetStringBytes("alias") %},
-                                    "uri": {%qz= attachment.GetStringBytes("uri") %}
+                                    "alias": {%qz= encoding.StringBytesToBase64Bytes(attachment.GetStringBytes("alias")) %},
+                                    "uri": {%qz= encoding.StringBytesToBase64Bytes(attachment.GetStringBytes("uri")) %}
                                 },
                                 {% case 5 %}
                                 "@type":"type.googleapis.com/p2p.AccountInfo",
                                 "attachment": {
-                                    "name": {%qz= attachment.GetStringBytes("name") %},
-                                    "description": {%qz= attachment.GetStringBytes("description") %}
+                                    "name": {%qz= encoding.StringBytesToBase64Bytes(attachment.GetStringBytes("name")) %},
+                                    "description": {%qz= encoding.StringBytesToBase64Bytes(attachment.GetStringBytes("description")) %}
                                 },
                                 {% case 6 %}
                                 "@type":"type.googleapis.com/p2p.AliasSell",
                                 "attachment": {
-                                    "name": {%qz= attachment.GetStringBytes("alias") %},
+                                    "name": {%qz= encoding.StringBytesToBase64Bytes(attachment.GetStringBytes("alias")) %},
                                     "price": {%d attachment.GetInt("priceNQT") %}
                                 },
                                 {% case 7 %}
                                 "@type":"type.googleapis.com/p2p.AliasBuy",
                                 "attachment": {
-                                    "name": {%qz= attachment.GetStringBytes("alias") %}
+                                    "name": {%qz= encoding.StringBytesToBase64Bytes(attachment.GetStringBytes("alias")) %}
                                 },
                                 {% endswitch %}
                             {% case 2 %}
@@ -105,18 +104,18 @@
                                 {% case 0 %}
                                 "@type":"type.googleapis.com/p2p.AssetIssuance",
                                 "attachment": {
-                                    "name": {%qz= attachment.GetStringBytes("name") %},
-                                    "description": {%qz= attachment.GetStringBytes("description") %},
+                                    "name": {%qz= encoding.StringBytesToBase64Bytes(attachment.GetStringBytes("name")) %},
+                                    "description": {%qz= encoding.StringBytesToBase64Bytes(attachment.GetStringBytes("description")) %},
                                     "quantity": {%d attachment.GetInt("quantityQNT") %},
                                     "decimals": {%d attachment.GetInt("decimals") %},
-                                    "comment": {%qz= attachment.GetStringBytes("comment") %}
+                                    "comment": {%qz= encoding.StringBytesToBase64Bytes(attachment.GetStringBytes("comment")) %}
                                 },
                                 {% case 1 %}
                                 "@type":"type.googleapis.com/p2p.AssetTransfer",
                                 "attachment": {
                                     "asset": {%qz= attachment.GetStringBytes("asset") %},
                                     "quantity": {%d attachment.GetInt("quantityQNT") %}
-                                    {% if tx.GetInt("version") == 0 %}, "comment": {%qz= attachment.GetStringBytes("comment") %}{% endif %}
+                                    {% if tx.GetInt("version") == 0 %}, "comment": {%qz= encoding.StringBytesToBase64Bytes(attachment.GetStringBytes("comment")) %}{% endif %}
                                 },
                                 {% case 2 %}
                                 "@type":"type.googleapis.com/p2p.AskOrderPlacement",
@@ -124,7 +123,7 @@
                                     "asset": {%qz= attachment.GetStringBytes("asset") %},
                                     "quantity": {%d attachment.GetInt("quantityQNT") %},
                                     "price": {%d attachment.GetInt("priceNQT") %},
-                                    "comment": {%qz= attachment.GetStringBytes("comment") %}
+                                    "comment": {%qz= encoding.StringBytesToBase64Bytes(attachment.GetStringBytes("comment")) %}
                                 },
                                 {% case 3 %}
                                 "@type":"type.googleapis.com/p2p.BidOrderPlacement",
@@ -149,9 +148,9 @@
                                 {% case 0 %}
                                 "@type":"type.googleapis.com/p2p.DigitalGoodsListing",
                                 "attachment": {
-                                    "name": {%qz= attachment.GetStringBytes("name") %},
-                                    "description": {%qz= attachment.GetStringBytes("description") %},
-                                    "tags": {%qz= attachment.GetStringBytes("tags") %},
+                                    "name": {%qz= encoding.StringBytesToBase64Bytes(attachment.GetStringBytes("name")) %},
+                                    "description": {%qz= encoding.StringBytesToBase64Bytes(attachment.GetStringBytes("description")) %},
+                                    "tags": {%qz= encoding.StringBytesToBase64Bytes(attachment.GetStringBytes("tags")) %},
                                     "quantity": {%d attachment.GetInt("quantity") %},
                                     "price": "{%d attachment.GetInt("priceNQT") %}"
                                 },
@@ -272,8 +271,8 @@
                                 {% case 0%}
                                 "@type":"type.googleapis.com/p2p.AutomatedTransactionsCreation",
                                 "attachment": {
-                                    "name": {%qz= attachment.GetStringBytes("name") %},
-                                    "description": {%qz= attachment.GetStringBytes("description") %},
+                                    "name": {%qz= encoding.StringBytesToBase64Bytes(attachment.GetStringBytes("name")) %},
+                                    "description": {%qz= encoding.StringBytesToBase64Bytes(attachment.GetStringBytes("description")) %},
                                     "bytes": {%qz= encoding.HexStringBytesToBase64Bytes(attachment.GetStringBytes("creationBytes")) %}
                                 },
                                 {% case 1%}
@@ -309,7 +308,7 @@
                                 {% if hasMessage %}
                                 "message": {
                                     "isText":  {% if attachment.GetBool("messageIsText") %}true{% else %}false{% endif %},
-                                    "content": {%qz= attachment.GetStringBytes("message") %}
+                                    "content": {%qz= encoding.StringBytesToBase64Bytes(attachment.GetStringBytes("message")) %}
                                 }{% if hasEncryptedMessage || hasPublicKeyAnnouncement || hasEncryptToSelfMessage %},{% endif %}
                                 {% endif %}
                                 {% if hasEncryptedMessage %}
@@ -453,8 +452,8 @@
                             "type":       1,
                             "subtype":    1,
                             "attachment": {
-                                "alias": {%q= tx.Attachment.Alias %},
-                                "uri": {%q= tx.Attachment.Uri %}
+                                "alias": {%qz= tx.Attachment.Alias %},
+                                "uri": {%qz= tx.Attachment.Uri %}
                         {% case "p2p.AccountInfo" %}
                         {% code
                            tx := new(p2p.AccountInfo)
@@ -466,8 +465,8 @@
                             "type":       1,
                             "subtype":    5,
                             "attachment": {
-                                "name": {%q= tx.Attachment.Name %},
-                                "description": {%q= tx.Attachment.Description %}
+                                "name": {%qz= tx.Attachment.Name %},
+                                "description": {%qz= tx.Attachment.Description %}
                         {% case "p2p.AliasSell" %}
                         {% code
                            tx := new(p2p.AliasSell)
@@ -480,7 +479,7 @@
                             "subtype":    6,
                             {% if header.Recipient == 0 %}"recipient":"0",{% endif %}
                             "attachment": {
-                                "alias":     {%q= tx.Attachment.Name %},
+                                "alias":     {%qz= tx.Attachment.Name %},
                                 "priceNQT": {%v tx.Attachment.Price %}
                         {% case "p2p.AliasBuy" %}
                         {% code
@@ -493,7 +492,7 @@
                             "type":       1,
                             "subtype":    7,
                             "attachment": {
-                                "alias": {%q= tx.Attachment.Name %}
+                                "alias": {%qz= tx.Attachment.Name %}
                         {% case "p2p.AssetIssuance" %}
                         {% code
                            tx := new(p2p.AssetIssuance)
@@ -505,11 +504,11 @@
                             "type":       2,
                             "subtype":    0,
                             "attachment": {
-                                "name": {%q= tx.Attachment.Name %},
-                                "description": {%q= tx.Attachment.Description %},
+                                "name": {%qz= tx.Attachment.Name %},
+                                "description": {%qz= tx.Attachment.Description %},
                                 "quantityQNT": {%v tx.Attachment.Quantity %},
                                 "decimals": {%v tx.Attachment.Decimals %}
-                                {% if len(tx.Attachment.Comment) > 0 %}, "comment": {%q= tx.Attachment.Comment %}{% endif %}
+                                {% if len(tx.Attachment.Comment) > 0 %}, "comment": {%qz= tx.Attachment.Comment %}{% endif %}
                         {% case "p2p.AssetTransfer" %}
                         {% code
                            tx := new(p2p.AssetTransfer)
@@ -523,7 +522,7 @@
                             "attachment": {
                                 "asset": "{%v tx.Attachment.Asset %}",
                                 "quantityQNT": {%v tx.Attachment.Quantity %}
-                                {% if header.Version == 0 %}, "comment": {%q= tx.Attachment.Comment %}{% endif %}
+                                {% if header.Version == 0 %}, "comment": {%qz= tx.Attachment.Comment %}{% endif %}
                         {% case "p2p.AskOrderPlacement" %}
                         {% code
                            tx := new(p2p.AskOrderPlacement)
@@ -538,7 +537,7 @@
                                 "asset": "{%v tx.Attachment.Asset %}",
                                 "quantityQNT": {%v tx.Attachment.Quantity %},
                                 "priceNQT": {%v tx.Attachment.Price %}
-                                {% if len(tx.Attachment.Comment) > 0 %}, "comment": {%q= tx.Attachment.Comment %}{% endif %}
+                                {% if len(tx.Attachment.Comment) > 0 %}, "comment": {%qz= tx.Attachment.Comment %}{% endif %}
                         {% case "p2p.BidOrderPlacement" %}
                         {% code
                            tx := new(p2p.BidOrderPlacement)
@@ -588,9 +587,9 @@
                             "type":       3,
                             "subtype":    0,
                             "attachment": {
-                                "name": {%q= tx.Attachment.Name %},
-                                "description": {%q= tx.Attachment.Description %},
-                                "tags": {%q= tx.Attachment.Tags %},
+                                "name": {%qz= tx.Attachment.Name %},
+                                "description": {%qz= tx.Attachment.Description %},
+                                "tags": {%qz= tx.Attachment.Tags %},
                                 "quantity": {%v tx.Attachment.Quantity %},
                                 "priceNQT": {%v tx.Attachment.Price %}
                         {% case "p2p.DigitalGoodsDelisting" %}
@@ -812,8 +811,8 @@
                             "type":       22,
                             "subtype":    0,
                             "attachment": {
-                                "name": {%q= tx.Attachment.Name %},
-                                "description": {%q= tx.Attachment.Description %},
+                                "name": {%qz= tx.Attachment.Name %},
+                                "description": {%qz= tx.Attachment.Description %},
                                 "creationBytes": {%qz= encoding.BytesToHexStringBytes(tx.Attachment.Bytes) %}
                         {% case "p2p.AutomatedTransactionsPayment" %}
                         {% code
@@ -830,7 +829,7 @@
                             {% if hasAttachmentData %},{% endif %}
                             {% if appendix.Message != nil %}
                                 "messageIsText": {% if appendix.Message.IsText %}true{% else %}false{% endif %},
-                                "message": {%q= appendix.Message.Content %}
+                                "message": {%qz= appendix.Message.Content %}
                                 {% if header.Version > 0 %}, "version.Message": {%v header.Version %}{% endif %}
                                 {% if appendix.EncryptedMessage != nil || appendix.EncryptToSelfMessage != nil || appendix.PublicKeyAnnouncement != nil %},{% endif %}
                             {% endif %}
