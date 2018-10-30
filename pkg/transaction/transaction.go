@@ -160,7 +160,7 @@ func WriteAppendix(e encoding.Encoder, a *pb.Appendix, version uint32) {
 		if version > 0 {
 			e.WriteUint8(uint8(version))
 		}
-		e.WriteStringWithInt32Len(a.Message.IsText, a.Message.Content)
+		e.WriteStringBytesWithInt32Len(a.Message.IsText, a.Message.Content)
 	}
 	if a.EncryptedMessage != nil {
 		if version > 0 {
