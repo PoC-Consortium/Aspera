@@ -75,8 +75,10 @@ func NewSynchronizer(client Client, manager Manager, store *s.Store, milestones 
 	}
 
 	for i, milestone := range milestones {
+		// milestone already handled (partialy) - adjust it's start
 		if store.RawStore.Current.Block.Height > milestone.Height {
-			continue
+			milestone.Id = store.RawStore.Current.Block.Id
+			milestone.Height = store.RawStore.Current.Block.Height
 		}
 
 		var toBlockMeta *blockMeta
@@ -84,6 +86,11 @@ func NewSynchronizer(client Client, manager Manager, store *s.Store, milestones 
 			toBlockMeta = &blockMeta{
 				id:     milestones[i+1].Id,
 				height: milestones[i+1].Height,
+			}
+			if toBlockMeta.height <= store.RawStore.Current.Block.Height {
+				// milestone already done; next one partially handled
+				// so we continue with the next one
+				continue
 			}
 		}
 
