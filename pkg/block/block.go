@@ -128,18 +128,21 @@ func (b *Block) Validate(previous *Block) error {
 	// ToDo: check for duplicte blocks - may this should go to the raw storage stuff
 	// throw new BlockNotAcceptedException("Duplicate block or invalid id for block " + block.getHeight());
 
-	for _, tx := range b.transactions {
-		if err := transaction.VerifySignature(tx); err != nil {
-			return err
-		}
-	}
-
 	generationSignatureExp := CalculateGenerationSignature(previous)
 	for i := range b.GenerationSignature {
 		if generationSignatureExp[i] != b.GenerationSignature[i] {
 			return ErrGenerationSignatureMismatch
 		}
 	}
+
+	for _, tx := range b.transactions {
+		if err := transaction.Validate(tx, b.Height, b.Timestamp, now); err != nil {
+			panic(err)
+			return err
+		}
+	}
+
+	_, b.Id = b.CalculateHashAndID()
 
 	return nil
 }

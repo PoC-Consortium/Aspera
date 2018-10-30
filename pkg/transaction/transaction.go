@@ -7,6 +7,7 @@ import (
 	pb "github.com/ac0v/aspera/pkg/api/p2p"
 	"github.com/ac0v/aspera/pkg/crypto"
 	"github.com/ac0v/aspera/pkg/encoding"
+	env "github.com/ac0v/aspera/pkg/environment"
 	. "github.com/ac0v/aspera/pkg/log"
 
 	"github.com/golang/protobuf/proto"
@@ -16,10 +17,16 @@ import (
 
 const (
 	signatureOffset = 96
+	signatureLen    = 64
+
+	maxTimestampDifference = 15
 )
 
 var (
 	ErrTransactionSignatureMismatch = errors.New("transaction signature mismatch")
+	ErrInvalidTransactionTimestamp  = errors.New("transaction timestamp invalid")
+	ErrInvalidTransactionID         = errors.New("transaction id invalid")
+	ErrTransactionFeeTooLow         = errors.New("transaction fee too low")
 )
 
 type Transaction interface {
@@ -103,14 +110,69 @@ func ToBytes(tx Transaction) []byte {
 	return e.Bytes()
 }
 
-func VerifySignature(tx Transaction) error {
-	var sig [64]byte
-	bs := ToBytes(tx)
-	for i := range sig {
-		sig[i] = bs[i+signatureOffset]
-		bs[i+signatureOffset] = 0
+func CalculateID(txBsWithZeroedSignature []byte) uint64 {
+	_, txId := crypto.BytesToHashAndID(txBsWithZeroedSignature)
+	return txId
+}
+
+func GetExpiration(tx Transaction) uint32 {
+	h := tx.GetHeader()
+	return h.Timestamp + 60*h.Deadline
+}
+
+func Validate(tx Transaction, height int32, blockTimestamp, now uint32) error {
+	if err := validateTimestamp(tx, blockTimestamp, now); err != nil {
+		return err
 	}
-	if crypto.Verify(sig[:], bs, tx.GetHeader().SenderPublicKey, true) {
+	if err := validateFee(tx.GetHeader().Fee, height); err != nil {
+		return err
+	}
+
+	txBsWithZeroedSignature := ToBytes(tx)
+	for i := signatureOffset; i < signatureOffset+signatureLen; i++ {
+		txBsWithZeroedSignature[i] = 0
+	}
+
+	// TODO: cache tx id
+	if err := validateID(txBsWithZeroedSignature); err != nil {
+		return err
+	}
+	if err := validateSignature(tx, txBsWithZeroedSignature); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func validateFee(fee uint64, height int32) error {
+	if fee < env.MinimumFee(height) {
+		return ErrTransactionFeeTooLow
+	}
+	return nil
+}
+
+func validateID(txBsWithZeroedSig []byte) error {
+	if txID := CalculateID((txBsWithZeroedSig)); txID == 0 {
+		return ErrInvalidTransactionID
+	}
+	return nil
+}
+
+func validateTimestamp(tx Transaction, blockTimestamp, now uint32) error {
+	txTimestamp := tx.GetHeader().Timestamp
+	switch {
+	case txTimestamp > now+maxTimestampDifference:
+		return ErrInvalidTransactionTimestamp
+	case txTimestamp > blockTimestamp+maxTimestampDifference:
+		return ErrInvalidTransactionTimestamp
+	case GetExpiration(tx) < blockTimestamp:
+		return ErrInvalidTransactionTimestamp
+	}
+	return nil
+}
+
+func validateSignature(tx Transaction, txBsWithZeroedSig []byte) error {
+	if crypto.Verify(tx.GetHeader().Signature, txBsWithZeroedSig, tx.GetHeader().SenderPublicKey, true) {
 		return nil
 	}
 	return ErrTransactionSignatureMismatch
