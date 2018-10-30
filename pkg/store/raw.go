@@ -17,10 +17,8 @@ import (
 
 	"github.com/dgraph-io/badger"
 	"github.com/dixonwille/skywalker"
-	"github.com/json-iterator/go"
+	"github.com/golang/protobuf/proto"
 )
-
-var json = jsoniter.ConfigCompatibleWithStandardLibrary
 
 type RawStore struct {
 	BasePath string
@@ -123,7 +121,7 @@ func (rawStore *RawStore) Store(block *api.Block, height int32) {
 		os.MkdirAll(filepath.Dir(path), os.ModePerm)
 	}
 
-	data, _ := json.Marshal(block)
+	data, _ := proto.Marshal(block)
 	ioutil.WriteFile(path, data, os.ModePerm)
 
 	rawStore.Current.Height = height
@@ -140,7 +138,7 @@ func (rawStore *RawStore) load(height int32) *api.Block {
 		Log.Fatal("Error reading file:", zap.Error(err))
 	}
 	block := &api.Block{}
-	if err := json.Unmarshal(in, block); err != nil {
+	if err := proto.Unmarshal(in, block); err != nil {
 		Log.Fatal("Error parse block file:", zap.Error(err))
 	}
 
@@ -154,11 +152,11 @@ func (rawStore *RawStore) StoreAndMaybeConsume(blocks []*api.Block) error {
 	// store
 	txn := rawStore.queue.NewTransaction(true)
 	for _, block := range blocks {
-		if blockJSON, err := json.Marshal(&block); err == nil {
+		if blockPb, err := proto.Marshal(block); err == nil {
 			height := int(block.Height)
 			heightBs := []byte(strconv.Itoa(height))
 			for {
-				if err := txn.Set(heightBs, blockJSON); err == nil {
+				if err := txn.Set(heightBs, blockPb); err == nil {
 					if waitForHeight == height {
 						readyToConsume = true
 					}
@@ -200,11 +198,11 @@ func (rawStore *RawStore) StoreAndMaybeConsume(blocks []*api.Block) error {
 			}
 		} else {
 			var blockBs []byte
-			if err := blockItem.Value(func(v []byte) error { blockBs = v; return nil }); err != nil {
+			if err := blockItem.Value(func(v []byte) error { blockBs = append([]byte{}, v...); return nil }); err != nil {
 				return err
 			} else {
-				var block *api.Block
-				if err := json.Unmarshal(blockBs, block); err != nil {
+				block := new(api.Block)
+				if err := proto.Unmarshal(blockBs, block); err != nil {
 					return err
 				} else {
 					rawStore.Store(block, int32(height))
