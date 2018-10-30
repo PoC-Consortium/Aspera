@@ -160,6 +160,9 @@ ValidateBlocks:
 				if err = b.Validate(blockWrappers[i]); err != nil {
 					s.refetchBlockRangeAndBlockPeers(blockBatch, err)
 					continue ValidateBlocks
+				} else {
+					blockWrappers[i].Id = b.PreviousBlock
+					Log.Info("syncing block", zap.Int32("height", b.Height), zap.Uint64("id", b.Id))
 				}
 			}
 
@@ -251,7 +254,7 @@ func (s *Synchronizer) fetchBlocks() {
 
 			s.blockBatchesEmpty <- &blockBatch{
 				blockRange: blockRange,
-				ids:        ids,
+				ids:        append([]uint64{currentID}, ids...),
 				peers:      peers,
 			}
 		case blockBatch := <-s.blockBatchesEmpty:
