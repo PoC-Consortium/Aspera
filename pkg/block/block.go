@@ -137,7 +137,6 @@ func (b *Block) Validate(previous *Block) error {
 
 	for _, tx := range b.transactions {
 		if err := transaction.Validate(tx, b.Height, b.Timestamp, now); err != nil {
-			panic(err)
 			return err
 		}
 	}
