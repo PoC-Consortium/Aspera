@@ -25,8 +25,8 @@ var (
 	ErrTimestampSmallerPrevious    = errors.New("timestamp smaller than previous block's")
 	ErrGenerationSignatureMismatch = errors.New("generation signature mismatch")
 	ErrInvalidPayloadHash          = errors.New("invalid payload hash")
-	ErrTransactionsAmountMismatch  = errors.New("transactions amount mismatch")
-	ErrTransactionsFeeMismatch     = errors.New("transactions fee mismatch")
+	ErrBlockAmountTooLow           = errors.New("block's total amount too low for transactions")
+	ErrBlockFeeTooLow              = errors.New("blocks' total fee too low for transactions")
 )
 
 const (
@@ -166,10 +166,10 @@ func (b *Block) validateTransactions(now uint32) error {
 	}
 
 	switch {
-	case totalAmount != b.TotalAmount:
-		return ErrTransactionsAmountMismatch
-	case totalFee != b.TotalFee:
-		return ErrTransactionsFeeMismatch
+	case totalAmount > b.TotalAmount:
+		return ErrBlockAmountTooLow
+	case totalFee > b.TotalFee:
+		return ErrBlockFeeTooLow
 	case !bytes.Equal(payloadDigest.Sum(nil), b.PayloadHash):
 		return ErrInvalidPayloadHash
 	}
