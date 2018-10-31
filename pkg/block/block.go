@@ -2,6 +2,7 @@ package block
 
 import (
 	"bytes"
+	"crypto/sha256"
 	"encoding/binary"
 	"errors"
 	"time"
@@ -23,6 +24,7 @@ var (
 	ErrTimestampTooLate            = errors.New("timestamp to late")
 	ErrTimestampSmallerPrevious    = errors.New("timestamp smaller than previous block's")
 	ErrGenerationSignatureMismatch = errors.New("generation signature mismatch")
+	ErrInvalidPayloadHash          = errors.New("invalid payload hash")
 )
 
 const (
@@ -135,14 +137,30 @@ func (b *Block) Validate(previous *Block) error {
 		}
 	}
 
-	for _, tx := range b.transactions {
-		if err := transaction.Validate(tx, b.Height, b.Timestamp, now); err != nil {
+	if len(b.transactions) > 0 {
+		if err := b.validateTransactions(now); err != nil {
 			return err
 		}
 	}
 
 	_, b.Id = b.CalculateHashAndID()
 
+	return nil
+}
+
+func (b *Block) validateTransactions(now uint32) error {
+	payloadDigest := sha256.New()
+	for _, tx := range b.transactions {
+		if bs, err := transaction.ValidateAndGetBytes(tx, b.Height, b.Timestamp, now); err == nil {
+			payloadDigest.Write(bs)
+		} else {
+			return err
+		}
+	}
+	payloadHash := payloadDigest.Sum(nil)
+	if !bytes.Equal(payloadHash, b.PayloadHash) {
+		return ErrInvalidPayloadHash
+	}
 	return nil
 }
 

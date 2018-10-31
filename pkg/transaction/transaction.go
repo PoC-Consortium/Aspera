@@ -120,28 +120,33 @@ func GetExpiration(tx Transaction) uint32 {
 	return h.Timestamp + 60*h.Deadline
 }
 
-func Validate(tx Transaction, height int32, blockTimestamp, now uint32) error {
+func ValidateAndGetBytes(tx Transaction, height int32, blockTimestamp, now uint32) ([]byte, error) {
+	h := tx.GetHeader()
 	if err := validateTimestamp(tx, blockTimestamp, now); err != nil {
-		return err
+		return nil, err
 	}
-	if err := validateFee(tx.GetHeader().Fee, height); err != nil {
-		return err
+	if err := validateFee(h.Fee, height); err != nil {
+		return nil, err
 	}
 
-	txBsWithZeroedSignature := ToBytes(tx)
+	// zero out signature
+	bs := ToBytes(tx)
 	for i := signatureOffset; i < signatureOffset+signatureLen; i++ {
-		txBsWithZeroedSignature[i] = 0
+		bs[i] = 0
 	}
 
 	// TODO: cache tx id
-	if err := validateID(txBsWithZeroedSignature); err != nil {
-		return err
+	if err := validateID(bs); err != nil {
+		return nil, err
 	}
-	if err := validateSignature(tx, txBsWithZeroedSignature); err != nil {
-		return err
+	if err := validateSignature(tx, bs); err != nil {
+		return nil, err
 	}
 
-	return nil
+	// restore signature
+	copy(bs[signatureOffset:signatureOffset+signatureLen], h.Signature)
+
+	return bs, nil
 }
 
 func validateFee(fee uint64, height int32) error {
