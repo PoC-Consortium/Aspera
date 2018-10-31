@@ -25,6 +25,8 @@ var (
 	ErrTimestampSmallerPrevious    = errors.New("timestamp smaller than previous block's")
 	ErrGenerationSignatureMismatch = errors.New("generation signature mismatch")
 	ErrInvalidPayloadHash          = errors.New("invalid payload hash")
+	ErrTransactionsAmountMismatch  = errors.New("transactions amount mismatch")
+	ErrTransactionsFeeMismatch     = errors.New("transactions fee mismatch")
 )
 
 const (
@@ -150,17 +152,28 @@ func (b *Block) Validate(previous *Block) error {
 
 func (b *Block) validateTransactions(now uint32) error {
 	payloadDigest := sha256.New()
+	var totalFee, totalAmount int64
 	for _, tx := range b.transactions {
 		if bs, err := transaction.ValidateAndGetBytes(tx, b.Height, b.Timestamp, now); err == nil {
 			payloadDigest.Write(bs)
 		} else {
 			return err
 		}
+		h := tx.GetHeader()
+		// TODO: either we use int64 for all amounts or uint64
+		totalFee += int64(h.Fee)
+		totalAmount += int64(h.Amount)
 	}
-	payloadHash := payloadDigest.Sum(nil)
-	if !bytes.Equal(payloadHash, b.PayloadHash) {
+
+	switch {
+	case totalAmount != b.TotalAmount:
+		return ErrTransactionsAmountMismatch
+	case totalFee != b.TotalFee:
+		return ErrTransactionsFeeMismatch
+	case !bytes.Equal(payloadDigest.Sum(nil), b.PayloadHash):
 		return ErrInvalidPayloadHash
 	}
+
 	return nil
 }
 
