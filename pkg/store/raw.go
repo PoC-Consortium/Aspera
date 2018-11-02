@@ -1,6 +1,7 @@
 package store
 
 import (
+	"encoding/hex"
 	"fmt"
 	"go.uber.org/zap"
 	"io/ioutil"
@@ -92,8 +93,16 @@ func NewRawStore(path string, genesisMilestone config.Milestone) *RawStore {
 	rawStore.Current = &RawCurrent{Height: int32(height)}
 
 	if height == -1 {
-		block := &api.Block{Id: genesisMilestone.Id}
-		rawStore.Store(block, genesisMilestone.Height)
+		payloadHash, _ := hex.DecodeString(`e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`)
+		genesisBlock := &api.Block{
+			Id:                  genesisMilestone.Id,
+			Version:             -1,
+			GeneratorPublicKey:  []byte{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+			BlockSignature:      []byte{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+			GenerationSignature: []byte{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+			PayloadHash:         payloadHash,
+		}
+		rawStore.Store(genesisBlock, genesisMilestone.Height)
 	} else {
 		rawStore.Current.Block = rawStore.load(rawStore.Current.Height)
 	}

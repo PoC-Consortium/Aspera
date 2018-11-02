@@ -90,14 +90,11 @@ func (b *Block) ToBytes() []byte {
 }
 
 func (b *Block) SizeInBytes() int {
-	l := 4 + 4 + 8 + 4 + 4 + 32 + 32 + 32 + 8 + 64
+	l := 4 + 4 + 8 + 4 + 4 + 32 + 32 + 32 + 8 + 64 + 32
 	if b.Version < 3 {
 		l += 4 + 4
 	} else {
 		l += 8 + 8
-	}
-	if b.Version > 1 {
-		l += 32
 	}
 	if b.BlockATs != nil {
 		l += len(b.BlockATs)
