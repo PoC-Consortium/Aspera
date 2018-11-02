@@ -17,7 +17,8 @@ func TestMain(m *testing.M) {
 	if err := os.Mkdir("var", 0777); err != nil {
 		panic(err)
 	}
-	bc = NewBlockchain().(*blockchain)
+	Init()
+	bc = BC.(*blockchain)
 	m.Run()
 }
 

@@ -9,6 +9,8 @@ import (
 	"github.com/dgraph-io/badger"
 )
 
+var BC Blockchain
+
 var (
 	ErrBalanceTooLow = errors.New("account's balance too low")
 )
@@ -23,6 +25,10 @@ type blockchain struct {
 	blockDB   *badger.DB
 }
 
+func Init() {
+	BC = newBlockchain()
+}
+
 func db(name string) *badger.DB {
 	opts := badger.DefaultOptions
 	opts.Dir = "var/" + name
@@ -34,7 +40,7 @@ func db(name string) *badger.DB {
 	}
 }
 
-func NewBlockchain() Blockchain {
+func newBlockchain() Blockchain {
 	return &blockchain{
 		accountDB: db("account"),
 		blockDB:   db("block"),
