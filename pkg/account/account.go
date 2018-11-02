@@ -1,43 +1,54 @@
 package account
 
 import (
-	"github.com/ac0v/aspera/pkg/encoding"
+	"errors"
+
+	"github.com/ac0v/aspera/pkg/account/pb"
+	"github.com/ac0v/aspera/pkg/crypto"
+	"github.com/ac0v/aspera/pkg/crypto/rsencoding"
+
+	"github.com/golang/protobuf/proto"
+)
+
+var (
+	ErrPublicKeyInvalidLen = errors.New("public key has invalid length")
 )
 
 type Account struct {
-	Id        uint64
-	Balance   int64
-	PublicKey []byte
+	*pb.Account
 }
 
-func NewAccount(id uint64, balance int64) *Account {
-	// TODO: calc public key
+func NewAccount(publicKey []byte, balance int64) *Account {
+	id := publicKeyToID(publicKey)
 	return &Account{
-		Id:      id,
-		Balance: balance,
+		Account: &pb.Account{
+			Id:              id,
+			PublicKey:       publicKey,
+			Balance:         balance,
+			RewardRecipient: id,
+			Address:         rsencoding.Encode(id),
+		},
 	}
 }
 
 func (a *Account) ToBytes() []byte {
-	e := encoding.NewEncoder(a.SizeInBytes())
-	e.WriteUint64(a.Id)
-	e.WriteInt64(a.Balance)
-	e.WriteBytes(a.PublicKey)
-	return e.Bytes()
-}
-
-func FromBytes(bs []byte) *Account {
-	d := encoding.NewDecoder(bs)
-	id := d.ReadUint64()
-	balance := d.ReadInt64()
-	publicKey := d.ReadBytes(32)
-	return &Account{
-		Id:        id,
-		Balance:   balance,
-		PublicKey: publicKey,
+	if bs, err := proto.Marshal(a.Account); err == nil {
+		return bs
+	} else {
+		panic(err)
 	}
 }
 
-func (a *Account) SizeInBytes() int {
-	return 8 + 8 + 32
+func FromBytes(bs []byte) *Account {
+	var a pb.Account
+	if err := proto.Unmarshal(bs, &a); err == nil {
+		return &Account{Account: &a}
+	} else {
+		panic(err)
+	}
+}
+
+func publicKeyToID(publicKey []byte) uint64 {
+	_, id := crypto.BytesToHashAndID(publicKey)
+	return id
 }

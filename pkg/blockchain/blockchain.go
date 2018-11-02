@@ -15,8 +15,7 @@ var (
 
 type Blockchain interface {
 	GetAccount(id uint64) (*account.Account, error)
-	GetOrCreateAccount(id uint64) (*account.Account, error)
-	UpdateAccountBalance(id uint64, amount int64) error
+	UpdateAccountBalance(id uint64, amount int64, publicKey []byte) error
 }
 
 type blockchain struct {
@@ -74,26 +73,7 @@ func (bc *blockchain) GetAccount(id uint64) (*account.Account, error) {
 	return a, err
 }
 
-func (bc *blockchain) GetOrCreateAccount(id uint64) (*account.Account, error) {
-	var a *account.Account
-	err := bc.accountDB.Update(func(txn *badger.Txn) error {
-		var err error
-		a, err = bc.getAccount(txn, id)
-
-		switch err {
-		case nil:
-			return nil
-		case badger.ErrKeyNotFound:
-			a = &account.Account{Id: id}
-			return bc.updateAccount(txn, a)
-		default:
-			return err
-		}
-	})
-	return a, err
-}
-
-func (bc *blockchain) UpdateAccountBalance(id uint64, amount int64) error {
+func (bc *blockchain) UpdateAccountBalance(id uint64, amount int64, publicKey []byte) error {
 	err := bc.accountDB.Update(func(txn *badger.Txn) error {
 		a, err := bc.getAccount(txn, id)
 
@@ -106,7 +86,7 @@ func (bc *blockchain) UpdateAccountBalance(id uint64, amount int64) error {
 			return bc.updateAccount(txn, a)
 		case badger.ErrKeyNotFound:
 			if amount >= 0 {
-				return bc.updateAccount(txn, account.NewAccount(id, amount))
+				return bc.updateAccount(txn, account.NewAccount(publicKey, amount))
 			} else {
 				return ErrBalanceTooLow
 			}

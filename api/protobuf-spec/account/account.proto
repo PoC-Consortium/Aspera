@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+package pb;
+
+message Account {
+    uint64 id = 1;
+    uint64 rewardRecipient = 2;
+    int64 balance = 3;
+    int64 reserved = 4;
+    bytes publicKey = 5;
+    string name = 6;
+    string address = 7;
+}
