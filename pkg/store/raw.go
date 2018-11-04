@@ -174,7 +174,7 @@ func (rawStore *RawStore) StoreAndMaybeConsume(blocks []*api.Block) error {
 					switch err {
 					case badger.ErrTxnTooBig:
 						// split up big transactions
-						_ = txn.Commit()
+						_ = txn.Commit(nil)
 						txn = rawStore.queue.NewTransaction(true)
 						continue
 					default:
@@ -184,7 +184,7 @@ func (rawStore *RawStore) StoreAndMaybeConsume(blocks []*api.Block) error {
 			}
 		}
 	}
-	_ = txn.Commit()
+	_ = txn.Commit(nil)
 
 	if !readyToConsume {
 		return nil
@@ -206,8 +206,7 @@ func (rawStore *RawStore) StoreAndMaybeConsume(blocks []*api.Block) error {
 				return err
 			}
 		} else {
-			var blockBs []byte
-			if err := blockItem.Value(func(v []byte) error { blockBs = append([]byte{}, v...); return nil }); err != nil {
+			if blockBs, err := blockItem.Value(); err != nil {
 				return err
 			} else {
 				block := new(api.Block)
@@ -220,7 +219,7 @@ func (rawStore *RawStore) StoreAndMaybeConsume(blocks []*api.Block) error {
 						switch err {
 						case badger.ErrTxnTooBig:
 							// split up big transactions
-							_ = txn.Commit()
+							_ = txn.Commit(nil)
 							txn = rawStore.queue.NewTransaction(true)
 							goto RETRY_DELETE
 						default:
