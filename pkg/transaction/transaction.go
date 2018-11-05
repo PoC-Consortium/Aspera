@@ -5,7 +5,6 @@ import (
 	"strings"
 
 	pb "github.com/ac0v/aspera/pkg/api/p2p"
-	"github.com/ac0v/aspera/pkg/blockchain"
 	"github.com/ac0v/aspera/pkg/crypto"
 	"github.com/ac0v/aspera/pkg/encoding"
 	env "github.com/ac0v/aspera/pkg/environment"
@@ -308,12 +307,4 @@ func AppendixFlags(a *pb.Appendix) uint32 {
 		flags |= 1 << 3
 	}
 	return flags
-}
-
-func Exec(tx Transaction) {
-	h := tx.GetHeader()
-}
-
-func Undo(tx Transaction) {
-
 }
