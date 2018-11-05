@@ -25,7 +25,8 @@ type Synchronizer struct {
 	blockBatchesFilled chan *blockBatch
 	blockBatchesGlue   chan []*block.Block
 
-	glueBlockOf *sync.Map
+	glueBlockOfMu sync.Mutex
+	glueBlockOf   map[int32]*block.Block
 }
 
 type statistic struct {
@@ -64,9 +65,9 @@ func NewSynchronizer(client Client, manager Manager, store *s.Store, milestones 
 		store:              store,
 		blockRanges:        make(chan *blockRange, len(milestones)),
 		blockBatchesEmpty:  make(chan *blockBatch, len(milestones)),
-		blockBatchesFilled: make(chan *blockBatch),
-		blockBatchesGlue:   make(chan []*block.Block),
-		glueBlockOf:        &sync.Map{},
+		blockBatchesFilled: make(chan *blockBatch, len(milestones)),
+		blockBatchesGlue:   make(chan []*block.Block, len(milestones)),
+		glueBlockOf:        make(map[int32]*block.Block),
 	}
 
 	// the current block is a predecessor for the first glue action
@@ -221,8 +222,8 @@ ValidateBlocks:
 			orphanedBlock := blocks[0]
 			// think we do not need any lock between load and delete,
 			// cause this matching pair will not be handled by someone else
-			if previousBlock, ok := s.glueBlockOf.Load(orphanedBlock.Height - 1); ok {
-				previousBlock := previousBlock.(*block.Block)
+			s.glueBlockOfMu.Lock()
+			if previousBlock, exists := s.glueBlockOf[orphanedBlock.Height-1]; exists {
 				blockBatch := &blockBatch{
 					blockRange: &blockRange{
 						from: blockMeta{
@@ -238,19 +239,28 @@ ValidateBlocks:
 					ids:    []uint64{previousBlock.Id, orphanedBlock.Id},
 				}
 
-				s.glueBlockOf.Delete(orphanedBlock.Height)
+				delete(s.glueBlockOf, orphanedBlock.Height)
+				s.glueBlockOfMu.Unlock()
+
 				blockBatch.isGlueResult = true
 				s.blockBatchesFilled <- blockBatch
 
 				Log.Info("glue pair found", zap.Int32("leftHeight", previousBlock.Height), zap.Int32("rightHeight", orphanedBlock.Height))
 			} else {
 				// keep track of possible successor
-				s.glueBlockOf.Store(orphanedBlock.Height, orphanedBlock)
+				s.glueBlockOf[orphanedBlock.Height] = orphanedBlock
+				s.glueBlockOfMu.Unlock()
 			}
 			if len(blocks) > 1 {
 				lastBlock := blocks[len(blocks)-1]
 				// keep track of - possible predecessor
-				s.glueBlockOf.Store(lastBlock.Height, lastBlock)
+				s.glueBlockOfMu.Lock()
+				s.glueBlockOf[lastBlock.Height] = lastBlock
+				s.glueBlockOfMu.Unlock()
+			}
+			keys := []int32{}
+			for k := range s.glueBlockOf {
+				keys = append(keys, k)
 			}
 		}
 	}
@@ -262,10 +272,11 @@ func (s *Synchronizer) fetchBlocks() {
 		case blockRange := <-s.blockRanges:
 			currentID := blockRange.from.id
 
+		FETCH_BLOCK_IDS_AGAIN:
 			res, peers, err := s.client.GetNextBlockIDs(currentID)
 			if err != nil {
 				Log.Error("get next blocks ids", zap.Error(err))
-				continue
+				goto FETCH_BLOCK_IDS_AGAIN
 			}
 
 			ids := res.NextBlockIds
