@@ -258,10 +258,6 @@ ValidateBlocks:
 				s.glueBlockOf[lastBlock.Height] = lastBlock
 				s.glueBlockOfMu.Unlock()
 			}
-			keys := []int32{}
-			for k := range s.glueBlockOf {
-				keys = append(keys, k)
-			}
 		}
 	}
 }
