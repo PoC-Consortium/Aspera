@@ -2,6 +2,7 @@ package account
 
 import (
 	"errors"
+	"fmt"
 
 	"github.com/ac0v/aspera/pkg/account/pb"
 	"github.com/ac0v/aspera/pkg/crypto"
@@ -18,13 +19,10 @@ type Account struct {
 	*pb.Account
 }
 
-func NewAccount(publicKey []byte, balance int64) *Account {
-	id := publicKeyToID(publicKey)
+func NewAccount(id uint64) *Account {
 	return &Account{
 		Account: &pb.Account{
 			Id:              id,
-			PublicKey:       publicKey,
-			Balance:         balance,
 			RewardRecipient: id,
 			Address:         rsencoding.Encode(id),
 		},
@@ -51,4 +49,8 @@ func FromBytes(bs []byte) *Account {
 func publicKeyToID(publicKey []byte) uint64 {
 	_, id := crypto.BytesToHashAndID(publicKey)
 	return id
+}
+
+func idToStringID(id uint64) string {
+	return fmt.Sprintf("%020d", id)
 }
