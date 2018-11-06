@@ -20,8 +20,8 @@ type Encoder interface {
 
 	WriteBytes(val []byte)
 
-	WriteStringBytesWithInt32Len(isTxt bool, val []byte)
-	WriteBytesWithInt32Len(isText bool, val []byte)
+	WriteStringBytesWithInt32Len(isTxt bool, val []byte) error
+	WriteBytesWithInt32Len(isText bool, val []byte) error
 
 	Bytes() []byte
 
@@ -90,22 +90,23 @@ func (e *encoder) WriteTypeAndInt32Len(isText bool, len int32) {
 	e.i += 4
 }
 
-func (e *encoder) WriteStringBytesWithInt32Len(isText bool, val []byte) {
+func (e *encoder) WriteStringBytesWithInt32Len(isText bool, val []byte) error {
 	l := len(val)
 	if isText {
 		e.WriteInt32(int32(l) | math.MinInt32)
-		e.WriteBytes([]byte(val))
+		e.WriteBytes(val)
 	} else {
 		l /= 2
 		e.WriteInt32(int32(l))
 		if _, err := hex.Decode(e.bs[e.i:e.i+l], val); err != nil {
-			panic(err)
+			return err
 		}
 		e.i += l
 	}
+	return nil
 }
 
-func (e *encoder) WriteBytesWithInt32Len(isText bool, val []byte) {
+func (e *encoder) WriteBytesWithInt32Len(isText bool, val []byte) error {
 	l := len(val)
 	if isText {
 		e.WriteInt32(int32(l) | math.MinInt32)
@@ -113,10 +114,11 @@ func (e *encoder) WriteBytesWithInt32Len(isText bool, val []byte) {
 	} else {
 		e.WriteInt32(int32(l))
 		if _, err := hex.Decode(e.bs[e.i:e.i+l], val); err != nil {
-			panic(err)
+			return err
 		}
 		e.i += l
 	}
+	return nil
 }
 
 func (e *encoder) Bytes() []byte {
