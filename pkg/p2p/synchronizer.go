@@ -83,12 +83,12 @@ func NewSynchronizer(client Client, manager Manager, store *s.Store, milestones 
 			go s.validateBlocks()
 		}
 
-		var bm []*blockMeta
-		for _, m := range milestones {
-			bm = append(bm, &blockMeta{id: m.Id, height: m.Height})
+		bms := make([]*blockMeta, len(milestones))
+		for i, m := range milestones {
+			bms[i] = &blockMeta{id: m.Id, height: m.Height}
 		}
 
-		for _, blockRange := range alignMilestonesWithCurrent(bm, &blockMeta{id: currentBlock.Id, height: currentBlock.Height}) {
+		for _, blockRange := range alignMilestonesWithCurrent(bms, &blockMeta{id: currentBlock.Id, height: currentBlock.Height}) {
 			s.blockRanges <- blockRange
 		}
 	}
