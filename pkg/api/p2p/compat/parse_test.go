@@ -23,7 +23,6 @@ func TestParseBlocks(t *testing.T) {
 	var failed int
 	unmarshaler := &jsonpb.Unmarshaler{AllowUnknownFields: false}
 	for _, f := range files {
-		t.Log("parsing ", f.Name())
 		javaWalletBs, err := ioutil.ReadFile("test_files/" + f.Name())
 		if err != nil {
 			t.Fatalf("failed to open file %s", "test_files/"+f.Name())
@@ -34,7 +33,6 @@ func TestParseBlocks(t *testing.T) {
 		msg := new(api.GetNextBlocksResponse)
 		if assert.NoError(t, unmarshaler.Unmarshal(bytes.NewReader(protoJSONBs), msg)) {
 			javaWalletBsRebuilt := Downgrade(msg)
-			ioutil.WriteFile("/tmp/failed.json", javaWalletBsRebuilt, 0644)
 
 			//fmt.Println(string(javaWalletBsRebuilt))
 			if f.Name() != "14590152916102211792.json" && !compareJSON(t, string(javaWalletBsRebuilt), string(javaWalletBs)) {
@@ -47,6 +45,10 @@ func TestParseBlocks(t *testing.T) {
 				//ioutil.WriteFile("/tmp/a."+f.Name(), []byte(comperands[0]), 0644)
 				//ioutil.WriteFile("/tmp/b."+f.Name(), []byte(comperands[1]), 0644)
 				failed++
+			}
+
+			if f.Name() == "15862859607306717502.json" {
+				assert.Equal(t, int64(9040538052446649), msg.NextBlocks[0].TotalAmount)
 			}
 			//panic(string(dst))
 			// fmt.Println(string(dst))
