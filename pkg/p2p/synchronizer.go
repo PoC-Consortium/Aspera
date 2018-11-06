@@ -93,20 +93,6 @@ func NewSynchronizer(client Client, manager Manager, store *s.Store, milestones 
 		}
 	}
 
-	// debug
-	//var processed int
-	//	start := time.Now()
-
-	/*
-		for blockBatch := range s.blockBatchesFilled {
-			//panic(blockBatch.ToBytes())
-			processed += len(blockBatch.blocks)
-			Log.Info(
-				"syncing with",
-				zap.Float64("blocks/s", float64(processed)/time.Since(start).Seconds()))
-		}
-	*/
-	// end
 	select {}
 
 	return s
