@@ -209,6 +209,11 @@ ValidateBlocks:
 			// think we do not need any lock between load and delete,
 			// cause this matching pair will not be handled by someone else
 			s.glueBlockOfMu.Lock()
+			if len(blocks) > 1 {
+				lastBlock := blocks[len(blocks)-1]
+				// keep track of - possible predecessor
+				s.glueBlockOf[lastBlock.Height] = lastBlock
+			}
 			if previousBlock, exists := s.glueBlockOf[orphanedBlock.Height-1]; exists {
 				blockBatch := &blockBatch{
 					blockRange: &blockRange{
@@ -235,13 +240,6 @@ ValidateBlocks:
 			} else {
 				// keep track of possible successor
 				s.glueBlockOf[orphanedBlock.Height] = orphanedBlock
-				s.glueBlockOfMu.Unlock()
-			}
-			if len(blocks) > 1 {
-				lastBlock := blocks[len(blocks)-1]
-				// keep track of - possible predecessor
-				s.glueBlockOfMu.Lock()
-				s.glueBlockOf[lastBlock.Height] = lastBlock
 				s.glueBlockOfMu.Unlock()
 			}
 		}
