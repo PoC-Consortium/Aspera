@@ -47,7 +47,7 @@ func StreamUpgrade(qw422016 *qt422016.Writer, src *fastjson.Value) {
             {
                 "timestamp":           `)
 		//line template/block.qtpl:17
-		qw422016.N().FPrec(block.GetFloat64("timestamp"), 0)
+		qw422016.E().V(block.Get("timestamp").String())
 		//line template/block.qtpl:17
 		qw422016.N().S(`,
                 "previousBlock":       `)
@@ -62,7 +62,7 @@ func StreamUpgrade(qw422016 *qt422016.Writer, src *fastjson.Value) {
 		qw422016.N().S(`,
                 "totalFee":            `)
 		//line template/block.qtpl:20
-		qw422016.N().FPrec(block.GetFloat64("totalFeeNQT"), 0)
+		qw422016.E().V(block.Get("totalFeeNQT").String())
 		//line template/block.qtpl:20
 		qw422016.N().S(`,
                 "nonce":               `)
@@ -97,12 +97,12 @@ func StreamUpgrade(qw422016 *qt422016.Writer, src *fastjson.Value) {
 		qw422016.N().S(`,
                 "totalAmount":         `)
 		//line template/block.qtpl:27
-		qw422016.N().FPrec(block.GetFloat64("totalAmountNQT"), 0)
+		qw422016.E().V(block.Get("totalAmountNQT").String())
 		//line template/block.qtpl:27
 		qw422016.N().S(`,
                 "payloadLength":       `)
 		//line template/block.qtpl:28
-		qw422016.N().FPrec(block.GetFloat64("payloadLength"), 0)
+		qw422016.E().V(block.Get("payloadLength").String())
 		//line template/block.qtpl:28
 		qw422016.N().S(`,
                 "previousBlockHash":   `)
@@ -297,7 +297,7 @@ func StreamUpgrade(qw422016 *qt422016.Writer, src *fastjson.Value) {
 					qw422016.N().S(`,
                                     "price": `)
 					//line template/block.qtpl:94
-					qw422016.N().FPrec(attachment.GetFloat64("priceNQT"), 0)
+					qw422016.E().V(attachment.Get("priceNQT").String())
 					//line template/block.qtpl:94
 					qw422016.N().S(`
                                 },
@@ -345,7 +345,7 @@ func StreamUpgrade(qw422016 *qt422016.Writer, src *fastjson.Value) {
 					qw422016.N().S(`,
                                     "quantity": `)
 					//line template/block.qtpl:109
-					qw422016.N().FPrec(attachment.GetFloat64("quantityQNT"), 0)
+					qw422016.E().V(attachment.Get("quantityQNT").String())
 					//line template/block.qtpl:109
 					qw422016.N().S(`,
                                     "decimals": `)
@@ -373,7 +373,7 @@ func StreamUpgrade(qw422016 *qt422016.Writer, src *fastjson.Value) {
 					qw422016.N().S(`,
                                     "quantity": `)
 					//line template/block.qtpl:117
-					qw422016.N().FPrec(attachment.GetFloat64("quantityQNT"), 0)
+					qw422016.E().V(attachment.Get("quantityQNT").String())
 					//line template/block.qtpl:117
 					qw422016.N().S(`
                                     `)
@@ -402,12 +402,12 @@ func StreamUpgrade(qw422016 *qt422016.Writer, src *fastjson.Value) {
 					qw422016.N().S(`,
                                     "quantity": `)
 					//line template/block.qtpl:124
-					qw422016.N().FPrec(attachment.GetFloat64("quantityQNT"), 0)
+					qw422016.E().V(attachment.Get("quantityQNT").String())
 					//line template/block.qtpl:124
 					qw422016.N().S(`,
                                     "price": `)
 					//line template/block.qtpl:125
-					qw422016.N().FPrec(attachment.GetFloat64("priceNQT"), 0)
+					qw422016.E().V(attachment.Get("priceNQT").String())
 					//line template/block.qtpl:125
 					qw422016.N().S(`,
                                     "comment": `)
@@ -430,12 +430,12 @@ func StreamUpgrade(qw422016 *qt422016.Writer, src *fastjson.Value) {
 					qw422016.N().S(`,
                                     "quantity": "`)
 					//line template/block.qtpl:132
-					qw422016.N().FPrec(attachment.GetFloat64("quantityQNT"), 0)
+					qw422016.E().V(attachment.Get("quantityQNT").String())
 					//line template/block.qtpl:132
 					qw422016.N().S(`",
                                     "price": "`)
 					//line template/block.qtpl:133
-					qw422016.N().FPrec(attachment.GetFloat64("priceNQT"), 0)
+					qw422016.E().V(attachment.Get("priceNQT").String())
 					//line template/block.qtpl:133
 					qw422016.N().S(`"
                                 },
@@ -501,12 +501,12 @@ func StreamUpgrade(qw422016 *qt422016.Writer, src *fastjson.Value) {
 					qw422016.N().S(`,
                                     "quantity": `)
 					//line template/block.qtpl:154
-					qw422016.N().FPrec(attachment.GetFloat64("quantity"), 0)
+					qw422016.E().V(attachment.Get("quantity").String())
 					//line template/block.qtpl:154
 					qw422016.N().S(`,
                                     "price": "`)
 					//line template/block.qtpl:155
-					qw422016.N().FPrec(attachment.GetFloat64("priceNQT"), 0)
+					qw422016.E().V(attachment.Get("priceNQT").String())
 					//line template/block.qtpl:155
 					qw422016.N().S(`"
                                 },
@@ -537,7 +537,7 @@ func StreamUpgrade(qw422016 *qt422016.Writer, src *fastjson.Value) {
 					qw422016.N().S(`,
                                     "price": "`)
 					//line template/block.qtpl:166
-					qw422016.N().FPrec(attachment.GetFloat64("priceNQT"), 0)
+					qw422016.E().V(attachment.Get("priceNQT").String())
 					//line template/block.qtpl:166
 					qw422016.N().S(`"
                                 },
@@ -555,7 +555,7 @@ func StreamUpgrade(qw422016 *qt422016.Writer, src *fastjson.Value) {
 					qw422016.N().S(`,
                                     "delta": `)
 					//line template/block.qtpl:172
-					qw422016.N().FPrec(attachment.GetFloat64("deltaQuantity"), 0)
+					qw422016.E().V(attachment.Get("deltaQuantity").String())
 					//line template/block.qtpl:172
 					qw422016.N().S(`
                                 },
@@ -573,12 +573,12 @@ func StreamUpgrade(qw422016 *qt422016.Writer, src *fastjson.Value) {
 					qw422016.N().S(`,
                                     "quantity": `)
 					//line template/block.qtpl:178
-					qw422016.N().FPrec(attachment.GetFloat64("quantity"), 0)
+					qw422016.E().V(attachment.Get("quantity").String())
 					//line template/block.qtpl:178
 					qw422016.N().S(`,
                                     "price": "`)
 					//line template/block.qtpl:179
-					qw422016.N().FPrec(attachment.GetFloat64("priceNQT"), 0)
+					qw422016.E().V(attachment.Get("priceNQT").String())
 					//line template/block.qtpl:179
 					qw422016.N().S(`",
                                     "deliveryDeadlineTimestamp": `)
@@ -624,7 +624,7 @@ func StreamUpgrade(qw422016 *qt422016.Writer, src *fastjson.Value) {
 					qw422016.N().S(`,
                                     "discount": "`)
 					//line template/block.qtpl:189
-					qw422016.N().FPrec(attachment.GetFloat64("discountNQT"), 0)
+					qw422016.E().V(attachment.Get("discountNQT").String())
 					//line template/block.qtpl:189
 					qw422016.N().S(`"
                                 },
@@ -655,7 +655,7 @@ func StreamUpgrade(qw422016 *qt422016.Writer, src *fastjson.Value) {
 					qw422016.N().S(`,
                                     "refund": "`)
 					//line template/block.qtpl:200
-					qw422016.N().FPrec(attachment.GetFloat64("refundNQT"), 0)
+					qw422016.E().V(attachment.Get("refundNQT").String())
 					//line template/block.qtpl:200
 					qw422016.N().S(`"
                                 },
@@ -934,12 +934,12 @@ func StreamUpgrade(qw422016 *qt422016.Writer, src *fastjson.Value) {
 			qw422016.N().S(`,
                                 "amount":          `)
 			//line template/block.qtpl:285
-			qw422016.N().FPrec(tx.GetFloat64("amountNQT"), 0)
+			qw422016.E().V(tx.Get("amountNQT").String())
 			//line template/block.qtpl:285
 			qw422016.N().S(`,
                                 "fee":             `)
 			//line template/block.qtpl:286
-			qw422016.N().FPrec(tx.GetFloat64("feeNQT"), 0)
+			qw422016.E().V(tx.Get("feeNQT").String())
 			//line template/block.qtpl:286
 			qw422016.N().S(`,
                                 `)
