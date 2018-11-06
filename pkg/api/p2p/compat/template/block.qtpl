@@ -14,18 +14,18 @@
         %}
         {% for blockId, block := range blocks %}
             {
-                "timestamp":           {%d block.GetInt("timestamp") %},
+                "timestamp":           {%f.0 block.GetFloat64("timestamp") %},
                 "previousBlock":       {%qz= block.GetStringBytes("previousBlock") %},
                 "blockATs":            {%qz= encoding.HexStringBytesToBase64Bytes(block.GetStringBytes("blockATs")) %},
-                "totalFee":            {%d block.GetInt("totalFeeNQT") %},
+                "totalFee":            {%f.0 block.GetFloat64("totalFeeNQT") %},
                 "nonce":               {%qz= block.GetStringBytes("nonce") %},
                 "version":             {%d block.GetInt("version") %},
                 "blockSignature":      {%qz= encoding.HexStringBytesToBase64Bytes(block.GetStringBytes("blockSignature")) %},
                 "payloadHash":         {%qz= encoding.HexStringBytesToBase64Bytes(block.GetStringBytes("payloadHash")) %},
                 "generatorPublicKey":  {%qz= encoding.HexStringBytesToBase64Bytes(block.GetStringBytes("generatorPublicKey")) %},
                 "generationSignature": {%qz= encoding.HexStringBytesToBase64Bytes(block.GetStringBytes("generationSignature")) %},
-                "totalAmount":         {%d block.GetInt("totalAmountNQT") %},
-                "payloadLength":       {%d block.GetInt("payloadLength") %},
+                "totalAmount":         {%f.0 block.GetFloat64("totalAmountNQT") %},
+                "payloadLength":       {%f.0 block.GetFloat64("payloadLength") %},
                 "previousBlockHash":   {%qz= encoding.HexStringBytesToBase64Bytes(block.GetStringBytes("previousBlockHash")) %},
                 "transactions": [
                     {% code
@@ -91,7 +91,7 @@
                                 "@type":"type.googleapis.com/p2p.AliasSell",
                                 "attachment": {
                                     "name": {%qz= encoding.StringBytesToBase64Bytes(attachment.GetStringBytes("alias")) %},
-                                    "price": {%d attachment.GetInt("priceNQT") %}
+                                    "price": {%f.0 attachment.GetFloat64("priceNQT") %}
                                 },
                                 {% case 7 %}
                                 "@type":"type.googleapis.com/p2p.AliasBuy",
@@ -106,7 +106,7 @@
                                 "attachment": {
                                     "name": {%qz= encoding.StringBytesToBase64Bytes(attachment.GetStringBytes("name")) %},
                                     "description": {%qz= encoding.StringBytesToBase64Bytes(attachment.GetStringBytes("description")) %},
-                                    "quantity": {%d attachment.GetInt("quantityQNT") %},
+                                    "quantity": {%f.0 attachment.GetFloat64("quantityQNT") %},
                                     "decimals": {%d attachment.GetInt("decimals") %},
                                     "comment": {%qz= encoding.StringBytesToBase64Bytes(attachment.GetStringBytes("comment")) %}
                                 },
@@ -114,23 +114,23 @@
                                 "@type":"type.googleapis.com/p2p.AssetTransfer",
                                 "attachment": {
                                     "asset": {%qz= attachment.GetStringBytes("asset") %},
-                                    "quantity": {%d attachment.GetInt("quantityQNT") %}
+                                    "quantity": {%f.0 attachment.GetFloat64("quantityQNT") %}
                                     {% if tx.GetInt("version") == 0 %}, "comment": {%qz= encoding.StringBytesToBase64Bytes(attachment.GetStringBytes("comment")) %}{% endif %}
                                 },
                                 {% case 2 %}
                                 "@type":"type.googleapis.com/p2p.AskOrderPlacement",
                                 "attachment": {
                                     "asset": {%qz= attachment.GetStringBytes("asset") %},
-                                    "quantity": {%d attachment.GetInt("quantityQNT") %},
-                                    "price": {%d attachment.GetInt("priceNQT") %},
+                                    "quantity": {%f.0 attachment.GetFloat64("quantityQNT") %},
+                                    "price": {%f.0 attachment.GetFloat64("priceNQT") %},
                                     "comment": {%qz= encoding.StringBytesToBase64Bytes(attachment.GetStringBytes("comment")) %}
                                 },
                                 {% case 3 %}
                                 "@type":"type.googleapis.com/p2p.BidOrderPlacement",
                                 "attachment": {
                                     "asset": {%qz= attachment.GetStringBytes("asset") %},
-                                    "quantity": "{%d attachment.GetInt("quantityQNT") %}",
-                                    "price": "{%d attachment.GetInt("priceNQT") %}"
+                                    "quantity": "{%f.0 attachment.GetFloat64("quantityQNT") %}",
+                                    "price": "{%f.0 attachment.GetFloat64("priceNQT") %}"
                                 },
                                 {% case 4 %}
                                 "@type":"type.googleapis.com/p2p.AskOrderCancellation",
@@ -151,8 +151,8 @@
                                     "name": {%qz= encoding.StringBytesToBase64Bytes(attachment.GetStringBytes("name")) %},
                                     "description": {%qz= encoding.StringBytesToBase64Bytes(attachment.GetStringBytes("description")) %},
                                     "tags": {%qz= encoding.StringBytesToBase64Bytes(attachment.GetStringBytes("tags")) %},
-                                    "quantity": {%d attachment.GetInt("quantity") %},
-                                    "price": "{%d attachment.GetInt("priceNQT") %}"
+                                    "quantity": {%f.0 attachment.GetFloat64("quantity") %},
+                                    "price": "{%f.0 attachment.GetFloat64("priceNQT") %}"
                                 },
                                 {% case 1 %}
                                 "@type":"type.googleapis.com/p2p.DigitalGoodsDelisting",
@@ -163,20 +163,20 @@
                                 "@type":"type.googleapis.com/p2p.DigitalGoodsPriceChange",
                                 "attachment": {
                                     "id": {%qz= attachment.GetStringBytes("goods") %},
-                                    "price": "{%d attachment.GetInt("priceNQT") %}"
+                                    "price": "{%f.0 attachment.GetFloat64("priceNQT") %}"
                                 },
                                 {% case 3 %}
                                 "@type":"type.googleapis.com/p2p.DigitalGoodsQuantityChange",
                                 "attachment": {
                                     "id": {%qz= attachment.GetStringBytes("goods") %},
-                                    "delta": {%d attachment.GetInt("deltaQuantity") %}
+                                    "delta": {%f.0 attachment.GetFloat64("deltaQuantity") %}
                                 },
                                 {% case 4 %}
                                 "@type":"type.googleapis.com/p2p.DigitalGoodsPurchase",
                                 "attachment": {
                                     "id": {%qz= attachment.GetStringBytes("goods") %},
-                                    "quantity": {%d attachment.GetInt("quantity") %},
-                                    "price": "{%d attachment.GetInt("priceNQT") %}",
+                                    "quantity": {%f.0 attachment.GetFloat64("quantity") %},
+                                    "price": "{%f.0 attachment.GetFloat64("priceNQT") %}",
                                     "deliveryDeadlineTimestamp": {%d attachment.GetInt("deliveryDeadlineTimestamp") %}
                                 },
                                 {% case 5 %}
@@ -186,7 +186,7 @@
                                     "isText": {% if attachment.GetBool("goodsIsText") %}true{% else %}false{% endif %},
                                     "data": {%qz= encoding.HexStringBytesToBase64Bytes(attachment.GetStringBytes("goodsData")) %},
                                     "nonce": {%qz= encoding.HexStringBytesToBase64Bytes(attachment.GetStringBytes("goodsNonce")) %},
-                                    "discount": "{%d attachment.GetInt("discountNQT") %}"
+                                    "discount": "{%f.0 attachment.GetFloat64("discountNQT") %}"
                                 },
                                 {% case 6 %}
                                 "@type":"type.googleapis.com/p2p.DigitalGoodsFeedback",
@@ -197,7 +197,7 @@
                                 "@type":"type.googleapis.com/p2p.DigitalGoodsRefund",
                                 "attachment": {
                                     "purchase": {%qz= attachment.GetStringBytes("purchase") %},
-                                    "refund": "{%d attachment.GetInt("refundNQT") %}"
+                                    "refund": "{%f.0 attachment.GetFloat64("refundNQT") %}"
                                 },
                                 {% endswitch %}
                             {% case 4 %}
@@ -282,8 +282,8 @@
                             "header": {
                                 "version":         {%d tx.GetInt("version") %},
                                 "timestamp":       {%d tx.GetInt("timestamp") %},
-                                "amount":          {%d tx.GetInt("amountNQT") %},
-                                "fee":             {%d tx.GetInt("feeNQT") %},
+                                "amount":          {%f.0 tx.GetFloat64("amountNQT") %},
+                                "fee":             {%f.0 tx.GetFloat64("feeNQT") %},
                                 {% if tx.Exists("recipient") %}
                                 "recipient":       {%qz= tx.GetStringBytes("recipient") %},
                                 {% endif %}
