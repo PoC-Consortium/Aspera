@@ -226,14 +226,14 @@ ValidateBlocks:
 							height: orphanedBlock.Height,
 						},
 					},
-					blocks: []*api.Block{previousBlock.Block, orphanedBlock.Block},
-					ids:    []uint64{previousBlock.Id, orphanedBlock.Id},
+					blocks:       []*api.Block{previousBlock.Block, orphanedBlock.Block},
+					ids:          []uint64{previousBlock.Id, orphanedBlock.Id},
+					isGlueResult: true,
 				}
 
 				delete(s.glueBlockOf, orphanedBlock.Height)
 				s.glueBlockOfMu.Unlock()
 
-				blockBatch.isGlueResult = true
 				s.blockBatchesFilled <- blockBatch
 
 				Log.Info("glue pair found", zap.Int32("leftHeight", previousBlock.Height), zap.Int32("rightHeight", orphanedBlock.Height))
