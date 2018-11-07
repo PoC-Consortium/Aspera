@@ -9,6 +9,8 @@ import { DashboardComponent } from './dashboard.component';
 import { MatSidenavModule } from '@angular/material';
 import { AccountsModule } from './accounts/accounts.module';
 import { SetupModule } from './setup/setup.module';
+import { HomeModule } from './home/home.module';
+import { TransactionsModule } from './transactions/transactions.module';
 
 @NgModule({
     imports: [
@@ -18,6 +20,8 @@ import { SetupModule } from './setup/setup.module';
         MatSidenavModule,
         AccountsModule,
         SetupModule,
+        HomeModule,
+        TransactionsModule,
         routing,
     ],
     declarations: [
