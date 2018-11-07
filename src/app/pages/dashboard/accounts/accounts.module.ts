@@ -4,7 +4,6 @@ import { FormsModule } from '@angular/forms';
 import { SharedModule } from '../../../lib/shared.module';
 
 import { AccountsComponent } from './accounts.component';
-import { AccountsRouting } from './accounts.routing';
 
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -16,7 +15,6 @@ import { DeleteAccountDialogComponent } from './delete-account-dialog/delete-acc
 
 @NgModule({
     imports: [
-        AccountsRouting,
         CommonModule,
         FormsModule,
         SharedModule,

@@ -7,7 +7,7 @@ import { StoreService, AccountService } from '../../lib/services';
 @Injectable({
   providedIn: 'root',
 })
-export class AuthGuard implements CanActivate {
+export class LoginGuard implements CanActivate {
   authorized: boolean = false;
   constructor(private storeService: StoreService,
               private accountService: AccountService,
@@ -15,6 +15,7 @@ export class AuthGuard implements CanActivate {
   }
 
   canActivate(): Observable<boolean> {
+    console.log('test');
     return this.storeService.ready.pipe(
       filter(Boolean),
       switchMap(async (ready) => {
@@ -28,7 +29,7 @@ export class AuthGuard implements CanActivate {
           this.router.navigate(['/dashboard/accounts'])
           return false;
         } else {
-          this.router.navigate(['/welcome']);
+          this.router.navigate(['/login']);
           return false;
         }
       })

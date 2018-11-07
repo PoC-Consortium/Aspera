@@ -14,9 +14,9 @@ import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 import { reducers, metaReducers } from './reducers';
 
 // our lib
-import { AuthModule } from './auth/auth.module';
 import { SharedModule } from './lib/shared.module';
 import { DashboardModule } from './pages/dashboard/dashboard.module';
+import { LoginModule } from './pages/login/login.module';
 
 import { environment } from '../environments/environment';
 import { TranslateModule } from '@ngx-translate/core';
@@ -31,7 +31,7 @@ let modules = [
     SharedModule.forRoot(),
     TranslateModule,
     DashboardModule,
-    AuthModule,
+    LoginModule,
     NotifierModule
 ];
 

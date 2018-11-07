@@ -15,7 +15,6 @@ import { CryptoService } from "./crypto.service";
 import { NotificationService} from "./notification.service";
 import { StoreService } from "./store.service";
 import { HttpClient, HttpHeaders, HttpParams } from "@angular/common/http";
-import { Credentials } from "../../auth/models/credentials";
 import { Observable } from "rxjs";
 import { fromPromise } from "rxjs/internal-compatibility";
 import { tap } from "rxjs/operators";
@@ -55,7 +54,7 @@ export class AccountService {
     * Generates keys for an account, encrypts them with the provided key and saves them.
     * TODO: error handling of asynchronous method calls
     */
-    public createActiveAccount({passphrase, pin = ""}: Credentials): Promise<Account> {
+    public createActiveAccount({passphrase, pin = ""}): Promise<Account> {
         return new Promise((resolve, reject) => {
             let account: Account = new Account();
             // import active account

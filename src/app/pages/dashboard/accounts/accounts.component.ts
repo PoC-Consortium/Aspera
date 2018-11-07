@@ -2,9 +2,7 @@ import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { MatTableDataSource, MatSort, MatDialog } from '@angular/material';
 import { Account } from '../../../lib/model';
-import { AccountsListActions } from '../../../auth/actions';
 import { AccountService, StoreService } from '../../../lib/services';
-import { Store } from '@ngrx/store';
 import { NotifierService } from 'angular-notifier';
 import { DeleteAccountDialogComponent } from './delete-account-dialog/delete-account-dialog.component';
 

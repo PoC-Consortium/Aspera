@@ -5,7 +5,7 @@ import { TransactionsComponent } from './transactions.component';
 // noinspection TypeScriptValidateTypes
 const routes: Routes = [
   {
-    path: '',
+    path: 'test',
     component: TransactionsComponent
   }
 ];

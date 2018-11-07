@@ -2,8 +2,6 @@ import { Component, Input, OnInit } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 import { MarketService, StoreService, AccountService } from '../../services';
 import { Account } from '../../model';
-import { AccountsListActions, AuthActions } from '../../../auth/actions';
-import { FormatInputPathObject } from 'path';
 import { Store } from '@ngrx/store';
 import * as fromAuth from '../../../reducers';
 import { MatDialog } from '@angular/material';
