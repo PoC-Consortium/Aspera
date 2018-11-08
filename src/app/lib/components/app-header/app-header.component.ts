@@ -2,8 +2,6 @@ import { Component, Input, OnInit } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 import { MarketService, StoreService, AccountService } from '../../services';
 import { Account } from '../../model';
-import { AccountsListActions, AuthActions } from '../../../auth/actions';
-import { FormatInputPathObject } from 'path';
 import { Store } from '@ngrx/store';
 import * as fromAuth from '../../../reducers';
 import { MatDialog } from '@angular/material';
@@ -60,16 +58,12 @@ export class AppHeaderComponent implements OnInit {
 
     }
 
-    public logout(account: Account) {
-        return this.store.dispatch(new AuthActions.LogoutConfirmation({ account: account }));
-    }
-
     public getTotalBurst(accounts: Account[]) {
         return accounts.reduce(((acc, { balance }) => acc + balance), 0)
     }
 
     public selectAccount(account: Account) {
-        return this.store.dispatch(new AccountsListActions.SelectAccount({ account: account }));
+        this.accountService.selectAccount(account);
     }
 
     public getPriceBTC(): string {

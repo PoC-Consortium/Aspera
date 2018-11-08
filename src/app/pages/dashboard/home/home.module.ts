@@ -4,7 +4,6 @@ import { FormsModule } from '@angular/forms';
 import { SharedModule } from '../../../lib/shared.module';
 
 import { HomeComponent } from './home.component';
-import { routing } from './home.routing';
 
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -17,7 +16,6 @@ import { MatTableModule } from '@angular/material/table';
         CommonModule,
         FormsModule,
         SharedModule,
-        routing,
         MatCardModule,
         MatFormFieldModule,
         MatGridListModule,

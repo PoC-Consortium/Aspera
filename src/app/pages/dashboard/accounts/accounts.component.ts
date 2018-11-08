@@ -1,10 +1,10 @@
 import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
-import { MatTableDataSource, MatSort } from '@angular/material';
+import { MatTableDataSource, MatSort, MatDialog } from '@angular/material';
 import { Account } from '../../../lib/model';
-import { AccountsListActions } from '../../../auth/actions';
 import { AccountService, StoreService } from '../../../lib/services';
-import { Store } from '@ngrx/store';
+import { NotifierService } from 'angular-notifier';
+import { DeleteAccountDialogComponent } from './delete-account-dialog/delete-account-dialog.component';
 
 @Component({
     selector: 'app-accounts',
@@ -15,17 +15,21 @@ export class AccountsComponent {
     private accounts: Account[];
     private dataSource: MatTableDataSource<Account>;
     private displayedColumns: string[];
+    public selectedAccounts: object;
 
     @ViewChild(MatSort) sort: MatSort;
 
     constructor(
         private storeService: StoreService,
-        private accountService: AccountService
+        private accountService: AccountService,
+        private notificationService: NotifierService,
+        private deleteDialog: MatDialog
     ) {}
 
     public ngOnInit() {
         this.accounts = [];
-        this.displayedColumns = ['id', 'address', 'alias', 'balance', 'selected'];
+        this.selectedAccounts = {};
+        this.displayedColumns = ['id', 'address', 'balance', 'alias', 'delete'];
         this.dataSource = new MatTableDataSource<Account>();
   
         this.storeService.ready.subscribe((ready) => {
@@ -35,6 +39,42 @@ export class AccountsComponent {
             })
           });
     }
+
+    public getSelectedAccounts() {
+        return this.accounts.filter(({id}) => {
+            return this.selectedAccounts[id]
+        });
+    }
+
+    public deleteSelectedAccounts() {
+
+        const selectedAccounts = this.getSelectedAccounts();
+
+        const dialogRef = this.deleteDialog.open(DeleteAccountDialogComponent, {
+            width: '400px',
+            data: selectedAccounts
+        });
+        
+        dialogRef.afterClosed().subscribe(confirm => {
+            if (confirm) {
+                return selectedAccounts.map((account) => {
+                    this.accountService.removeAccount(account).then(() => {
+                        this.notificationService.notify(`success`, `Account(s) Deleted`);
+                        this.storeService.getAllAccounts().then((accounts) => {
+                            this.accounts = accounts;
+                            this.dataSource.data = this.accounts;
+                        })
+                    });
+                });
+            }
+        });
+    }
+
+
+    openDialog(): void {
+
+    }
+
 
     public ngAfterViewInit() {
         this.dataSource.sort = this.sort;
