@@ -12,7 +12,7 @@ import { NotifierService } from 'angular-notifier';
     styleUrls: ['./home.component.css'],
     templateUrl: './home.component.html'
 })
-export class HomeComponent {
+export class HomeComponent implements OnInit {
     displayedColumns = ['type', 'opposite', 'amount', 'fee', 'timestamp', 'confirmed'];
     recentTransactionData;
     account: Account;
@@ -26,12 +26,16 @@ export class HomeComponent {
     ) {
 
         // handle route reloads (i.e. if user changes accounts)
-        this.navigationSubscription = this.router.events.subscribe((e: any) => {
-            if (e instanceof NavigationEnd) {
-                this.fetchTransactions();
-            }
-        });
+        // this.navigationSubscription = this.router.events.subscribe((e: any) => {
+        //     if (e instanceof NavigationEnd) {
+        //         this.fetchTransactions();
+        //     }
+        // });
             
+    }
+
+    ngOnInit() {
+        console.log('hi');
     }
 
     fetchTransactions() {

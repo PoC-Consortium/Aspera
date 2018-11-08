@@ -1,22 +1,24 @@
 import { Routes, RouterModule }  from '@angular/router';
 import { DashboardComponent } from './dashboard.component';
 import { ModuleWithProviders } from '@angular/core';
-import { AuthGuard } from '../../auth/services/auth-guard.service';
-import { AccountNewComponent } from './setup/account/account.component';
+import { LoginGuard } from '../login/login-guard.service';
+import { AccountsComponent } from './accounts';
+import { HomeComponent } from './home';
+import { TransactionsComponent } from './transactions';
 
 // noinspection TypeScriptValidateTypes
 const routes: Routes = [
     {
         path: 'dashboard',
         component: DashboardComponent,
-        canActivate: [AuthGuard],
+        canActivate: [LoginGuard],
         runGuardsAndResolvers: 'always',
         children: [
             { path: '', redirectTo: 'home', pathMatch: 'full' },
-            { path: 'accounts', loadChildren: './accounts/accounts.module#AccountsModule' },
-            { path: 'home', loadChildren: './home/home.module#HomeModule' },
+            { path: 'accounts', component: AccountsComponent },
+            { path: 'home', component: HomeComponent },
             { path: 'setup', loadChildren: './setup/setup.module#SetupModule' },
-            { path: 'transactions', loadChildren: './transactions/transactions.module#TransactionsModule' }
+            { path: 'transactions', component: TransactionsComponent }
         ]
     }
 ];

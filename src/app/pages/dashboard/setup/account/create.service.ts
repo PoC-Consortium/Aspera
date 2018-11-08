@@ -1,7 +1,5 @@
 import { Injectable } from '@angular/core';
-import { CreateActiveAccount, CreatePassiveAccount } from './create.actions';
 import { Store } from '@ngrx/store';
-import * as fromAuth from '../../../../auth/reducers';
 import { AccountService } from '../../../../lib/services';
 
 @Injectable()
@@ -12,8 +10,7 @@ export class CreateService {
     private address: string;
     private stepIndex: number;
 
-    constructor(private store: Store<fromAuth.State>,
-                private accountService: AccountService) {
+    constructor(private accountService: AccountService) {
         this.stepIndex = 0;
         this.reset();
     }
@@ -71,11 +68,10 @@ export class CreateService {
     }
 
     public createActiveAccount() {
-        return this.store.dispatch(new CreateActiveAccount({ passphrase: this.getCompletePassphrase(), pin: this.pin }));
+        return this.accountService.createActiveAccount({ passphrase: this.getCompletePassphrase(), pin: this.pin });
     }
 
     public createPassiveAccount() {
-        // return this.store.dispatch(new CreatePassiveAccount({ address: this.address }));
         return this.accountService.createOfflineAccount(`BURST-${this.address}`);
     }
 
