@@ -1,6 +1,6 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { Router } from '@angular/router';
-import { MarketService, StoreService } from '../../services';
+import { MarketService, StoreService, AccountService } from '../../services';
 import { MatDialog } from '@angular/material';
 import { Account } from '../../model';
 import { SendBurstDialogComponent } from '../send-burst-dialog';
@@ -22,39 +22,25 @@ export class MenuAsideComponent implements OnInit {
     private marketService: MarketService,
     private storeService: StoreService,
     public dialog: MatDialog,
+    private accountService: AccountService
   ) {
+  }
 
-    this.storeService.ready.subscribe((ready) => {
-      this.storeService.getAllAccounts().then((accounts) => {
-        this.accounts = accounts;
-      })
-      this.storeService.getSelectedAccount().then((account) => {
+  ngOnInit() {
+    this.accountService.currentAccount.subscribe((account) => {
+        this.getSelectedAccounts();
         this.selectedAccount = account;
-      })
-    });
-
+    })
   }
 
-  public ngOnInit() {
-    // TODO
+  private getSelectedAccounts() {
+      this.storeService.getAllAccounts().then((accounts) => {
+          this.accounts = accounts;
+      });
   }
 
-  openSendDialog(): void {
-
-    // get suggested fees
-    this.marketService.getSuggestedFees().subscribe((fees) => {
-
-      // open dialog
-      const dialogRef = this.dialog.open(SendBurstDialogComponent, {
-        width: '600px',
-        data: { account: this.selectedAccount, fees: fees }
-      });
-
-      dialogRef.afterClosed().subscribe(result => {
-        console.log('The dialog was closed', result);
-      });
-    });
-
+  public selectAccount(account: Account) {
+      this.accountService.selectAccount(account);
   }
 
 }
