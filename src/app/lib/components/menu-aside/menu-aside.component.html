@@ -1,4 +1,30 @@
-<mat-nav-list>
+<div class="sidebar">
+    <img class="logo" src="public/assets/img/logo.png">
+
+    <ul class="nav">
+        <li *ngFor="let account of accounts" (click)="selectAccount(account)" routerLink="/">
+            <strong>{{ account.address }}</strong>
+            {{ account.balance }} 
+        </li>
+        <li routerLink="/dashboard/setup/create">
+            <mat-icon>add_box</mat-icon>
+            <span>{{ "New Account" | i18n }}</span>
+        </li>
+        <li routerLink="/dashboard/accounts">
+            <mat-icon>account_box</mat-icon>
+            <span>Manage Accounts</span>
+        </li>
+    </ul>
+
+    <ul class="nav-bottom">
+        <li routerLink="/dashboard/setup">
+            <mat-icon>settings</mat-icon>
+            <span>{{ "settings" | i18n }}</span>
+        </li>
+    </ul>
+</div>
+
+<!-- <mat-nav-list>
     <mat-list-item>
         <a title="Dashboard" routerLink="/dashboard/home"><i class="fa fa-lg fa-fw fa-tachometer"></i>
             <span class="menu-item">{{'Dashboard' | i18n}}</span></a>
@@ -6,7 +32,7 @@
 
     <mat-list-item class="top-menu-invisible">
         <a routerLink="/dashboard/transactions/"><i class="fa fa-lg fa-fw fa-briefcase"></i> 
-            <span class="menu-item-parent">{{'Transactions' | i18n}}</span></a>
+            <span class="menu-item-parent">{{'Transactions' | i18n}}</span></a> -->
         <!-- <mat-nav-list>
             <mat-list-item routerLinkActive="active">
                 <a routerLink="/dashboard/transactions/"><i class="fa fa-exchange"></i>
@@ -25,7 +51,7 @@
                     {{'ATs (Smart Contracts)' | i18n}}</a>
             </mat-list-item>
         </mat-nav-list> -->
-    </mat-list-item>
+    <!-- </mat-list-item>
 
     <mat-list-item class="top-menu-invisible">
         <a (click)="openSendDialog()"><i class="fa fa-lg fa-fw fa-send"></i> 
@@ -35,7 +61,7 @@
     <mat-list-item class="top-menu-invisible">
         <a routerLink="/dashboard/accounts"><i class="fa fa-lg fa-fw fa-users"></i> 
             <span class="menu-item-parent">Accounts</span></a>
-    </mat-list-item>
+    </mat-list-item> -->
 
     <!-- <mat-list-item class="top-menu-invisible">
         <a routerLink="/exchange/"><i class="fa fa-lg fa-fw fa-bar-chart-o"></i> <span class="menu-item-parent">{{'Asset
@@ -153,4 +179,4 @@
         <a routerLink="/peers" title="Peers"><i class="fa fa-lg fa-fw fa-sitemap"></i> <span class="menu-item-parent">{{'Peers'
                 | i18n}}</span></a>
     </mat-list-item> -->
-</mat-nav-list>
+<!-- </mat-nav-list> -->

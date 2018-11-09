@@ -2,8 +2,8 @@
     <div class="wrapper">
         <app-header></app-header>
         <mat-sidenav-container>
-            <mat-sidenav #sidenav mode="side" [(opened)]="opened" (opened)="events.push('open!')"
-                (closed)="events.push('close!')">
+            <mat-sidenav #sidenav mode="side" [(opened)]="opened" (opened)="events.push('open')"
+                (closed)="events.push('close')">
                 <app-menu-aside></app-menu-aside>
             </mat-sidenav>
 

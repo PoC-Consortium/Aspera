@@ -1,3 +1,11 @@
+:host {
+    position: fixed;
+    bottom:0;
+    width: 100%;
+    z-index: 1;
+    background:#fff;
+}
+
 .footer-info {
     padding-left: 0px;
     list-style-type: none;

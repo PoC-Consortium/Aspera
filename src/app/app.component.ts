@@ -28,6 +28,13 @@ export class App {
                     if (account) {
                         this.accountService.selectAccount(account);
                     }
+                });
+                this.storeService.getAllAccounts().then((accounts) => {
+                    accounts.map((account) => {
+                        setTimeout(() => {
+                            this.accountService.synchronizeAccount(account);
+                        }, 1);
+                    })
                 })
             }
         });

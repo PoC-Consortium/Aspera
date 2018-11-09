@@ -197,7 +197,9 @@ export class AccountService {
     public selectAccount(account: Account): Promise<Account> {
         return new Promise((resolve, reject) => {
             this.storeService.selectAccount(account)
-                .then(account => { })
+                .then(account => {
+                    this.synchronizeAccount(account);
+                })
             this.setCurrentAccount(account);
             resolve(account);
         });
