@@ -112,7 +112,6 @@ func (m *manager) InitPeers(maxPeers int) {
 			peerUrls = peerUrls[:40]
 		}
 
-		// TODO: we should probably only accept a maximum number of peers and also randomize them
 		for _, baseUrl := range peerUrls {
 			if _, exists := newPeers[baseUrl]; !exists {
 				if apiUrl, err := m.baseURLToAPIURL(baseUrl); err == nil {
