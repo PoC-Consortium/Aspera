@@ -22,11 +22,15 @@ var (
 
 type Manager interface {
 	NewIterator(height int32) Iterator
+	RenewPeers()
 }
 
 type manager struct {
 	peers   map[string]Peer
 	peersMu sync.Mutex
+
+	stopJobs   chan struct{}
+	renewPeers chan struct{}
 
 	internetProtocols []string
 }
@@ -47,7 +51,8 @@ func NewManager(peerUrls, internetProtocols []string) Manager {
 		}
 	}
 
-	m.InitPeers(maxPeers)
+	m.initPeers(maxPeers)
+	go m.jobs()
 
 	return m
 }
@@ -74,7 +79,7 @@ func (m *manager) NewIterator(minHeight int32) Iterator {
 // 1. remember throttled peers
 // 2. keep an old peer with a chance of 50%, but only a max of maxPeers/2
 // 3. try to fill up the remaining maxPeers/2 with random chunks from current peers
-func (m *manager) InitPeers(maxPeers int) {
+func (m *manager) initPeers(maxPeers int) {
 	var unthrottledPeers int
 	newPeers := make(map[string]Peer, maxPeers)
 	now := time.Now()
@@ -196,6 +201,37 @@ func (m *manager) checkProtocol(u *url.URL) error {
 		}
 	}
 	return ErrUnsupportedInternetProtocol
+}
+
+// RenewPeers renews Peers if they weren't initialised recently
+func (m *manager) RenewPeers() {
+	m.renewPeers <- struct{}{}
+}
+
+func (m *manager) jobs() {
+	renewPeersInterval := 10 * time.Minute
+	renewPeersTicker := time.After(renewPeersInterval)
+
+	lastRenew := time.Now()
+	renewPeers := func() {
+		// only accept renewing peers every 30 seconds
+		if time.Now().Sub(lastRenew) < 30*time.Second {
+			return
+		}
+		m.initPeers(maxPeers)
+		renewPeersTicker = time.After(renewPeersInterval)
+		lastRenew = time.Now()
+	}
+	for {
+		select {
+		case <-renewPeersTicker:
+			renewPeers()
+		case <-m.renewPeers:
+			renewPeers()
+		case <-m.stopJobs:
+			return
+		}
+	}
 }
 
 type Iterator interface {
