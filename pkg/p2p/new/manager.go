@@ -52,7 +52,7 @@ func NewManager(peerUrls, internetProtocols []string) Manager {
 	return m
 }
 
-// NewIterator returns a peer iterator that contains peer
+// NewIterator returns a peer iterator that contains peers
 // that already synced to a minimum Height of minHeight
 func (m *manager) NewIterator(minHeight int32) Iterator {
 	now := time.Now()
@@ -98,7 +98,7 @@ func (m *manager) InitPeers(maxPeers int) {
 
 	shufflePeers(currentPeersRand)
 
-	// new loop, because we don't want to throw make inside a lock
+	// new loop, because we don't want to make requests inside a lock
 	sem := make(chan struct{}, 8)
 	for _, peer := range currentPeersRand {
 		peerUrls, err := peer.GetPeerUrls()
