@@ -21,7 +21,8 @@ var (
 )
 
 type Manager interface {
-	NewIterator(height int32) Iterator
+	SetIterators(minHeights []int32)
+	RandomPeer(minHeight int32) Peer
 	RenewPeers()
 }
 
@@ -31,6 +32,11 @@ type manager struct {
 
 	stopJobs   chan struct{}
 	renewPeers chan struct{}
+
+	// all iterators sorted by their supported block height ascending
+	iterators []*iterator
+	// TODO: rw mutex?
+	iteratorsMu sync.Mutex
 
 	internetProtocols []string
 }
@@ -57,9 +63,35 @@ func NewManager(peerUrls, internetProtocols []string) Manager {
 	return m
 }
 
-// NewIterator returns a peer iterator that contains peers
-// that already synced to a minimum Height of minHeight
-func (m *manager) NewIterator(minHeight int32) Iterator {
+func (m *manager) SetIterators(minHeights []int32) {
+	m.iteratorsMu.Lock()
+	defer m.iteratorsMu.Unlock()
+
+	its := make([]*iterator, len(minHeights))
+	for i, h := range minHeights {
+		its[i] = m.newIterator(h)
+	}
+	m.iterators = its
+}
+
+func (m *manager) RandomPeer(minHeight int32) Peer {
+	m.iteratorsMu.Lock()
+	defer m.iteratorsMu.Unlock()
+	var p Peer
+	for i, it := range m.iterators {
+		if it.minHeight >= minHeight {
+			for p = it.next(); p == nil; {
+				// TODO: we should probably add some reinitialise peer logic here
+				it = m.newIterator(minHeight)
+				m.iterators[i] = it
+			}
+			return p
+		}
+	}
+	panic("did not get any peer")
+}
+
+func (m *manager) newIterator(minHeight int32) *iterator {
 	now := time.Now()
 	m.peersMu.Lock()
 	var peers []Peer
@@ -72,7 +104,7 @@ func (m *manager) NewIterator(minHeight int32) Iterator {
 
 	shufflePeers(peers)
 
-	return NewIterator(peers)
+	return newIterator(peers, minHeight)
 }
 
 // InitPeers initialises the peers new with the following rules:
@@ -234,23 +266,20 @@ func (m *manager) jobs() {
 	}
 }
 
-type Iterator interface {
-	Next() Peer
-}
-
 type iterator struct {
-	peers []Peer
-	idx   int
-	sync.Mutex
+	minHeight int32
+	peers     []Peer
+	idx       int
 }
 
-func NewIterator(peers []Peer) Iterator {
-	return &iterator{peers: peers}
+func newIterator(peers []Peer, minHeight int32) *iterator {
+	return &iterator{
+		minHeight: minHeight,
+		peers:     peers,
+	}
 }
 
-func (i *iterator) Next() Peer {
-	i.Lock()
-	defer i.Unlock()
+func (i *iterator) next() Peer {
 	if i.idx < len(i.peers) {
 		p := i.peers[i.idx]
 		i.idx++

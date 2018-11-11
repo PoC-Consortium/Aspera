@@ -45,3 +45,8 @@ func TestGetPeerUrls(t *testing.T) {
 func TestNewManager(t *testing.T) {
 	assert.True(t, len(m.peers) > 2, "added no extra peers")
 }
+
+func TestRandomPeer(t *testing.T) {
+	m.SetIterators([]int32{10, 100, 1000, 400000})
+	assert.NotNil(t, m.RandomPeer(100))
+}
