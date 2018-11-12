@@ -1,4 +1,4 @@
-package p2p
+package manager
 
 import (
 	"strconv"

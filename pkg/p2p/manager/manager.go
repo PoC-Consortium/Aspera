@@ -1,4 +1,4 @@
-package p2p
+package manager
 
 import (
 	"errors"
@@ -35,8 +35,6 @@ type manager struct {
 
 	// all iterators sorted by their supported block height ascending
 	iterators []*iterator
-	// TODO: rw mutex?
-	iteratorsMu sync.Mutex
 
 	internetProtocols []string
 }
@@ -46,6 +44,8 @@ func NewManager(peerUrls, internetProtocols []string) Manager {
 	m := &manager{
 		internetProtocols: internetProtocols,
 		peers:             make(map[string]Peer),
+		stopJobs:          make(chan struct{}),
+		renewPeers:        make(chan struct{}),
 	}
 
 	// set inital peers
@@ -64,9 +64,6 @@ func NewManager(peerUrls, internetProtocols []string) Manager {
 }
 
 func (m *manager) SetIterators(minHeights []int32) {
-	m.iteratorsMu.Lock()
-	defer m.iteratorsMu.Unlock()
-
 	its := make([]*iterator, len(minHeights))
 	for i, h := range minHeights {
 		its[i] = m.newIterator(h)
@@ -75,32 +72,49 @@ func (m *manager) SetIterators(minHeights []int32) {
 }
 
 func (m *manager) RandomPeer(minHeight int32) Peer {
-	m.iteratorsMu.Lock()
-	defer m.iteratorsMu.Unlock()
 	var p Peer
 	for i, it := range m.iterators {
-		if it.minHeight >= minHeight {
-			for p = it.next(); p == nil; {
+		if it.minHeight >= minHeight || i == len(m.iterators)-1 {
+			it.Lock()
+			p = it.next()
+			for ; p == nil; p = it.next() {
 				// TODO: we should probably add some reinitialise peer logic here
-				it = m.newIterator(minHeight)
-				m.iterators[i] = it
+				m.resetIterator(it)
 			}
+			it.Unlock()
 			return p
 		}
 	}
 	panic("did not get any peer")
 }
 
+func (m *manager) resetIterator(it *iterator) {
+	now := time.Now()
+	m.peersMu.Lock()
+	var peers []Peer
+	for _, peer := range m.peers {
+		if peer.IsUsable(it.minHeight, now) {
+			peers = append(peers, peer)
+		}
+	}
+	m.peersMu.Unlock()
+
+	shufflePeers(peers)
+
+	it.idx = 0
+	it.peers = peers
+}
+
 func (m *manager) newIterator(minHeight int32) *iterator {
 	now := time.Now()
 	m.peersMu.Lock()
+	defer m.peersMu.Unlock()
 	var peers []Peer
 	for _, peer := range m.peers {
 		if peer.IsUsable(minHeight, now) {
 			peers = append(peers, peer)
 		}
 	}
-	m.peersMu.Unlock()
 
 	shufflePeers(peers)
 
@@ -136,6 +150,7 @@ func (m *manager) initPeers(maxPeers int) {
 	shufflePeers(currentPeersRand)
 
 	// new loop, because we don't want to make requests inside a lock
+	var wg sync.WaitGroup
 	sem := make(chan struct{}, 8)
 	for _, peer := range currentPeersRand {
 		peerUrls, err := peer.GetPeerUrls()
@@ -155,9 +170,11 @@ func (m *manager) initPeers(maxPeers int) {
 					p := NewPeer(apiUrl)
 					// TODO: probably use a go routine pool
 					sem <- struct{}{}
+					wg.Add(1)
 					go func() {
 						p.SetHeight()
 						<-sem
+						wg.Done()
 					}()
 					newPeers[baseUrl] = p
 					unthrottledPeers++
@@ -168,6 +185,7 @@ func (m *manager) initPeers(maxPeers int) {
 			break
 		}
 	}
+	wg.Wait()
 
 	newPeersSlice := make([]Peer, len(newPeers))
 	var j int
@@ -270,6 +288,7 @@ type iterator struct {
 	minHeight int32
 	peers     []Peer
 	idx       int
+	sync.Mutex
 }
 
 func newIterator(peers []Peer, minHeight int32) *iterator {

@@ -11,13 +11,13 @@ import (
 	"github.com/ac0v/aspera/pkg/block"
 	"github.com/ac0v/aspera/pkg/config"
 	. "github.com/ac0v/aspera/pkg/log"
+	"github.com/ac0v/aspera/pkg/p2p/manager"
 	s "github.com/ac0v/aspera/pkg/store"
 )
 
 type Synchronizer struct {
 	store     *s.Store
 	client    Client
-	manager   Manager
 	statistic *statistic
 
 	blockRanges        chan *blockRange
@@ -47,21 +47,20 @@ type blockMeta struct {
 type blockBatch struct {
 	blockRange *blockRange
 
-	peers  []string
+	peers  []manager.Peer
 	ids    []uint64
 	blocks []*api.Block
 
 	isGlueResult bool
 }
 
-func NewSynchronizer(client Client, manager Manager, store *s.Store, milestones []config.Milestone) *Synchronizer {
+func NewSynchronizer(client Client, store *s.Store, milestones []config.Milestone) *Synchronizer {
 	s := &Synchronizer{
 		statistic: &statistic{
 			start:     time.Now(),
 			processed: 0,
 		},
 		client:             client,
-		manager:            manager,
 		store:              store,
 		blockRanges:        make(chan *blockRange, len(milestones)),
 		blockBatchesEmpty:  make(chan *blockBatch, len(milestones)),
@@ -138,7 +137,7 @@ func alignMilestonesWithCurrent(milestones []*blockMeta, current *blockMeta) []*
 func (s *Synchronizer) refetchBlockRangeAndBlockPeers(blockBatch *blockBatch, err error) {
 	Log.Error("got invalid blocks", zap.Error(err))
 	for _, p := range blockBatch.peers {
-		s.manager.BlockPeer(p, PeerDataIntegrityValidation)
+		p.Throttle()
 	}
 	s.blockRanges <- blockBatch.blockRange
 }
@@ -251,9 +250,10 @@ func (s *Synchronizer) fetchBlocks() {
 		select {
 		case blockRange := <-s.blockRanges:
 			currentID := blockRange.from.id
+			currentHeight := blockRange.from.height
 
 		FETCH_BLOCK_IDS_AGAIN:
-			res, peers, err := s.client.GetNextBlockIDs(currentID)
+			res, peers, err := s.client.GetNextBlockIDs(currentID, currentHeight)
 			if err != nil {
 				Log.Error("get next blocks ids", zap.Error(err))
 				goto FETCH_BLOCK_IDS_AGAIN
@@ -277,9 +277,10 @@ func (s *Synchronizer) fetchBlocks() {
 			}
 		case blockBatch := <-s.blockBatchesEmpty:
 			currentID := blockBatch.blockRange.from.id
+			currentHeight := blockBatch.blockRange.from.height
 
 		FETCH_BLOCKS_AGAIN:
-			res, peers, err := s.client.GetNextBlocks(currentID)
+			res, peers, err := s.client.GetNextBlocks(currentID, currentHeight)
 			if err != nil {
 				Log.Error("get next blocks", zap.Error(err))
 				goto FETCH_BLOCKS_AGAIN

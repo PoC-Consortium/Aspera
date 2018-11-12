@@ -4,13 +4,13 @@ import (
 	"bytes"
 	"errors"
 	"gopkg.in/resty.v1"
-	"net/http"
-	"strconv"
 
 	api "github.com/ac0v/aspera/pkg/api/p2p"
 	compat "github.com/ac0v/aspera/pkg/api/p2p/compat"
 	b "github.com/ac0v/aspera/pkg/block"
 	"github.com/ac0v/aspera/pkg/config"
+	"github.com/ac0v/aspera/pkg/p2p/manager"
+
 	"github.com/golang/protobuf/jsonpb"
 	"github.com/json-iterator/go"
 )
@@ -27,38 +27,26 @@ type GetNextBlocksResponse struct {
 }
 
 type Client interface {
-	GetNextBlockIDs(blockID uint64) (*api.GetNextBlockIdsResponse, []string, error)
-	GetNextBlocks(blockID uint64) (*api.GetNextBlocksResponse, []string, error)
-	GetPeersOf(apiUrl string) (*api.GetPeers, error)
-
-	SetManager(m Manager)
+	GetNextBlockIDs(blockID uint64, height int32) (*api.GetNextBlockIdsResponse, []manager.Peer, error)
+	GetNextBlocks(blockID uint64, height int32) (*api.GetNextBlocksResponse, []manager.Peer, error)
 }
 
 type client struct {
-	manager     Manager
+	manager     manager.Manager
 	unmarshaler *jsonpb.Unmarshaler
 }
 
-func NewClient(config *config.P2P, internetProtocols []string) Client {
+func NewClient(config *config.P2P, manager manager.Manager) Client {
 	resty.SetTimeout(config.Timeout)
 	resty.SetDebug(config.Debug)
 
 	return &client{
+		manager:     manager,
 		unmarshaler: &jsonpb.Unmarshaler{AllowUnknownFields: true},
 	}
 }
 
-func (c *client) SetManager(m Manager) {
-	c.manager = m
-}
-
-func (c *client) request(req *resty.Request) (*resty.Response, string, error) {
-	peer := c.manager.RandomPeer()
-	res, err := req.Post(peer)
-	return res, peer, err
-}
-
-func (c *client) requestByMajority(requestType string, params map[string]interface{}) ([]byte, []string, error) {
+func (c *client) requestByMajority(height int32, req func(p manager.Peer) ([]byte, error)) ([]byte, []manager.Peer, error) {
 	foundMajority := make(chan struct{})
 
 	sem := make(chan struct{}, parallelism)
@@ -67,7 +55,7 @@ func (c *client) requestByMajority(requestType string, params map[string]interfa
 	}
 
 	type peerResponse struct {
-		of   string
+		of   manager.Peer
 		body string
 	}
 	peerResponses := make(chan *peerResponse)
@@ -79,16 +67,16 @@ func (c *client) requestByMajority(requestType string, params map[string]interfa
 				return
 			case <-sem:
 				go func() {
-					peer := c.manager.RandomPeer()
-					res, err := c.buildRequest(requestType, params).Post(peer)
+					peer := c.manager.RandomPeer(height)
 
-					if err != nil || res == nil || res.StatusCode() != http.StatusOK {
-						c.manager.BlockPeer(peer, PeerTimeout)
-					} else {
+					body, err := req(peer)
+					if err == nil {
 						peerResponses <- &peerResponse{
 							of:   peer,
-							body: res.String(),
+							body: string(body),
 						}
+					} else {
+						peer.Throttle()
 					}
 
 					sem <- struct{}{}
@@ -97,11 +85,11 @@ func (c *client) requestByMajority(requestType string, params map[string]interfa
 		}
 	}()
 
-	seenBy := make(map[string]map[string]struct{})
+	seenBy := make(map[string]map[manager.Peer]struct{})
 	for peerResponse := range peerResponses {
 		peers := seenBy[peerResponse.body]
 		if peers == nil {
-			seenBy[peerResponse.body] = map[string]struct{}{peerResponse.of: struct{}{}}
+			seenBy[peerResponse.body] = map[manager.Peer]struct{}{peerResponse.of: struct{}{}}
 		} else {
 			if _, processedPeer := peers[peerResponse.of]; processedPeer {
 				continue
@@ -114,11 +102,11 @@ func (c *client) requestByMajority(requestType string, params map[string]interfa
 				for otherBody, peers := range seenBy {
 					if otherBody != peerResponse.body {
 						for p := range peers {
-							c.manager.BlockPeer(p, PeerDataIntegrity)
+							p.Throttle()
 						}
 					}
 				}
-				var peersSlice []string
+				var peersSlice []manager.Peer
 				for p := range peers {
 					peersSlice = append(peersSlice, p)
 				}
@@ -131,22 +119,9 @@ func (c *client) requestByMajority(requestType string, params map[string]interfa
 	return nil, nil, errors.New("unexpected error")
 }
 
-func (c *client) buildRequest(requestType string, params map[string]interface{}) *resty.Request {
-	paramsCopy := make(map[string]interface{}, len(params))
-	for k, v := range params {
-		paramsCopy[k] = v
-	}
-
-	paramsCopy["protocol"] = "B1"
-	paramsCopy["requestType"] = requestType
-
-	return resty.R().SetBody(paramsCopy)
-}
-
-func (c *client) GetNextBlockIDs(blockId uint64) (*api.GetNextBlockIdsResponse, []string, error) {
-	body, peers, err := c.requestByMajority("getNextBlockIds", map[string]interface{}{
-		"blockId": strconv.FormatUint(blockId, 10),
-	})
+func (c *client) GetNextBlockIDs(blockId uint64, height int32) (*api.GetNextBlockIdsResponse, []manager.Peer, error) {
+	req := func(p manager.Peer) ([]byte, error) { return p.GetNextBlockIDsBody(blockId) }
+	body, peers, err := c.requestByMajority(height, req)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -156,30 +131,18 @@ func (c *client) GetNextBlockIDs(blockId uint64) (*api.GetNextBlockIdsResponse, 
 	return msg, peers, err
 }
 
-func (c *client) GetNextBlocks(blockId uint64) (*api.GetNextBlocksResponse, []string, error) {
-	req := c.buildRequest("getNextBlocks", map[string]interface{}{
-		"blockId": strconv.FormatUint(blockId, 10),
-	})
-	res, peers, err := c.request(req)
+func (c *client) GetNextBlocks(blockId uint64, height int32) (*api.GetNextBlocksResponse, []manager.Peer, error) {
+	p := c.manager.RandomPeer(height)
+	body, err := p.GetNextBlocksBody(blockId)
 	if err != nil {
-		return nil, nil, err
+		return nil, []manager.Peer{p}, err
 	}
 
 	var json []byte
-	if json, err = compat.Upgrade(res.Body()); err != nil {
+	if json, err = compat.Upgrade(body); err != nil {
 		return nil, nil, err
 	}
 
 	var msg = new(api.GetNextBlocksResponse)
-	return msg, []string{peers}, c.unmarshaler.Unmarshal(bytes.NewReader(json), msg)
-}
-
-func (c *client) GetPeersOf(apiUrl string) (*api.GetPeers, error) {
-	res, err := c.buildRequest("getPeers", map[string]interface{}{}).Post(apiUrl)
-	if err != nil {
-		return nil, err
-	}
-
-	msg := new(api.GetPeers)
-	return msg, c.unmarshaler.Unmarshal(bytes.NewReader(res.Body()), msg)
+	return msg, []manager.Peer{p}, c.unmarshaler.Unmarshal(bytes.NewReader(json), msg)
 }
