@@ -3,6 +3,7 @@ package manager
 import (
 	"strconv"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	api "github.com/ac0v/aspera/pkg/api/p2p"
@@ -22,6 +23,7 @@ type Peer interface {
 	GetNextBlocksBody(blockId uint64) ([]byte, error)
 	GetPeerUrls() ([]string, error)
 	Throttle()
+	DeThrottle()
 	IsThrottled(now time.Time) bool
 	IsUsable(height int32, now time.Time) bool
 }
@@ -54,17 +56,12 @@ func (p *peer) SetHeight() error {
 	if err != nil {
 		return err
 	}
-	p.Lock()
-	p.height = msg.BlockchainHeight
-	p.Unlock()
+	atomic.StoreInt32(&p.height, msg.BlockchainHeight)
 	return nil
 }
 
 func (p *peer) GetHeight() int32 {
-	p.Lock()
-	h := p.height
-	p.Unlock()
-	return h
+	return atomic.LoadInt32(&p.height)
 }
 
 func (p *peer) GetPeerUrls() ([]string, error) {
@@ -93,22 +90,30 @@ func (p *peer) GetNextBlocksBody(blockId uint64) ([]byte, error) {
 	})
 }
 
+func (p *peer) DeThrottle() {
+	p.Lock()
+	p.throttleWeight = 0
+	p.Unlock()
+}
+
 func (p *peer) Throttle() {
 	p.Lock()
 	p.throttleWeight++
 	var throttleDuration time.Duration
 	// TODO: use more reasonable values
 	switch p.throttleWeight {
-	case 1:
-		throttleDuration = 30 * time.Second
-	case 2:
-		throttleDuration = 2 * time.Minute
-	case 3:
-		throttleDuration = 5 * time.Minute
-	case 4:
-		throttleDuration = 10 * time.Minute
 	default:
-		throttleDuration = 30 * time.Minute
+		throttleDuration = 20 * time.Second
+		// case 1:
+		// 	throttleDuration = 30 * time.Second
+		// case 2:
+		// 	throttleDuration = 2 * time.Minute
+		// case 3:
+		// 	throttleDuration = 5 * time.Minute
+		// case 4:
+		// 	throttleDuration = 10 * time.Minute
+		// default:
+		// 	throttleDuration = 30 * time.Minute
 	}
 	p.throttledUntil = time.Now().Add(throttleDuration)
 	p.Unlock()

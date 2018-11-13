@@ -311,7 +311,8 @@ func (s *Synchronizer) fetchBlocks() {
 				}
 			}
 
-			blockBatch.peers = append(blockBatch.peers, peers...)
+			blockBatch.peers = peers
+			// blockBatch.peers = append(blockBatch.peers, peers...)
 
 			s.blockBatchesFilled <- blockBatch
 		}

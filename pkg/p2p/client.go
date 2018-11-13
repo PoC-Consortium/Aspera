@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"errors"
 	"gopkg.in/resty.v1"
+	"sync"
 
 	api "github.com/ac0v/aspera/pkg/api/p2p"
 	compat "github.com/ac0v/aspera/pkg/api/p2p/compat"
@@ -16,8 +17,7 @@ import (
 )
 
 const (
-	majority    = 3
-	parallelism = 5
+	majority = 3
 )
 
 var json = jsoniter.ConfigCompatibleWithStandardLibrary
@@ -49,23 +49,21 @@ func NewClient(config *config.P2P, manager manager.Manager) Client {
 func (c *client) requestByMajority(height int32, req func(p manager.Peer) ([]byte, error)) ([]byte, []manager.Peer, error) {
 	foundMajority := make(chan struct{})
 
-	sem := make(chan struct{}, parallelism)
-	for i := 0; i < parallelism; i++ {
-		sem <- struct{}{}
-	}
-
 	type peerResponse struct {
 		of   manager.Peer
 		body string
 	}
-	peerResponses := make(chan *peerResponse)
 
+	peerResponses := make(chan *peerResponse, majority)
+	sem := make(chan struct{}, majority)
+	var wg sync.WaitGroup
 	go func() {
 		for {
 			select {
 			case <-foundMajority:
 				return
-			case <-sem:
+			case sem <- struct{}{}:
+				wg.Add(1)
 				go func() {
 					peer := c.manager.RandomPeer(height)
 
@@ -79,7 +77,8 @@ func (c *client) requestByMajority(height int32, req func(p manager.Peer) ([]byt
 						peer.Throttle()
 					}
 
-					sem <- struct{}{}
+					<-sem
+					wg.Done()
 				}()
 			}
 		}
@@ -108,8 +107,10 @@ func (c *client) requestByMajority(height int32, req func(p manager.Peer) ([]byt
 				}
 				var peersSlice []manager.Peer
 				for p := range peers {
+					p.DeThrottle()
 					peersSlice = append(peersSlice, p)
 				}
+				wg.Wait()
 				return []byte(peerResponse.body), peersSlice, nil
 			}
 		}
