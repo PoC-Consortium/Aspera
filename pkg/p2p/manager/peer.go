@@ -12,7 +12,10 @@ import (
 	"gopkg.in/resty.v1"
 )
 
-// TODO: set resty timeout
+func init() {
+	// TODO: use dynamic timeout
+	resty.SetTimeout(5 * time.Second)
+}
 
 var json = jsoniter.ConfigCompatibleWithStandardLibrary
 
