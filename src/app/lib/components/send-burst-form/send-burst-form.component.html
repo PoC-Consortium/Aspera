@@ -38,18 +38,17 @@
   </div>
 
   <div *ngIf="advanced">
-    <!-- <mat-form-field>
-      <label>{{ "deadline_hours" | i18n }}</label>
-      <input matInput [(ngModel)]="deadline" value="24" name="deadline">
-    </mat-form-field> -->
-
-    <mat-form-field> 
-      <input matInput [(ngModel)]="fullHash" name="fullHash" placeholder="{{ 'referenced_transaction_full_hash' | i18n }}">
+    <mat-form-field>
+      <input matInput [(ngModel)]="deadline" value="24" name="deadline" placeholder="{{ 'deadline_hours' | i18n }}" disabled>
     </mat-form-field>
 
-    <mat-checkbox [(ngModel)]="broadcast" name="broadcast">{{ "do_not_broadcast" | i18n }}</mat-checkbox><br />
+    <mat-form-field> 
+      <input matInput [(ngModel)]="fullHash" name="fullHash" placeholder="{{ 'referenced_transaction_full_hash' | i18n }}" disabled>
+    </mat-form-field>
 
-    <mat-checkbox [(ngModel)]="note" name="note">{{ "add_note_to_self_q" | i18n }}</mat-checkbox>
+    <mat-checkbox [(ngModel)]="broadcast" name="broadcast" disabled>{{ "do_not_broadcast" | i18n }}</mat-checkbox><br />
+
+    <mat-checkbox [(ngModel)]="note" name="note" disabled>{{ "add_note_to_self_q" | i18n }}</mat-checkbox>
 
     <div *ngIf="note">
       <mat-form-field>
