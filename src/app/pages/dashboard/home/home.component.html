@@ -7,9 +7,9 @@
             <span>Receive</span>
         </li>
         <li class="balance">
-            <span>Balance</span>
+            <span>{{account.alias}}</span>
             <h2>{{account.balance}}</h2>
-            <h3>BURST</h3>
+            <h3>{{account.address}}</h3>
         </li>
         <li class="send" (click)="openSendDialog()">
             <mat-icon>send</mat-icon>

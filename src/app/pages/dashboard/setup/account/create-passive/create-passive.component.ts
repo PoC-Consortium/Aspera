@@ -7,7 +7,7 @@ import { Router } from '@angular/router';
 @Component({
   selector: 'app-create-passive',
   templateUrl: './create-passive.component.html',
-  styleUrls: ['./create-passive.component.css']
+  styleUrls: ['./create-passive.component.scss']
 })
 export class CreatePassiveAccountComponent implements OnInit {
 
