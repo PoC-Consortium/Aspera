@@ -24,3 +24,7 @@ mat-form-field {
 form {
     margin:20px 0;
 }
+
+.add-recipient {
+    width:100%;
+}

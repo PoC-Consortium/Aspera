@@ -4,6 +4,10 @@ import { Transaction, Attachment, SuggestedFees } from '../../model';
 import { NgForm } from '@angular/forms';
 import { BurstUtil } from '../../util/burst';
 
+interface Recipient {
+  address: string,
+  amountNQT: string
+}
 
 @Component({
   selector: 'app-send-multi-out-form',
@@ -13,31 +17,50 @@ import { BurstUtil } from '../../util/burst';
 export class SendMultiOutFormComponent implements OnInit {
   @ViewChild('sendBurstForm') public sendBurstForm: NgForm;
   @ViewChild('feeNQT') public feeNQT: string;
-  @ViewChild('recipientAddress') public recipientAddress: string;
   @ViewChild('amountNQT') public amountNQT: string;
+  @ViewChild('recipients') public recipients: Recipient[];
   @ViewChild('message') public message: string;
   @ViewChild('fullHash') public fullHash: string;
-  @ViewChild('encrypt') public encrypt: string;
   @ViewChild('pin') public pin: string;
-  @ViewChild('deadline') public deadline: string;
 
   @Input('fees') public fees: SuggestedFees;
   @Input('balance') public balance: number;
   @Input('close') public close: Function;
 
   @Output() submit = new EventEmitter<any>();
-  advanced: boolean = false;
-  showMessage: boolean = false;
+  sameAmount: boolean = false;
   burstAddressPattern = BurstUtil.burstAddressPattern;
 
   constructor() {
   }
 
   ngOnInit() {
+    this.recipients = [this.createRecipient(), this.createRecipient()];
+  }
+
+  createRecipient() {
+    return { 
+      amountNQT:'', 
+      address:''
+    };
+  }
+
+  toggleSameAmount() {
+    this.sameAmount = !this.sameAmount;
+    console.log(this.sameAmount);
+  }
+
+  addRecipient() {
+    this.recipients.push(this.createRecipient());
   }
 
   getTotal() {
-    return parseFloat(this.amountNQT) + parseFloat(this.feeNQT) || 0;
+    const calculateMultiOutTotal = this.recipients.map((recipient) => {
+      return parseFloat(recipient.amountNQT) || 0;
+    }).reduce((acc, curr) => acc + curr, 0);
+
+    return this.sameAmount ? parseFloat(this.amountNQT) + parseFloat(this.feeNQT) || 0
+      : calculateMultiOutTotal || 0;
   }
 
   setFee(feeNQT: string) {
@@ -49,38 +72,19 @@ export class SendMultiOutFormComponent implements OnInit {
   }
 
   onSubmit(event) {
-    this.submit.emit({
-      transaction: {
-        recipientAddress: `BURST-${this.recipientAddress}`,
-        amountNQT: parseFloat(this.amountNQT),
-        feeNQT: this.feeNQT,
-        attachment: this.getMessage(),
-        deadline: parseFloat(this.deadline),
-        fullHash: this.fullHash,
-        type: 1
-      },
-      pin: this.pin
-    });
+    // this.submit.emit({
+    //   transaction: {
+    //     // recipientAddress: `BURST-${this.recipientAddress}`,
+    //     amountNQT: parseFloat(this.amountNQT),
+    //     feeNQT: this.feeNQT,
+    //     attachment: this.getMessage(),
+    //     deadline: parseFloat(this.deadline),
+    //     fullHash: this.fullHash,
+    //     type: 1
+    //   },
+    //   pin: this.pin
+    // });
     event.stopImmediatePropagation();
-  }
-
-  getMessage() {
-    if (this.message) {
-      if (this.encrypt) {
-        return {
-          data: this.message,
-          nonce: null, //todo
-          type: 'encrypted_message'
-        }
-      } else {
-        return {
-          message: this.message,
-          type: 'message',
-          messageIsText: true
-        }
-      }
-    }
-    return null;
   }
 }
 
