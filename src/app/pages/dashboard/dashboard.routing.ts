@@ -5,6 +5,10 @@ import { LoginGuard } from '../login/login-guard.service';
 import { AccountsComponent } from './accounts';
 import { HomeComponent } from './home';
 import { TransactionsComponent } from './transactions';
+import { SetupComponent } from './setup/setup.component';
+import { AccountNewComponent } from './setup/account/account.component';
+import { CreateActiveAccountComponent } from './setup/account/create-active/create.component';
+import { CreatePassiveAccountComponent } from './setup/account/create-passive/create-passive.component';
 
 // noinspection TypeScriptValidateTypes
 const routes: Routes = [
@@ -17,7 +21,22 @@ const routes: Routes = [
             { path: '', redirectTo: 'home', pathMatch: 'full' },
             { path: 'accounts', component: AccountsComponent },
             { path: 'home', component: HomeComponent },
-            { path: 'setup', loadChildren: './setup/setup.module#SetupModule' },
+            {
+                path: 'setup',
+                component: SetupComponent
+            },
+            {
+                path: 'setup/create',
+                component: AccountNewComponent
+            },
+            {
+                path: 'setup/create/active',
+                component: CreateActiveAccountComponent
+            },
+            {
+                path: 'setup/create/passive',
+                component: CreatePassiveAccountComponent
+            },
             { path: 'transactions', component: TransactionsComponent }
         ]
     }

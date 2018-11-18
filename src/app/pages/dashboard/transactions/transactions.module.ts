@@ -4,7 +4,6 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { SharedModule } from '../../../lib/shared.module';
 
 import { TransactionsComponent } from './transactions.component';
-import { TransactionsRouting } from './transactions.routing';
 
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -24,7 +23,6 @@ import { MatTabsModule } from '@angular/material/tabs';
 
 @NgModule({
     imports: [
-        TransactionsRouting,
         CommonModule,
         FormsModule,
         SharedModule,

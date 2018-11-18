@@ -23,7 +23,8 @@ export class AccountsComponent {
         private storeService: StoreService,
         private accountService: AccountService,
         private notificationService: NotifierService,
-        private deleteDialog: MatDialog
+        private deleteDialog: MatDialog,
+        public router: Router
     ) {}
 
     public ngOnInit() {

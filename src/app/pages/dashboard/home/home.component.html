@@ -1,4 +1,24 @@
 <mat-card>
+    <ul class="top-bar">
+        <li class="receive">
+            <svg style="width:45px;height:45px" viewBox="0 0 24 24">
+                <path fill="#000000" d="M3,11H5V13H3V11M11,5H13V9H11V5M9,11H13V15H11V13H9V11M15,11H17V13H19V11H21V13H19V15H21V19H19V21H17V19H13V21H11V17H15V15H17V13H15V11M19,19V15H17V19H19M15,3H21V9H15V3M17,5V7H19V5H17M3,3H9V9H3V3M5,5V7H7V5H5M3,15H9V21H3V15M5,17V19H7V17H5Z" />
+            </svg>
+            <span>Receive</span>
+        </li>
+        <li class="balance">
+            <span>{{account.alias}}</span>
+            <h2>{{account.balance}}</h2>
+            <h3>{{account.address}}</h3>
+        </li>
+        <li class="send" (click)="openSendDialog()">
+            <mat-icon>send</mat-icon>
+            <span>Send</span>
+        </li>
+    </ul>
+</mat-card>
+
+<mat-card>
     <mat-form-field>
         <input matInput (keyup)="applyFilter($event.target.value)" placeholder="Filter">
     </mat-form-field>
@@ -13,9 +33,9 @@
             </mat-cell>
         </ng-container>
 
-        <ng-container matColumnDef="opposite">
+        <ng-container matColumnDef="account">
             <mat-header-cell *matHeaderCellDef mat-sort-header>
-                <mat-icon>account_box</mat-icon>&nbsp;Opposite</mat-header-cell>
+                <mat-icon>account_box</mat-icon>&nbsp;Account</mat-header-cell>
             <mat-cell *matCellDef="let transaction">
                 <span *ngIf="isOwnAccount(transaction.senderAddress)">{{transaction.recipientAddress}}</span>
                 <span *ngIf="!isOwnAccount(transaction.senderAddress)">{{transaction.senderAddress}}</span>

@@ -1,25 +1,25 @@
 import { Component, OnInit } from '@angular/core';
 import { Store, select } from '@ngrx/store';
 import { AccountService } from '../../lib/services';
+import { CreateService } from '../dashboard/setup/account/create.service';
+import { NotifierService } from 'angular-notifier';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'bc-login-page',
-  template: `
-    <h1>Burst</h1>
-    <h2>Add an account to get started</h2>
-    <app-account-new></app-account-new>
-  `,
-  styles: [],
+  templateUrl: './login.component.html',
+  styleUrls: ['./login.component.scss'],
 })
 export class LoginComponent implements OnInit {
 
-  constructor(private accountService: AccountService) {}
+  constructor(private accountService: AccountService,
+    private createService: CreateService,
+    private notificationService: NotifierService,
+    private router: Router) {}
+
+  method: string;
 
   ngOnInit() {
-    console.log('wtf');
-  }
-
-  onSubmit(credentials) {
-    this.accountService.createActiveAccount(credentials);
+    this.method = 'passive';
   }
 }
