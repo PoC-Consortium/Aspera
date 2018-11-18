@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation, Output } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation, Output, HostListener } from '@angular/core';
 import { LoggerService, StoreService, AccountService } from '../../lib/services';
 import { Observable, Subject } from 'rxjs/Rx';
 import { MarketService } from '../../lib/services';
@@ -13,7 +13,11 @@ export class DashboardComponent implements OnInit {
     opened: boolean = true;
     events: string[] = [];
     @Output() recentTransactions: Transaction[];
-
+    @HostListener('window:resize', ['$event'])
+    onResize(event) {
+        console.log(event.target.innerWidth);
+        this.opened = (event.target.innerWidth > 800);
+    }
     constructor(
         private marketService: MarketService
     ) {
@@ -25,6 +29,8 @@ export class DashboardComponent implements OnInit {
         timer.subscribe(t =>
             this.marketService.updateCurrency()
         );
+
+        
     } 
 
 

@@ -18,6 +18,8 @@ export class BurstInputValidatorDirective {
     setTimeout(() => {
       if (data.indexOf('BURST-') > -1) {
         this.control.control.setValue(data.split('BURST-')[1]);
+      } else {
+        this.control.control.setValue(data);
       }
     }, 100);
   }

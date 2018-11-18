@@ -12,7 +12,6 @@
 @import "/public/fonts/material/material-icons.css";
 
 @import "~angular-notifier/styles.scss";
-
 // .danger {
 //     color: $red;
 // }
@@ -152,7 +151,10 @@ app-root:empty + .loading h1 {
   }
 }
 
-// todo: create burst material theme
+body, html, .particle, .wrapper {
+  height:100% !important;
+}
+
 .mat-step-header .mat-step-icon {
   background: #3c8dbc;
 }
@@ -163,4 +165,17 @@ app-root:empty + .loading h1 {
 
 .mat-progress-bar-fill::after {
   background: #3c8dbc;
+}
+
+.mat-drawer {
+  background:darken(#3c8dbc, 40%);
+}
+
+.wrapper {
+  display: flex;
+}
+
+.mat-drawer-container {
+  width:100%;
+  margin-bottom:38px;
 }
