@@ -50,13 +50,13 @@ type blockBatch struct {
 	blocks []*block.Block
 }
 
-func (s *statistic) update(blockCount int) float64 {
+func (s *statistic) update(blockCount int) (float64, int) {
 	s.processed += blockCount
 	now := time.Now()
 	d := now.Sub(s.tick).Seconds()
-	s.syncSpeed = 0.9*s.syncSpeed + 0.1*float64(blockCount)/d
+	s.syncSpeed = 0.95*s.syncSpeed + 0.05*float64(blockCount)/d
 	s.tick = now
-	return s.syncSpeed
+	return s.syncSpeed, s.processed
 }
 
 func NewSynchronizer(client Client, store *s.Store, milestones []config.Milestone) *Synchronizer {
@@ -102,24 +102,15 @@ func NewSynchronizer(client Client, store *s.Store, milestones []config.Mileston
 
 func alignMilestonesWithCurrent(milestones []*blockMeta, current *blockMeta) []*blockBatch {
 	var blockBatches []*blockBatch
-	for i, milestone := range milestones {
+	for i, milestone := range milestones[:len(milestones)-1] {
+		if milestones[i+1].height <= current.height {
+			continue
+		}
+
 		// milestone already handled (partialy) - adjust it's start
 		if current.height > milestone.height {
 			milestone.id = current.id
 			milestone.height = current.height
-		}
-
-		var toBlockMeta blockMeta
-		if len(milestones) > i+1 {
-			toBlockMeta = blockMeta{
-				id:     milestones[i+1].id,
-				height: milestones[i+1].height,
-			}
-			if toBlockMeta.height <= current.height {
-				// milestone already done; next one partially handled
-				// so we continue with the next one
-				continue
-			}
 		}
 
 		blockBatches = append(
@@ -129,7 +120,10 @@ func alignMilestonesWithCurrent(milestones []*blockMeta, current *blockMeta) []*
 					id:     milestone.id,
 					height: milestone.height,
 				},
-				to: toBlockMeta,
+				to: blockMeta{
+					id:     milestones[i+1].id,
+					height: milestones[i+1].height,
+				},
 			},
 		)
 	}
@@ -265,11 +259,11 @@ validateBlocks:
 		blockBatch.from.id = blocks[len(blocks)-1].Id
 
 		s.statisticMu.Lock()
-		syncSpeed := s.statistic.update(numNewBlocks)
+		syncSpeed, processed := s.statistic.update(numNewBlocks)
 		s.statisticMu.Unlock()
-		Log.Info("syncing with", zap.Float64("blocks/s", syncSpeed))
+		Log.Info("syncing with", zap.Float64("blocks/s", syncSpeed), zap.Int("processed", processed))
 
-		if blockBatch.to.height == 0 || blockBatch.from.height < blockBatch.to.height {
+		if blockBatch.from.height < blockBatch.to.height {
 			s.blockBatchesEmpty <- blockBatch
 		}
 	}
