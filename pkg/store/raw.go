@@ -13,6 +13,7 @@ import (
 	"sync"
 
 	api "github.com/ac0v/aspera/pkg/api/p2p"
+	"github.com/ac0v/aspera/pkg/block"
 	"github.com/ac0v/aspera/pkg/config"
 	. "github.com/ac0v/aspera/pkg/log"
 
@@ -154,14 +155,14 @@ func (rawStore *RawStore) load(height int32) *api.Block {
 	return block
 }
 
-func (rawStore *RawStore) StoreAndMaybeConsume(blocks []*api.Block) error {
+func (rawStore *RawStore) StoreAndMaybeConsume(blocks []*block.Block) error {
 	readyToConsume := false
 	waitForHeight := int(rawStore.Current.Height + 1)
 
 	// store
 	txn := rawStore.queue.NewTransaction(true)
 	for _, block := range blocks {
-		if blockPb, err := proto.Marshal(block); err == nil {
+		if blockPb, err := proto.Marshal(block.Block); err == nil {
 			height := int(block.Height)
 			heightBs := []byte(strconv.Itoa(height))
 			for {

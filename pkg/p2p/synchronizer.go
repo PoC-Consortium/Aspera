@@ -1,13 +1,12 @@
 package p2p
 
 import (
+	"errors"
 	"sync"
-	"sync/atomic"
 	"time"
 
 	"go.uber.org/zap"
 
-	api "github.com/ac0v/aspera/pkg/api/p2p"
 	"github.com/ac0v/aspera/pkg/block"
 	"github.com/ac0v/aspera/pkg/config"
 	. "github.com/ac0v/aspera/pkg/log"
@@ -16,27 +15,24 @@ import (
 )
 
 type Synchronizer struct {
-	store     *s.Store
-	client    Client
-	statistic *statistic
+	store  *s.Store
+	client Client
 
-	blockRanges        chan *blockRange
-	blockBatchesEmpty  chan *blockBatch
-	blockBatchesFilled chan *blockBatch
-	blockBatchesGlue   chan []*block.Block
+	blockBatchesEmpty  chan *blockBatch // range information
+	blockBatchesIDs    chan *blockBatch // ids for fetching blocks
+	blockBatchesBlocks chan *blockBatch // blocks for validation
 
-	glueBlockOfMu sync.Mutex
-	glueBlockOf   map[int32]*block.Block
+	glueBlocks   map[int32]*block.Block
+	glueBlocksMu sync.Mutex
+
+	statistic   *statistic
+	statisticMu sync.Mutex
 }
 
 type statistic struct {
-	start     time.Time
-	processed int32
-}
-
-type blockRange struct {
-	from blockMeta
-	to   *blockMeta
+	syncSpeed float64
+	processed int
+	tick      time.Time
 }
 
 type blockMeta struct {
@@ -45,39 +41,45 @@ type blockMeta struct {
 }
 
 type blockBatch struct {
-	blockRange *blockRange
+	from blockMeta
+	to   blockMeta
 
-	peers  []manager.Peer
+	peers []manager.Peer
+
 	ids    []uint64
-	blocks []*api.Block
+	blocks []*block.Block
+}
 
-	isGlueResult bool
+func (s *statistic) update(blockCount int) float64 {
+	s.processed += blockCount
+	now := time.Now()
+	d := now.Sub(s.tick).Seconds()
+	s.syncSpeed = 0.9*s.syncSpeed + 0.1*float64(blockCount)/d
+	s.tick = now
+	return s.syncSpeed
 }
 
 func NewSynchronizer(client Client, store *s.Store, milestones []config.Milestone) *Synchronizer {
 	s := &Synchronizer{
-		statistic: &statistic{
-			start:     time.Now(),
-			processed: 0,
-		},
-		client:             client,
-		store:              store,
-		blockRanges:        make(chan *blockRange, len(milestones)),
+		statistic: &statistic{tick: time.Now()},
+		client:    client,
+		store:     store,
+
 		blockBatchesEmpty:  make(chan *blockBatch, len(milestones)),
-		blockBatchesFilled: make(chan *blockBatch, len(milestones)),
-		blockBatchesGlue:   make(chan []*block.Block, len(milestones)),
-		glueBlockOf:        make(map[int32]*block.Block),
+		blockBatchesIDs:    make(chan *blockBatch, len(milestones)),
+		blockBatchesBlocks: make(chan *blockBatch, len(milestones)),
+
+		glueBlocks: make(map[int32]*block.Block),
 	}
 
 	// the current block is a predecessor for the first glue action
 	if currentBlock, err := block.NewBlock(store.RawStore.Current.Block); err != nil {
 		panic(err)
 	} else {
-		go func() {
-			s.blockBatchesGlue <- []*block.Block{currentBlock}
-		}()
+		s.glueBlocks[currentBlock.Height] = currentBlock
 
-		for i := 0; i < 20; i++ {
+		for i := 0; i < len(milestones); i++ {
+			go s.fetchBlockIDs()
 			go s.fetchBlocks()
 			go s.validateBlocks()
 		}
@@ -87,8 +89,9 @@ func NewSynchronizer(client Client, store *s.Store, milestones []config.Mileston
 			bms[i] = &blockMeta{id: m.Id, height: m.Height}
 		}
 
-		for _, blockRange := range alignMilestonesWithCurrent(bms, &blockMeta{id: currentBlock.Id, height: currentBlock.Height}) {
-			s.blockRanges <- blockRange
+		blockBatches := alignMilestonesWithCurrent(bms, &blockMeta{id: currentBlock.Id, height: currentBlock.Height})
+		for _, blockBatch := range blockBatches {
+			s.blockBatchesEmpty <- blockBatch
 		}
 	}
 
@@ -97,8 +100,8 @@ func NewSynchronizer(client Client, store *s.Store, milestones []config.Mileston
 	return s
 }
 
-func alignMilestonesWithCurrent(milestones []*blockMeta, current *blockMeta) []*blockRange {
-	var blockRanges []*blockRange
+func alignMilestonesWithCurrent(milestones []*blockMeta, current *blockMeta) []*blockBatch {
+	var blockBatches []*blockBatch
 	for i, milestone := range milestones {
 		// milestone already handled (partialy) - adjust it's start
 		if current.height > milestone.height {
@@ -106,9 +109,9 @@ func alignMilestonesWithCurrent(milestones []*blockMeta, current *blockMeta) []*
 			milestone.height = current.height
 		}
 
-		var toBlockMeta *blockMeta
+		var toBlockMeta blockMeta
 		if len(milestones) > i+1 {
-			toBlockMeta = &blockMeta{
+			toBlockMeta = blockMeta{
 				id:     milestones[i+1].id,
 				height: milestones[i+1].height,
 			}
@@ -119,9 +122,9 @@ func alignMilestonesWithCurrent(milestones []*blockMeta, current *blockMeta) []*
 			}
 		}
 
-		blockRanges = append(
-			blockRanges,
-			&blockRange{
+		blockBatches = append(
+			blockBatches,
+			&blockBatch{
 				from: blockMeta{
 					id:     milestone.id,
 					height: milestone.height,
@@ -130,8 +133,7 @@ func alignMilestonesWithCurrent(milestones []*blockMeta, current *blockMeta) []*
 			},
 		)
 	}
-
-	return blockRanges
+	return blockBatches
 }
 
 func (s *Synchronizer) refetchBlockRangeAndBlockPeers(blockBatch *blockBatch, err error) {
@@ -139,182 +141,136 @@ func (s *Synchronizer) refetchBlockRangeAndBlockPeers(blockBatch *blockBatch, er
 	for _, p := range blockBatch.peers {
 		p.Throttle()
 	}
-	s.blockRanges <- blockBatch.blockRange
+	s.blockBatchesEmpty <- blockBatch
 }
 
-func (s *Synchronizer) validateBlocks() {
-ValidateBlocks:
-	for {
-		select {
-		case blockBatch := <-s.blockBatchesFilled:
-			// if we have more than one block, we can do the basic validation (eg. hashing)
-			// for all blocks except of the first one where the previous is unknown
-			blocks := blockBatch.blocks
+func (s *Synchronizer) fetchBlockIDs() {
+	for blockBatch := range s.blockBatchesEmpty {
+		currentID := blockBatch.from.id
+		currentHeight := blockBatch.from.height
 
-			blockWrappers := make([]*block.Block, len(blocks))
-			var err error
-			for i, b := range blocks {
-				if blockWrappers[i], err = block.NewBlock(b); err != nil {
-					s.refetchBlockRangeAndBlockPeers(blockBatch, err)
-					continue ValidateBlocks
-				}
+		// TODO: if we can't get any blocks we probably have to go back to an earlier id
+	fetchBlockIDs:
+		for {
+			res, peers, err := s.client.GetNextBlockIDs(currentID, currentHeight)
+			if err != nil {
+				Log.Error("get next blocks ids", zap.Error(err))
+				continue fetchBlockIDs
 			}
 
-			storedCount := 0
-			if len(blockWrappers) > 1 {
-				// can only validate a block series with at least 2 elements (aka. block with previousBlock)
-				for i, b := range blockWrappers[1:len(blockWrappers)] {
-					// blocks[i] is the previousBlock .. cause that's a slice above
-					// - starting with element no. 2
-					if err = b.Validate(blockWrappers[i]); err != nil {
-						s.refetchBlockRangeAndBlockPeers(blockBatch, err)
-						continue ValidateBlocks
-					} else {
-						Log.Info("syncing block", zap.Int32("height", b.Height), zap.Uint64("id", b.Id))
-					}
-				}
-
-				// ToDo: may we should hand over the block batch to allow blocking bad peers?
-				s.store.RawStore.StoreAndMaybeConsume(blocks[1:len(blocks)])
-				storedCount = len(blocks) - 1
-
-				// if this was no glue action we need to store the possible successor and predecessor
-				if !blockBatch.isGlueResult {
-					s.blockBatchesGlue <- []*block.Block{
-						blockWrappers[0],
-						blockWrappers[len(blocks)-1],
-					}
-				}
-			} else {
-				// the first element is a possible predecessor - except for a handled glue result
-				s.blockBatchesGlue <- []*block.Block{blockWrappers[0]}
+			ids := res.NextBlockIds
+			if len(ids) == 0 {
+				time.Sleep(10 * time.Second)
+				Log.Error("get next blocks ids", zap.Error(errors.New("empty response")))
+				continue fetchBlockIDs
 			}
-
-			//if blocks[0].Height == 0 {
-			// ToDo: may we should hand over the block batch to allow blocking bad peers?
-			//s.store.RawStore.StoreAndMaybeConsume(blockBatch.blocks)
-			//storedCount++
-
-			processedCount := atomic.AddInt32(&s.statistic.processed, int32(storedCount))
-			Log.Info(
-				"syncing with",
-				zap.Int32(
-					"blocks/s",
-					int32(float64(processedCount)/time.Since(s.statistic.start).Seconds()),
-				),
-			)
-		case blocks := <-s.blockBatchesGlue:
-			orphanedBlock := blocks[0]
-			// think we do not need any lock between load and delete,
-			// cause this matching pair will not be handled by someone else
-			s.glueBlockOfMu.Lock()
-			if len(blocks) > 1 {
-				lastBlock := blocks[len(blocks)-1]
-				// keep track of - possible predecessor
-				s.glueBlockOf[lastBlock.Height] = lastBlock
-			}
-			if previousBlock, exists := s.glueBlockOf[orphanedBlock.Height-1]; exists {
-				blockBatch := &blockBatch{
-					blockRange: &blockRange{
-						from: blockMeta{
-							id:     previousBlock.Id,
-							height: previousBlock.Height,
-						},
-						to: &blockMeta{
-							id:     orphanedBlock.Id,
-							height: orphanedBlock.Height,
-						},
-					},
-					blocks:       []*api.Block{previousBlock.Block, orphanedBlock.Block},
-					ids:          []uint64{previousBlock.Id, orphanedBlock.Id},
-					isGlueResult: true,
-				}
-
-				delete(s.glueBlockOf, orphanedBlock.Height)
-				s.glueBlockOfMu.Unlock()
-
-				s.blockBatchesFilled <- blockBatch
-
-				Log.Info("glue pair found", zap.Int32("leftHeight", previousBlock.Height), zap.Int32("rightHeight", orphanedBlock.Height))
-			} else {
-				// keep track of possible successor
-				s.glueBlockOf[orphanedBlock.Height] = orphanedBlock
-				s.glueBlockOfMu.Unlock()
-			}
+			blockBatch.ids = ids
+			blockBatch.peers = peers
+			s.blockBatchesIDs <- blockBatch
+			break fetchBlockIDs
 		}
 	}
 }
 
 func (s *Synchronizer) fetchBlocks() {
-	for {
-		select {
-		case blockRange := <-s.blockRanges:
-			currentID := blockRange.from.id
-			currentHeight := blockRange.from.height
+	for blockBatch := range s.blockBatchesIDs {
+		currentID := blockBatch.from.id
+		currentHeight := blockBatch.from.height
 
-		FETCH_BLOCK_IDS_AGAIN:
-			res, peers, err := s.client.GetNextBlockIDs(currentID, currentHeight)
-			if err != nil {
-				Log.Error("get next blocks ids", zap.Error(err))
-				goto FETCH_BLOCK_IDS_AGAIN
-			}
-
-			ids := res.NextBlockIds
-
-			idCount := len(ids)
-			if idCount == 0 {
-				time.Sleep(10 * time.Second)
-				s.blockRanges <- blockRange
-				continue
-			}
-
-			Log.Info("syncing block", zap.Uint64("id", currentID))
-
-			s.blockBatchesEmpty <- &blockBatch{
-				blockRange: blockRange,
-				ids:        ids,
-				peers:      peers,
-			}
-		case blockBatch := <-s.blockBatchesEmpty:
-			currentID := blockBatch.blockRange.from.id
-			currentHeight := blockBatch.blockRange.from.height
-
-		FETCH_BLOCKS_AGAIN:
+		// TODO: if we can't get any blocks we probably have to go back to an earlier id
+	fetchBlocks:
+		for {
 			res, peers, err := s.client.GetNextBlocks(currentID, currentHeight)
 			if err != nil {
+				for _, p := range peers {
+					p.Throttle()
+				}
 				Log.Error("get next blocks", zap.Error(err))
-				goto FETCH_BLOCKS_AGAIN
+				continue fetchBlocks
+			}
+			if len(res.NextBlocks) == 0 {
+				for _, p := range peers {
+					p.Throttle()
+				}
+				Log.Error("get next blocks", zap.Error(errors.New("empty response")))
+				continue fetchBlocks
 			}
 
-			blockBatch.blocks = res.NextBlocks
-
-			validBlockCount := countValidBlocksAndSetHeight(currentID, blockBatch)
-
-			if validBlockCount == 0 {
-				s.blockRanges <- blockBatch.blockRange
-				continue
-			}
-
-			from := blockBatch.blockRange.from
-			to := blockBatch.blockRange.to
-
-			from.height += int32(validBlockCount)
-			from.id = blockBatch.ids[validBlockCount-1]
-
-			blockBatch.blocks = blockBatch.blocks[:validBlockCount]
-
-			// TODO: kill some sync threads when we reached end of a block range?
-			if to == nil || from.height <= to.height {
-				s.blockRanges <- &blockRange{
-					from: from,
-					to:   to,
+			blocks := make([]*block.Block, len(res.NextBlocks))
+			for i, b := range res.NextBlocks {
+				if blocks[i], err = block.NewBlock(b); err != nil {
+					Log.Error("put api block into wrapper", zap.Error(err))
+					continue fetchBlocks
 				}
 			}
+			blockBatch.blocks = blocks
+			validBlockCount := countValidBlocksAndSetHeight(currentID, blockBatch)
+			if validBlockCount == 0 {
+				Log.Error("got not id overlaps for blocks and ids", zap.Uint64("block id", currentID))
+				continue fetchBlocks
+			} else {
+				blockBatch.blocks = blockBatch.blocks[:validBlockCount]
+			}
 
-			blockBatch.peers = peers
-			// blockBatch.peers = append(blockBatch.peers, peers...)
+			blockBatch.peers = append(blockBatch.peers, peers...)
+			s.blockBatchesBlocks <- blockBatch
+			break
+		}
+	}
+}
 
-			s.blockBatchesFilled <- blockBatch
+func (s *Synchronizer) validateBlocks() {
+validateBlocks:
+	for blockBatch := range s.blockBatchesBlocks {
+		blocks := blockBatch.blocks
+
+		numNewBlocks := len(blocks)
+		firstBlock := blocks[0]
+		lastBlock := blocks[len(blocks)-1]
+
+		s.glueBlocksMu.Lock()
+		// we need the predecessor of the first block of this batch
+		// if we have it cached we can simply prepend it
+		// otherwise we need to cache the first block for later validation
+		if b, exists := s.glueBlocks[firstBlock.Height-1]; exists {
+			blocks = append([]*block.Block{b}, blocks...)
+		} else {
+			s.glueBlocks[firstBlock.Height] = firstBlock
+		}
+
+		// the last block of this batch could be the predecessor of another block
+		// that still needs to be validated
+		if b, exists := s.glueBlocks[lastBlock.Height+1]; exists {
+			blocks = append(blocks, b)
+			delete(s.glueBlocks, b.Height)
+		} else {
+			s.glueBlocks[lastBlock.Height] = lastBlock
+		}
+		s.glueBlocksMu.Unlock()
+
+		for i, b := range blocks[1:len(blocks)] {
+			previousBlock := blocks[i]
+			// ToDo: after validation fails we should probably refetch the block ids
+			if err := b.Validate(previousBlock); err != nil {
+				s.refetchBlockRangeAndBlockPeers(blockBatch, err)
+				continue validateBlocks
+			}
+		}
+
+		// ToDo: may we should hand over the block batch to allow blocking bad peers?
+		// sync speed
+
+		s.store.RawStore.StoreAndMaybeConsume(blocks[1:len(blocks)])
+		blockBatch.from.height += int32(numNewBlocks)
+		blockBatch.from.id = blocks[len(blocks)-1].Id
+
+		s.statisticMu.Lock()
+		syncSpeed := s.statistic.update(numNewBlocks)
+		s.statisticMu.Unlock()
+		Log.Info("syncing with", zap.Float64("blocks/s", syncSpeed))
+
+		if blockBatch.to.height == 0 || blockBatch.from.height < blockBatch.to.height {
+			s.blockBatchesEmpty <- blockBatch
 		}
 	}
 }
@@ -322,13 +278,11 @@ func (s *Synchronizer) fetchBlocks() {
 func countValidBlocksAndSetHeight(currentId uint64, blockBatch *blockBatch) int {
 	ids := blockBatch.ids
 	blocks := blockBatch.blocks
-
 	for i, id := range append([]uint64{currentId}, ids...) {
 		if i > len(blocks)-1 || blocks[i].PreviousBlock != id {
 			return i
 		}
-		blocks[i].Height = blockBatch.blockRange.from.height + int32(i+1)
+		blocks[i].Height = blockBatch.from.height + int32(i+1)
 	}
-
 	return len(ids)
 }
