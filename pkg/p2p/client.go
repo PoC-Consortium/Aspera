@@ -4,13 +4,12 @@ import (
 	"bytes"
 	"errors"
 	"gopkg.in/resty.v1"
-	"sync"
 
 	api "github.com/ac0v/aspera/pkg/api/p2p"
 	compat "github.com/ac0v/aspera/pkg/api/p2p/compat"
 	b "github.com/ac0v/aspera/pkg/block"
 	"github.com/ac0v/aspera/pkg/config"
-	"github.com/ac0v/aspera/pkg/p2p/manager"
+	. "github.com/ac0v/aspera/pkg/p2p/manager"
 
 	"github.com/golang/protobuf/jsonpb"
 	"github.com/json-iterator/go"
@@ -27,16 +26,16 @@ type GetNextBlocksResponse struct {
 }
 
 type Client interface {
-	GetNextBlockIDs(blockID uint64, height int32) (*api.GetNextBlockIdsResponse, []manager.Peer, error)
-	GetNextBlocks(blockID uint64, height int32) (*api.GetNextBlocksResponse, []manager.Peer, error)
+	GetNextBlockIDs(blockID uint64, height int32) (*api.GetNextBlockIdsResponse, []Peer, error)
+	GetNextBlocks(blockID uint64, height int32) (*api.GetNextBlocksResponse, []Peer, error)
 }
 
 type client struct {
-	manager     manager.Manager
+	manager     Manager
 	unmarshaler *jsonpb.Unmarshaler
 }
 
-func NewClient(config *config.P2P, manager manager.Manager) Client {
+func NewClient(config *config.P2P, manager Manager) Client {
 	resty.SetTimeout(config.Timeout)
 	resty.SetDebug(config.Debug)
 
@@ -46,82 +45,102 @@ func NewClient(config *config.P2P, manager manager.Manager) Client {
 	}
 }
 
-func (c *client) requestByMajority(height int32, req func(p manager.Peer) ([]byte, error)) ([]byte, []manager.Peer, error) {
-	foundMajority := make(chan struct{})
+type vote struct {
+	voter *voter
+	peer  Peer
+	body  string
+}
 
-	type peerResponse struct {
-		of   manager.Peer
-		body string
+type voter struct {
+	token chan struct{}
+	quit  chan struct{}
+}
+
+func (v *voter) vote() {
+	v.token <- struct{}{}
+}
+
+func (v *voter) stop() {
+	v.quit <- struct{}{}
+}
+
+func newVoter(votes chan *vote, height int32, req func(p Peer) ([]byte, error), pm Manager) *voter {
+	v := &voter{
+		token: make(chan struct{}),
+		quit:  make(chan struct{}),
 	}
-
-	peerResponses := make(chan *peerResponse, majority)
-	sem := make(chan struct{}, majority)
-	var wg sync.WaitGroup
 	go func() {
 		for {
 			select {
-			case <-foundMajority:
+			case <-v.quit:
 				return
-			case sem <- struct{}{}:
-				wg.Add(1)
-				go func() {
-					peer := c.manager.RandomPeer(height)
-
-					body, err := req(peer)
-					if err == nil {
-						peerResponses <- &peerResponse{
-							of:   peer,
-							body: string(body),
-						}
-					} else {
-						peer.Throttle()
+			case <-v.token:
+			retryVote:
+				peer := pm.RandomPeer(height)
+				if body, err := req(peer); err == nil {
+					votes <- &vote{
+						voter: v,
+						peer:  peer,
+						body:  string(body),
 					}
-
-					<-sem
-					wg.Done()
-				}()
+				} else {
+					peer.Throttle()
+					if len(v.quit) == 0 {
+						goto retryVote
+					}
+					return
+				}
 			}
 		}
 	}()
+	return v
+}
 
-	seenBy := make(map[string]map[manager.Peer]struct{})
-	for peerResponse := range peerResponses {
-		peers := seenBy[peerResponse.body]
+func (c *client) requestByMajority(height int32, req func(p Peer) ([]byte, error)) ([]byte, []Peer, error) {
+	votes := make(chan *vote, majority)
+	voters := make([]*voter, majority)
+	for i := range voters {
+		v := newVoter(votes, height, req, c.manager)
+		v.vote()
+		voters[i] = v
+	}
+
+	seenBy := make(map[string]map[Peer]struct{})
+	for vote := range votes {
+		peers := seenBy[vote.body]
 		if peers == nil {
-			seenBy[peerResponse.body] = map[manager.Peer]struct{}{peerResponse.of: struct{}{}}
-		} else {
-			if _, processedPeer := peers[peerResponse.of]; processedPeer {
-				continue
-			}
-
-			peers[peerResponse.of] = struct{}{}
+			seenBy[vote.body] = map[Peer]struct{}{vote.peer: struct{}{}}
+		} else if _, processedPeer := peers[vote.peer]; !processedPeer {
+			peers[vote.peer] = struct{}{}
 
 			if len(peers) >= majority {
-				foundMajority <- struct{}{}
+				for _, v := range voters {
+					v.stop()
+				}
+				// close(votes)
 				for otherBody, peers := range seenBy {
-					if otherBody != peerResponse.body {
+					if otherBody != vote.body {
 						for p := range peers {
 							p.Throttle()
 						}
 					}
 				}
-				var peersSlice []manager.Peer
+				var peersSlice []Peer
 				for p := range peers {
 					p.DeThrottle()
 					peersSlice = append(peersSlice, p)
 				}
-				wg.Wait()
-				return []byte(peerResponse.body), peersSlice, nil
+				return []byte(vote.body), peersSlice, nil
 			}
 		}
-
+		vote.voter.vote()
 	}
 
 	return nil, nil, errors.New("unexpected error")
 }
 
-func (c *client) GetNextBlockIDs(blockId uint64, height int32) (*api.GetNextBlockIdsResponse, []manager.Peer, error) {
-	req := func(p manager.Peer) ([]byte, error) { return p.GetNextBlockIDsBody(blockId) }
+func (c *client) GetNextBlockIDs(blockId uint64, height int32) (*api.GetNextBlockIdsResponse, []Peer, error) {
+	req := func(p Peer) ([]byte, error) { return p.GetNextBlockIDsBody(blockId) }
 	body, peers, err := c.requestByMajority(height, req)
 	if err != nil {
 		return nil, nil, err
@@ -132,11 +151,11 @@ func (c *client) GetNextBlockIDs(blockId uint64, height int32) (*api.GetNextBloc
 	return msg, peers, err
 }
 
-func (c *client) GetNextBlocks(blockId uint64, height int32) (*api.GetNextBlocksResponse, []manager.Peer, error) {
+func (c *client) GetNextBlocks(blockId uint64, height int32) (*api.GetNextBlocksResponse, []Peer, error) {
 	p := c.manager.RandomPeer(height)
 	body, err := p.GetNextBlocksBody(blockId)
 	if err != nil {
-		return nil, []manager.Peer{p}, err
+		return nil, []Peer{p}, err
 	}
 
 	var json []byte
@@ -145,5 +164,5 @@ func (c *client) GetNextBlocks(blockId uint64, height int32) (*api.GetNextBlocks
 	}
 
 	var msg = new(api.GetNextBlocksResponse)
-	return msg, []manager.Peer{p}, c.unmarshaler.Unmarshal(bytes.NewReader(json), msg)
+	return msg, []Peer{p}, c.unmarshaler.Unmarshal(bytes.NewReader(json), msg)
 }
