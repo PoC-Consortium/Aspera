@@ -17,6 +17,7 @@ type DigitalGoodsDelivery struct {
 func (tx *DigitalGoodsDelivery) WriteAttachmentBytes(e encoding.Encoder) {
 	e.WriteUint64(tx.Attachment.Purchase)
 	e.WriteBytesWithInt32Len(tx.Attachment.IsText, tx.Attachment.Data)
+	e.WriteBytes(tx.Attachment.Data)
 	e.WriteBytes(tx.Attachment.Nonce)
 	e.WriteUint64(tx.Attachment.Discount)
 }
