@@ -185,7 +185,7 @@
                                 "attachment": {
                                     "purchase": {%qz= attachment.GetStringBytes("purchase") %},
                                     "isText": {% if attachment.GetBool("goodsIsText") %}true{% else %}false{% endif %},
-                                    "data": {%qz= encoding.HexStringBytesToBase64Bytes(attachment.GetStringBytes("goodsData")) %},
+                                    "data": {%qz= encoding.StringBytesToBase64Bytes(attachment.GetStringBytes("goodsData")) %},
                                     "nonce": {%qz= encoding.HexStringBytesToBase64Bytes(attachment.GetStringBytes("goodsNonce")) %},
                                     "discount": "{%v attachment.Get("discountNQT").String() %}"
                                 },
