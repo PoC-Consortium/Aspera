@@ -14,7 +14,7 @@ import (
 
 func init() {
 	// TODO: use dynamic timeout
-	resty.SetTimeout(5 * time.Second)
+	resty.SetTimeout(10 * time.Second)
 }
 
 var json = jsoniter.ConfigCompatibleWithStandardLibrary
