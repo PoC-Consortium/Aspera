@@ -26,6 +26,8 @@ type RawStore struct {
 	BasePath string
 	Current  *RawCurrent
 	queue    *badger.DB
+
+	sync.Mutex
 }
 
 type RawCurrent struct {
@@ -155,80 +157,89 @@ func (rawStore *RawStore) load(height int32) *api.Block {
 	return block
 }
 
-func (rawStore *RawStore) StoreAndMaybeConsume(blocks []*block.Block) error {
+func (rawStore *RawStore) store(blocks []*block.Block) (bool, int) {
 	readyToConsume := false
 	waitForHeight := int(rawStore.Current.Height + 1)
-
-	// store
 	txn := rawStore.queue.NewTransaction(true)
 	for _, block := range blocks {
 		if blockPb, err := proto.Marshal(block.Block); err == nil {
 			height := int(block.Height)
 			heightBs := []byte(strconv.Itoa(height))
-			for {
-				if err := txn.Set(heightBs, blockPb); err == nil {
-					if waitForHeight == height {
-						readyToConsume = true
-					}
-					break
-				} else {
-					switch err {
-					case badger.ErrTxnTooBig:
-						// split up big transactions
-						_ = txn.Commit(nil)
-						txn = rawStore.queue.NewTransaction(true)
-						continue
-					default:
-						panic(err)
-					}
+
+			switch err := txn.Set(heightBs, blockPb); err {
+			case nil:
+			case badger.ErrTxnTooBig:
+				if err = txn.Commit(nil); err != nil {
+					panic(err)
 				}
-			}
-		}
-	}
-	_ = txn.Commit(nil)
-
-	if !readyToConsume {
-		return nil
-	}
-
-	// consume, cause looks like we just stored at least the height we we're waiting for
-	txn = rawStore.queue.NewTransaction(true)
-	for {
-		height := waitForHeight
-		heightBs := []byte(strconv.Itoa(height))
-		waitForHeight++
-
-		if blockItem, err := txn.Get(heightBs); err != nil {
-			switch err {
-			case badger.ErrKeyNotFound:
-				// looks like we have no further blocks which matches the required sequence atm
-				return nil
+				txn = rawStore.queue.NewTransaction(true)
+				if err := txn.Set(heightBs, blockPb); err != nil {
+					panic(err)
+				}
 			default:
-				return err
+				panic(err)
+			}
+			if waitForHeight == height {
+				readyToConsume = true
 			}
 		} else {
-			if blockBs, err := blockItem.Value(); err != nil {
-				return err
-			} else {
-				block := new(api.Block)
-				if err := proto.Unmarshal(blockBs, block); err != nil {
-					return err
-				} else {
-					rawStore.Store(block, int32(height))
-				RETRY_DELETE:
-					if err := txn.Delete(heightBs); err != nil {
-						switch err {
-						case badger.ErrTxnTooBig:
-							// split up big transactions
-							_ = txn.Commit(nil)
-							txn = rawStore.queue.NewTransaction(true)
-							goto RETRY_DELETE
-						default:
-							panic(err)
-						}
-					}
-				}
-			}
+			panic(err)
 		}
 	}
+	if err := txn.Commit(nil); err != nil {
+		panic(err)
+	}
+	return readyToConsume, waitForHeight
+}
+
+func (rawStore *RawStore) consume(startHeight int) {
+	txn := rawStore.queue.NewTransaction(true)
+	for height := startHeight; ; height++ {
+		heightBs := []byte(strconv.Itoa(height))
+
+		switch blockItem, err := txn.Get(heightBs); err {
+		case nil:
+			blockBs, err := blockItem.Value()
+			if err != nil {
+				panic(err)
+			}
+
+			block := new(api.Block)
+			if err = proto.Unmarshal(blockBs, block); err != nil {
+				panic(err)
+			}
+			rawStore.Store(block, int32(height))
+
+			switch err := txn.Delete(heightBs); err {
+			case nil:
+			case badger.ErrTxnTooBig:
+				if err := txn.Commit(nil); err != nil {
+					panic(err)
+				}
+				txn = rawStore.queue.NewTransaction(true)
+				if err := txn.Delete(heightBs); err != nil {
+					panic(err)
+				}
+			default:
+				panic(err)
+			}
+		case badger.ErrKeyNotFound:
+			if err := txn.Commit(nil); err != nil {
+				panic(err)
+			}
+			return
+		default:
+			panic(err)
+		}
+	}
+}
+
+func (rawStore *RawStore) StoreAndMaybeConsume(blocks []*block.Block) {
+	// TODO: probably solve without lock
+	// without lock we get a conflict in consume, while deleting (which doesn't make sense to me right now)
+	rawStore.Lock()
+	if readyToConsume, startHeight := rawStore.store(blocks); readyToConsume {
+		rawStore.consume(startHeight)
+	}
+	rawStore.Unlock()
 }
