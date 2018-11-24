@@ -2,6 +2,7 @@ package math
 
 import (
 	"math/big"
+	"strconv"
 )
 
 // Various big integer limit values.
@@ -10,8 +11,10 @@ var (
 	tt256     = BigPow(2, 256)
 	tt256m1   = new(big.Int).Sub(tt256, big.NewInt(1))
 	tt63      = BigPow(2, 63)
+	tt64      = BigPow(2, 64)
 	MaxBig256 = new(big.Int).Set(tt256m1)
 	MaxBig63  = new(big.Int).Sub(tt63, big.NewInt(1))
+	MaxBig64  = new(big.Int).Sub(tt64, big.NewInt(1))
 	BigZero   = new(big.Int)
 )
 
@@ -38,4 +41,11 @@ func S256(x *big.Int) *big.Int {
 // U256 encodes as a 256 bit two's complement number. This operation is destructive.
 func U256(x *big.Int) *big.Int {
 	return x.And(x, tt256m1)
+}
+
+// BigFromUint64 creates a big int from a 64 bit unsigned integer
+func BigFromUint64(i uint64) *big.Int {
+	var b big.Int
+	b.SetString(strconv.FormatUint(i, 10), 10)
+	return &b
 }

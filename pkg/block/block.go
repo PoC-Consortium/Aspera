@@ -5,15 +5,19 @@ import (
 	"crypto/sha256"
 	"encoding/binary"
 	"errors"
+	"math/big"
 	"time"
 
 	api "github.com/ac0v/aspera/pkg/api/p2p"
 	"github.com/ac0v/aspera/pkg/burstmath"
+	. "github.com/ac0v/aspera/pkg/common/math"
 	"github.com/ac0v/aspera/pkg/crypto"
 	"github.com/ac0v/aspera/pkg/crypto/shabal256"
 	"github.com/ac0v/aspera/pkg/encoding"
+	env "github.com/ac0v/aspera/pkg/environment"
 	"github.com/ac0v/aspera/pkg/transaction"
 
+	"github.com/golang/protobuf/proto"
 	"github.com/json-iterator/go"
 )
 
@@ -53,6 +57,14 @@ func NewBlock(apiBlock *api.Block) (*Block, error) {
 		}
 	}
 	return &Block{apiBlock, transactions}, nil
+}
+
+func FromProtoBytes(bs []byte) (*Block, error) {
+	pbBlock := new(api.Block)
+	if err := proto.Unmarshal(bs, pbBlock); err != nil {
+		return nil, err
+	}
+	return NewBlock(pbBlock)
 }
 
 func (b *Block) CalcScoop() uint32 {
@@ -180,4 +192,92 @@ func CalculateGenerationSignature(previous *Block) []byte {
 	binary.BigEndian.PutUint64(bs, id)
 	hash := shabal256.Sum256(append(previous.GenerationSignature, bs...))
 	return hash[:]
+}
+
+func (b *Block) SetBaseTargetAndCummulativeDifficulty(previousBlocks []*Block) {
+	switch {
+	case b.Height == 0:
+		b.BaseTarget = env.InitialBaseTarget
+		b.CummulativeDifficulty = big.NewInt(0).Bytes()
+	case b.Height < 4:
+		b.BaseTarget = env.InitialBaseTarget
+		previousBlock := previousBlocks[len(previousBlocks)-1]
+		cummulativeDifficulty := new(big.Int).SetBytes(previousBlock.CummulativeDifficulty)
+		var tmp big.Int
+		tmp.Quo(MaxBig64, big.NewInt(env.InitialBaseTarget))
+		b.CummulativeDifficulty = cummulativeDifficulty.Add(cummulativeDifficulty, &tmp).Bytes()
+	case b.Height < env.AdjustDifficutlyHeight:
+		var avgBaseTargetBig big.Int
+		previousBlocks = previousBlocks[len(previousBlocks)-4:]
+		for _, p := range previousBlocks {
+			avgBaseTargetBig.Add(&avgBaseTargetBig, BigFromUint64(p.BaseTarget))
+		}
+		avgBaseTargetBig.Quo(&avgBaseTargetBig, big.NewInt(4))
+
+		dt := int64(b.Timestamp - previousBlocks[0].Timestamp)
+
+		currentBaseTarget := avgBaseTargetBig.Uint64()
+		newBaseTargetBig := avgBaseTargetBig.Mul(&avgBaseTargetBig, big.NewInt(dt))
+		newBaseTarget := newBaseTargetBig.Quo(newBaseTargetBig, big.NewInt(240*4)).Uint64()
+		if newBaseTarget < 0 || newBaseTarget > env.MaxBaseTarget {
+			newBaseTarget = env.MaxBaseTarget
+		}
+		if newBaseTarget < currentBaseTarget*9/10 {
+			newBaseTarget = currentBaseTarget * 9 / 10
+		}
+		if newBaseTarget == 0 {
+			newBaseTarget = 1
+		}
+		twofoldCurrentBaseTarget := int64(currentBaseTarget) * 11 / 10
+		if twofoldCurrentBaseTarget < 0 {
+			twofoldCurrentBaseTarget = env.MaxBaseTarget
+		}
+		if newBaseTarget > uint64(twofoldCurrentBaseTarget) {
+			newBaseTarget = uint64(twofoldCurrentBaseTarget)
+		}
+		b.BaseTarget = newBaseTarget
+		previousCummulativeDifficulty := new(big.Int).SetBytes(previousBlocks[3].CummulativeDifficulty)
+		var tmp big.Int
+		tmp.Quo(MaxBig64, BigFromUint64(newBaseTarget))
+		b.CummulativeDifficulty = previousCummulativeDifficulty.Add(
+			previousCummulativeDifficulty, &tmp).Bytes()
+	default:
+		previousBlocks = previousBlocks[len(previousBlocks)-24:]
+		avgBaseTargetBig := BigFromUint64(previousBlocks[23].BaseTarget)
+		for i := 22; i >= 0; i-- {
+			avgBaseTargetBig.Mul(avgBaseTargetBig, big.NewInt(int64(24-i)))
+			avgBaseTargetBig.Add(avgBaseTargetBig, BigFromUint64(previousBlocks[i].BaseTarget))
+			avgBaseTargetBig.Quo(avgBaseTargetBig, big.NewInt(int64(25-i)))
+		}
+		dt := int64(b.Timestamp - previousBlocks[0].Timestamp)
+		var dtTarget int64 = 24 * 4 * 60
+
+		if dt < dtTarget/2 {
+			dt = dtTarget / 2
+		}
+		if dt > dtTarget*2 {
+			dt = dtTarget * 2
+		}
+		currentBaseTarget := previousBlocks[23].BaseTarget
+		tmp1 := new(big.Int).Mul(avgBaseTargetBig, big.NewInt(dt))
+		newBaseTarget := tmp1.Quo(tmp1, big.NewInt(dtTarget)).Uint64()
+		if newBaseTarget < 0 || newBaseTarget > env.MaxBaseTarget {
+			newBaseTarget = env.MaxBaseTarget
+		}
+		if newBaseTarget == 0 {
+			newBaseTarget = 1
+		}
+		if newBaseTarget < currentBaseTarget*8/10 {
+			newBaseTarget = currentBaseTarget * 8 / 10
+		}
+		if newBaseTarget > currentBaseTarget*12/10 {
+			newBaseTarget = currentBaseTarget * 12 / 10
+		}
+		b.BaseTarget = newBaseTarget
+		previousCummulativeDifficulty := new(big.Int).SetBytes(previousBlocks[23].CummulativeDifficulty)
+		var tmp2 big.Int
+		tmp2.Quo(MaxBig64, BigFromUint64(newBaseTarget))
+		b.CummulativeDifficulty = previousCummulativeDifficulty.Add(
+			previousCummulativeDifficulty, &tmp2).Bytes()
+	}
 }
