@@ -1,0 +1,84 @@
+import { NgModule } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
+import { SharedModule } from '../../../lib/shared.module';
+
+import { SetupRouting } from './setup.routing';
+import { SetupComponent } from './setup.component';
+import { NodeSetupComponent } from './node/node.component';
+import { NodeSetupAddressComponent } from './node/address/address.component';
+import { AccountNewComponent } from './account/account.component';
+import { CreatePassiveAccountComponent } from './account/create-passive/create-passive.component';
+import { CreateActiveAccountComponent } from './account/create-active/create.component';
+import { AccountCreatePinComponent } from './account/create-active/pin/pin.component';
+import { AccountCreateRecordComponent } from './account/create-active/record/record.component';
+import { AccountCreateSeedComponent } from './account/create-active/seed/seed.component';
+
+import { SetupService } from './setup.service';
+import { CreateService } from './account/create.service';
+import { NodeService } from './node/node.service';
+
+import { MatButtonModule } from '@angular/material/button';
+import { MatCardModule } from '@angular/material/card';
+import { MatChipsModule } from '@angular/material/chips';
+import { MatDividerModule } from '@angular/material/divider';
+import { MatExpansionModule } from '@angular/material/expansion';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatGridListModule } from '@angular/material/grid-list';
+import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material';
+import { MatListModule } from '@angular/material/list';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { MatStepperModule } from '@angular/material/stepper';
+import { I18nModule } from '../../../lib/i18n/i18n.module';
+import { NgxMaskModule } from 'ngx-mask';
+
+@NgModule({
+    imports: [
+        CommonModule,
+        MatButtonModule,
+        MatCardModule,
+        MatChipsModule,
+        MatDividerModule,
+        MatExpansionModule,
+        MatFormFieldModule,
+        MatGridListModule,
+        MatIconModule,
+        MatInputModule,
+        MatListModule,
+        MatProgressBarModule,
+        MatProgressSpinnerModule,
+        MatSlideToggleModule,
+        MatStepperModule,
+        ReactiveFormsModule,
+        SetupRouting,
+        SharedModule,
+        FormsModule,
+        I18nModule,
+        NgxMaskModule.forRoot()
+    ],
+    declarations: [
+        SetupComponent,
+        CreateActiveAccountComponent,
+        CreatePassiveAccountComponent,
+        AccountCreatePinComponent,
+        AccountCreateRecordComponent,
+        AccountCreateSeedComponent,
+        AccountNewComponent,
+        NodeSetupComponent,
+        NodeSetupAddressComponent,
+    ],
+    providers: [
+        CreateService,
+        NodeService,
+        SetupService
+    ],
+    exports: [
+        AccountNewComponent,
+        CreateActiveAccountComponent,
+        CreatePassiveAccountComponent
+    ]
+})
+export class SetupModule { }

@@ -1,0 +1,1 @@
+export { SendMultiOutFormComponent } from './send-multi-out-form.component';

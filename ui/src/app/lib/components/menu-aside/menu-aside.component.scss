@@ -1,0 +1,47 @@
+.mat-nav-list .mat-list-item {
+    height:auto;
+}
+.sidebar {
+    width:200px;
+    color:#fff;
+    text-align: center;
+    .logo {
+        width:30%;
+        height:auto;
+        margin:20px auto;
+    }
+    ul {
+        padding: 0;
+        margin:0;
+        text-align: left;
+    }
+    li {
+        padding:20px 15px;
+        list-style: none;
+        cursor: pointer;
+        font-size: 12px;
+        &:hover {
+            background:rgba(#3c8dbc, .15);
+            border-right:5px solid rgba(#3c8dbc, .5);
+        }
+    }
+    strong {    
+        display: block;
+        max-width: 52px; 
+        text-overflow: ellipsis;
+        word-wrap: break-word;
+        white-space: nowrap;
+        overflow: hidden;
+        direction: rtl;
+    }
+    span {
+        position: relative;
+        top:-7px;
+        left:5px;
+    }
+    .nav-bottom {
+        position: absolute;
+        bottom: 0;
+        width: 100%;
+    }
+}

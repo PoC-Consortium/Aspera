@@ -1,0 +1,27 @@
+@import 'src/public/assets/scss/variables/light';
+
+.seed-area {
+    height: 100px;
+    text-align: center;
+    border-radius: $default-border-radius;
+    border: solid 1px $default-border-color;
+}
+
+.spinner-center {
+    margin: 0 auto;
+    width: 5%;
+}
+
+.passphrase {
+    width:75%;
+    margin-right:20px;
+}
+
+.passphrase-container mat-form-field {
+    display:block;
+}
+
+.pin-container {
+    font-size:.8em;
+    margin-bottom: 2.5em;
+}
