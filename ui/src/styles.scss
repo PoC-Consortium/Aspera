@@ -1,0 +1,189 @@
+/* You can add global styles to this file, and also import other style files */
+// @import '/public/assets/scss/variables/light';
+// @import '/public/assets/scss/index';
+
+// @import "~bootstrap/dist/css/bootstrap.css";
+@import "~font-awesome/css/font-awesome.css";
+// @import "~ionicons/dist/css/ionicons.css";
+
+@import "~@angular/material/prebuilt-themes/indigo-pink.css";
+
+// @import "/public/assets/css/particle.css";
+@import "/public/fonts/material/material-icons.css";
+
+@import "~angular-notifier/styles.scss";
+// .danger {
+//     color: $red;
+// }
+
+// .success {
+//     color: $lime;
+// }
+
+// .danger-bg {
+//     background-color: $red;
+// }
+
+// .success-bg {
+//     background-color: $lime;
+// }
+
+html, body {
+    margin:0;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+.mat-nav-list {
+  padding-top:0 !important;
+}
+
+.mat-nav-list .mat-list-item .mat-list-item-content {
+  display:block !important;
+  padding:0 !important;
+}
+
+.mat-nav-list .mat-list-item:hover {
+  background:none;
+}
+
+.mat-nav-list .mat-list-item a { 
+  display: block;
+  margin:10px 0;
+  padding:10px;
+}
+
+.mat-nav-list .mat-nav-list a {
+  padding:5px;
+}
+
+.mat-nav-list .mat-list-item a:hover {
+  background:darken($color: #efefef, $amount: 15);
+}
+
+.mat-nav-list .mat-list-item {
+  padding:0 20px;
+}
+
+// Loading page with cubes
+.loading {
+    opacity: 0;
+    transition: opacity .8s ease-in-out;
+    position: fixed;
+    height: 100%;
+    width: 100%;
+    top: 0;
+    left: 0;
+    background: white;
+    z-index: -1;
+}
+app-root:empty + .loading {
+    opacity: 1;
+    z-index: 100;
+}
+app-root:empty + .loading h1 {
+    color: black;
+    position: absolute;
+    top: 50%;
+    width: 100%;
+    text-align: center;
+    transform: translate(0, -50%);
+}
+
+.sk-cube-grid {
+  width: 60px;
+  height: 60px;
+  margin: 100px auto;
+}
+
+.sk-cube-grid .sk-cube {
+  width: 33%;
+  height: 33%;
+  background-color: black;
+  float: left;
+  -webkit-animation: sk-cubeGridScaleDelay 1.3s infinite ease-in-out;
+          animation: sk-cubeGridScaleDelay 1.3s infinite ease-in-out;
+}
+.sk-cube-grid .sk-cube1 {
+  -webkit-animation-delay: 0.2s;
+          animation-delay: 0.2s; }
+.sk-cube-grid .sk-cube2 {
+  -webkit-animation-delay: 0.3s;
+          animation-delay: 0.3s; }
+.sk-cube-grid .sk-cube3 {
+  -webkit-animation-delay: 0.4s;
+          animation-delay: 0.4s; }
+.sk-cube-grid .sk-cube4 {
+  -webkit-animation-delay: 0.1s;
+          animation-delay: 0.1s; }
+.sk-cube-grid .sk-cube5 {
+  -webkit-animation-delay: 0.2s;
+          animation-delay: 0.2s; }
+.sk-cube-grid .sk-cube6 {
+  -webkit-animation-delay: 0.3s;
+          animation-delay: 0.3s; }
+.sk-cube-grid .sk-cube7 {
+  -webkit-animation-delay: 0s;
+          animation-delay: 0s; }
+.sk-cube-grid .sk-cube8 {
+  -webkit-animation-delay: 0.1s;
+          animation-delay: 0.1s; }
+.sk-cube-grid .sk-cube9 {
+  -webkit-animation-delay: 0.2s;
+          animation-delay: 0.2s; }
+
+@-webkit-keyframes sk-cubeGridScaleDelay {
+  0%, 70%, 100% {
+    -webkit-transform: scale3D(1, 1, 1);
+            transform: scale3D(1, 1, 1);
+  } 35% {
+    -webkit-transform: scale3D(0, 0, 1);
+            transform: scale3D(0, 0, 1);
+  }
+}
+
+@keyframes sk-cubeGridScaleDelay {
+  0%, 70%, 100% {
+    -webkit-transform: scale3D(1, 1, 1);
+            transform: scale3D(1, 1, 1);
+  } 35% {
+    -webkit-transform: scale3D(0, 0, 1);
+            transform: scale3D(0, 0, 1);
+  }
+}
+
+body, html, .particle, .wrapper {
+  height:100% !important;
+}
+
+.mat-step-header .mat-step-icon {
+  background: #3c8dbc;
+}
+
+.mat-progress-bar-buffer {
+  background: lighten(#3c8dbc, 30%);
+}
+
+.mat-progress-bar-fill::after {
+  background: #3c8dbc;
+}
+
+.mat-drawer, .mat-tab-group.mat-primary .mat-ink-bar, .mat-tab-nav-bar.mat-primary .mat-ink-bar {
+  background:darken(#3c8dbc, 40%);
+}
+
+.mat-button.mat-primary, .mat-icon-button.mat-primary, .mat-stroked-button.mat-primary {
+  color: darken(#3c8dbc, 40%);
+}
+
+.wrapper {
+  display: flex;
+}
+
+.mat-drawer-container {
+  width:100%;
+  margin-bottom:38px;
+}
+
+h2 {
+  font-size: 1em;
+}

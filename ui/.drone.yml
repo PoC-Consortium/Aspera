@@ -1,0 +1,9 @@
+pipeline:
+  build:
+    image: node:latest
+    commands:
+      - npm install --silent --global @angular/cli
+      - npm install --silent
+      - ng build -v -e demo
+    when:
+      event: [ push, pull_request ]

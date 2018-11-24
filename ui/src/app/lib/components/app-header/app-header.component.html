@@ -1,0 +1,102 @@
+<!-- Main Header
+<header class="main-header">
+
+  <div>
+    <img class="logo" src="public/assets/img/burst_logo.png">
+  </div>
+
+  <nav class="navbar navbar-static-top" role="navigation">
+
+    <button mat-button [matMenuTriggerFor]="accountsMenu">
+      <mat-icon>account_box</mat-icon>
+      <span>{{ selectedAccount.address }}</span>
+    </button>
+    <mat-menu #accountsMenu="matMenu" class="account-menu-panel" [overlapTrigger]="false">
+      <button mat-menu-item *ngFor="let account of accounts" (click)="selectAccount(account)">
+        <span>{{ account.address }}</span>
+      </button>
+
+      <button mat-menu-item routerLink="/dashboard/accounts">
+        <mat-icon>account_box</mat-icon>
+        <span>Manage Accounts</span>
+      </button>
+    </mat-menu>
+
+    <button mat-button [matMenuTriggerFor]="balance">
+      <mat-icon>local_atm</mat-icon> 
+      <span>{{ selectedAccount.balance }} BURST</span>
+    </button>
+    <mat-menu #balance="matMenu" class="account-menu-panel" width="300" [overlapTrigger]="false">
+      <button mat-menu-item (click)="openSendDialog()">
+        <mat-icon>send</mat-icon>
+        <span>{{ "send_burst" | i18n }}</span>
+      </button>
+    </mat-menu>
+
+    <button mat-button>
+      <mat-icon>{{ getTrendingIcon() }}</mat-icon>
+      <span>{{ getPriceBTC() }}</span>
+    </button>
+
+    <button mat-button [matMenuTriggerFor]="connectivity">
+      <mat-icon>dns</mat-icon>
+      <span>Local | 97 Peers | Valid</span>
+    </button>
+    <mat-menu #connectivity="matMenu" class="account-menu-panel" [overlapTrigger]="false">
+      <button mat-menu-item>
+        <mat-icon>account_box</mat-icon>
+        <span>Check</span>
+      </button>
+    </mat-menu>
+
+    <div class="navbar-custom-menu">
+      <ul class="nav navbar-nav">
+        <li>
+          <button mat-icon-button [matMenuTriggerFor]="contacts">
+            <mat-icon>contacts</mat-icon>
+          </button>
+          <mat-menu #contacts="matMenu" [overlapTrigger]="false">
+            <button mat-menu-item>
+              <mat-icon>dialpad</mat-icon>
+              <span>Redial</span>
+            </button>
+            <button mat-menu-item>
+              <mat-icon>notifications_off</mat-icon>
+              <span>Disable alerts</span>
+            </button>
+          </mat-menu>
+        </li>
+        <li>
+          <button mat-icon-button [matMenuTriggerFor]="message">
+            <mat-icon>message</mat-icon>
+          </button>
+          <mat-menu #message="matMenu" [overlapTrigger]="false">
+            <button mat-menu-item>
+              <mat-icon>dialpad</mat-icon>
+              <span>Redial</span>
+            </button>
+            <button mat-menu-item>
+              <mat-icon>notifications_off</mat-icon>
+              <span>Disable alerts</span>
+            </button>
+          </mat-menu>
+        </li>
+        <li>
+          <button mat-icon-button [matMenuTriggerFor]="settings">
+            <mat-icon>more_vert</mat-icon>
+          </button>
+          <mat-menu #settings="matMenu" [overlapTrigger]="false">
+            <button mat-menu-item>
+              <mat-icon>dialpad</mat-icon>
+              <span>Redial</span>
+            </button>
+            <button mat-menu-item>
+              <mat-icon>notifications_off</mat-icon>
+              <span>Disable alerts</span>
+            </button>
+          </mat-menu>
+        </li>
+      </ul>
+    </div>
+  </nav>
+</header> -->
