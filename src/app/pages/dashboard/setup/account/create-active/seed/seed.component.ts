@@ -9,7 +9,7 @@ import { CreateService } from '../../create.service';
     templateUrl: './seed.component.html'
 })
 export class AccountCreateSeedComponent implements OnInit {
-    private seedLimit: number = 10;
+    private seedLimit: number = 100;
     private seed: any[] = [];
     private update: boolean = false;
     private progress = 0;

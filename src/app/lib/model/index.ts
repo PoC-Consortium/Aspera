@@ -9,3 +9,4 @@ export * from "./burstNode";
 export * from "./settings";
 export * from "./transaction";
 export * from "./suggestedFees";
+export * from "./getBlockchainStatusResponse";

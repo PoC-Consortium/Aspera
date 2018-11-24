@@ -20,6 +20,6 @@ export class LoginComponent implements OnInit {
   method: string;
 
   ngOnInit() {
-    this.method = 'passive';
+    this.method = 'active';
   }
 }

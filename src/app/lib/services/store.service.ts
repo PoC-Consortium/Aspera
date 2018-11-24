@@ -27,7 +27,10 @@ export class StoreService {
     * Called on db start
     */
     public init() {
-        console.log("called2")
+        let blocks = this.store.getCollection("blocks");
+        if (blocks == null) {
+            blocks = this.store.addCollection("blocks", { unique : ["blockHeight"]});
+        }
         let accounts = this.store.getCollection("accounts");
         if (accounts == null) {
             accounts = this.store.addCollection("accounts", { unique : ["id"]});
@@ -69,7 +72,7 @@ export class StoreService {
                 } else {
                     accounts.chain().find({ id : account.id }).update(w => {
                         w.balance = account.balance;
-                        w.type = account.type;
+                        w.type = account.type; 
                         w.selected = account.selected;
                         w.keys = account.keys;
                         w.transactions = account.transactions;
