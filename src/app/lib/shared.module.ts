@@ -27,6 +27,7 @@ import {
     NotificationService,
     NetworkService,
     StoreService,
+    BurstService,
 } from './services';
 import { I18nModule } from './i18n/i18n.module';
 import { MatDialogModule, MatFormFieldModule, MatInputModule, MatTabsModule, MatCheckboxModule, MatGridListModule } from '@angular/material';
@@ -59,7 +60,8 @@ const NGA_SERVICES = [
     NotificationService,
     NetworkService,
     StoreService,
-    TranslateService
+    TranslateService,
+    BurstService
 ];
 
 const NGA_VALIDATORS = [

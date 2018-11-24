@@ -1,4 +1,10 @@
-# Burst Particle
+# Burst Wallet
+
+## Key Features
+- 🔒 PIN-based access, no passphrases stored
+- 🔥 Latest Angular, TypeScript, LokiJS
+- 🔥 [angular-cli](https://cli.angular.io/) support
+- 🔥 [Hot Module Replacement](https://webpack.js.org/concepts/hot-module-replacement/) support
 
 # Contribute / Development Setup
 

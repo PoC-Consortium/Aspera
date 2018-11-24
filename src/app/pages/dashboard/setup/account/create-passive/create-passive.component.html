@@ -2,6 +2,5 @@
     <mat-form-field appearance="outline">
         <input matInput prefix="BURST-" burstInputValidator [patterns]="burstAddressPattern" mask="____-____-____-_____"  [dropSpecialCharacters]="false"
                 [showMaskTyped]="true" [(ngModel)]="address" name="address" placeholder="{{ 'address' | i18n }}">
-    </mat-form-field><br />
-    <button mat-button (click)="submit(this.address)">{{ 'login' | i18n }}</button>
+    </mat-form-field> <i class="fa fa-lg fa-fw fa-arrow-right" (click)="submit(this.address)"></i>
 </div>

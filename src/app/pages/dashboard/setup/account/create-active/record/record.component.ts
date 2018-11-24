@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, NgZone, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, OnDestroy, NgZone, ViewEncapsulation, ElementRef } from '@angular/core';
 import { Router } from '@angular/router';
 import { CryptoService } from '../../../../../../lib/services';
 import { CreateService } from '../../create.service';
@@ -34,6 +34,20 @@ export class AccountCreateRecordComponent implements OnInit {
 
     public next() {
         this.createService.setStepIndex(2);
+    }
+
+    public copy() {
+        let selBox = document.createElement('textarea');
+        selBox.style.position = 'fixed';
+        selBox.style.left = '0';
+        selBox.style.top = '0';
+        selBox.style.opacity = '0';
+        selBox.value = this.createService.getCompletePassphrase();
+        document.body.appendChild(selBox);
+        selBox.focus();
+        selBox.select();
+        document.execCommand('copy');
+        document.body.removeChild(selBox);
     }
 
 }

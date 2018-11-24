@@ -418,6 +418,10 @@ export class AccountService {
         });
     }
 
+    handleIncomingTransactions(transactions: Transaction[]) {
+        console.log(`NEW TRANSACTIONS FOUND`, transactions); // todo
+    }
+
     /*
     * Method responsible for verifying the PIN
     */

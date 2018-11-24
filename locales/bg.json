@@ -14,6 +14,7 @@
    "add_contact" : "Добави контакт",
    "add_message_q" : "Добави съобщение?",
    "add_note_to_self_q" : "Добави бележка към себе си?",
+   "add_recipient": "Add Recipient",
    "add_recipient_to_contacts_q" : "Добави получателя към контактите?",
    "add_sender_as_contact" : "Добави подателя към контактите",
    "add_to_group" : "Добави към група",

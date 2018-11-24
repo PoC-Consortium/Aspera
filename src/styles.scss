@@ -167,8 +167,12 @@ body, html, .particle, .wrapper {
   background: #3c8dbc;
 }
 
-.mat-drawer {
+.mat-drawer, .mat-tab-group.mat-primary .mat-ink-bar, .mat-tab-nav-bar.mat-primary .mat-ink-bar {
   background:darken(#3c8dbc, 40%);
+}
+
+.mat-button.mat-primary, .mat-icon-button.mat-primary, .mat-stroked-button.mat-primary {
+  color: darken(#3c8dbc, 40%);
 }
 
 .wrapper {
@@ -178,4 +182,8 @@ body, html, .particle, .wrapper {
 .mat-drawer-container {
   width:100%;
   margin-bottom:38px;
+}
+
+h2 {
+  font-size: 1em;
 }
