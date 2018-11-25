@@ -118,7 +118,7 @@ func (b *Block) CalculateHashAndID() ([32]byte, uint64) {
 	return crypto.BytesToHashAndID(b.ToBytes())
 }
 
-func (b *Block) Validate(previous *Block) error {
+func (b *Block) PreValidate(previous *Block) error {
 	now := burstmath.DateToTimestamp(time.Now())
 
 	switch {
@@ -156,6 +156,12 @@ func (b *Block) Validate(previous *Block) error {
 
 	_, b.Id = b.CalculateHashAndID()
 
+	return nil
+}
+
+func (b *Block) Validate(previousBlocks []*Block) error {
+	b.SetBaseTargetAndCummulativeDifficulty(previousBlocks)
+	// TODO: sequential validation
 	return nil
 }
 

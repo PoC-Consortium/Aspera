@@ -245,7 +245,7 @@ validateBlocks:
 		for i, b := range blocks[1:len(blocks)] {
 			previousBlock := blocks[i]
 			// ToDo: after validation fails we should probably refetch the block ids
-			if err := b.Validate(previousBlock); err != nil {
+			if err := b.PreValidate(previousBlock); err != nil {
 				s.refetchBlockRangeAndBlockPeers(blockBatch, err)
 				continue validateBlocks
 			}

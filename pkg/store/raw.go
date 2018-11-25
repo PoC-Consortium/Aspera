@@ -27,6 +27,8 @@ type RawStore struct {
 	Current  *RawCurrent
 	queue    *badger.DB
 
+	blockCache *blockCache
+
 	sync.Mutex
 }
 
@@ -38,6 +40,24 @@ type RawCurrent struct {
 type LookupWorker struct {
 	*sync.Mutex
 	found []string
+}
+
+// blockCache stores the last n blocks and gives access to them.
+// For the validation of a single block we need its predecessors for:
+// - base target calculation
+// - timestamp difference and deadline validation
+// ...
+type blockCache struct {
+	Blocks []*block.Block
+}
+
+func (bc *blockCache) store(b *block.Block) {
+	// currently calculating the base target depends on 24 previous blocks
+	if len(bc.Blocks) < 24 {
+		bc.Blocks = append(bc.Blocks, b)
+	} else {
+		bc.Blocks = append(bc.Blocks[1:], b)
+	}
 }
 
 func (lookupWorker *LookupWorker) Work(path string) {
@@ -111,11 +131,34 @@ func NewRawStore(path string, genesisMilestone config.Milestone) *RawStore {
 	}
 	Log.Info("loaded Raw Storage", zap.Int("height", int(rawStore.Current.Height)))
 
+	rawStore.blockCache = &blockCache{}
+	rawStore.cacheLatestBlocks()
+
 	return &rawStore
 }
 
 func (rawStore *RawStore) Push(block *api.Block) {
 	rawStore.Store(block, rawStore.Current.Height+1)
+}
+
+// CacheLatestBlocks caches the upto 24 latest blocks of the raw storage.
+func (rawStore *RawStore) cacheLatestBlocks() {
+	currentHeight := rawStore.Current.Height
+
+	var blockCount, startHeight int32
+	if currentHeight >= 24 {
+		blockCount = 24
+		startHeight = currentHeight - 24
+	} else {
+		blockCount = currentHeight
+		startHeight = 0
+	}
+
+	for height := startHeight; height < startHeight+blockCount; height++ {
+		pbBlock := rawStore.load(height)
+		block, _ := block.NewBlock(pbBlock)
+		rawStore.blockCache.store(block)
+	}
 }
 
 func (rawStore *RawStore) convertHeightToPathInfo(height int32) string {
@@ -204,11 +247,19 @@ func (rawStore *RawStore) consume(startHeight int) {
 				panic(err)
 			}
 
-			block := new(api.Block)
-			if err = proto.Unmarshal(blockBs, block); err != nil {
+			pbBlock := new(api.Block)
+			if err = proto.Unmarshal(blockBs, pbBlock); err != nil {
 				panic(err)
 			}
-			rawStore.Store(block, int32(height))
+
+			b, _ := block.NewBlock(pbBlock)
+			err = b.Validate(rawStore.blockCache.Blocks)
+			if err != nil {
+				panic(err)
+			}
+			rawStore.blockCache.store(b)
+
+			rawStore.Store(pbBlock, int32(height))
 
 			switch err := txn.Delete(heightBs); err {
 			case nil:
