@@ -1,6 +1,7 @@
 package block
 
 import (
+	"encoding/hex"
 	"testing"
 
 	api "github.com/ac0v/aspera/pkg/api/p2p"
@@ -339,4 +340,10 @@ func TestSetBaseTargetAndCummulativeDifficulty(t *testing.T) {
 		b.SetBaseTargetAndCummulativeDifficulty(test.previousBlocks)
 		assert.Equal(t, test.expBaseTarget, b.BaseTarget)
 	}
+}
+
+func TestGeneratorID(t *testing.T) {
+	generatorPubKey, _ := hex.DecodeString("08452e6a675a6ae3ebb287b3ceb9b91e9ee9e8d80b819cec6a575dfd1024bc71")
+	b := &Block{Block: &api.Block{GeneratorPublicKey: generatorPubKey}}
+	assert.Equal(t, uint64(3605721418087211807), b.GeneratorID())
 }

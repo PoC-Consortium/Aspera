@@ -200,6 +200,11 @@ func CalculateGenerationSignature(previous *Block) []byte {
 	return hash[:]
 }
 
+func (b *Block) GeneratorID() uint64 {
+	_, id := crypto.BytesToHashAndID(b.GeneratorPublicKey)
+	return id
+}
+
 func (b *Block) SetBaseTargetAndCummulativeDifficulty(previousBlocks []*Block) {
 	switch {
 	case b.Height == 0:
