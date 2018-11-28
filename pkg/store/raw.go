@@ -150,7 +150,7 @@ func (rawStore *RawStore) cacheLatestBlocks() {
 		blockCount = 24
 		startHeight = currentHeight - 24
 	} else {
-		blockCount = currentHeight
+		blockCount = currentHeight + 1
 		startHeight = 0
 	}
 
