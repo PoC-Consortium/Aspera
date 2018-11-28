@@ -1,0 +1,200 @@
+{
+  "swagger" : "2.0",
+  "info" : {
+    "title" : "The Burst API",
+    "version" : "1.0.0",
+    "contact" : {
+      "email" : "bots@cryptoguru.org"
+    }
+  },
+  "host" : "localhost:8125",
+  "basePath" : "/api/v1",
+  "produces" : [ "application/json" ],
+  "schemes" : [ "https", "http" ],
+  "tags" : [ {
+    "name" : "server",
+    "description" : "Get basic information about this wallet."
+  } ],
+  "paths" : {
+    "/server/getAccountsWithRewardRecipient" : {
+      "get" : {
+        "tags" : [ "server" ],
+        "summary" : "Get all pool members of a specific account.",
+        "operationId" : "getAccountsWithRewardRecipient",
+        "parameters" : [ {
+          "in" : "query",
+          "name" : "account",
+          "type" : "string",
+          "allowEmptyValue" : false,
+          "required" : true
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "successful operation",
+            "schema" : {
+              "type" : "object",
+              "properties" : {
+                "accounts" : {
+                  "type" : "array",
+                  "items" : {
+                    "type" : "integer"
+                  }
+                },
+                "requestProcessingTime" : {
+                  "type" : "integer"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Invalid account."
+          },
+          "404" : {
+            "description" : "Account not found."
+          }
+        },
+        "deprecated" : false
+      }
+    },
+    "/server/getBlockchainStatus" : {
+      "get" : {
+        "tags" : [ "server" ],
+        "summary" : "Get general informations about the Burst blockchain.",
+        "operationId" : "getBlockchainStatus",
+        "responses" : {
+          "200" : {
+            "description" : "successful operation",
+            "schema" : {
+              "type" : "object",
+              "properties" : {
+                "lastBlock" : {
+                  "type" : "integer"
+                },
+                "application" : {
+                  "type" : "string"
+                },
+                "isScanning" : {
+                  "type" : "boolean"
+                },
+                "cumulativeDifficulty" : {
+                  "type" : "integer"
+                },
+                "lastBlockchainFeederHeight" : {
+                  "type" : "integer"
+                },
+                "numberOfBlocks" : {
+                  "type" : "integer"
+                },
+                "time" : {
+                  "type" : "integer"
+                },
+                "version" : {
+                  "type" : "string"
+                },
+                "lastBlockchainFeeder" : {
+                  "type" : "string"
+                },
+                "requestProcessingTime" : {
+                  "type" : "integer"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Bad request."
+          }
+        },
+        "deprecated" : false
+      }
+    },
+    "/server/getMiningInfo" : {
+      "get" : {
+        "tags" : [ "server" ],
+        "summary" : "Get information needed to mine the current block.",
+        "operationId" : "getMiningInfo",
+        "responses" : {
+          "200" : {
+            "description" : "successful operation",
+            "schema" : {
+              "type" : "object",
+              "properties" : {
+                "generationSignature" : {
+                  "type" : "string"
+                },
+                "baseTarget" : {
+                  "type" : "integer"
+                },
+                "height" : {
+                  "type" : "integer"
+                },
+                "requestProcessingTime" : {
+                  "type" : "integer"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Bad request."
+          }
+        },
+        "deprecated" : false
+      }
+    },
+    "/server/getMyInfo" : {
+      "get" : {
+        "tags" : [ "server" ],
+        "summary" : "Get hostname and address of the requesting node.",
+        "operationId" : "getMyInfo",
+        "responses" : {
+          "200" : {
+            "description" : "successful operation",
+            "schema" : {
+              "type" : "object",
+              "properties" : {
+                "address" : {
+                  "type" : "string"
+                },
+                "host" : {
+                  "type" : "integer"
+                },
+                "requestProcessingTime" : {
+                  "type" : "integer"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Bad request."
+          }
+        }
+      }
+    },
+    "/server/getTime" : {
+      "get" : {
+        "tags" : [ "server" ],
+        "summary" : "Get the current time.",
+        "operationId" : "getTime",
+        "responses" : {
+          "200" : {
+            "description" : "successful operation",
+            "schema" : {
+              "type" : "object",
+              "properties" : {
+                "time" : {
+                  "type" : "integer"
+                },
+                "requestProcessingTime" : {
+                  "type" : "integer"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Bad request."
+          }
+        },
+        "deprecated" : false
+      }
+    }
+  }
+}
