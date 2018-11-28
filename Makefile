@@ -2,6 +2,8 @@
 
 ROOT_DIR := $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
 
+all: clibs build
+
 build:
 	mkdir -p $(ROOT_DIR)/pkg/api/p2p
 	mkdir -p $(ROOT_DIR)/pkg/account/pb

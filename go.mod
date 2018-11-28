@@ -1,0 +1,57 @@
+module github.com/ac0v/aspera
+
+require (
+	github.com/AndreasBriese/bbloom v0.0.0-20180913140656-343706a395b7
+	github.com/Jeffail/gabs v1.1.1
+	github.com/PuerkitoBio/purell v1.1.0
+	github.com/PuerkitoBio/urlesc v0.0.0-20170810143723-de5bf2ad4578
+	github.com/alecthomas/template v0.0.0-20160405071501-a0175ee3bccc
+	github.com/davecgh/go-spew v1.1.1
+	github.com/dgraph-io/badger v1.5.4
+	github.com/dgryski/go-farm v0.0.0-20180109070241-2de33835d102
+	github.com/dixonwille/skywalker v0.0.0-20170804202456-07698455332d
+	github.com/fsnotify/fsnotify v1.4.7
+	github.com/gin-contrib/sse v0.0.0-20170109093832-22d885f9ecc7
+	github.com/gin-gonic/gin v1.3.0
+	github.com/go-openapi/jsonpointer v0.17.2
+	github.com/go-openapi/jsonreference v0.17.2
+	github.com/go-openapi/spec v0.17.2
+	github.com/go-openapi/swag v0.17.2
+	github.com/gobwas/glob v0.2.3
+	github.com/golang/protobuf v1.2.0
+	github.com/hashicorp/hcl v1.0.0
+	github.com/json-iterator/go v1.1.5
+	github.com/klauspost/cpuid v0.0.0-20170728055534-ae7887de9fa5
+	github.com/lukechampine/randmap v0.0.0-20161125183226-9e3c222d0413
+	github.com/magiconair/properties v1.8.0
+	github.com/mailru/easyjson v0.0.0-20180823135443-60711f1a8329
+	github.com/mattn/go-isatty v0.0.4
+	github.com/mitchellh/mapstructure v1.1.2
+	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd
+	github.com/modern-go/reflect2 v0.0.0-20180701023420-4b7aa43c6742
+	github.com/pelletier/go-toml v1.2.0
+	github.com/pkg/errors v0.8.0
+	github.com/pmezard/go-difflib v1.0.0
+	github.com/satori/go.uuid v1.2.0
+	github.com/spf13/afero v1.1.2
+	github.com/spf13/cast v1.3.0
+	github.com/spf13/jwalterweatherman v1.0.0
+	github.com/spf13/pflag v1.0.3
+	github.com/spf13/viper v1.2.1
+	github.com/stretchr/testify v1.2.2
+	github.com/swaggo/gin-swagger v1.0.0
+	github.com/swaggo/swag v1.3.2
+	github.com/ugorji/go v1.1.1
+	github.com/valyala/fastjson v0.0.0-20181102213714-93391a394550
+	github.com/valyala/quicktemplate v0.0.0-20160610110555-de41ba48f1d9
+	go.uber.org/atomic v1.3.2
+	go.uber.org/multierr v1.1.0
+	go.uber.org/zap v1.9.1
+	golang.org/x/crypto v0.0.0-20181030102418-4d3f4d9ffa16
+	golang.org/x/net v0.0.0-20181102091132-c10e9556a7bc
+	golang.org/x/sys v0.0.0-20181031143558-9b800f95dbbc
+	golang.org/x/text v0.3.0
+	gopkg.in/go-playground/validator.v8 v8.18.2
+	gopkg.in/resty.v1 v1.10.1
+	gopkg.in/yaml.v2 v2.2.1
+)
