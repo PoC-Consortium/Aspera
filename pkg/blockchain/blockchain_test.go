@@ -43,11 +43,11 @@ func TestNewBlockchain(t *testing.T) {
 	assert.NotNil(t, bc.blockDB)
 }
 
-func TestSendBurst(t *testing.T) {
+func TestTransferBurst(t *testing.T) {
 	senderPublicKey, _ := hex.DecodeString("d37ebb299c54fa4603f1b656f6bcf70810a9cd1d56e2ea979c7933d94ae3602a")
 	var receiverId uint64 = 8964081770308214857
 
-	err := bc.SendBurst(senderPublicKey, receiverId, 10, 1)
+	err := bc.TransferBurst(senderPublicKey, receiverId, 10, 1)
 	assert.Equal(t, ErrUnknownAccount, err)
 
 	sender := account.NewAccount(7900104405094198526)
@@ -55,13 +55,13 @@ func TestSendBurst(t *testing.T) {
 	sender.PublicKey = senderPublicKey
 	createDummyAccount(sender)
 
-	err = bc.SendBurst(senderPublicKey, receiverId, 10, 1)
+	err = bc.TransferBurst(senderPublicKey, receiverId, 10, 1)
 	assert.Equal(t, ErrBalanceTooLow, err)
 
 	sender.Balance = 11
 	createDummyAccount(sender)
 
-	err = bc.SendBurst(senderPublicKey, receiverId, 10, 1)
+	err = bc.TransferBurst(senderPublicKey, receiverId, 10, 1)
 	assert.Nil(t, err)
 
 	receiver, err := bc.GetAccountById(receiverId)

@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	pb "github.com/ac0v/aspera/pkg/api/p2p"
+	. "github.com/ac0v/aspera/pkg/blockchain"
 	"github.com/ac0v/aspera/pkg/crypto"
 	"github.com/ac0v/aspera/pkg/encoding"
 	env "github.com/ac0v/aspera/pkg/environment"
@@ -307,4 +308,13 @@ func AppendixFlags(a *pb.Appendix) uint32 {
 		flags |= 1 << 3
 	}
 	return flags
+}
+
+func Execute(tx Transaction) error {
+	h := tx.GetHeader()
+	if err := BC.TransferBurst(h.SenderPublicKey, h.Recipient, int64(h.Amount), int64(h.Fee)); err != nil {
+		return err
+	}
+	// return tx.Execute()
+	return nil
 }

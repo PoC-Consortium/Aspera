@@ -9,6 +9,7 @@ import (
 	"time"
 
 	api "github.com/ac0v/aspera/pkg/api/p2p"
+	. "github.com/ac0v/aspera/pkg/blockchain"
 	"github.com/ac0v/aspera/pkg/burstmath"
 	. "github.com/ac0v/aspera/pkg/common/math"
 	"github.com/ac0v/aspera/pkg/crypto"
@@ -162,6 +163,30 @@ func (b *Block) PreValidate(previous *Block) error {
 func (b *Block) Validate(previousBlocks []*Block) error {
 	b.SetBaseTargetAndCummulativeDifficulty(previousBlocks)
 	// TODO: sequential validation
+	return nil
+}
+
+func (b *Block) BlockReward() int64 {
+	blockReward := env.BlockReward(b.Height)
+	for _, tx := range b.transactions {
+		blockReward += int64(tx.GetHeader().Fee)
+	}
+	return blockReward
+}
+
+func (b *Block) Execute() error {
+	if b.Height < env.RewardRecipientStartHeight {
+		if err := BC.TransferBurst(nil, b.GeneratorID(), b.BlockReward(), 0); err != nil {
+			panic(err)
+		}
+	} else {
+		panic("process reward reipient")
+	}
+	for _, tx := range b.transactions {
+		if err := transaction.Execute(tx); err != nil {
+			panic(err)
+		}
+	}
 	return nil
 }
 

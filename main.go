@@ -3,6 +3,7 @@ package main
 import (
 	"go.uber.org/zap"
 
+	"github.com/ac0v/aspera/pkg/blockchain"
 	"github.com/ac0v/aspera/pkg/config"
 	. "github.com/ac0v/aspera/pkg/log"
 	p2p "github.com/ac0v/aspera/pkg/p2p"
@@ -11,6 +12,8 @@ import (
 )
 
 func main() {
+	blockchain.Init()
+
 	c, err := config.Parse("config.yml")
 	if err != nil {
 		Log.Fatal("parse config", zap.Error(err))

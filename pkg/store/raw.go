@@ -3,7 +3,6 @@ package store
 import (
 	"encoding/hex"
 	"fmt"
-	"go.uber.org/zap"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -20,6 +19,7 @@ import (
 	"github.com/dgraph-io/badger"
 	"github.com/dixonwille/skywalker"
 	"github.com/golang/protobuf/proto"
+	"go.uber.org/zap"
 )
 
 type RawStore struct {
@@ -253,10 +253,13 @@ func (rawStore *RawStore) consume(startHeight int) {
 			}
 
 			b, _ := block.NewBlock(pbBlock)
-			err = b.Validate(rawStore.blockCache.Blocks)
-			if err != nil {
+			if err = b.Validate(rawStore.blockCache.Blocks); err != nil {
 				panic(err)
 			}
+			// TODO: activate block execution
+			// if err := b.Execute(); err != nil {
+			// 	panic(err)
+			// }
 			rawStore.blockCache.store(b)
 
 			rawStore.Store(pbBlock, int32(height))

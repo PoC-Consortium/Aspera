@@ -11,6 +11,8 @@ const (
 	preDymaxionForkHeight = 500000
 	poc2ForkHeight        = 502000
 
+	RewardRecipientStartHeight = 6500
+
 	AdjustDifficutlyHeight = 2700
 
 	InitialBaseTarget = 18325193796
