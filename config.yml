@@ -4,6 +4,7 @@ network:
   internetProtocols:
     - v4
   p2p:
+    listen: :8123
     peers:
       - wallet.burst.cryptoguru.org
       - 195.201.124.43

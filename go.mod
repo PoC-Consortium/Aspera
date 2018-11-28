@@ -21,7 +21,7 @@ require (
 	github.com/golang/protobuf v1.2.0
 	github.com/hashicorp/hcl v1.0.0
 	github.com/json-iterator/go v1.1.5
-	github.com/klauspost/cpuid v0.0.0-20170728055534-ae7887de9fa5
+	github.com/klauspost/cpuid v0.0.0-20180405133222-e7e905edc00e
 	github.com/lukechampine/randmap v0.0.0-20161125183226-9e3c222d0413
 	github.com/magiconair/properties v1.8.0
 	github.com/mailru/easyjson v0.0.0-20180823135443-60711f1a8329
@@ -42,6 +42,7 @@ require (
 	github.com/swaggo/gin-swagger v1.0.0
 	github.com/swaggo/swag v1.3.2
 	github.com/ugorji/go v1.1.1
+	github.com/valyala/fasthttp v1.0.0
 	github.com/valyala/fastjson v0.0.0-20181102213714-93391a394550
 	github.com/valyala/quicktemplate v0.0.0-20160610110555-de41ba48f1d9
 	go.uber.org/atomic v1.3.2

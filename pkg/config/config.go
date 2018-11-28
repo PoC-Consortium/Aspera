@@ -25,6 +25,7 @@ type Network struct {
 type P2P struct {
 	Timeout    time.Duration
 	Debug      bool
+	Listen     string
 	Peers      []string
 	Milestones []Milestone
 }

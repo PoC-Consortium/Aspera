@@ -49,3 +49,9 @@ func BigFromUint64(i uint64) *big.Int {
 	b.SetString(strconv.FormatUint(i, 10), 10)
 	return &b
 }
+
+func StringFromBigBytes(bs []byte) string {
+	var b big.Int
+	b.SetBytes(bs)
+	return b.String()
+}
