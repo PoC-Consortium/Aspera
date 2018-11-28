@@ -42,5 +42,5 @@ message Block {
     int32 height = 15;
     bytes previousBlockHash = 16;
     uint64 baseTarget = 17;
-    bytes cummulativeDifficulty = 18;
+    bytes cumulativeDifficulty = 18;
 }

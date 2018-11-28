@@ -8,7 +8,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestSetBaseTargetAndCummulativeDifficulty(t *testing.T) {
+func TestSetBaseTargetAndCumulativeDifficulty(t *testing.T) {
 	// TODO: test cummulative difficutly
 	type test struct {
 		block                    *Block
@@ -337,7 +337,7 @@ func TestSetBaseTargetAndCummulativeDifficulty(t *testing.T) {
 	}
 	for _, test := range tests {
 		b := test.block
-		b.SetBaseTargetAndCummulativeDifficulty(test.previousBlocks)
+		b.SetBaseTargetAndCumulativeDifficulty(test.previousBlocks)
 		assert.Equal(t, test.expBaseTarget, b.BaseTarget)
 	}
 }

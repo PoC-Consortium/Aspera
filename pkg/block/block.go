@@ -161,7 +161,7 @@ func (b *Block) PreValidate(previous *Block) error {
 }
 
 func (b *Block) Validate(previousBlocks []*Block) error {
-	b.SetBaseTargetAndCummulativeDifficulty(previousBlocks)
+	b.SetBaseTargetAndCumulativeDifficulty(previousBlocks)
 	// TODO: sequential validation
 	return nil
 }
@@ -230,18 +230,18 @@ func (b *Block) GeneratorID() uint64 {
 	return id
 }
 
-func (b *Block) SetBaseTargetAndCummulativeDifficulty(previousBlocks []*Block) {
+func (b *Block) SetBaseTargetAndCumulativeDifficulty(previousBlocks []*Block) {
 	switch {
 	case b.Height == 0:
 		b.BaseTarget = env.InitialBaseTarget
-		b.CummulativeDifficulty = big.NewInt(0).Bytes()
+		b.CumulativeDifficulty = big.NewInt(0).Bytes()
 	case b.Height < 4:
 		b.BaseTarget = env.InitialBaseTarget
 		previousBlock := previousBlocks[len(previousBlocks)-1]
-		cummulativeDifficulty := new(big.Int).SetBytes(previousBlock.CummulativeDifficulty)
+		cumulativeDifficulty := new(big.Int).SetBytes(previousBlock.CumulativeDifficulty)
 		var tmp big.Int
 		tmp.Quo(MaxBig64, big.NewInt(env.InitialBaseTarget))
-		b.CummulativeDifficulty = cummulativeDifficulty.Add(cummulativeDifficulty, &tmp).Bytes()
+		b.CumulativeDifficulty = cumulativeDifficulty.Add(cumulativeDifficulty, &tmp).Bytes()
 	case b.Height < env.AdjustDifficutlyHeight:
 		var avgBaseTargetBig big.Int
 		previousBlocks = previousBlocks[len(previousBlocks)-4:]
@@ -272,11 +272,11 @@ func (b *Block) SetBaseTargetAndCummulativeDifficulty(previousBlocks []*Block) {
 			newBaseTarget = uint64(twofoldCurrentBaseTarget)
 		}
 		b.BaseTarget = newBaseTarget
-		previousCummulativeDifficulty := new(big.Int).SetBytes(previousBlocks[3].CummulativeDifficulty)
+		previousCumulativeDifficulty := new(big.Int).SetBytes(previousBlocks[3].CumulativeDifficulty)
 		var tmp big.Int
 		tmp.Quo(MaxBig64, BigFromUint64(newBaseTarget))
-		b.CummulativeDifficulty = previousCummulativeDifficulty.Add(
-			previousCummulativeDifficulty, &tmp).Bytes()
+		b.CumulativeDifficulty = previousCumulativeDifficulty.Add(
+			previousCumulativeDifficulty, &tmp).Bytes()
 	default:
 		previousBlocks = previousBlocks[len(previousBlocks)-24:]
 		avgBaseTargetBig := BigFromUint64(previousBlocks[23].BaseTarget)
@@ -310,10 +310,10 @@ func (b *Block) SetBaseTargetAndCummulativeDifficulty(previousBlocks []*Block) {
 			newBaseTarget = currentBaseTarget * 12 / 10
 		}
 		b.BaseTarget = newBaseTarget
-		previousCummulativeDifficulty := new(big.Int).SetBytes(previousBlocks[23].CummulativeDifficulty)
+		previousCumulativeDifficulty := new(big.Int).SetBytes(previousBlocks[23].CumulativeDifficulty)
 		var tmp2 big.Int
 		tmp2.Quo(MaxBig64, BigFromUint64(newBaseTarget))
-		b.CummulativeDifficulty = previousCummulativeDifficulty.Add(
-			previousCummulativeDifficulty, &tmp2).Bytes()
+		b.CumulativeDifficulty = previousCumulativeDifficulty.Add(
+			previousCumulativeDifficulty, &tmp2).Bytes()
 	}
 }
