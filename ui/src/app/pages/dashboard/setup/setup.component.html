@@ -1,0 +1,17 @@
+<mat-card class="content">
+    <mat-card-header>
+        <mat-card-title>Setup</mat-card-title>
+        <mat-card-subtitle>Node & Account</mat-card-subtitle>
+    </mat-card-header>
+    <mat-vertical-stepper [linear]="true" #stepper="matVerticalStepper">
+        <ng-template matStepperIcon="edit">
+            <mat-icon>build</mat-icon>
+        </ng-template>
+        <mat-step [completed]="this.setupService.getBurstNode() != undefined" label="Node">
+            <app-node-setup></app-node-setup>
+        </mat-step>
+        <mat-step [completed]="this.setupService.getAccount() != undefined" label="Account">
+            <app-account-new></app-account-new>
+        </mat-step>
+    </mat-vertical-stepper>
+</mat-card>

@@ -12,7 +12,7 @@ import (
 	. "github.com/ac0v/aspera/pkg/p2p/manager"
 
 	"github.com/golang/protobuf/jsonpb"
-	"github.com/json-iterator/go"
+	"github.com/json-iterator/go"	
 )
 
 const (
