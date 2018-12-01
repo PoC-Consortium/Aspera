@@ -1,0 +1,647 @@
+swagger: '2.0'
+info:
+  title: The Burst API
+  version: "1.0.0"
+  contact:
+    email: bots@cryptoguru.org
+
+host: localhost:8125
+basePath: /api/v1
+produces:
+  - application/json
+schemes:
+  - https
+  - http
+
+tags:
+  - name: all
+    description: Every API call.
+  - name: server
+    description: Get basic information about this wallet
+  - name: accounts
+    description: Get information about accounts and do operations
+
+paths:
+  /server/getAccountsWithRewardRecipient:
+    get:
+      tags:
+        - server
+        - all
+      summary: Get all pool members of a specific account.
+      operationId: getAccountsWithRewardRecipient
+      parameters:
+        - in: query
+          name: account
+          type: string
+          allowEmptyValue: false
+          required: true
+      responses:
+        '200':
+          description: successful operation
+          schema:
+            type: object
+            properties:
+              accounts:
+                type: array
+                items:
+                  type: string
+              requestProcessingTime:
+                type: integer
+        '400':
+          description: Invalid account.
+        '404':
+          description: Account not found.
+      deprecated: false
+  /server/getBlockchainStatus:
+    get:
+      tags:
+        - server
+        - all
+      summary: Get general informations about the Burst blockchain.
+      operationId: getBlockchainStatus
+      responses:
+        '200':
+          description: successful operation
+          schema:
+            type: object
+            properties:
+              lastBlock:
+                type: string
+              application:
+                type: string
+              isScanning:
+                type: boolean
+              cumulativeDifficulty:
+                type: string
+              lastBlockchainFeederHeight:
+                type: integer
+              numberOfBlocks:
+                type: integer
+              time:
+                type: integer
+              version:
+                type: string
+              lastBlockchainFeeder:
+                type: string
+              requestProcessingTime:
+                type: integer
+        '400':
+          description: Bad request.
+      deprecated: false
+  /server/getConstants:
+    get:
+      tags:
+        - server
+        - all
+      summary: Get all defined constants.
+      operationId: getConstants
+      responses:
+        '200':
+          description: successful operation
+          schema:
+            type: object
+            properties:
+              maxBlockPayloadLength:
+                type: integer
+              genesisAccountId:
+                type: string
+              genesisBlockId:
+                type: string
+              transactionTypes:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    description:
+                      type: string
+                    value:
+                      type: integer
+                    subtypes:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          description:
+                            type: string
+                          value:
+                            type: integer
+              peerStates:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    description:
+                      type: string
+                    value:
+                      type: integer
+              maxArbitraryMessageLength:
+                type: integer
+              requestTypes:
+                type: object
+        '400':
+          description: Bad request.
+      deprecated: false
+  /server/getMiningInfo:
+    get:
+      tags:
+        - server
+        - all
+      summary: Get information needed to mine the current block.
+      operationId: getMiningInfo
+      responses:
+        '200':
+          description: successful operation
+          schema:
+            type: object
+            properties:
+              generationSignature:
+                type: string
+              baseTarget:
+                type: integer
+              height:
+                type: integer
+              requestProcessingTime:
+                type: integer
+        '400':
+          description: Bad request.
+      deprecated: false
+  /server/getMyInfo:
+    get:
+      tags:
+        - server
+        - all
+      summary: Get hostname and address of the requesting node.
+      operationId: getMyInfo
+      responses:
+        '200':
+          description: successful operation
+          schema:
+            type: object
+            properties:
+              address:
+                type: string
+              host:
+                type: string
+              requestProcessingTime:
+                type: integer
+        '400':
+          description: Bad request.
+      deprecated: false
+  /server/getPeer:
+    get:
+      tags:
+        - server
+        - all
+      summary: Get basic information of a peer.
+      operationId: getPeer
+      parameters:
+        - in: query
+          name: peer
+          type: string
+          allowEmptyValue: false
+          required: true
+      responses:
+        '200':
+          description: successful operation
+          schema:
+            type: object
+            properties:
+              lastUpdated:
+                type: integer
+              downloadedVolume:
+                type: integer
+              blacklisted:
+                type: boolean
+              announcedAddress:
+                type: string
+              application:
+                type: string
+              uploadedVolume:
+                type: integer
+              state:
+                type: integer
+              version:
+                type: string
+              platform:
+                type: string
+              shareAddress:
+                type: boolean
+              requestProcessingTime:
+                type: integer
+        '400':
+          description: Bad request.
+      deprecated: false
+  /server/getPeers:
+    get:
+      tags:
+        - server
+        - all
+      summary: Get IP of all connected peers.
+      operationId: getPeers
+      parameters:
+        - in: query
+          name: active
+          type: boolean
+          allowEmptyValue: false
+          required: false
+        - in: query
+          name: state
+          type: string
+          allowEmptyValue: false
+          required: false
+          enum: [NON_CONNECTED, CONNECTED, DISCONNECTED]
+      responses:
+        '200':
+          description: successful operation
+          schema:
+            type: object
+            properties:
+              peers:
+                type: array
+                items:
+                  type: string
+              requestProcessingTime:
+                type: integer
+        '400':
+          description: Bad request.
+      deprecated: false
+  /server/getRewardRecipient:
+    get:
+      tags:
+        - server
+        - all
+      summary: Get the reward recipient of a specific account.
+      operationId: getRewardRecipient
+      parameters:
+        - in: query
+          name: account
+          type: string
+          allowEmptyValue: false
+          required: true
+      responses:
+        '200':
+          description: successful operation
+          schema:
+            type: object
+            properties:
+              rewardRecipient:
+                type: string
+              requestProcessingTime:
+                type: integer
+      deprecated: false
+  /server/getState:
+    get:
+      tags:
+        - server
+        - all
+      summary: Get the state of the Burst Network.
+      description: ''
+      operationId: getState
+      parameters:
+        - in: query
+          name: includeCounts
+          type: boolean
+          allowEmptyValue: true
+          required: false
+      responses:
+        '200':
+          description: successful operation
+          schema:
+            type: object
+            properties:
+              numberOfPeers:
+                type: integer
+              numberOfUnlockedAccounts:
+                type: integer
+              numberOfTransfers:
+                type: integer
+              numberOfOrders:
+                type: integer
+              numberOfTransactions:
+                type: integer
+              maxMemory:
+                type: integer
+              isScanning:
+                type: boolean
+              cumulativeDifficulty:
+                type: string
+              numberOfAssets:
+                type: integer
+              freeMemory:
+                type: integer
+              availableProcessors:
+                type: integer
+              totalEffectiveBalanceNXT:
+                type: integer
+              numberOfAccounts:
+                type: integer
+              numberOfBlocks:
+                type: integer
+              version:
+                type: string
+              numberOfBidOrders:
+                type: integer
+              lastBlock:
+                type: string
+              totalMemory:
+                type: integer
+              application:
+                type: string
+              numberOfAliases:
+                type: integer
+              lastBlockchainFeederHeight:
+                type: integer
+              numberOfTrades:
+                type: integer
+              time:
+                type: integer
+              numberOfAskOrders:
+                type: integer
+              lastBlockchainFeeder:
+                type: string
+              requestProcessingTime:
+                type: integer
+      deprecated: false
+  /server/getTime:
+    get:
+      tags:
+        - server
+        - all
+      summary: Get the current time.
+      operationId: getTime
+      responses:
+        '200':
+          description: successful operation
+          schema:
+            type: object
+            properties:
+              time:
+                type: integer
+              requestProcessingTime:
+                type: integer
+        '400':
+          description: Bad request.
+      deprecated: false
+  /accounts/getAccount:
+    get:
+      tags:
+        - accounts
+        - all
+      summary: Get information about a specific account.
+      operationId: getAccount
+      parameters:
+        - in: query
+          name: account
+          type: string
+          allowEmptyValue: false
+          required: true
+      responses:
+        '200':
+          description: successful operation
+          schema:
+            type: object
+            properties:
+              unconfirmedBalanceNQT:
+                type: string
+              guaranteedBalanceNQT:
+                type: string
+              unconfirmedAssetBalances:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    unconfirmedBalanceQNT:
+                      type: string
+                    asset:
+                      type: string
+              effectiveBalanceNXT:
+                type: string
+              accountRS:
+                type: string
+              forgedBalanceNQT:
+                type: string
+              balanceNQT:
+                type: string
+              publicKey:
+                type: string
+              assetBalances:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    balanceQNT:
+                      type: string
+                    asset:
+                      type: string
+              account:
+                type: string
+              requestProcessingTime:
+                type: integer
+        '400':
+          description: Bad request.
+      deprecated: false
+  /accounts/getAccountATs:
+    get:
+      tags:
+        - accounts
+        - all
+      summary: Get all running ATs of an account.
+      operationId: getAccountATs
+      parameters:
+        - in: query
+          name: account
+          type: string
+          allowEmptyValue: false
+          required: true
+      responses:
+        '200':
+          description: successful operation
+          schema:
+            type: object
+            properties:
+              ats:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    atVersion:
+                      type: integer
+                    creator:
+                      type: string
+                    creatorRS:
+                      type: string
+                    stopped:
+                      type: boolean
+                    machineCode:
+                      type: string
+                    description:
+                      type: string
+                    machineData:
+                      type: string
+                    frozen:
+                      type: boolean
+                    finished:
+                      type: boolean
+                    dead:
+                      type: boolean
+                    balanceNQT:
+                      type: string
+                    nextBlock:
+                      type: integer
+                    minActivation:
+                      type: string
+                    running:
+                      type: boolean
+                    at:
+                      type: string
+                    name:
+                      type: string
+                    atRS:
+                      type: string
+                    prevBalanceNQT:
+                      type: string
+                    creationBlock:
+                      type: integer
+              requestProcessingTime:
+                type: integer
+        '400':
+          description: Bad request.
+      deprecated: false
+  /account/getAccountBlockIds:
+    get:
+      tags:
+        - accounts
+        - all
+      summary: Get the block IDs of all blocks forged (generated) by an account in reverse block height order..
+      parameters:
+        - in: query
+          name: account
+          type: string
+          allowEmptyValue: false
+          required: true
+        - in: query
+          name: timestamp
+          type: integer
+          allowEmptyValue: false
+          required: false
+        - in: query
+          name: firstIndex
+          type: integer
+          allowEmptyValue: false
+          required: false
+        - in: query
+          name: lastIndex
+          type: integer
+          allowEmptyValue: false
+          required: false          
+      operationId: getAccountBlockIds
+      responses:
+        '200':
+          description: successful operation
+          schema:
+            type: object
+            properties:
+              ats:
+                type: array
+                items:
+                  type: string
+              requestProcessingTime:
+                  type: integer
+        '400':
+          description: Bad request.
+      deprecated: false
+  /account/getAccountBlocks:
+    get:
+      tags:
+        - accounts
+        - all
+      summary: Get the block IDs of all blocks forged (generated) by an account in reverse block height order..
+      parameters:
+        - in: query
+          name: account
+          type: string
+          allowEmptyValue: false
+          required: true
+        - in: query
+          name: timestamp
+          type: integer
+          allowEmptyValue: false
+          required: false
+        - in: query
+          name: firstIndex
+          type: integer
+          allowEmptyValue: false
+          required: false
+        - in: query
+          name: lastIndex
+          type: integer
+          allowEmptyValue: false
+          required: false 
+        - in: query
+          name: includeTransactions
+          type: boolean
+          allowEmptyValue: false
+          required: false 
+      operationId: getAccountBlocks
+      responses:
+        '200':
+          description: successful operation
+          schema:
+            type: object
+            properties:
+              blocks:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    previousBlockHash:
+                      type: string
+                    payloadLength:
+                      type: integer
+                    totalAmountNQT:
+                      type: string
+                    generationSignature:
+                      type: string
+                    generator:
+                      type: string
+                    generatorPublicKey:
+                      type: string
+                    baseTarget:
+                      type: string
+                    payloadHash:
+                      type: string
+                    generatorRS:
+                      type: string
+                    blockReward:
+                      type: string
+                    nextBlock:
+                      type: string
+                    scoopNum:
+                      type: string
+                    numberOfTransactions:
+                      type: integer
+                    blockSignature:
+                      type: string
+                    transactions:
+                      type: array
+                      items:
+                        type: string
+                    nonce:
+                      type: string
+                    version:
+                      type: integer
+                    totalFeeNQT:
+                      type: string
+                    previousBlock:
+                      type: string
+                    block:
+                      type: string
+                    height:
+                      type: integer
+                    timestamp:
+                      type: integer
+              requestProcessingTime:
+                  type: integer
+        '400':
+          description: Bad request.
+      deprecated: false
