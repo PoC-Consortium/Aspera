@@ -34,8 +34,6 @@ export class HomeComponent implements OnInit {
                 this.fetchTransactions();
             }
         });
-
-        // todo: auto-refresh
             
     }
 

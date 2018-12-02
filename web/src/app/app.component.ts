@@ -40,7 +40,6 @@ export class App {
             this.burstService.getBlockchainStatus().subscribe((response: GetBlockchainStatusResponse | HttpError | any) => {
                 this.isScanning = !this.firstTime && (this.previousLastBlock != response.lastBlock);
                 this.previousLastBlock = response.lastBlock;
-                this.firstTime = false;
                 if (this.isScanning && !this.firstTime) {
                     this.updateAccounts();
                     this.burstService.getBlock(response.lastBlock).subscribe((blockResponse: Block | HttpError | any) => {
@@ -53,6 +52,7 @@ export class App {
                         this.notificationService.notify('error', error.toString());
                     });
                 }
+                this.firstTime = false;
             });
         };
     }
