@@ -216,9 +216,8 @@ export class AccountService {
                 .set("lastIndex", constants.transactionCount)
                 .set("account", id);
 
-            let requestOptions = this.getRequestOptions();
+            let requestOptions = BurstUtil.getRequestOptions();
             requestOptions.params = params;
-            console.log(this.nodeUrl)
             return this.http.get(this.nodeUrl, requestOptions)
                 .timeout(constants.connectionTimeout)
                 .toPromise<any>() // todo
@@ -246,7 +245,7 @@ export class AccountService {
             let params: HttpParams = new HttpParams()
                 .set("requestType", "getUnconfirmedTransactions")
                 .set("account", id);
-            let requestOptions = this.getRequestOptions();
+            let requestOptions = BurstUtil.getRequestOptions();
             requestOptions.params = params;
             return this.http.get(this.nodeUrl, requestOptions)
                 .timeout(constants.connectionTimeout)
@@ -273,7 +272,7 @@ export class AccountService {
             let params: HttpParams = new HttpParams()
                 .set("requestType", "getTransaction")
                 .set("transaction", id);
-            let requestOptions = this.getRequestOptions();
+            let requestOptions = BurstUtil.getRequestOptions();
             requestOptions.params = params;
             return this.http.get(this.nodeUrl, requestOptions)
                 .timeout(constants.connectionTimeout)
@@ -293,7 +292,7 @@ export class AccountService {
             let params: HttpParams = new HttpParams()
                 .set("requestType", "getBalance")
                 .set("account", id);
-            let requestOptions = this.getRequestOptions();
+            let requestOptions = BurstUtil.getRequestOptions();
             requestOptions.params = params;
             return this.http.get(this.nodeUrl, requestOptions)
                 .timeout(constants.connectionTimeout)
@@ -325,7 +324,7 @@ export class AccountService {
             let params: HttpParams = new HttpParams()
                 .set("requestType", "getAccountPublicKey")
                 .set("account", id);
-            let requestOptions = this.getRequestOptions();
+            let requestOptions = BurstUtil.getRequestOptions();
             requestOptions.params = params;
             return this.http.get(this.nodeUrl, requestOptions)
                 .timeout(constants.connectionTimeout)
@@ -368,7 +367,7 @@ export class AccountService {
                         .set("messageIsText", String(m.messageIsText))
                 }
             }
-            let requestOptions = this.getRequestOptions();
+            let requestOptions = BurstUtil.getRequestOptions();
             requestOptions.params = params;
             // request 'sendMoney' to burst node
             return this.http.post(this.nodeUrl, {}, requestOptions)
@@ -387,7 +386,7 @@ export class AccountService {
                             params = new HttpParams()
                                 .set("requestType", "broadcastTransaction")
                                 .set("transactionBytes", signedTransactionBytes);
-                            requestOptions = this.getRequestOptions();
+                            requestOptions = BurstUtil.getRequestOptions();
                             requestOptions.params = params;
                             // request 'broadcastTransaction' to burst node
                             return this.http.post(this.nodeUrl, {}, requestOptions)
@@ -397,7 +396,7 @@ export class AccountService {
                                     params = new HttpParams()
                                     .set("requestType", "getTransaction")
                                     .set("transaction", response.transaction);
-                                    requestOptions = this.getRequestOptions();
+                                    requestOptions = BurstUtil.getRequestOptions();
                                     requestOptions.params = params;
                                     // request 'getTransaction' to burst node
                                     return this.http.get(this.nodeUrl, requestOptions)
@@ -466,20 +465,5 @@ export class AccountService {
     */
     public convertNumberToString(n: number) {
         return parseFloat(n.toString()).toFixed(8).replace(".", "");
-    }
-
-    /*
-    * Helper method to construct request options
-    */
-    public getRequestOptions(fields = {}): any {
-        let headers = new HttpHeaders(fields);
-        return { headers: headers };
-    }
-
-    /*
-    * Helper method to handle HTTP error
-    */
-    private handleError(error: Response | any) {
-        return Promise.reject(new HttpError(error));
     }
 }

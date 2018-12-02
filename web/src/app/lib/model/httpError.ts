@@ -14,6 +14,7 @@ export class HttpError {
     public message: string;
     public path: string;
     public timestamp: Date;
+    public errorCode: number;
 
     constructor (data: any = {}) {
         this.status = data.status || 0;
@@ -22,5 +23,6 @@ export class HttpError {
         this.message = data.message || '';
         this.path = data.path || '';
         this.timestamp = data.timestamp || Date.now();
+        this.errorCode = data.errorCode || 0;
     }
 }
