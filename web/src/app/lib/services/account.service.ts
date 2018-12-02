@@ -227,8 +227,8 @@ export class AccountService {
                     }
                     let transactions: Transaction[] = [];
                     response.transactions.map(transaction => {
-                        transaction.amountNQT = parseFloat(this.convertStringToNumber(transaction.amountNQT));
-                        transaction.feeNQT = parseFloat(this.convertStringToNumber(transaction.feeNQT));
+                        transaction.amountNQT = BurstUtil.convertStringToNumber(transaction.amountNQT);
+                        transaction.feeNQT = BurstUtil.convertStringToNumber(transaction.feeNQT);
                         transactions.push(new Transaction(transaction));
                     });
                     return resolve(transactions);
@@ -253,8 +253,8 @@ export class AccountService {
                 .then(response => {
                     let transactions: Transaction[] = [];
                     response.unconfirmedTransactions.map(transaction => {
-                        transaction.amountNQT = parseFloat(this.convertStringToNumber(transaction.amountNQT));
-                        transaction.feeNQT = parseFloat(this.convertStringToNumber(transaction.feeNQT));
+                        transaction.amountNQT = BurstUtil.convertStringToNumber(transaction.amountNQT);
+                        transaction.feeNQT = BurstUtil.convertStringToNumber(transaction.feeNQT);
                         transaction.confirmed = false;
                         transactions.push(new Transaction(transaction));
                     });
@@ -300,9 +300,9 @@ export class AccountService {
                 .then(response => {
                     if (response.errorCode == undefined) {
                         let balanceString = response.guaranteedBalanceNQT;
-                        balanceString = this.convertStringToNumber(balanceString);
+                        balanceString = BurstUtil.convertStringToNumber(balanceString);
                         let unconfirmedBalanceString = response.unconfirmedBalanceNQT;
-                        unconfirmedBalanceString = this.convertStringToNumber(unconfirmedBalanceString);
+                        unconfirmedBalanceString = BurstUtil.convertStringToNumber(unconfirmedBalanceString);
                         resolve({ confirmed: parseFloat(balanceString), unconfirmed: parseFloat(unconfirmedBalanceString) });
                     } else {
                         if (response.errorDescription == "Unknown account") {
@@ -451,13 +451,6 @@ export class AccountService {
     */
     public isPin(pin: string): boolean {
         return /^[0-9]{6}$/i.test(pin);
-    }
-
-    /*
-    * Helper method to handle NQT
-    */
-    public convertStringToNumber(str, value = ".", position = 8) {
-        return str.substring(0, str.length - position) + value + str.substring(str.length - position);
     }
 
     /*

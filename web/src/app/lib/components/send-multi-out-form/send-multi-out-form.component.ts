@@ -68,9 +68,9 @@ export class SendMultiOutFormComponent implements OnInit {
   }
 
   convertFeeToBurst(feeNQT: string) {
-    return parseFloat(feeNQT)/100000000;
+    return BurstUtil.convertStringToNumber(feeNQT);
   }
-
+  
   onSubmit(event) {
     // this.submit.emit({
     //   transaction: {

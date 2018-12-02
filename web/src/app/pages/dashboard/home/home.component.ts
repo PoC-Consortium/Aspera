@@ -4,7 +4,7 @@ import { Router, NavigationEnd } from '@angular/router';
 import { MatTableDataSource, MatSort, MatDialog } from '@angular/material';
 import { Transaction, Account } from '../../../lib/model';
 import { AccountService, StoreService, MarketService } from '../../../lib/services';
-import { Converter } from '../../../lib/util';
+import { Converter, BurstUtil } from '../../../lib/util';
 import { NotifierService } from 'angular-notifier';
 import { SendBurstDialogComponent } from '../../../lib/components';
 
@@ -35,6 +35,10 @@ export class HomeComponent implements OnInit {
             }
         });
             
+    }
+
+    convertFeeToBurst(feeNQT) {
+        return BurstUtil.convertStringToNumber(feeNQT);
     }
 
     ngOnInit() {
