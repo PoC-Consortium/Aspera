@@ -44,7 +44,7 @@ export class SendBurstFormComponent implements OnInit {
   }
 
   convertFeeToBurst(feeNQT: string) {
-    return parseFloat(feeNQT)/100000000;
+    return BurstUtil.convertStringToNumber(feeNQT);
   }
 
   onSubmit(event) {

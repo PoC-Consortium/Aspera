@@ -242,7 +242,7 @@ export class BurstUtil {
         return "BURST-" + parts[0] + "-" + parts[1] + "-" + parts[2] + "-" + parts[3];
     }
 
-    /*
+    /* 
     * Validation Check. Quick validation of Burst addresses included
     */
     public static isBurstcoinAddress(address: string): boolean {
@@ -266,6 +266,10 @@ export class BurstUtil {
     */
     private handleError(error: Response | any) {
         return Promise.reject(new HttpError(error));
+    }
+
+    public static convertStringToNumber(amount: string) {
+        return parseFloat(amount)/100000000;
     }
 
 }
