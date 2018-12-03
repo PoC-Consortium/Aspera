@@ -36,8 +36,7 @@ export class AccountService {
     constructor(
         private http: HttpClient,
         private cryptoService: CryptoService,
-        private storeService: StoreService,
-        private notificationService: NotificationService
+        private storeService: StoreService
     ) {
         this.storeService.settings.subscribe((settings: Settings) => {
             this.nodeUrl = settings.node;
