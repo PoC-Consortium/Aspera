@@ -50,7 +50,7 @@ export class I18nService {
     return this.state.subscribe(sub, err)
   }
 
-  public getTranslation(phrase:string):string {
+  public getTranslation(phrase:string, opts?:object):string {
     return this.data && this.data[phrase] ? this.data[phrase] : phrase
   }
 

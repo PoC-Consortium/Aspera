@@ -2,12 +2,9 @@
 * Copyright 2018 PoC-Consortium
 */
 
-import { Transaction } from "./transaction";
 
 /*
 * Block class
-*
-* NOT USED YET. CREATED IN REGARD TO SPV: https://bitcoin.org/bitcoin.pdf - §8
 */
 export class Block {
     public id: number;
@@ -31,7 +28,8 @@ export class Block {
     public byteLength: number;
     public pocTime:number;
     public blockAts: number[];
-    public transactions: Transaction[];
+    public transactions: string[];
+    public numberOfTransactions: number;
 
     constructor(data: any = {}) {
         this.id = data.id || undefined;
@@ -56,5 +54,6 @@ export class Block {
         this.pocTime = data.pocTime || undefined;
         this.blockAts = data.blockAts || undefined;
         this.transactions = data.transactions || undefined;
+        this.numberOfTransactions = data.numberOfTransactions || undefined;
     }
 }

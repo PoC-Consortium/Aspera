@@ -1,3 +1,6 @@
+import { HttpHeaders } from "@angular/common/http";
+import { HttpError } from "../model";
+
 /*
 * Copyright 2018 PoC-Consortium
 */
@@ -249,5 +252,20 @@ export class BurstUtil {
     public static burstAddressPattern = {
         '_': { pattern: new RegExp('\[a-zA-Z0-9\]')}
     };
-    
+
+    /*
+    * Helper method to construct request options
+    */
+    public static getRequestOptions(fields = {}): any {
+        let headers = new HttpHeaders(fields);
+        return { headers: headers };
+    }
+
+    /*
+    * Helper method to handle HTTP error
+    */
+    private handleError(error: Response | any) {
+        return Promise.reject(new HttpError(error));
+    }
+
 }

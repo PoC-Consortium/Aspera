@@ -34,8 +34,6 @@ export class HomeComponent implements OnInit {
                 this.fetchTransactions();
             }
         });
-
-        // todo: auto-refresh
             
     }
 
@@ -56,6 +54,7 @@ export class HomeComponent implements OnInit {
                     (error) => {
                         // Todo: throw a warning to the user that their account is unverified!!
                         console.log(error);
+                        this.recentTransactionData = [];
                         this.notificationService.notify('error', error.toString());
                     })
             })

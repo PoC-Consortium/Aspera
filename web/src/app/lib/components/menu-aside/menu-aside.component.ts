@@ -4,6 +4,7 @@ import { MarketService, StoreService, AccountService } from '../../services';
 import { MatDialog } from '@angular/material';
 import { Account } from '../../model';
 import { SendBurstDialogComponent } from '../send-burst-dialog';
+import { NotifierService } from 'angular-notifier';
 
 @Component({
   selector: 'app-menu-aside',
@@ -22,25 +23,28 @@ export class MenuAsideComponent implements OnInit {
     private marketService: MarketService,
     private storeService: StoreService,
     public dialog: MatDialog,
-    private accountService: AccountService
+    private accountService: AccountService,
+    private notificationService: NotifierService
   ) {
   }
 
   ngOnInit() {
     this.accountService.currentAccount.subscribe((account) => {
-        this.getSelectedAccounts();
-        this.selectedAccount = account;
+      this.getSelectedAccounts();
+      this.selectedAccount = account;
     })
   }
 
   private getSelectedAccounts() {
-      this.storeService.getAllAccounts().then((accounts) => {
-          this.accounts = accounts;
-      });
+    this.storeService.getAllAccounts().then((accounts) => {
+      this.accounts = accounts;
+    });
   }
 
   public selectAccount(account: Account) {
-      this.accountService.selectAccount(account);
+    this.accountService.selectAccount(account).catch((error) => {
+      this.notificationService.notify('error', error.toString());
+    });
   }
 
 }
