@@ -1,9 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Injectable } from '@angular/core';
 import { CreateService } from '../create.service';
 import { BurstUtil } from '../../../../../lib/util';
 import { NotifierService } from 'angular-notifier';
 import { Router } from '@angular/router';
 
+@Injectable()
 @Component({
   selector: 'app-create-passive',
   templateUrl: './create-passive.component.html',

@@ -2,8 +2,6 @@ import { Component, Input, OnInit } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 import { MarketService, StoreService, AccountService } from '../../services';
 import { Account } from '../../model';
-import { Store } from '@ngrx/store';
-import * as fromAuth from '../../../reducers';
 import { MatDialog } from '@angular/material';
 import { SendBurstDialogComponent } from '../send-burst-dialog/send-burst-dialog.component';
 import { HttpClient } from '@angular/common/http';
@@ -22,7 +20,6 @@ export class AppHeaderComponent implements OnInit {
     constructor(
         private marketService: MarketService,
         private storeService: StoreService,
-        private store: Store<fromAuth.State>,
         private accountService: AccountService,
         public dialog: MatDialog,
     ) {}

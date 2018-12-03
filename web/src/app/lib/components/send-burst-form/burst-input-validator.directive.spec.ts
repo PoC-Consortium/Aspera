@@ -17,7 +17,7 @@ beforeEach(async(() => {
   }).compileComponents();
 }));
 
-describe('BurstInputValidatorDirective', () => {
+xdescribe('BurstInputValidatorDirective', () => {
   let mockEl = new MockElementRef({});
 
   it('should create an instance', () => {
