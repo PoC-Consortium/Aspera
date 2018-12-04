@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-//option go_package = "github.com/ac0v/aspera/pkg/api/p2p/attachment";
+//option go_package = "github.com/PoC-Consortium/aspera/pkg/api/p2p/attachment";
 
 package p2p;
 

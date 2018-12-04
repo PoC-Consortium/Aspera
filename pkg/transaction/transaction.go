@@ -4,12 +4,12 @@ import (
 	"errors"
 	"strings"
 
-	pb "github.com/ac0v/aspera/pkg/api/p2p"
-	. "github.com/ac0v/aspera/pkg/blockchain"
-	"github.com/ac0v/aspera/pkg/crypto"
-	"github.com/ac0v/aspera/pkg/encoding"
-	env "github.com/ac0v/aspera/pkg/environment"
-	. "github.com/ac0v/aspera/pkg/log"
+	pb "github.com/PoC-Consortium/aspera/pkg/api/p2p"
+	. "github.com/PoC-Consortium/aspera/pkg/blockchain"
+	"github.com/PoC-Consortium/aspera/pkg/crypto"
+	"github.com/PoC-Consortium/aspera/pkg/encoding"
+	env "github.com/PoC-Consortium/aspera/pkg/environment"
+	. "github.com/PoC-Consortium/aspera/pkg/log"
 
 	"github.com/golang/protobuf/proto"
 	any "github.com/golang/protobuf/ptypes/any"

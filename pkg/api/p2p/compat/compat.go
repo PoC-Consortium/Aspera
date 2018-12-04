@@ -1,8 +1,8 @@
 package compat
 
 import (
-	api "github.com/ac0v/aspera/pkg/api/p2p"
-	"github.com/ac0v/aspera/pkg/api/p2p/compat/template"
+	api "github.com/PoC-Consortium/aspera/pkg/api/p2p"
+	"github.com/PoC-Consortium/aspera/pkg/api/p2p/compat/template"
 
 	"github.com/valyala/fastjson"
 )

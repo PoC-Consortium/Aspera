@@ -10,7 +10,7 @@ import (
 	"errors"
 	"io"
 
-	"github.com/ac0v/aspera/pkg/crypto/curve25519"
+	"github.com/PoC-Consortium/aspera/pkg/crypto/curve25519"
 )
 
 var (

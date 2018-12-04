@@ -4,9 +4,9 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/ac0v/aspera/pkg/account/pb"
-	"github.com/ac0v/aspera/pkg/crypto"
-	"github.com/ac0v/aspera/pkg/crypto/rsencoding"
+	"github.com/PoC-Consortium/aspera/pkg/account/pb"
+	"github.com/PoC-Consortium/aspera/pkg/crypto"
+	"github.com/PoC-Consortium/aspera/pkg/crypto/rsencoding"
 
 	"github.com/golang/protobuf/proto"
 )

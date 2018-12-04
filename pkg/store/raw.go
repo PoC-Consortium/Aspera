@@ -11,10 +11,10 @@ import (
 	"strings"
 	"sync"
 
-	api "github.com/ac0v/aspera/pkg/api/p2p"
-	"github.com/ac0v/aspera/pkg/block"
-	"github.com/ac0v/aspera/pkg/config"
-	. "github.com/ac0v/aspera/pkg/log"
+	api "github.com/PoC-Consortium/aspera/pkg/api/p2p"
+	"github.com/PoC-Consortium/aspera/pkg/block"
+	"github.com/PoC-Consortium/aspera/pkg/config"
+	. "github.com/PoC-Consortium/aspera/pkg/log"
 
 	"github.com/dgraph-io/badger"
 	"github.com/dixonwille/skywalker"

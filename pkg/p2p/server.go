@@ -1,11 +1,11 @@
 package p2p
 
 import (
-	api "github.com/ac0v/aspera/pkg/api/p2p"
-	"github.com/ac0v/aspera/pkg/common/math"
-	"github.com/ac0v/aspera/pkg/config"
-	. "github.com/ac0v/aspera/pkg/log"
-	s "github.com/ac0v/aspera/pkg/store"
+	api "github.com/PoC-Consortium/aspera/pkg/api/p2p"
+	"github.com/PoC-Consortium/aspera/pkg/common/math"
+	"github.com/PoC-Consortium/aspera/pkg/config"
+	. "github.com/PoC-Consortium/aspera/pkg/log"
+	s "github.com/PoC-Consortium/aspera/pkg/store"
 
 	"github.com/golang/protobuf/jsonpb"
 	"github.com/valyala/fasthttp"
@@ -59,7 +59,7 @@ func requestHandler(ctx *fasthttp.RequestCtx, store *s.Store) {
 	case "getMilestoneBlockIds":
 		// {"error":"Old getMilestoneBlockIds protocol not supported, please upgrade"}
 	case "getNextBlockIds":
-		
+
 	case "getBlocksFromHeight":
 	case "getNextBlocks":
 	case "getPeers":

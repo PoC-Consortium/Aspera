@@ -1,7 +1,7 @@
 package store
 
 import (
-	"github.com/ac0v/aspera/pkg/config"
+	"github.com/PoC-Consortium/aspera/pkg/config"
 )
 
 type Store struct {

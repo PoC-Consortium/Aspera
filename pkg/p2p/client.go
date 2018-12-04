@@ -5,14 +5,14 @@ import (
 	"errors"
 	"gopkg.in/resty.v1"
 
-	api "github.com/ac0v/aspera/pkg/api/p2p"
-	compat "github.com/ac0v/aspera/pkg/api/p2p/compat"
-	b "github.com/ac0v/aspera/pkg/block"
-	"github.com/ac0v/aspera/pkg/config"
-	. "github.com/ac0v/aspera/pkg/p2p/manager"
+	api "github.com/PoC-Consortium/aspera/pkg/api/p2p"
+	compat "github.com/PoC-Consortium/aspera/pkg/api/p2p/compat"
+	b "github.com/PoC-Consortium/aspera/pkg/block"
+	"github.com/PoC-Consortium/aspera/pkg/config"
+	. "github.com/PoC-Consortium/aspera/pkg/p2p/manager"
 
 	"github.com/golang/protobuf/jsonpb"
-	"github.com/json-iterator/go"	
+	"github.com/json-iterator/go"
 )
 
 const (

@@ -6,8 +6,8 @@ package template
 
 //line pkg/api/p2p/compat/template/block.qtpl:1
 import (
-	"github.com/ac0v/aspera/pkg/api/p2p"
-	"github.com/ac0v/aspera/pkg/encoding"
+	"github.com/PoC-Consortium/aspera/pkg/api/p2p"
+	"github.com/PoC-Consortium/aspera/pkg/encoding"
 	"strconv"
 	"strings"
 

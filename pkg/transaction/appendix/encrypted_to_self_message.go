@@ -1,8 +1,8 @@
 package appendix
 
 import (
-	pb "github.com/ac0v/aspera/pkg/api/p2p"
-	"github.com/ac0v/aspera/pkg/encoding"
+	pb "github.com/PoC-Consortium/aspera/pkg/api/p2p"
+	"github.com/PoC-Consortium/aspera/pkg/encoding"
 )
 
 type EncryptedToSelfMessage struct {

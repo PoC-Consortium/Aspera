@@ -3,12 +3,12 @@ package main
 import (
 	"go.uber.org/zap"
 
-	"github.com/ac0v/aspera/pkg/blockchain"
-	"github.com/ac0v/aspera/pkg/config"
-	. "github.com/ac0v/aspera/pkg/log"
-	p2p "github.com/ac0v/aspera/pkg/p2p"
-	"github.com/ac0v/aspera/pkg/p2p/manager"
-	s "github.com/ac0v/aspera/pkg/store"
+	"github.com/PoC-Consortium/aspera/pkg/blockchain"
+	"github.com/PoC-Consortium/aspera/pkg/config"
+	. "github.com/PoC-Consortium/aspera/pkg/log"
+	p2p "github.com/PoC-Consortium/aspera/pkg/p2p"
+	"github.com/PoC-Consortium/aspera/pkg/p2p/manager"
+	s "github.com/PoC-Consortium/aspera/pkg/store"
 )
 
 func main() {

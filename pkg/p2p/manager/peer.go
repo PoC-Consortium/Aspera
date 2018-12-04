@@ -6,7 +6,7 @@ import (
 	"sync/atomic"
 	"time"
 
-	api "github.com/ac0v/aspera/pkg/api/p2p"
+	api "github.com/PoC-Consortium/aspera/pkg/api/p2p"
 
 	"github.com/json-iterator/go"
 	"gopkg.in/resty.v1"

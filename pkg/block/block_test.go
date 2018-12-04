@@ -4,7 +4,7 @@ import (
 	"encoding/hex"
 	"testing"
 
-	api "github.com/ac0v/aspera/pkg/api/p2p"
+	api "github.com/PoC-Consortium/aspera/pkg/api/p2p"
 	"github.com/stretchr/testify/assert"
 )
 
