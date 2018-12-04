@@ -4,7 +4,7 @@ import (
 	"crypto/sha256"
 	"math/big"
 
-	"github.com/PoC-Consortium/aspera/pkg/crypto/curve25519"
+	"github.com/PoC-Consortium/Aspera/pkg/crypto/curve25519"
 )
 
 func secretPhraseToPrivateKey(secretPhrase string) []byte {

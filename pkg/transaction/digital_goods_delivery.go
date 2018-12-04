@@ -4,8 +4,8 @@ import (
 	"encoding/hex"
 	"math"
 
-	pb "github.com/PoC-Consortium/aspera/pkg/api/p2p"
-	"github.com/PoC-Consortium/aspera/pkg/encoding"
+	pb "github.com/PoC-Consortium/Aspera/pkg/api/p2p"
+	"github.com/PoC-Consortium/Aspera/pkg/encoding"
 )
 
 const (

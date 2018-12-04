@@ -5,7 +5,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/PoC-Consortium/aspera/pkg/account"
+	"github.com/PoC-Consortium/Aspera/pkg/account"
 
 	"github.com/dgraph-io/badger"
 	"github.com/stretchr/testify/assert"

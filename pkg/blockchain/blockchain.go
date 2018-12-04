@@ -3,8 +3,8 @@ package blockchain
 import (
 	"errors"
 
-	"github.com/PoC-Consortium/aspera/pkg/account"
-	"github.com/PoC-Consortium/aspera/pkg/crypto"
+	"github.com/PoC-Consortium/Aspera/pkg/account"
+	"github.com/PoC-Consortium/Aspera/pkg/crypto"
 
 	"github.com/dgraph-io/badger"
 )

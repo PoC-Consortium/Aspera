@@ -9,7 +9,7 @@ import (
 	"math/big"
 	"unsafe"
 
-	"github.com/PoC-Consortium/aspera/pkg/common/math"
+	"github.com/PoC-Consortium/Aspera/pkg/common/math"
 	"golang.org/x/crypto/ripemd160"
 )
 

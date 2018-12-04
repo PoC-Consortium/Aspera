@@ -1,11 +1,11 @@
 package p2p
 
 import (
-	api "github.com/PoC-Consortium/aspera/pkg/api/p2p"
-	"github.com/PoC-Consortium/aspera/pkg/common/math"
-	"github.com/PoC-Consortium/aspera/pkg/config"
-	. "github.com/PoC-Consortium/aspera/pkg/log"
-	s "github.com/PoC-Consortium/aspera/pkg/store"
+	api "github.com/PoC-Consortium/Aspera/pkg/api/p2p"
+	"github.com/PoC-Consortium/Aspera/pkg/common/math"
+	"github.com/PoC-Consortium/Aspera/pkg/config"
+	. "github.com/PoC-Consortium/Aspera/pkg/log"
+	s "github.com/PoC-Consortium/Aspera/pkg/store"
 
 	"github.com/golang/protobuf/jsonpb"
 	"github.com/valyala/fasthttp"

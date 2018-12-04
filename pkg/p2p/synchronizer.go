@@ -7,11 +7,11 @@ import (
 
 	"go.uber.org/zap"
 
-	"github.com/PoC-Consortium/aspera/pkg/block"
-	"github.com/PoC-Consortium/aspera/pkg/config"
-	. "github.com/PoC-Consortium/aspera/pkg/log"
-	"github.com/PoC-Consortium/aspera/pkg/p2p/manager"
-	s "github.com/PoC-Consortium/aspera/pkg/store"
+	"github.com/PoC-Consortium/Aspera/pkg/block"
+	"github.com/PoC-Consortium/Aspera/pkg/config"
+	. "github.com/PoC-Consortium/Aspera/pkg/log"
+	"github.com/PoC-Consortium/Aspera/pkg/p2p/manager"
+	s "github.com/PoC-Consortium/Aspera/pkg/store"
 )
 
 type Synchronizer struct {
