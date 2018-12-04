@@ -6,6 +6,7 @@ Package p2p is a generated protocol buffer package.
 
 It is generated from these files:
 	transaction.proto
+	p2p.proto
 
 It has these top-level messages:
 	TransactionHeader
@@ -42,6 +43,11 @@ It has these top-level messages:
 	AutomatedTransactionsCreation
 	AutomatedTransactionsPayment
 	OrdinaryPayment
+	GetCumulativeDifficultyResponse
+	GetNextBlocksResponse
+	GetNextBlockIdsResponse
+	GetPeers
+	Block
 */
 package p2p
 

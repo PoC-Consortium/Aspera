@@ -7,8 +7,7 @@ all: clibs build
 build:
 	mkdir -p $(ROOT_DIR)/pkg/api/p2p
 	mkdir -p $(ROOT_DIR)/pkg/account/pb
-	protoc -I $(ROOT_DIR)/api/protobuf-spec/p2p --go_out=plugins=grpc:$(ROOT_DIR)/pkg/api/p2p transaction.proto
-	protoc -I $(ROOT_DIR)/api/protobuf-spec/p2p --go_out=plugins=grpc:$(ROOT_DIR)/pkg/api/p2p p2p.proto
+	protoc -I $(ROOT_DIR)/api/protobuf-spec/p2p --go_out=plugins=grpc:$(ROOT_DIR)/pkg/api/p2p transaction.proto p2p.proto
 	protoc -I $(ROOT_DIR)/api/protobuf-spec/account --go_out=plugins=grpc:$(ROOT_DIR)/pkg/account/pb account.proto
 	qtc $(ROOT_DIR)/pkg/api/p2p/compat/template/block.qtpl
 	go build -ldflags="-s -w" main.go
