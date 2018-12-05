@@ -12,45 +12,41 @@ produces:
 schemes:
   - https
   - http
-
+  
 tags:
   - name: all
-    description: Every API call.
+    description: Every API call
   - name: server
     description: Get basic information about this wallet
-  - name: accounts
-    description: Get information about accounts and do operations
+  - name: account
+    description: Get information about accounts and perform operations
+  - name: mining
+    description: Mining operations
 
 paths:
-  /server/getAccountsWithRewardRecipient:
+  /server/getMyInfo:
     get:
       tags:
         - server
         - all
-      summary: Get all pool members of a specific account.
-      operationId: getAccountsWithRewardRecipient
-      parameters:
-        - in: query
-          name: account
-          type: string
-          allowEmptyValue: false
-          required: true
+      summary: Get hostname and address of the requesting node.
+      operationId: getMyInfo
       responses:
         '200':
           description: successful operation
           schema:
             type: object
             properties:
-              accounts:
-                type: array
-                items:
-                  type: string
+              address:
+                type: string
+                description: IP address of the current node
+              host:
+                type: string
+                description: Current host
               requestProcessingTime:
                 type: integer
         '400':
-          description: Invalid account.
-        '404':
-          description: Account not found.
+          description: Bad request.
       deprecated: false
   /server/getBlockchainStatus:
     get:
@@ -67,22 +63,30 @@ paths:
             properties:
               lastBlock:
                 type: string
+                description:  Last block ID on the blockchain
               application:
                 type: string
+                description:  Application name, typically BRS
               isScanning:
                 type: boolean
+                description: True if the blockchain is being scanned by the application, false otherwise
               cumulativeDifficulty:
                 type: string
               lastBlockchainFeederHeight:
                 type: integer
+                description: Height of the last blockchain of greatest cumulative difficulty obtained from a peer
               numberOfBlocks:
                 type: integer
+                description: Nnumber of blocks in the blockchain (height + 1)
               time:
                 type: integer
+                description: Current timestamp (in seconds since the genesis block)
               version:
                 type: string
+                description: Application version
               lastBlockchainFeeder:
                 type: string
+                description: Address or announced address of the peer providing the last blockchain of greatest cumulative difficulty
               requestProcessingTime:
                 type: integer
         '400':
@@ -103,19 +107,25 @@ paths:
             properties:
               maxBlockPayloadLength:
                 type: integer
+                description: Maximum block payload length (in bytes)
               genesisAccountId:
                 type: string
+                description: Genesis account number
               genesisBlockId:
                 type: string
+                description: Genesis block ID
               transactionTypes:
                 type: array
+                description: Array of defined transaction types and subtypes
                 items:
                   type: object
                   properties:
                     description:
                       type: string
+                      description: Name of the feature
                     value:
                       type: integer
+                      description: ID of the feature
                     subtypes:
                       type: array
                       items:
@@ -123,67 +133,27 @@ paths:
                         properties:
                           description:
                             type: string
+                            description: Name of the action
                           value:
                             type: integer
+                            description: ID of the action
               peerStates:
                 type: array
+                description: Array of defined peer states 
                 items:
                   type: object
                   properties:
                     description:
                       type: string
+                      description: Name of the state
                     value:
                       type: integer
+                      description: ID of the state
               maxArbitraryMessageLength:
                 type: integer
+                description: Maximum length in bytes of an arbitrary message
               requestTypes:
                 type: object
-        '400':
-          description: Bad request.
-      deprecated: false
-  /server/getMiningInfo:
-    get:
-      tags:
-        - server
-        - all
-      summary: Get information needed to mine the current block.
-      operationId: getMiningInfo
-      responses:
-        '200':
-          description: successful operation
-          schema:
-            type: object
-            properties:
-              generationSignature:
-                type: string
-              baseTarget:
-                type: integer
-              height:
-                type: integer
-              requestProcessingTime:
-                type: integer
-        '400':
-          description: Bad request.
-      deprecated: false
-  /server/getMyInfo:
-    get:
-      tags:
-        - server
-        - all
-      summary: Get hostname and address of the requesting node.
-      operationId: getMyInfo
-      responses:
-        '200':
-          description: successful operation
-          schema:
-            type: object
-            properties:
-              address:
-                type: string
-              host:
-                type: string
-              requestProcessingTime:
-                type: integer
         '400':
           description: Bad request.
       deprecated: false
@@ -208,24 +178,34 @@ paths:
             properties:
               lastUpdated:
                 type: integer
+                description: Timestamp (in seconds since the genesis block) of the last peer status update
               downloadedVolume:
                 type: integer
+                description: Number of bytes downloaded by the peer
               blacklisted:
                 type: boolean
+                description: True if the peer is blacklisted
               announcedAddress:
                 type: string
+                description: Name that the peer announced to the network (could be a DNS name, IP address, or any other string)
               application:
                 type: string
+                description: Name of the software application, typically BRS
               uploadedVolume:
                 type: integer
+                description: Number of bytes uploaded by the peer
               state:
                 type: integer
+                description: State of the peer - 0 for NON_CONNECTED, 1 for CONNECTED, or 2 for DISCONNECTED
               version:
                 type: string
+                description: Version of the software running on the pee
               platform:
                 type: string
+                description: String representing the peer's platform
               shareAddress:
                 type: boolean
+                description: True if the address is allowed to be shared with other peers
               requestProcessingTime:
                 type: integer
         '400':
@@ -258,36 +238,14 @@ paths:
             properties:
               peers:
                 type: array
+                description: Array of peer addresses
                 items:
                   type: string
+                  description: IP address of the peers
               requestProcessingTime:
                 type: integer
         '400':
           description: Bad request.
-      deprecated: false
-  /server/getRewardRecipient:
-    get:
-      tags:
-        - server
-        - all
-      summary: Get the reward recipient of a specific account.
-      operationId: getRewardRecipient
-      parameters:
-        - in: query
-          name: account
-          type: string
-          allowEmptyValue: false
-          required: true
-      responses:
-        '200':
-          description: successful operation
-          schema:
-            type: object
-            properties:
-              rewardRecipient:
-                type: string
-              requestProcessingTime:
-                type: integer
       deprecated: false
   /server/getState:
     get:
@@ -311,54 +269,79 @@ paths:
             properties:
               numberOfPeers:
                 type: integer
+                description: Number of known peers on the network
               numberOfUnlockedAccounts:
                 type: integer
+                description: Number of unlocked accounts on this node
               numberOfTransfers:
                 type: integer
+                description: Number of Asset Exchange transfers in the blockchain
               numberOfOrders:
                 type: integer
+                description: Number of Asset Exchange orders in the blockchain
               numberOfTransactions:
                 type: integer
+                description: Number of transactions in the blockchain
               maxMemory:
                 type: integer
+                description: Maximum amount of memory the node may use (in Bytes)
               isScanning:
                 type: boolean
+                description: True if this node is scanning the blockchain, false otherwise
               cumulativeDifficulty:
                 type: string
+                description: Current cumulative forging difficulty
               numberOfAssets:
                 type: integer
+                description: Number of AE assets in the blockchain
               freeMemory:
                 type: integer
+                description: Amount of free memory on this node (in Bytes)
               availableProcessors:
                 type: integer
+                description: Number of processors on this node
               totalEffectiveBalanceNXT:
                 type: integer
+                description: Total effective Balance of the network in BURST
               numberOfAccounts:
                 type: integer
+                description: Number of accounts in the blockchain
               numberOfBlocks:
                 type: integer
+                description: Number of blocks (height + 1) in the blockchain
               version:
                 type: string
+                description: Software version on this node
               numberOfBidOrders:
                 type: integer
+                description: Number of Asset Exchange bid orders in the blockchain
               lastBlock:
                 type: string
+                description: Last block address
               totalMemory:
                 type: integer
+                description: Amount of memory this node is using (in Bytes)
               application:
                 type: string
+                description: Name of the software running on this node (typically BRS)
               numberOfAliases:
                 type: integer
+                description: Number of aliases in the blockchain
               lastBlockchainFeederHeight:
                 type: integer
+                description: Height of the last blockchain feeder
               numberOfTrades:
                 type: integer
+                description: Number of AE trades in the blockchain
               time:
                 type: integer
+                description: Current node time (in seconds since the genesis block)
               numberOfAskOrders:
                 type: integer
+                description: Number of Asset Exchange ask orders in the blockchain
               lastBlockchainFeeder:
                 type: string
+                description: Announced name of the feeder of the last blockchain
               requestProcessingTime:
                 type: integer
       deprecated: false
@@ -377,15 +360,16 @@ paths:
             properties:
               time:
                 type: integer
+                description: Current node time (in seconds since the genesis block)
               requestProcessingTime:
                 type: integer
         '400':
           description: Bad request.
       deprecated: false
-  /accounts/getAccount:
+  /account/getAccount:
     get:
       tags:
-        - accounts
+        - account
         - all
       summary: Get information about a specific account.
       operationId: getAccount
@@ -418,6 +402,8 @@ paths:
                 type: string
               accountRS:
                 type: string
+              name:
+                type: string
               forgedBalanceNQT:
                 type: string
               balanceNQT:
@@ -440,10 +426,10 @@ paths:
         '400':
           description: Bad request.
       deprecated: false
-  /accounts/getAccountATs:
+  /account/getAccountATs:
     get:
       tags:
-        - accounts
+        - account
         - all
       summary: Get all running ATs of an account.
       operationId: getAccountATs
@@ -510,7 +496,7 @@ paths:
   /account/getAccountBlockIds:
     get:
       tags:
-        - accounts
+        - account
         - all
       summary: Get the block IDs of all blocks forged (generated) by an account in reverse block height order..
       parameters:
@@ -553,7 +539,7 @@ paths:
   /account/getAccountBlocks:
     get:
       tags:
-        - accounts
+        - account
         - all
       summary: Get the block IDs of all blocks forged (generated) by an account in reverse block height order..
       parameters:
@@ -644,4 +630,82 @@ paths:
                   type: integer
         '400':
           description: Bad request.
+      deprecated: false
+  /mining/getAccountsWithRewardRecipient:
+    get:
+      tags:
+        - mining
+        - all
+      summary: Get all pool members of a specific account.
+      operationId: getAccountsWithRewardRecipient
+      parameters:
+        - in: query
+          name: account
+          type: string
+          allowEmptyValue: false
+          required: true
+      responses:
+        '200':
+          description: successful operation
+          schema:
+            type: object
+            properties:
+              accounts:
+                type: array
+                items:
+                  type: string
+              requestProcessingTime:
+                type: integer
+        '400':
+          description: Invalid account.
+        '404':
+          description: Account not found.
+      deprecated: false
+  /mining/getMiningInfo:
+    get:
+      tags:
+        - mining
+        - all
+      summary: Get information needed to mine the current block.
+      operationId: getMiningInfo
+      responses:
+        '200':
+          description: successful operation
+          schema:
+            type: object
+            properties:
+              generationSignature:
+                type: string
+              baseTarget:
+                type: integer
+              height:
+                type: integer
+              requestProcessingTime:
+                type: integer
+        '400':
+          description: Bad request.
+      deprecated: false
+  /mining/getRewardRecipient:
+    get:
+      tags:
+        - mining
+        - all
+      summary: Get the reward recipient of a specific account.
+      operationId: getRewardRecipient
+      parameters:
+        - in: query
+          name: account
+          type: string
+          allowEmptyValue: false
+          required: true
+      responses:
+        '200':
+          description: successful operation
+          schema:
+            type: object
+            properties:
+              rewardRecipient:
+                type: string
+              requestProcessingTime:
+                type: integer
       deprecated: false
