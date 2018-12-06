@@ -5,6 +5,7 @@ import (
 	"strconv"
 
 	api "github.com/PoC-Consortium/Aspera/pkg/api/p2p"
+	"github.com/PoC-Consortium/Aspera/pkg/api/p2p/compat"
 	"github.com/PoC-Consortium/Aspera/pkg/block"
 	"github.com/PoC-Consortium/Aspera/pkg/common/math"
 	c "github.com/PoC-Consortium/Aspera/pkg/config"
@@ -123,12 +124,7 @@ func requestHandler(ctx *fasthttp.RequestCtx, config *c.Config, store *s.Store) 
 			for _, b := range blocks {
 				nextBlocks = append(nextBlocks, b.Block)
 			}
-			marshaler.Marshal(
-				ctx.Response.BodyWriter(),
-				&api.GetNextBlocksResponse{
-					NextBlocks: nextBlocks,
-				},
-			)
+			ctx.SetBody(compat.Downgrade(&api.GetNextBlocksResponse{NextBlocks: nextBlocks}))
 		}
 	case "getPeers":
 	case "getUnconfirmedTransactions":
