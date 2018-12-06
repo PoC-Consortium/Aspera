@@ -333,26 +333,33 @@ func (b *Block) Freeze() ([][][]byte, error) {
 		return [][][]byte{
 			[][]byte{
 				[]byte(fmt.Sprintf(ById, block.Id)),
-				pb,
+				[]byte(fmt.Sprintf(ByHeight, block.Height)),
 			},
 			[][]byte{
 				[]byte(fmt.Sprintf(ByHeight, block.Height)),
-				[]byte(fmt.Sprintf("%020d", block.Id)),
+				pb,
 			},
 		}, nil
 	}
 }
 
 func Thaw(txn *badger.Txn, key string) (*Block, error) {
-	if ok, _ := regexp.Match("^block:(?:id|height):[0-9]+$", []byte(key)); !ok {
+	keyBs := []byte(key)
+	if ok, _ := regexp.Match("^block:(?:id|height):[0-9]+$", keyBs); !ok {
 		return nil, errors.New("invalid key " + key)
 	}
-	if blockItem, err := txn.Get([]byte(key)); err != nil {
+fetchData:
+	if blockItem, err := txn.Get(keyBs); err != nil {
 		return nil, err
 	} else {
 		if blockBs, err := blockItem.Value(); err != nil {
 			return nil, err
 		} else {
+			if !bytes.HasPrefix(keyBs, []byte("block:height:")) {
+				keyBs = blockBs
+				goto fetchData
+			}
+
 			pbBlock := new(api.Block)
 			if err := proto.Unmarshal(blockBs, pbBlock); err != nil {
 				return nil, err
@@ -363,5 +370,24 @@ func Thaw(txn *badger.Txn, key string) (*Block, error) {
 				return nil, err
 			}
 		}
+	}
+}
+
+func BulkThaw(txn *badger.Txn, key string, limit int) ([]*Block, error) {
+	if block, err := Thaw(txn, key); err != nil {
+		return nil, err
+	} else {
+		var blocks []*Block
+		for i := 1; i <= limit; i++ {
+			block, err = Thaw(txn, fmt.Sprintf(ByHeight, block.Height+1))
+			if err == nil {
+				blocks = append(blocks, block)
+			} else if err == badger.ErrKeyNotFound {
+				return blocks, nil
+			} else {
+				return nil, err
+			}
+		}
+		return blocks, nil
 	}
 }

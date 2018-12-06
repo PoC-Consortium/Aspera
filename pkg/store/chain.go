@@ -5,6 +5,7 @@ import (
 	"path/filepath"
 
 	"github.com/PoC-Consortium/Aspera/pkg/block"
+	. "github.com/PoC-Consortium/Aspera/pkg/log"
 
 	"github.com/dgraph-io/badger"
 	"go.uber.org/zap"
@@ -35,6 +36,7 @@ func NewChainStore(path string) *ChainStore {
 }
 
 func (chainStore *ChainStore) Store(block *block.Block) {
+	Log.Info("Store Block to ChainStore", zap.Int32("height", block.Height), zap.Uint64("id", block.Id))
 	txn := chainStore.db.NewTransaction(true)
 	if blockDataBs, err := block.Freeze(); err == nil {
 		for _, keyValue := range blockDataBs {
@@ -61,14 +63,27 @@ func (chainStore *ChainStore) Store(block *block.Block) {
 }
 
 func (chainStore *ChainStore) FindBlockBy(key string) (*block.Block, error) {
-	txn := chainStore.db.NewTransaction(true)
-	if block, err := block.Thaw(txn, key); err == nil {
-		if err := txn.Commit(nil); err != nil {
-			panic(err)
-		}
-		return block, err
-	} else {
-		return block, err
-	}
+	var b *block.Block
+	err := chainStore.db.View(func(txn *badger.Txn) error {
+		var err error
+		b, err = block.Thaw(txn, key)
+		return err
+	})
+	return b, err
+}
 
+func (chainStore *ChainStore) FindBlocksAfter(key string, limit int) ([]*block.Block, error) {
+	var blocks []*block.Block
+	err := chainStore.db.View(func(txn *badger.Txn) error {
+		var err error
+		blocks, err = block.BulkThaw(txn, key, limit)
+		return err
+	})
+	return blocks, err
+}
+
+func (chainStore *ChainStore) Rebuild() {
+	for rit := s.RawStore.Iterator(); rit.Next(); {
+		chainStore.Store(rit.Current)
+	}
 }
