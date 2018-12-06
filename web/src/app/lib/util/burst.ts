@@ -272,4 +272,11 @@ export class BurstUtil {
         return parseFloat(amount)/100000000;
     }
 
+    /*
+    * Helper method to Number to String(8 decimals) representation
+    */
+    public static convertNumberToString(n: number) {
+        return parseFloat(n.toString()).toFixed(8).replace(".", "");
+    }
+
 }

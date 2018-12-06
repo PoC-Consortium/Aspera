@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { StoreService, AccountService, BurstService } from './lib/services';
 import { GetBlockchainStatusResponse, Account, HttpError, Block } from './lib/model';
-import { map } from 'rxjs-compat/operator/map';
 import { NotifierService } from 'angular-notifier';
 
 @Component( {
@@ -46,10 +45,11 @@ export class App {
                         if (blockResponse.errorCode) {
                             return this.notificationService.notify('error', this.burstService.translateServerError(response));
                         }
+                        this.checkBlockchainStatus();
                     });
                 } else if (this.account) {
                     this.accountService.synchronizeAccount(this.account).catch((error) => {
-                        this.notificationService.notify('error', error.toString());
+                        // this.notificationService.notify('error', error.toString());
                     });
                 }
                 this.firstTime = false;
@@ -69,7 +69,7 @@ export class App {
             accounts.map((account) => {
                 setTimeout(() => {
                     this.accountService.synchronizeAccount(account).catch((error) => {
-                        this.notificationService.notify('error', error.toString());
+                        // this.notificationService.notify('error', error.toString());
                     })
                 }, 1);
             });

@@ -17,9 +17,9 @@ export class BurstInputValidatorDirective {
 
     setTimeout(() => {
       if (data.indexOf('BURST-') > -1) {
-        this.control.control.setValue(data.split('BURST-')[1]);
+        this.control.control.setValue(data.split('BURST-')[1].replace(/(\r\n\t|\n|\r\t)/gm,""));
       } else {
-        this.control.control.setValue(data);
+        this.control.control.setValue(data.replace(/(\r\n\t|\n|\r\t)/gm,""));
       }
     }, 100);
   }
