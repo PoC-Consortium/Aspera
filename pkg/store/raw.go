@@ -196,7 +196,7 @@ func (rawStore *RawStore) load(height int32) *api.Block {
 	if err := proto.Unmarshal(in, block); err != nil {
 		Log.Fatal("Error parse block file:", zap.Error(err))
 	}
-
+	block.Height = height
 	return block
 }
 
@@ -297,4 +297,26 @@ func (rawStore *RawStore) StoreAndMaybeConsume(blocks []*block.Block) {
 		rawStore.consume(startHeight)
 	}
 	rawStore.Unlock()
+}
+
+func (rawStore *RawStore) Iterator() *rawStorageIterator {
+	return &rawStorageIterator{}
+}
+
+type rawStorageIterator struct {
+	Current *block.Block
+}
+
+func (rit *rawStorageIterator) Next() bool {
+	var nextHeight int32
+	if rit.Current == nil {
+		nextHeight = 0
+	} else {
+		nextHeight = rit.Current.Height + 1
+	}
+	if pbBlock := s.RawStore.load(nextHeight); pbBlock != nil {
+		rit.Current, _ = block.NewBlock(pbBlock)
+		return true
+	}
+	return false
 }
