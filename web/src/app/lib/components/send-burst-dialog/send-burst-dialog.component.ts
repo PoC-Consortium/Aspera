@@ -1,6 +1,6 @@
 import { Component, OnInit, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material';
-import { Account, Transaction } from '../../model';
+import { Account, Transaction, EncryptedMessage } from '../../model';
 import { CryptoService, AccountService } from '../../services';
 
 
@@ -26,12 +26,24 @@ export class SendBurstDialogComponent implements OnInit {
     
   }
 
-  sendBurst(transactionRequest) {
+  async sendBurst(transactionRequest) {
     const { transaction, pin } = transactionRequest;
     let transactionToSend: Transaction = { 
       senderPublicKey: this.data.account.keys.publicKey,
       ...transaction 
     };
+
+    if (transactionToSend.attachment && transactionToSend.attachment.encryptedMessage) {
+      const recipientPublicKey = await this.accountService.getAccountPublicKey(transaction.recipientAddress);
+      const encryptedMessage = await this.cryptoService.encryptMessage(transactionToSend.attachment.encryptedMessage, 
+        this.data.account.keys.signPrivateKey, pin, recipientPublicKey);
+      transactionToSend.attachment = new EncryptedMessage({
+        data: encryptedMessage.m,
+        nonce: encryptedMessage.n,
+        isText: true
+      })
+    }
+
     return this.accountService.doTransaction(transactionToSend, this.data.account.keys.signPrivateKey, pin).then((transaction: Transaction) => {
       console.log(transaction);
       this.closeDialog();

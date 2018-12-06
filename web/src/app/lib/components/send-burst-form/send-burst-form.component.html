@@ -34,7 +34,7 @@
     <mat-form-field>
       <textarea matInput [(ngModel)]="message" name="message" placeholder="{{ 'message' | i18n }}"></textarea>
     </mat-form-field>
-    <mat-checkbox [(ngModel)]="encrypt" name="encrypt" disabled>{{ "encrypt_message" | i18n }}</mat-checkbox>
+    <mat-checkbox [(ngModel)]="encrypt" name="encrypt">{{ "encrypt_message" | i18n }}</mat-checkbox>
   </div>
 
   <div *ngIf="advanced">
