@@ -5,7 +5,9 @@ import (
 	"crypto/sha256"
 	"encoding/binary"
 	"errors"
+	"fmt"
 	"math/big"
+	"regexp"
 	"time"
 
 	api "github.com/PoC-Consortium/Aspera/pkg/api/p2p"
@@ -18,6 +20,7 @@ import (
 	env "github.com/PoC-Consortium/Aspera/pkg/environment"
 	"github.com/PoC-Consortium/Aspera/pkg/transaction"
 
+	"github.com/dgraph-io/badger"
 	"github.com/golang/protobuf/proto"
 	"github.com/json-iterator/go"
 )
@@ -39,6 +42,9 @@ const (
 	// TODO: move constants
 	oneBurst               = 100000000
 	maxTimestampDifference = 15
+
+	ById     = "block:id:%020d"
+	ByHeight = "block:height:%010d"
 )
 
 var json = jsoniter.ConfigCompatibleWithStandardLibrary
@@ -315,5 +321,47 @@ func (b *Block) SetBaseTargetAndCumulativeDifficulty(previousBlocks []*Block) {
 		tmp2.Quo(MaxBig64, BigFromUint64(newBaseTarget))
 		b.CumulativeDifficulty = previousCumulativeDifficulty.Add(
 			previousCumulativeDifficulty, &tmp2).Bytes()
+	}
+}
+
+func (b *Block) Freeze() ([][][]byte, error) {
+	block := b.Block
+
+	if pb, err := proto.Marshal(block); err != nil {
+		return nil, err
+	} else {
+		return [][][]byte{
+			[][]byte{
+				[]byte(fmt.Sprintf(ById, block.Id)),
+				pb,
+			},
+			[][]byte{
+				[]byte(fmt.Sprintf(ByHeight, block.Height)),
+				[]byte(fmt.Sprintf("%020d", block.Id)),
+			},
+		}, nil
+	}
+}
+
+func Thaw(txn *badger.Txn, key string) (*Block, error) {
+	if ok, _ := regexp.Match("^block:(?:id|height):[0-9]+$", []byte(key)); !ok {
+		return nil, errors.New("invalid key " + key)
+	}
+	if blockItem, err := txn.Get([]byte(key)); err != nil {
+		return nil, err
+	} else {
+		if blockBs, err := blockItem.Value(); err != nil {
+			return nil, err
+		} else {
+			pbBlock := new(api.Block)
+			if err := proto.Unmarshal(blockBs, pbBlock); err != nil {
+				return nil, err
+			}
+			if block, err := NewBlock(pbBlock); err == nil {
+				return block, nil
+			} else {
+				return nil, err
+			}
+		}
 	}
 }
