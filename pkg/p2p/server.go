@@ -3,10 +3,9 @@ package p2p
 import (
 	api "github.com/PoC-Consortium/Aspera/pkg/api/p2p"
 	"github.com/PoC-Consortium/Aspera/pkg/common/math"
-	"github.com/PoC-Consortium/Aspera/pkg/config"
+	c "github.com/PoC-Consortium/Aspera/pkg/config"
 	. "github.com/PoC-Consortium/Aspera/pkg/log"
 	s "github.com/PoC-Consortium/Aspera/pkg/store"
-
 	"github.com/golang/protobuf/jsonpb"
 	"github.com/valyala/fasthttp"
 	"github.com/valyala/fastjson"
@@ -17,17 +16,22 @@ var (
 	marshaler = jsonpb.Marshaler{}
 )
 
-func Serve(config *config.P2P, store *s.Store) {
+func Serve(config *c.Config, store *s.Store) {
+	if len(config.Network.P2P.Listen) < 1 {
+		// p2p server disabled
+		return
+	}
 	h := func(ctx *fasthttp.RequestCtx) {
-		requestHandler(ctx, store)
+		requestHandler(ctx, config, store)
 	}
 	h = fasthttp.CompressHandler(h)
-	if err := fasthttp.ListenAndServe(config.Listen, h); err != nil {
+	if err := fasthttp.ListenAndServe(config.Network.P2P.Listen, h); err != nil {
 		panic(err)
 	}
 }
 
-func requestHandler(ctx *fasthttp.RequestCtx, store *s.Store) {
+func requestHandler(ctx *fasthttp.RequestCtx, config *c.Config, store *s.Store) {
+	ctx.Response.Header.SetServerBytes([]byte("Aspera"))
 	if string(ctx.Path()) != "/burst" {
 		ctx.Error("Unsupported path", fasthttp.StatusNotFound)
 		return
@@ -55,11 +59,24 @@ func requestHandler(ctx *fasthttp.RequestCtx, store *s.Store) {
 			},
 		)
 	case "getInfo":
-		// {"announcedAddress":"195.201.124.43","application":"BRS","version":"2.2.5","platform":"PC","shareAddress":true}
+		marshaler.Marshal(
+			ctx.Response.BodyWriter(),
+			&api.GetInfoResponse{
+				AnnouncedAddress: "",
+				Version:          c.Version,
+				Application:      c.Application,
+				Platform:         config.Common.Platform,
+				ShareAddress:     true, // only served if listening - and then this is true ... always
+			},
+		)
 	case "getMilestoneBlockIds":
-		// {"error":"Old getMilestoneBlockIds protocol not supported, please upgrade"}
+		marshaler.Marshal(
+			ctx.Response.BodyWriter(),
+			&api.ErrorResponse{
+				Error: "Old getMilestoneBlockIds protocol not supported, please upgrade",
+			},
+		)
 	case "getNextBlockIds":
-
 	case "getBlocksFromHeight":
 	case "getNextBlocks":
 	case "getPeers":
