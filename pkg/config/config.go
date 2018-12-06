@@ -2,9 +2,11 @@ package config
 
 import (
 	"errors"
-	"time"
-
 	"github.com/spf13/viper"
+	"net"
+	"runtime"
+	"strconv"
+	"time"
 )
 
 var (
@@ -12,9 +14,20 @@ var (
 	ErrEmptyPeers              = errors.New("no peers")
 )
 
+const (
+	Application    = "Aspera"
+	Version        = "0.0.1"
+	DefaultP2PPort = "8123"
+)
+
 type Config struct {
+	Common  Common
 	Network Network
 	Storage Storage
+}
+
+type Common struct {
+	Platform string
 }
 
 type Network struct {
@@ -59,6 +72,10 @@ func Parse(cfgPath string) (*Config, error) {
 
 	maybeInsertGenesisMilestone(&c)
 
+	if len(c.Common.Platform) < 1 {
+		c.Common.Platform = runtime.GOOS
+	}
+
 	return &c, nil
 }
 
@@ -97,3 +114,48 @@ func validate(c *Config) error {
 
 	return nil
 }
+
+func parseIP(c *Config, s string) (net.IP, string, string, error) {
+	var ip net.IP
+	var port string
+	var err error
+	if ip = net.ParseIP(s); ip == nil {
+		var host string
+		if host, port, err = net.SplitHostPort(s); err != nil {
+			if len(port) > 0 {
+				if _, err = strconv.ParseUint(port, 10, 16); err != nil {
+					return nil, "", "", err
+				}
+			}
+			if ip = net.ParseIP(host); ip == nil {
+				return nil, "", "", errors.New("invalid IP")
+			}
+		} else {
+			return nil, "", "", err
+		}
+	}
+
+	space := "IPv6"
+	if ip4 := ip.To4(); ip4 != nil {
+		space = "IPv4"
+		ip = ip4
+	}
+
+	return ip, port, space, nil
+}
+
+/*
+func detectPublicIP(c *Config) error {
+	if len(c.Network.P2P.Listen) == 0 {
+
+	}
+	conn, err := net.Dial("udp", "8.8.8.8:80")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer conn.Close()
+
+	localAddr := conn.LocalAddr().(*net.UDPAddr)
+http: //whatismyip.akamai.com/
+}
+*/
