@@ -140,7 +140,7 @@ export class CryptoService {
                     let iv = CryptoJS.lib.WordArray.random(16);
                     let messageB64 = CryptoJS.AES.encrypt(message, key.toString(), {iv: iv}).toString();
                     // convert base 64 to hex due to node limitation
-                    let messageHex = iv.toString(CryptoJS.enc.Hex) + CryptoJS.enc.Base64.parse(messageB64.ciphertext).toString(CryptoJS.enc.Hex);
+                    let messageHex = iv.toString(CryptoJS.enc.Hex) + CryptoJS.enc.Base64.parse(messageB64).toString(CryptoJS.enc.Hex);
                     // Uint 8 to hex
                     let nonce = random_bytes.toString(CryptoJS.enc.Hex);
                     // return encrypted pair

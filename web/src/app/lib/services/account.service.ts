@@ -342,7 +342,6 @@ export class AccountService {
 
     /*
     * Method responsible for executing a transaction.
-    * TODO: very bloated, maybe 'un'bloat
     */
     public doTransaction(transaction: Transaction, encryptedPrivateKey: string, pin: string): Promise<Transaction> {
         return new Promise((resolve, reject) => {

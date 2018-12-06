@@ -1,8 +1,8 @@
 import { Component, OnInit, ViewChild, Input, Output, EventEmitter } from '@angular/core';
-import { BehaviorSubject, Subject } from 'rxjs';
-import { Transaction, Attachment, SuggestedFees } from '../../model';
+import { Transaction, Attachment, SuggestedFees, EncryptedMessage, Message } from '../../model';
 import { NgForm } from '@angular/forms';
 import { BurstUtil } from '../../util/burst';
+import { CryptoService } from '../../services';
 
 @Component({
   selector: 'app-send-burst-form',
@@ -67,9 +67,7 @@ export class SendBurstFormComponent implements OnInit {
     if (this.message) {
       if (this.encrypt) {
         return {
-          data: this.message,
-          nonce: null, //todo
-          type: 'encrypted_message'
+          encryptedMessage: this.message
         }
       } else {
         return {
