@@ -3,6 +3,7 @@ import { BehaviorSubject, Subject } from 'rxjs';
 import { Transaction, Attachment, SuggestedFees } from '../../model';
 import { NgForm } from '@angular/forms';
 import { BurstUtil } from '../../util/burst';
+import { AccountService } from '../../services';
 
 interface Recipient {
   address: string,
@@ -60,7 +61,7 @@ export class SendMultiOutFormComponent implements OnInit {
     }).reduce((acc, curr) => acc + curr, 0);
 
     return this.sameAmount ? parseFloat(this.amountNQT) + parseFloat(this.feeNQT) || 0
-      : calculateMultiOutTotal || 0;
+      : calculateMultiOutTotal + parseFloat(this.feeNQT) || 0;
   }
 
   setFee(feeNQT: string) {
@@ -70,20 +71,32 @@ export class SendMultiOutFormComponent implements OnInit {
   convertFeeToBurst(feeNQT: string) {
     return BurstUtil.convertStringToNumber(feeNQT);
   }
+
+  getMultiOutString() {
+    if (this.sameAmount) {
+      return this.recipients.map((recipient) => 
+        `${BurstUtil.decode(`BURST-${recipient.address}`)}`)
+        .join(';');
+    } else {
+      return this.recipients.map((recipient) => 
+        `${BurstUtil.decode(`BURST-${recipient.address}`)}:${BurstUtil.convertNumberToString(parseFloat(recipient.amountNQT))}`)
+        .join(';');
+    }
+  }
   
   onSubmit(event) {
-    // this.submit.emit({
-    //   transaction: {
-    //     // recipientAddress: `BURST-${this.recipientAddress}`,
-    //     amountNQT: parseFloat(this.amountNQT),
-    //     feeNQT: this.feeNQT,
-    //     attachment: this.getMessage(),
-    //     deadline: parseFloat(this.deadline),
-    //     fullHash: this.fullHash,
-    //     type: 1
-    //   },
-    //   pin: this.pin
-    // });
+    const multiOutString = this.getMultiOutString();
+
+    this.submit.emit({
+      transaction: {
+        recipients: multiOutString,
+        feeNQT: BurstUtil.convertNumberToString(parseFloat(this.feeNQT)),
+        deadline: "1440",
+        amountNQT: BurstUtil.convertNumberToString(this.getTotal())
+      },
+      pin: this.pin,
+      sameAmount: this.sameAmount
+    });
     event.stopImmediatePropagation();
   }
 }

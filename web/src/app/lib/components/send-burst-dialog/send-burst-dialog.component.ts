@@ -39,12 +39,12 @@ export class SendBurstDialogComponent implements OnInit {
   }
 
   sendBurstMultiOut(transactionRequest) {
-    const { transaction, pin } = transactionRequest;
+    const { transaction, pin, sameAmount } = transactionRequest;
     let transactionToSend: Transaction = { 
       senderPublicKey: this.data.account.keys.publicKey,
       ...transaction 
     };
-    return this.accountService.doTransaction(transactionToSend, this.data.account.keys.signPrivateKey, pin).then((transaction: Transaction) => {
+    return this.accountService.doMultiOutTransaction(transactionToSend, this.data.account.keys.signPrivateKey, pin, sameAmount).then((transaction: Transaction) => {
       console.log(transaction);
       this.closeDialog();
     });

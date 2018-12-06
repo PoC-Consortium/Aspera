@@ -17,10 +17,11 @@ export class Transaction {
     public blockTimestamp?: number;
     public confirmations?: number;
     public confirmed?: boolean;
-    public deadline?: number;
+    public deadline?: string;
     public feeNQT?: number;
     public fullHash?: string;
     public height?: number;
+    public recipients?: string;
     public recipientId?: string;
     public recipientAddress: string;
     public recipientPublicKey?: string;
