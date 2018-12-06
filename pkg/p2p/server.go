@@ -1,11 +1,16 @@
 package p2p
 
 import (
+	"fmt"
+	"strconv"
+
 	api "github.com/PoC-Consortium/Aspera/pkg/api/p2p"
+	"github.com/PoC-Consortium/Aspera/pkg/block"
 	"github.com/PoC-Consortium/Aspera/pkg/common/math"
 	c "github.com/PoC-Consortium/Aspera/pkg/config"
 	. "github.com/PoC-Consortium/Aspera/pkg/log"
 	s "github.com/PoC-Consortium/Aspera/pkg/store"
+
 	"github.com/golang/protobuf/jsonpb"
 	"github.com/valyala/fasthttp"
 	"github.com/valyala/fastjson"
@@ -77,8 +82,54 @@ func requestHandler(ctx *fasthttp.RequestCtx, config *c.Config, store *s.Store) 
 			},
 		)
 	case "getNextBlockIds":
+		if blockId, err := strconv.ParseUint(string(src.GetStringBytes("blockId")), 10, 64); err != nil {
+			marshaler.Marshal(
+				ctx.Response.BodyWriter(),
+				&api.ErrorResponse{
+					Error: err.Error(),
+				},
+			)
+		} else {
+			blocks, _ := store.ChainStore.FindBlocksAfter(
+				fmt.Sprintf(block.ById, blockId),
+				100,
+			)
+			var nextBlockIds []uint64
+			for _, b := range blocks {
+				nextBlockIds = append(nextBlockIds, b.Id)
+			}
+			marshaler.Marshal(
+				ctx.Response.BodyWriter(),
+				&api.GetNextBlockIdsResponse{
+					NextBlockIds: nextBlockIds,
+				},
+			)
+		}
 	case "getBlocksFromHeight":
 	case "getNextBlocks":
+		if blockId, err := strconv.ParseUint(string(src.GetStringBytes("blockId")), 10, 64); err != nil {
+			marshaler.Marshal(
+				ctx.Response.BodyWriter(),
+				&api.ErrorResponse{
+					Error: err.Error(),
+				},
+			)
+		} else {
+			blocks, _ := store.ChainStore.FindBlocksAfter(
+				fmt.Sprintf(block.ById, blockId),
+				100,
+			)
+			var nextBlocks []*api.Block
+			for _, b := range blocks {
+				nextBlocks = append(nextBlocks, b.Block)
+			}
+			marshaler.Marshal(
+				ctx.Response.BodyWriter(),
+				&api.GetNextBlocksResponse{
+					NextBlocks: nextBlocks,
+				},
+			)
+		}
 	case "getPeers":
 	case "getUnconfirmedTransactions":
 	case "processBlock":
