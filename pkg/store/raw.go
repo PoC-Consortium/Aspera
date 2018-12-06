@@ -260,6 +260,7 @@ func (rawStore *RawStore) consume(startHeight int) {
 			// if err := b.Execute(); err != nil {
 			// 	panic(err)
 			// }
+			s.ChainStore.Store(b)
 			rawStore.blockCache.store(b)
 
 			rawStore.Store(pbBlock, int32(height))
