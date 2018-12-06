@@ -7,9 +7,21 @@ package p2p;
 import "google/protobuf/any.proto";
 import "transaction.proto";
 
+message ErrorResponse {
+    string error = 1;
+}
+
 message GetCumulativeDifficultyResponse {
-  int32 blockchainHeight = 1;
-  string cumulativeDifficulty = 2;
+    int32 blockchainHeight = 1;
+    string cumulativeDifficulty = 2;
+}
+
+message GetInfoResponse {
+    string announcedAddress = 1;
+    string application = 2;
+    string version = 3;
+    string platform = 4;
+    bool shareAddress = 5;
 }
 
 message GetNextBlocksResponse {
