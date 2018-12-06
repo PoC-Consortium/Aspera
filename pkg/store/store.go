@@ -5,13 +5,17 @@ import (
 )
 
 type Store struct {
-	RawStore *RawStore
+	RawStore   *RawStore
+	ChainStore *ChainStore
 }
 
+var s *Store
+
 func Init(path string, genesisMilestone config.Milestone) *Store {
-	var store Store
-	store.RawStore = NewRawStore(path, genesisMilestone)
-	return &store
+	s = new(Store)
+	s.RawStore = NewRawStore(path, genesisMilestone)
+	s.ChainStore = NewChainStore(path)
+	return s
 }
 
 func (store *Store) Close() {
