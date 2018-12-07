@@ -12,7 +12,7 @@ build:
 	qtc $(ROOT_DIR)/pkg/api/p2p/compat/template/block.qtpl
 	go build -ldflags="-s -w" main.go
 start:
-	go run main.go -path=$(ROOT_DIR)/var
+	go run main.go
 clibs:
 	cd c; \
 	$(CC) $(CFLAGS) -c -o shabal64.o shabal64.s; \
