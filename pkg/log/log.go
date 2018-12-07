@@ -5,7 +5,3 @@ import (
 )
 
 var Log *zap.Logger
-
-func init() {
-	Log, _ = zap.NewProduction()
-}

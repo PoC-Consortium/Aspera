@@ -2,11 +2,17 @@ package config
 
 import (
 	"errors"
-	"github.com/spf13/viper"
 	"net"
+	"os"
+	"path/filepath"
 	"runtime"
 	"strconv"
 	"time"
+
+	. "github.com/PoC-Consortium/Aspera/pkg/log"
+
+	"github.com/spf13/viper"
+	"go.uber.org/zap"
 )
 
 var (
@@ -24,6 +30,7 @@ type Config struct {
 	Common  Common
 	Network Network
 	Storage Storage
+	Log     zap.Config
 }
 
 type Common struct {
@@ -59,12 +66,30 @@ func Parse(cfgPath string) (*Config, error) {
 	}
 
 	var c Config
+
+	c.Log = zap.NewProductionConfig()
+	c.Log.OutputPaths = append(c.Log.OutputPaths, "var/log/aspera.log")
 	c.Network.P2P.Timeout = 5 * time.Second
 	c.Network.P2P.Debug = false
 
 	if err := viper.Unmarshal(&c); err != nil {
 		return nil, err
 	}
+
+	for _, logfile := range c.Log.OutputPaths {
+		if logfile != "stdout" && logfile != "stderr" {
+			if _, err := os.Stat(filepath.Dir(logfile)); os.IsNotExist(err) {
+				os.MkdirAll(filepath.Dir(logfile), os.ModePerm)
+			}
+		}
+	}
+
+	var err error
+	if Log, err = c.Log.Build(); err != nil {
+		return nil, err
+	}
+	// .. let's wait for the next badger release ...
+	// badger.SetLogger(Log.Sugar())
 
 	if err := validate(&c); err != nil {
 		return nil, err

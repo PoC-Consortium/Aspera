@@ -36,3 +36,6 @@ network:
         id: 16219776992541504875
       - height: 500000
         id: 3013573467081493371
+log:
+  OutputPaths:
+    - var/log/aspera.log
