@@ -36,7 +36,7 @@ export class SendBurstDialogComponent implements OnInit {
     if (transactionToSend.attachment && transactionToSend.attachment.encryptedMessage) {
       const recipientPublicKey = await this.accountService.getAccountPublicKey(transaction.recipientAddress);
       const encryptedMessage = await this.cryptoService.encryptMessage(transactionToSend.attachment.encryptedMessage, 
-        this.data.account.keys.signPrivateKey, pin, recipientPublicKey);
+        this.data.account.keys.agreementPrivateKey, this.accountService.hashPinEncryption(pin), recipientPublicKey);
       transactionToSend.attachment = new EncryptedMessage({
         data: encryptedMessage.m,
         nonce: encryptedMessage.n,

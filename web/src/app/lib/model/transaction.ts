@@ -12,7 +12,7 @@ import { Attachment, EncryptedMessage, Message } from "./attachment"
 export class Transaction {
     public id?: string;
     public amountNQT?: number;
-    public attachment?: Attachment;
+    public attachment?: Attachment | EncryptedMessage | Message;
     public block?: string;
     public blockTimestamp?: number;
     public confirmations?: number;
