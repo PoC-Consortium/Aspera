@@ -14,6 +14,14 @@ type DigitalGoodsQuantityChange struct {
 	*pb.DigitalGoodsQuantityChange
 }
 
+func EmptyDigitalGoodsQuantityChange() *DigitalGoodsQuantityChange {
+	return &DigitalGoodsQuantityChange{
+		DigitalGoodsQuantityChange: &pb.DigitalGoodsQuantityChange{
+			Attachment: &pb.DigitalGoodsQuantityChange_Attachment{},
+		},
+	}
+}
+
 func (tx *DigitalGoodsQuantityChange) WriteAttachmentBytes(e encoding.Encoder) {
 	e.WriteUint64(tx.Attachment.Id)
 	e.WriteInt32(tx.Attachment.Delta)

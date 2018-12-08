@@ -14,6 +14,14 @@ type AutomatedTransactionsCreation struct {
 	*pb.AutomatedTransactionsCreation
 }
 
+func EmptyAutomatedTransactionCreation() *AutomatedTransactionsCreation {
+	return &AutomatedTransactionsCreation{
+		AutomatedTransactionsCreation: &pb.AutomatedTransactionsCreation{
+			Attachment: &pb.AutomatedTransactionsCreation_Attachment{},
+		},
+	}
+}
+
 func (tx *AutomatedTransactionsCreation) WriteAttachmentBytes(e encoding.Encoder) {
 	e.WriteUint8(uint8(len(tx.Attachment.Name)))
 	e.WriteBytes(tx.Attachment.Name)

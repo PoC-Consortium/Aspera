@@ -17,6 +17,14 @@ type DigitalGoodsDelivery struct {
 	*pb.DigitalGoodsDelivery
 }
 
+func EmptyDigitalGoodsDelivery() *DigitalGoodsDelivery {
+	return &DigitalGoodsDelivery{
+		DigitalGoodsDelivery: &pb.DigitalGoodsDelivery{
+			Attachment: &pb.DigitalGoodsDelivery_Attachment{},
+		},
+	}
+}
+
 func (tx *DigitalGoodsDelivery) WriteAttachmentBytes(e encoding.Encoder) {
 	e.WriteUint64(tx.Attachment.Purchase)
 	// java wallet <3

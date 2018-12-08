@@ -14,6 +14,14 @@ type DigitalGoodsRefund struct {
 	*pb.DigitalGoodsRefund
 }
 
+func EmptyDigitalGoodsRefund() *DigitalGoodsRefund {
+	return &DigitalGoodsRefund{
+		DigitalGoodsRefund: &pb.DigitalGoodsRefund{
+			Attachment: &pb.DigitalGoodsRefund_Attachment{},
+		},
+	}
+}
+
 func (tx *DigitalGoodsRefund) WriteAttachmentBytes(e encoding.Encoder) {
 	e.WriteUint64(tx.Attachment.Purchase)
 	e.WriteUint64(tx.Attachment.Refund)

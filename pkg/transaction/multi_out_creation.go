@@ -14,6 +14,14 @@ type MultiOutCreation struct {
 	*pb.MultiOutCreation
 }
 
+func EmptyMultiOutCreation() *MultiOutCreation {
+	return &MultiOutCreation{
+		MultiOutCreation: &pb.MultiOutCreation{
+			Attachment: &pb.MultiOutCreation_Attachment{},
+		},
+	}
+}
+
 func (tx *MultiOutCreation) WriteAttachmentBytes(e encoding.Encoder) {
 	e.WriteUint8(uint8(len(tx.Attachment.Recipients)))
 	for _, recipIdAndAmount := range tx.Attachment.Recipients {

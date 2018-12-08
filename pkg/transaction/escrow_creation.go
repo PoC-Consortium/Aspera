@@ -14,6 +14,14 @@ type EscrowCreation struct {
 	*pb.EscrowCreation
 }
 
+func EmptyEscrowCreation() *EscrowCreation {
+	return &EscrowCreation{
+		EscrowCreation: &pb.EscrowCreation{
+			Attachment: &pb.EscrowCreation_Attachment{},
+		},
+	}
+}
+
 func (tx *EscrowCreation) WriteAttachmentBytes(e encoding.Encoder) {
 	e.WriteUint64(tx.Attachment.Amount)
 	e.WriteUint32(tx.Attachment.Deadline)

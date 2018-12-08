@@ -14,6 +14,12 @@ type OrdinaryPayment struct {
 	*pb.OrdinaryPayment
 }
 
+func EmptyOrdinaryPayment() *OrdinaryPayment {
+	return &OrdinaryPayment{
+		OrdinaryPayment: &pb.OrdinaryPayment{},
+	}
+}
+
 func (tx *OrdinaryPayment) WriteAttachmentBytes(e encoding.Encoder) {}
 
 func (tx *OrdinaryPayment) AttachmentSizeInBytes() int {

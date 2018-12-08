@@ -14,6 +14,14 @@ type AssetIssuance struct {
 	*pb.AssetIssuance
 }
 
+func EmptyAssetIssuance() *AssetIssuance {
+	return &AssetIssuance{
+		AssetIssuance: &pb.AssetIssuance{
+			Attachment: &pb.AssetIssuance_Attachment{},
+		},
+	}
+}
+
 func (tx *AssetIssuance) WriteAttachmentBytes(e encoding.Encoder) {
 	e.WriteUint8(uint8(len(tx.Attachment.Name)))
 	e.WriteBytes(tx.Attachment.Name)

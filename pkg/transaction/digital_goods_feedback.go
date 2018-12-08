@@ -14,6 +14,14 @@ type DigitalGoodsFeedback struct {
 	*pb.DigitalGoodsFeedback
 }
 
+func EmptyDigitalGoodsFeedback() *DigitalGoodsFeedback {
+	return &DigitalGoodsFeedback{
+		DigitalGoodsFeedback: &pb.DigitalGoodsFeedback{
+			Attachment: &pb.DigitalGoodsFeedback_Attachment{},
+		},
+	}
+}
+
 func (tx *DigitalGoodsFeedback) WriteAttachmentBytes(e encoding.Encoder) {
 	e.WriteUint64(tx.Attachment.Purchase)
 }

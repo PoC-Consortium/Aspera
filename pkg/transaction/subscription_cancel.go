@@ -14,6 +14,14 @@ type SubscriptionCancel struct {
 	*pb.SubscriptionCancel
 }
 
+func EmptySubscriptionCancel() *SubscriptionCancel {
+	return &SubscriptionCancel{
+		SubscriptionCancel: &pb.SubscriptionCancel{
+			Attachment: &pb.SubscriptionCancel_Attachment{},
+		},
+	}
+}
+
 func (tx *SubscriptionCancel) WriteAttachmentBytes(e encoding.Encoder) {
 	e.WriteUint64(tx.Attachment.Id)
 }

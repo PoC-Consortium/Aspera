@@ -14,6 +14,12 @@ type RewardRecipientAssignment struct {
 	*pb.RewardRecipientAssignment
 }
 
+func EmptyRewardRecipientAssignment() *RewardRecipientAssignment {
+	return &RewardRecipientAssignment{
+		RewardRecipientAssignment: &pb.RewardRecipientAssignment{},
+	}
+}
+
 func (tx *RewardRecipientAssignment) WriteAttachmentBytes(e encoding.Encoder) {}
 
 func (tx *RewardRecipientAssignment) AttachmentSizeInBytes() int {

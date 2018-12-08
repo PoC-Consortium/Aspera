@@ -14,6 +14,14 @@ type DigitalGoodsPurchase struct {
 	*pb.DigitalGoodsPurchase
 }
 
+func EmptyDigitalGoodsPurchase() *DigitalGoodsPurchase {
+	return &DigitalGoodsPurchase{
+		DigitalGoodsPurchase: &pb.DigitalGoodsPurchase{
+			Attachment: &pb.DigitalGoodsPurchase_Attachment{},
+		},
+	}
+}
+
 func (tx *DigitalGoodsPurchase) WriteAttachmentBytes(e encoding.Encoder) {
 	e.WriteUint64(tx.Attachment.Id)
 	e.WriteUint32(tx.Attachment.Quantity)

@@ -14,6 +14,14 @@ type AliasBuy struct {
 	*pb.AliasBuy
 }
 
+func EmptyAliasBuy() *AliasBuy {
+	return &AliasBuy{
+		AliasBuy: &pb.AliasBuy{
+			Attachment: &pb.AliasBuy_Attachment{},
+		},
+	}
+}
+
 func (tx *AliasBuy) WriteAttachmentBytes(e encoding.Encoder) {
 	e.WriteUint8(uint8(len(tx.Attachment.Name)))
 	e.WriteBytes(tx.Attachment.Name)

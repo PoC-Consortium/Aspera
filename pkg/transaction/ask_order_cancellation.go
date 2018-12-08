@@ -14,6 +14,14 @@ type AskOrderCancellation struct {
 	*pb.AskOrderCancellation
 }
 
+func EmptyAskOrderCancellation() *AskOrderCancellation {
+	return &AskOrderCancellation{
+		AskOrderCancellation: &pb.AskOrderCancellation{
+			Attachment: &pb.AskOrderCancellation_Attachment{},
+		},
+	}
+}
+
 func (tx *AskOrderCancellation) WriteAttachmentBytes(e encoding.Encoder) {
 	e.WriteUint64(tx.Attachment.Order)
 }

@@ -14,6 +14,14 @@ type SubscriptionSubscribe struct {
 	*pb.SubscriptionSubscribe
 }
 
+func EmptySubscriptionSubscribe() *SubscriptionSubscribe {
+	return &SubscriptionSubscribe{
+		SubscriptionSubscribe: &pb.SubscriptionSubscribe{
+			Attachment: &pb.SubscriptionSubscribe_Attachment{},
+		},
+	}
+}
+
 func (tx *SubscriptionSubscribe) WriteAttachmentBytes(e encoding.Encoder) {
 	e.WriteUint32(tx.Attachment.Frequency)
 }

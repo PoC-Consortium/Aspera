@@ -14,6 +14,14 @@ type AssetTransfer struct {
 	*pb.AssetTransfer
 }
 
+func EmptyAssetTransfer() *AssetTransfer {
+	return &AssetTransfer{
+		AssetTransfer: &pb.AssetTransfer{
+			Attachment: &pb.AssetTransfer_Attachment{},
+		},
+	}
+}
+
 func (tx *AssetTransfer) WriteAttachmentBytes(e encoding.Encoder) {
 	e.WriteUint64(tx.Attachment.Asset)
 	e.WriteUint64(tx.Attachment.Quantity)

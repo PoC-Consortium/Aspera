@@ -14,6 +14,14 @@ type AliasAssignment struct {
 	*pb.AliasAssignment
 }
 
+func EmptyAliasAssignment() *AliasAssignment {
+	return &AliasAssignment{
+		AliasAssignment: &pb.AliasAssignment{
+			Attachment: &pb.AliasAssignment_Attachment{},
+		},
+	}
+}
+
 func (tx *AliasAssignment) WriteAttachmentBytes(e encoding.Encoder) {
 	e.WriteUint8(uint8(len(tx.Attachment.Alias)))
 	e.WriteBytes(tx.Attachment.Alias)

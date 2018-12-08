@@ -14,6 +14,14 @@ type DigitalGoodsDelisting struct {
 	*pb.DigitalGoodsDelisting
 }
 
+func EmptyDigitalGoodsDelisting() *DigitalGoodsDelisting {
+	return &DigitalGoodsDelisting{
+		DigitalGoodsDelisting: &pb.DigitalGoodsDelisting{
+			Attachment: &pb.DigitalGoodsDelisting_Attachment{},
+		},
+	}
+}
+
 func (tx *DigitalGoodsDelisting) WriteAttachmentBytes(e encoding.Encoder) {
 	e.WriteUint64(tx.Attachment.Id)
 }

@@ -14,6 +14,12 @@ type ArbitaryMessage struct {
 	*pb.ArbitaryMessage
 }
 
+func EmptyArbitraryMessage() *ArbitaryMessage {
+	return &ArbitaryMessage{
+		ArbitaryMessage: &pb.ArbitaryMessage{},
+	}
+}
+
 func (tx *ArbitaryMessage) WriteAttachmentBytes(e encoding.Encoder) {}
 
 func (tx *ArbitaryMessage) AttachmentSizeInBytes() int {

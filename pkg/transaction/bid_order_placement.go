@@ -14,6 +14,14 @@ type BidOrderPlacement struct {
 	*pb.BidOrderPlacement
 }
 
+func EmptyBidOrderPlacement() *BidOrderPlacement {
+	return &BidOrderPlacement{
+		BidOrderPlacement: &pb.BidOrderPlacement{
+			Attachment: &pb.BidOrderPlacement_Attachment{},
+		},
+	}
+}
+
 func (tx *BidOrderPlacement) WriteAttachmentBytes(e encoding.Encoder) {
 	e.WriteUint64(tx.Attachment.Asset)
 	e.WriteUint64(tx.Attachment.Quantity)

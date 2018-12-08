@@ -14,6 +14,14 @@ type AliasSell struct {
 	*pb.AliasSell
 }
 
+func EmptyAliasSell() *AliasSell {
+	return &AliasSell{
+		AliasSell: &pb.AliasSell{
+			Attachment: &pb.AliasSell_Attachment{},
+		},
+	}
+}
+
 func (tx *AliasSell) WriteAttachmentBytes(e encoding.Encoder) {
 	e.WriteUint8(uint8(len(tx.Attachment.Name)))
 	e.WriteBytes(tx.Attachment.Name)

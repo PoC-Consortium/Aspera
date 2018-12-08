@@ -14,6 +14,14 @@ type BidOrderCancellation struct {
 	*pb.BidOrderCancellation
 }
 
+func EmptyBidOrderCancellation() *BidOrderCancellation {
+	return &BidOrderCancellation{
+		BidOrderCancellation: &pb.BidOrderCancellation{
+			Attachment: &pb.BidOrderCancellation_Attachment{},
+		},
+	}
+}
+
 func (tx *BidOrderCancellation) WriteAttachmentBytes(e encoding.Encoder) {
 	e.WriteUint64(tx.Attachment.Order)
 }

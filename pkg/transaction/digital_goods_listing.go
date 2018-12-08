@@ -14,6 +14,14 @@ type DigitalGoodsListing struct {
 	*pb.DigitalGoodsListing
 }
 
+func EmptyDigitalGoodsListing() *DigitalGoodsListing {
+	return &DigitalGoodsListing{
+		DigitalGoodsListing: &pb.DigitalGoodsListing{
+			Attachment: &pb.DigitalGoodsListing_Attachment{},
+		},
+	}
+}
+
 func (tx *DigitalGoodsListing) WriteAttachmentBytes(e encoding.Encoder) {
 	e.WriteUint16(uint16(len(tx.Attachment.Name)))
 	e.WriteBytes(tx.Attachment.Name)

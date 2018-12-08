@@ -21,6 +21,14 @@ func (tx *AccountInfo) WriteAttachmentBytes(e encoding.Encoder) {
 	e.WriteBytes(tx.Attachment.Description)
 }
 
+func EmptyAccountInfo() *AccountInfo {
+	return &AccountInfo{
+		AccountInfo: &pb.AccountInfo{
+			Attachment: &pb.AccountInfo_Attachment{},
+		},
+	}
+}
+
 func (tx *AccountInfo) AttachmentSizeInBytes() int {
 	return 1 + len(tx.Attachment.Name) + 2 + len(tx.Attachment.Description)
 }

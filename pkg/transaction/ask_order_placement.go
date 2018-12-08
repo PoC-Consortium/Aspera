@@ -14,6 +14,14 @@ type AskOrderPlacement struct {
 	*pb.AskOrderPlacement
 }
 
+func EmptyAskOrderPlacement() *AskOrderPlacement {
+	return &AskOrderPlacement{
+		AskOrderPlacement: &pb.AskOrderPlacement{
+			Attachment: &pb.AskOrderPlacement_Attachment{},
+		},
+	}
+}
+
 func (tx *AskOrderPlacement) WriteAttachmentBytes(e encoding.Encoder) {
 	e.WriteUint64(tx.Attachment.Asset)
 	e.WriteUint64(tx.Attachment.Quantity)

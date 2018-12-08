@@ -14,6 +14,14 @@ type EscrowSign struct {
 	*pb.EscrowSign
 }
 
+func EmptyEscrowSign() *EscrowSign {
+	return &EscrowSign{
+		EscrowSign: &pb.EscrowSign{
+			Attachment: &pb.EscrowSign_Attachment{},
+		},
+	}
+}
+
 func (tx *EscrowSign) WriteAttachmentBytes(e encoding.Encoder) {
 	e.WriteUint64(tx.Attachment.Id)
 	e.WriteUint8(uint8(tx.Attachment.Decision))

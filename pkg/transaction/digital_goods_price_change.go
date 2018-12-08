@@ -14,6 +14,14 @@ type DigitalGoodsPriceChange struct {
 	*pb.DigitalGoodsPriceChange
 }
 
+func EmptyDigitalGoodsPriceChange() *DigitalGoodsPriceChange {
+	return &DigitalGoodsPriceChange{
+		DigitalGoodsPriceChange: &pb.DigitalGoodsPriceChange{
+			Attachment: &pb.DigitalGoodsPriceChange_Attachment{},
+		},
+	}
+}
+
 func (tx *DigitalGoodsPriceChange) WriteAttachmentBytes(e encoding.Encoder) {
 	e.WriteUint64(tx.Attachment.Id)
 	e.WriteUint64(tx.Attachment.Price)

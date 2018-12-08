@@ -14,6 +14,14 @@ type MultiSameOutCreation struct {
 	*pb.MultiSameOutCreation
 }
 
+func EmptyMultiSameOutCreation() *MultiSameOutCreation {
+	return &MultiSameOutCreation{
+		MultiSameOutCreation: &pb.MultiSameOutCreation{
+			Attachment: &pb.MultiSameOutCreation_Attachment{},
+		},
+	}
+}
+
 func (tx *MultiSameOutCreation) WriteAttachmentBytes(e encoding.Encoder) {
 	e.WriteUint8(uint8(len(tx.Attachment.Recipients)))
 	for _, recip := range tx.Attachment.Recipients {

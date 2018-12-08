@@ -14,6 +14,14 @@ type EffectiveBalanceLeasing struct {
 	*pb.EffectiveBalanceLeasing
 }
 
+func EmptyEffectiveBalanceLeasing() *EffectiveBalanceLeasing {
+	return &EffectiveBalanceLeasing{
+		EffectiveBalanceLeasing: &pb.EffectiveBalanceLeasing{
+			Attachment: &pb.EffectiveBalanceLeasing_Attachment{},
+		},
+	}
+}
+
 func (tx *EffectiveBalanceLeasing) WriteAttachmentBytes(e encoding.Encoder) {
 	e.WriteUint16(uint16(tx.Attachment.Period))
 }
