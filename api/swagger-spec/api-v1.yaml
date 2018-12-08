@@ -14,21 +14,37 @@ schemes:
   - http
   
 tags:
-  - name: all
+  - name: All
     description: Every API call
-  - name: server
+  - name: Server
     description: Get basic information about this wallet
-  - name: account
-    description: Get information about accounts and perform operations
-  - name: mining
+  - name: Account
+    description: Account operations
+  - name: Transactions
+    description: Transactional operations
+  - name: Aliases
+    description: Alias operations
+  - name: Asset Exchange
+    description: AE operations
+  - name: Digital Goods Store
+    description: DGS operations
+  - name: Messages
+    description: Arbitrary Message System operations
+  - name: Blocks
+    description: Get information about blocks
+  - name: Mining
     description: Mining operations
+  - name: Automated Transaction
+    description: AT operations
+  - name: Utils
+    description: Utilities
 
 paths:
   /server/getMyInfo:
     get:
       tags:
-        - server
-        - all
+        - Server
+        - All
       summary: Get hostname and address of the requesting node.
       operationId: getMyInfo
       responses:
@@ -51,8 +67,8 @@ paths:
   /server/getBlockchainStatus:
     get:
       tags:
-        - server
-        - all
+        - Server
+        - All
       summary: Get general informations about the Burst blockchain.
       operationId: getBlockchainStatus
       responses:
@@ -95,8 +111,8 @@ paths:
   /server/getConstants:
     get:
       tags:
-        - server
-        - all
+        - Server
+        - All
       summary: Get all defined constants.
       operationId: getConstants
       responses:
@@ -160,8 +176,8 @@ paths:
   /server/getPeer:
     get:
       tags:
-        - server
-        - all
+        - Server
+        - All
       summary: Get basic information of a peer.
       operationId: getPeer
       parameters:
@@ -214,8 +230,8 @@ paths:
   /server/getPeers:
     get:
       tags:
-        - server
-        - all
+        - Server
+        - All
       summary: Get IP of all connected peers.
       operationId: getPeers
       parameters:
@@ -250,8 +266,8 @@ paths:
   /server/getState:
     get:
       tags:
-        - server
-        - all
+        - Server
+        - All
       summary: Get the state of the Burst Network.
       description: ''
       operationId: getState
@@ -267,21 +283,54 @@ paths:
           schema:
             type: object
             properties:
-              numberOfPeers:
-                type: integer
-                description: Number of known peers on the network
-              numberOfUnlockedAccounts:
-                type: integer
-                description: Number of unlocked accounts on this node
               numberOfTransfers:
+                #NULL if includeCounts = false
                 type: integer
                 description: Number of Asset Exchange transfers in the blockchain
               numberOfOrders:
+                #NULL if includeCounts = false
                 type: integer
                 description: Number of Asset Exchange orders in the blockchain
               numberOfTransactions:
+                #NULL if includeCounts = false
                 type: integer
                 description: Number of transactions in the blockchain
+              numberOfAskOrders:
+                #NULL if includeCounts = false
+                type: integer
+                description: Number of Asset Exchange ask orders in the blockchain
+              numberOfBidOrders:
+                #NULL if includeCounts = false
+                type: integer
+                description: Number of Asset Exchange bid orders in the blockchain
+              numberOfAliases:
+                #NULL if includeCounts = false
+                type: integer
+                description: Number of aliases in the blockchain
+              numberOfAssets:
+                #NULL if includeCounts = false
+                type: integer
+                description: Number of AE assets in the blockchain
+              numberOfAccounts:
+                #NULL if includeCounts = false
+                type: integer
+                description: Number of accounts in the blockchain
+              numberOfBlocks:
+                #NULL if includeCounts = false
+                type: integer
+                description: Number of blocks (height + 1) in the blockchain
+              numberOfTrades:
+                #NULL if includeCounts = false
+                type: integer
+                description: Number of AE trades in the blockchain
+              numberOfPeers:
+                #!!! NOT NULL even if includeCounts = false !!!
+                type: integer
+                description: Number of known peers on the network
+              numberOfUnlockedAccounts:
+                #!!! NOT NULL even if includeCounts = false !!!
+                type: integer
+                description: Number of unlocked accounts on this node
               maxMemory:
                 type: integer
                 description: Maximum amount of memory the node may use (in Bytes)
@@ -291,9 +340,6 @@ paths:
               cumulativeDifficulty:
                 type: string
                 description: Current cumulative forging difficulty
-              numberOfAssets:
-                type: integer
-                description: Number of AE assets in the blockchain
               freeMemory:
                 type: integer
                 description: Amount of free memory on this node (in Bytes)
@@ -303,18 +349,9 @@ paths:
               totalEffectiveBalanceNXT:
                 type: integer
                 description: Total effective Balance of the network in BURST
-              numberOfAccounts:
-                type: integer
-                description: Number of accounts in the blockchain
-              numberOfBlocks:
-                type: integer
-                description: Number of blocks (height + 1) in the blockchain
               version:
                 type: string
                 description: Software version on this node
-              numberOfBidOrders:
-                type: integer
-                description: Number of Asset Exchange bid orders in the blockchain
               lastBlock:
                 type: string
                 description: Last block address
@@ -324,21 +361,12 @@ paths:
               application:
                 type: string
                 description: Name of the software running on this node (typically BRS)
-              numberOfAliases:
-                type: integer
-                description: Number of aliases in the blockchain
               lastBlockchainFeederHeight:
                 type: integer
                 description: Height of the last blockchain feeder
-              numberOfTrades:
-                type: integer
-                description: Number of AE trades in the blockchain
               time:
                 type: integer
                 description: Current node time (in seconds since the genesis block)
-              numberOfAskOrders:
-                type: integer
-                description: Number of Asset Exchange ask orders in the blockchain
               lastBlockchainFeeder:
                 type: string
                 description: Announced name of the feeder of the last blockchain
@@ -348,8 +376,8 @@ paths:
   /server/getTime:
     get:
       tags:
-        - server
-        - all
+        - Server
+        - All
       summary: Get the current time.
       operationId: getTime
       responses:
@@ -369,8 +397,8 @@ paths:
   /account/getAccount:
     get:
       tags:
-        - account
-        - all
+        - Account
+        - All
       summary: Get information about a specific account.
       operationId: getAccount
       parameters:
@@ -429,8 +457,8 @@ paths:
   /account/getAccountATs:
     get:
       tags:
-        - account
-        - all
+        - Account
+        - All
       summary: Get all running ATs of an account.
       operationId: getAccountATs
       parameters:
@@ -496,8 +524,8 @@ paths:
   /account/getAccountBlockIds:
     get:
       tags:
-        - account
-        - all
+        - Account
+        - All
       summary: Get the block IDs of all blocks forged (generated) by an account in reverse block height order..
       parameters:
         - in: query
@@ -539,8 +567,8 @@ paths:
   /account/getAccountBlocks:
     get:
       tags:
-        - account
-        - all
+        - Account
+        - All
       summary: Get the block IDs of all blocks forged (generated) by an account in reverse block height order..
       parameters:
         - in: query
@@ -634,8 +662,8 @@ paths:
   /mining/getAccountsWithRewardRecipient:
     get:
       tags:
-        - mining
-        - all
+        - Mining
+        - All
       summary: Get all pool members of a specific account.
       operationId: getAccountsWithRewardRecipient
       parameters:
@@ -664,8 +692,8 @@ paths:
   /mining/getMiningInfo:
     get:
       tags:
-        - mining
-        - all
+        - Mining
+        - All
       summary: Get information needed to mine the current block.
       operationId: getMiningInfo
       responses:
@@ -688,8 +716,8 @@ paths:
   /mining/getRewardRecipient:
     get:
       tags:
-        - mining
-        - all
+        - Mining
+        - All
       summary: Get the reward recipient of a specific account.
       operationId: getRewardRecipient
       parameters:
@@ -709,3 +737,140 @@ paths:
               requestProcessingTime:
                 type: integer
       deprecated: false
+
+parameters:
+  #Common parameters for Transactions
+  recipient:
+    in: query
+    name: recipient
+    type: string
+    description: Account ID of the recipient
+    allowEmptyValue: false
+    required: true
+  amountNQT:
+    in: query
+    name: amountNQT
+    type: string
+    description: Amount (in NQT) in the transaction
+    allowEmptyValue: false
+    required: true
+  secretPhrase:
+    in: query
+    name: secretPhrase
+    type: string
+    description: Secret passphrase of the signing account
+    allowEmptyValue: true
+    required: false
+  publicKey:
+    in: query
+    name: publicKey
+    type: string
+    description: Public key of the account (optional if secretPhrase provided)
+    allowEmptyValue: false
+    required: false
+  feeNQT:
+    in: query
+    name: feeNQT
+    type: string
+    description: Fee (in NQT) for the transaction
+    allowEmptyValue: true
+    required: false
+  deadline:
+    in: query
+    name: deadline
+    type: integer
+    description: Deadline (in minutes) for the transaction to be confirmed, 1440 minutes maximum
+    allowEmptyValue: false
+    required: true
+  referencedTransactionFullHash:
+    in: query
+    name: referencedTransactionFullHash
+    type: string
+    description: Referenced Transaction FullHash parameter to create a chained transaction
+    allowEmptyValue: false
+    required: false
+  broadcast:
+    in: query
+    name: broadcast
+    type: boolean
+    description: False to prevent broadcasting the transaction to the network
+    default: true
+    allowEmptyValue: false
+    required: false
+  message:
+    in: query
+    name: message
+    type: string
+    description: Either UTF-8 text or a string of hex digits to be converted into a bytecode with a maximum length of one kilobyte
+    allowEmptyValue: false
+    required: false
+  messageIsText:
+    in: query
+    name: messageIsText
+    type: boolean
+    description: False if the message is a hex string, otherwise the message is text
+    allowEmptyValue: false
+    required: false
+  messageToEncrypt:
+    in: query
+    name: messageToEncrypt
+    type: string
+    description: UTF-8 text or a string of hex digits to be compressed and converted into a bytecode with a maximum length of one kilobyte, then encrypted using AES
+    allowEmptyValue: false
+    required: false
+  messageToEncryptIsText:
+    in: query
+    name: messageToEncryptIsText
+    type: boolean
+    description: False if the message to encrypt is a hex string, otherwise the message to encrypt is text
+    allowEmptyValue: false
+    required: false
+  encryptedMessageData:
+    in: query
+    name: encryptedMessageData
+    type: string
+    description: Already encrypted data which overrides messageToEncrypt if provided
+    allowEmptyValue: false
+    required: false
+  encryptedMessageNonce:
+    in: query
+    name: encryptedMessageData
+    type: string
+    description: Unique 32-byte number which cannot be reused (optional unless encryptedMessageData is provided)
+    allowEmptyValue: false
+    required: false
+  messageToEncryptToSelf:
+    in: query
+    name: messageToEncryptToSelf
+    type: string
+    description: Either UTF-8 text or a string of hex digits to be compressed and converted into a one kilobyte maximum bytecode then encrypted with AES, then sent to the sending account
+    allowEmptyValue: false
+    required: false
+  messageToEncryptToSelfIsText:
+    in: query
+    name: messageToEncryptToSelf
+    type: boolean
+    description: False if the message to self-encrypt is a hex string, otherwise the message to encrypt is text
+    allowEmptyValue: false
+    required: false
+  encryptToSelfMessageData:
+    in: query
+    name: encryptToSelfMessageData
+    type: string
+    description: Already encrypted data which overrides messageToEncryptToSelf if provided
+    allowEmptyValue: false
+    required: false
+  encryptToSelfMessageNonce:
+    in: query
+    name: encryptToSelfMessageNonce
+    type: string
+    description: Unique 32-byte number which cannot be reused (optional unless encryptToSelfMessageData is provided)
+    allowEmptyValue: false
+    required: false
+  recipientPublicKey:
+    in: query
+    name: recipientPublicKey
+    type: string
+    description: Public key of the receiving account (optional, enhances security of a new account)
+    allowEmptyValue: false
+    required: false
