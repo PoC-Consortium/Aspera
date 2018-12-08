@@ -29,6 +29,13 @@ func (tx *DigitalGoodsPurchase) WriteAttachmentBytes(e encoding.Encoder) {
 	e.WriteUint32(tx.Attachment.DeliveryDeadlineTimestamp)
 }
 
+func (tx *DigitalGoodsPurchase) ReadAttachmentBytes(d encoding.Decoder) {
+	tx.Attachment.Id = d.ReadUint64()
+	tx.Attachment.Quantity = d.ReadUint32()
+	tx.Attachment.Price = d.ReadUint64()
+	tx.Attachment.DeliveryDeadlineTimestamp = d.ReadUint32()
+}
+
 func (tx *DigitalGoodsPurchase) AttachmentSizeInBytes() int {
 	return 8 + 4 + 8 + 4
 }

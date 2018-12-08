@@ -252,19 +252,12 @@
                                 {% case 4 %}
                                 "@type":"type.googleapis.com/p2p.SubscriptionCancel",
                                 "attachment": {
-                                    "id": {%qz= attachment.GetStringBytes("subscriptionId") %}
+                                    "subscriptionId": {%qz= attachment.GetStringBytes("subscriptionId") %}
                                 },
                                 {% case 5 %}
                                 "@type":"type.googleapis.com/p2p.SubscriptionPayment",
                                 "attachment": {
-                                    "ids": [
-                                        {% code
-                                         subscribers := attachment.GetArray("subscriptionIDs")
-                                         %}
-                                        {% for subscriberId, subscriber := range subscribers %}
-                                        {%qz= subscriber.GetStringBytes() %}{% if subscriberId + 1 < len(subscribers) %},{% endif %}
-                                        {% endfor %}
-                                    ]
+                                    "subscriptionId": {%qz= attachment.GetStringBytes("subscriptionId") %}
                                 }
                                 {% endswitch %}
                             {% case 22 %}
@@ -793,14 +786,7 @@
                             "type":       21,
                             "subtype":    5,
                             "attachment": {
-                                "subscriptionIDs": [
-                                    {% code
-                                       subscribers := tx.Attachment.Ids
-                                     %}
-                                    {% for subscriberId, subscriber := range subscribers %}
-                                        "{%v subscriber %}"{% if subscriberId + 1 < len(subscribers) %},{% endif %}
-                                    {% endfor %}
-                                ]
+                                "subscriptionId": "{%v tx.Attachment.Id %}"
                         {% case "p2p.AutomatedTransactionsCreation" %}
                         {% code
                            tx := new(p2p.AutomatedTransactionsCreation)

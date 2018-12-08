@@ -26,6 +26,10 @@ func (tx *DigitalGoodsDelisting) WriteAttachmentBytes(e encoding.Encoder) {
 	e.WriteUint64(tx.Attachment.Id)
 }
 
+func (tx *DigitalGoodsDelisting) ReadAttachmentBytes(d encoding.Decoder) {
+	tx.Attachment.Id = d.ReadUint64()
+}
+
 func (tx *DigitalGoodsDelisting) AttachmentSizeInBytes() int {
 	return 8
 }

@@ -29,6 +29,13 @@ func EmptyAccountInfo() *AccountInfo {
 	}
 }
 
+func (tx *AccountInfo) ReadAttachmentBytes(d encoding.Decoder) {
+	nameLen := d.ReadUint8()
+	tx.Attachment.Name = d.ReadBytes(int(nameLen))
+	descriptionLen := d.ReadUint16()
+	tx.Attachment.Description = d.ReadBytes(int(descriptionLen))
+}
+
 func (tx *AccountInfo) AttachmentSizeInBytes() int {
 	return 1 + len(tx.Attachment.Name) + 2 + len(tx.Attachment.Description)
 }

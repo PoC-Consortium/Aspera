@@ -29,6 +29,13 @@ func (tx *MultiSameOutCreation) WriteAttachmentBytes(e encoding.Encoder) {
 	}
 }
 
+func (tx *MultiSameOutCreation) ReadAttachmentBytes(d encoding.Decoder) {
+	tx.Attachment.Recipients = make([]uint64, d.ReadUint8())
+	for i := range tx.Attachment.Recipients {
+		tx.Attachment.Recipients[i] = d.ReadUint64()
+	}
+}
+
 func (tx *MultiSameOutCreation) AttachmentSizeInBytes() int {
 	return 1 + len(tx.Attachment.Recipients)*8
 }

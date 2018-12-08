@@ -20,7 +20,7 @@ var _ = math.Inf
 const _ = proto.ProtoPackageIsVersion2 // please upgrade the proto package
 
 type ErrorResponse struct {
-	Error                string   `protobuf:"bytes,1,opt,name=error" json:"error,omitempty"`
+	Error                string   `protobuf:"bytes,1,opt,name=error,proto3" json:"error,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -58,8 +58,8 @@ func (m *ErrorResponse) GetError() string {
 }
 
 type GetCumulativeDifficultyResponse struct {
-	BlockchainHeight     int32    `protobuf:"varint,1,opt,name=blockchainHeight" json:"blockchainHeight,omitempty"`
-	CumulativeDifficulty string   `protobuf:"bytes,2,opt,name=cumulativeDifficulty" json:"cumulativeDifficulty,omitempty"`
+	BlockchainHeight     int32    `protobuf:"varint,1,opt,name=blockchainHeight,proto3" json:"blockchainHeight,omitempty"`
+	CumulativeDifficulty string   `protobuf:"bytes,2,opt,name=cumulativeDifficulty,proto3" json:"cumulativeDifficulty,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -104,11 +104,11 @@ func (m *GetCumulativeDifficultyResponse) GetCumulativeDifficulty() string {
 }
 
 type GetInfoResponse struct {
-	AnnouncedAddress     string   `protobuf:"bytes,1,opt,name=announcedAddress" json:"announcedAddress,omitempty"`
-	Application          string   `protobuf:"bytes,2,opt,name=application" json:"application,omitempty"`
-	Version              string   `protobuf:"bytes,3,opt,name=version" json:"version,omitempty"`
-	Platform             string   `protobuf:"bytes,4,opt,name=platform" json:"platform,omitempty"`
-	ShareAddress         bool     `protobuf:"varint,5,opt,name=shareAddress" json:"shareAddress,omitempty"`
+	AnnouncedAddress     string   `protobuf:"bytes,1,opt,name=announcedAddress,proto3" json:"announcedAddress,omitempty"`
+	Application          string   `protobuf:"bytes,2,opt,name=application,proto3" json:"application,omitempty"`
+	Version              string   `protobuf:"bytes,3,opt,name=version,proto3" json:"version,omitempty"`
+	Platform             string   `protobuf:"bytes,4,opt,name=platform,proto3" json:"platform,omitempty"`
+	ShareAddress         bool     `protobuf:"varint,5,opt,name=shareAddress,proto3" json:"shareAddress,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -174,7 +174,7 @@ func (m *GetInfoResponse) GetShareAddress() bool {
 }
 
 type GetNextBlocksResponse struct {
-	NextBlocks           []*Block `protobuf:"bytes,1,rep,name=nextBlocks" json:"nextBlocks,omitempty"`
+	NextBlocks           []*Block `protobuf:"bytes,1,rep,name=nextBlocks,proto3" json:"nextBlocks,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -212,7 +212,7 @@ func (m *GetNextBlocksResponse) GetNextBlocks() []*Block {
 }
 
 type GetNextBlockIdsResponse struct {
-	NextBlockIds         []uint64 `protobuf:"varint,1,rep,packed,name=nextBlockIds" json:"nextBlockIds,omitempty"`
+	NextBlockIds         []uint64 `protobuf:"varint,1,rep,packed,name=nextBlockIds,proto3" json:"nextBlockIds,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -250,7 +250,7 @@ func (m *GetNextBlockIdsResponse) GetNextBlockIds() []uint64 {
 }
 
 type GetPeers struct {
-	Peers                []string `protobuf:"bytes,1,rep,name=peers" json:"peers,omitempty"`
+	Peers                []string `protobuf:"bytes,1,rep,name=peers,proto3" json:"peers,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -288,23 +288,23 @@ func (m *GetPeers) GetPeers() []string {
 }
 
 type Block struct {
-	PayloadLength        uint32     `protobuf:"varint,1,opt,name=payloadLength" json:"payloadLength,omitempty"`
-	TotalAmount          int64      `protobuf:"varint,2,opt,name=totalAmount" json:"totalAmount,omitempty"`
+	PayloadLength        uint32     `protobuf:"varint,1,opt,name=payloadLength,proto3" json:"payloadLength,omitempty"`
+	TotalAmount          int64      `protobuf:"varint,2,opt,name=totalAmount,proto3" json:"totalAmount,omitempty"`
 	GenerationSignature  []byte     `protobuf:"bytes,3,opt,name=generationSignature,proto3" json:"generationSignature,omitempty"`
 	GeneratorPublicKey   []byte     `protobuf:"bytes,4,opt,name=generatorPublicKey,proto3" json:"generatorPublicKey,omitempty"`
 	PayloadHash          []byte     `protobuf:"bytes,5,opt,name=payloadHash,proto3" json:"payloadHash,omitempty"`
 	BlockSignature       []byte     `protobuf:"bytes,6,opt,name=blockSignature,proto3" json:"blockSignature,omitempty"`
-	Transactions         []*any.Any `protobuf:"bytes,7,rep,name=transactions" json:"transactions,omitempty"`
-	Version              int32      `protobuf:"varint,8,opt,name=version" json:"version,omitempty"`
-	Nonce                uint64     `protobuf:"varint,9,opt,name=nonce" json:"nonce,omitempty"`
-	TotalFee             int64      `protobuf:"varint,10,opt,name=totalFee" json:"totalFee,omitempty"`
+	Transactions         []*any.Any `protobuf:"bytes,7,rep,name=transactions,proto3" json:"transactions,omitempty"`
+	Version              int32      `protobuf:"varint,8,opt,name=version,proto3" json:"version,omitempty"`
+	Nonce                uint64     `protobuf:"varint,9,opt,name=nonce,proto3" json:"nonce,omitempty"`
+	TotalFee             int64      `protobuf:"varint,10,opt,name=totalFee,proto3" json:"totalFee,omitempty"`
 	BlockATs             []byte     `protobuf:"bytes,11,opt,name=blockATs,proto3" json:"blockATs,omitempty"`
-	PreviousBlock        uint64     `protobuf:"varint,12,opt,name=previousBlock" json:"previousBlock,omitempty"`
-	Timestamp            uint32     `protobuf:"varint,13,opt,name=timestamp" json:"timestamp,omitempty"`
-	Id                   uint64     `protobuf:"varint,14,opt,name=id" json:"id,omitempty"`
-	Height               int32      `protobuf:"varint,15,opt,name=height" json:"height,omitempty"`
+	PreviousBlock        uint64     `protobuf:"varint,12,opt,name=previousBlock,proto3" json:"previousBlock,omitempty"`
+	Timestamp            uint32     `protobuf:"varint,13,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
+	Id                   uint64     `protobuf:"varint,14,opt,name=id,proto3" json:"id,omitempty"`
+	Height               int32      `protobuf:"varint,15,opt,name=height,proto3" json:"height,omitempty"`
 	PreviousBlockHash    []byte     `protobuf:"bytes,16,opt,name=previousBlockHash,proto3" json:"previousBlockHash,omitempty"`
-	BaseTarget           uint64     `protobuf:"varint,17,opt,name=baseTarget" json:"baseTarget,omitempty"`
+	BaseTarget           uint64     `protobuf:"varint,17,opt,name=baseTarget,proto3" json:"baseTarget,omitempty"`
 	CumulativeDifficulty []byte     `protobuf:"bytes,18,opt,name=cumulativeDifficulty,proto3" json:"cumulativeDifficulty,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}   `json:"-"`
 	XXX_unrecognized     []byte     `json:"-"`

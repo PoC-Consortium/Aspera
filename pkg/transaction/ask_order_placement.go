@@ -28,6 +28,12 @@ func (tx *AskOrderPlacement) WriteAttachmentBytes(e encoding.Encoder) {
 	e.WriteUint64(tx.Attachment.Price)
 }
 
+func (tx *AskOrderPlacement) ReadAttachmentBytes(d encoding.Decoder) {
+	tx.Attachment.Asset = d.ReadUint64()
+	tx.Attachment.Quantity = d.ReadUint64()
+	tx.Attachment.Price = d.ReadUint64()
+}
+
 func (tx *AskOrderPlacement) AttachmentSizeInBytes() int {
 	return 8 + 8 + 8
 }

@@ -28,6 +28,12 @@ func (tx *AliasSell) WriteAttachmentBytes(e encoding.Encoder) {
 	e.WriteInt64(tx.Attachment.Price)
 }
 
+func (tx *AliasSell) ReadAttachmentBytes(d encoding.Decoder) {
+	nameLen := d.ReadUint8()
+	tx.Attachment.Name = d.ReadBytes(int(nameLen))
+	tx.Attachment.Price = d.ReadInt64()
+}
+
 func (tx *AliasSell) AttachmentSizeInBytes() int {
 	return 1 + len(tx.Attachment.Name) + 8
 }

@@ -26,6 +26,8 @@ func (tx *RewardRecipientAssignment) AttachmentSizeInBytes() int {
 	return 0
 }
 
+func (tx *RewardRecipientAssignment) ReadAttachmentBytes(d encoding.Decoder) {}
+
 func (tx *RewardRecipientAssignment) GetType() uint16 {
 	return RewardRecipientAssignmentSubType<<8 | RewardRecipientAssignmentType
 }

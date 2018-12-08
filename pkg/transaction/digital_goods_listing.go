@@ -33,6 +33,17 @@ func (tx *DigitalGoodsListing) WriteAttachmentBytes(e encoding.Encoder) {
 	e.WriteUint64(tx.Attachment.Price)
 }
 
+func (tx *DigitalGoodsListing) ReadAttachmentBytes(d encoding.Decoder) {
+	nameLen := d.ReadUint16()
+	tx.Attachment.Name = d.ReadBytes(int(nameLen))
+	descriptionLen := d.ReadUint16()
+	tx.Attachment.Description = d.ReadBytes(int(descriptionLen))
+	tagsLen := d.ReadUint16()
+	tx.Attachment.Tags = d.ReadBytes(int(tagsLen))
+	tx.Attachment.Quantity = d.ReadUint32()
+	tx.Attachment.Price = d.ReadUint64()
+}
+
 func (tx *DigitalGoodsListing) AttachmentSizeInBytes() int {
 	return 2 + len(tx.Attachment.Name) + 2 + len(tx.Attachment.Description) + 2 + len(tx.Attachment.Tags) + 4 + 8
 }

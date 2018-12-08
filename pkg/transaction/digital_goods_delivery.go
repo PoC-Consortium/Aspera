@@ -43,6 +43,23 @@ func (tx *DigitalGoodsDelivery) WriteAttachmentBytes(e encoding.Encoder) {
 	e.WriteUint64(tx.Attachment.Discount)
 }
 
+func (tx *DigitalGoodsDelivery) ReadAttachmentBytes(d encoding.Decoder) {
+	tx.Attachment.Purchase = d.ReadUint64()
+	dataLen := d.ReadInt32()
+	if dataLen < 0 {
+		tx.Attachment.IsText = true
+		dataLen &= math.MaxInt32
+
+		tx.Attachment.Data = make([]byte, dataLen*2)
+		hex.Encode(tx.Attachment.Data, d.ReadBytes(int(dataLen)))
+	} else {
+		tx.Attachment.Data = make([]byte, dataLen*2)
+		hex.Encode(tx.Attachment.Data, d.ReadBytes(int(dataLen)))
+	}
+	tx.Attachment.Nonce = d.ReadBytes(32)
+	tx.Attachment.Discount = d.ReadUint64()
+}
+
 func (tx *DigitalGoodsDelivery) AttachmentSizeInBytes() int {
 	return 8 + 4 + len(tx.Attachment.Data)/2 + len(tx.Attachment.Nonce) + 8
 }

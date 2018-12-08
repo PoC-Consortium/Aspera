@@ -30,6 +30,10 @@ func (tx *SubscriptionCancel) AttachmentSizeInBytes() int {
 	return 8
 }
 
+func (tx *SubscriptionCancel) ReadAttachmentBytes(d encoding.Decoder) {
+	tx.Attachment.Id = d.ReadUint64()
+}
+
 func (tx *SubscriptionCancel) GetType() uint16 {
 	return SubscriptionCancelSubType<<8 | SubscriptionCancelType
 }

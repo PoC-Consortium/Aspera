@@ -329,7 +329,7 @@ message SubscriptionCancel {
 
 message SubscriptionPayment {
     message Attachment {
-        repeated uint64 ids = 1;
+        uint64 id = 1;
     }
     TransactionHeader header = 1;
     Attachment attachment = 2;

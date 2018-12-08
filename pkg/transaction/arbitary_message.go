@@ -22,6 +22,8 @@ func EmptyArbitraryMessage() *ArbitaryMessage {
 
 func (tx *ArbitaryMessage) WriteAttachmentBytes(e encoding.Encoder) {}
 
+func (tx *ArbitaryMessage) ReadAttachmentBytes(d encoding.Decoder) {}
+
 func (tx *ArbitaryMessage) AttachmentSizeInBytes() int {
 	return 0
 }

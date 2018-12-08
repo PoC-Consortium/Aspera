@@ -26,6 +26,8 @@ func (tx *OrdinaryPayment) AttachmentSizeInBytes() int {
 	return 0
 }
 
+func (tx *OrdinaryPayment) ReadAttachmentBytes(d encoding.Decoder) {}
+
 func (tx *OrdinaryPayment) GetType() uint16 {
 	return OrdinaryPaymentSubType<<8 | OrdinaryPaymentType
 }

@@ -19,13 +19,13 @@ var _ = math.Inf
 const _ = proto.ProtoPackageIsVersion2 // please upgrade the proto package
 
 type Account struct {
-	Id                   uint64   `protobuf:"varint,1,opt,name=id" json:"id,omitempty"`
-	RewardRecipient      uint64   `protobuf:"varint,2,opt,name=rewardRecipient" json:"rewardRecipient,omitempty"`
-	Balance              int64    `protobuf:"varint,3,opt,name=balance" json:"balance,omitempty"`
-	Reserved             int64    `protobuf:"varint,4,opt,name=reserved" json:"reserved,omitempty"`
+	Id                   uint64   `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	RewardRecipient      uint64   `protobuf:"varint,2,opt,name=rewardRecipient,proto3" json:"rewardRecipient,omitempty"`
+	Balance              int64    `protobuf:"varint,3,opt,name=balance,proto3" json:"balance,omitempty"`
+	Reserved             int64    `protobuf:"varint,4,opt,name=reserved,proto3" json:"reserved,omitempty"`
 	PublicKey            []byte   `protobuf:"bytes,5,opt,name=publicKey,proto3" json:"publicKey,omitempty"`
-	Name                 string   `protobuf:"bytes,6,opt,name=name" json:"name,omitempty"`
-	Address              string   `protobuf:"bytes,7,opt,name=address" json:"address,omitempty"`
+	Name                 string   `protobuf:"bytes,6,opt,name=name,proto3" json:"name,omitempty"`
+	Address              string   `protobuf:"bytes,7,opt,name=address,proto3" json:"address,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`

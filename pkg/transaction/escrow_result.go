@@ -27,6 +27,11 @@ func (tx *EscrowResult) WriteAttachmentBytes(e encoding.Encoder) {
 	e.WriteUint8(uint8(tx.Attachment.Decision))
 }
 
+func (tx *EscrowResult) ReadAttachmentBytes(d encoding.Decoder) {
+	tx.Attachment.Id = d.ReadUint64()
+	tx.Attachment.Decision = pb.DeadlineAction(d.ReadUint8())
+}
+
 func (tx *EscrowResult) AttachmentSizeInBytes() int {
 	return 8 + 1
 }

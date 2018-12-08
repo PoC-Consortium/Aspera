@@ -26,6 +26,10 @@ func (tx *BidOrderCancellation) WriteAttachmentBytes(e encoding.Encoder) {
 	e.WriteUint64(tx.Attachment.Order)
 }
 
+func (tx *BidOrderCancellation) ReadAttachmentBytes(d encoding.Decoder) {
+	tx.Attachment.Order = d.ReadUint64()
+}
+
 func (tx *BidOrderCancellation) AttachmentSizeInBytes() int {
 	return 8
 }

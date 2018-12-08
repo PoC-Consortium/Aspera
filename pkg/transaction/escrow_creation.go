@@ -33,6 +33,17 @@ func (tx *EscrowCreation) WriteAttachmentBytes(e encoding.Encoder) {
 	}
 }
 
+func (tx *EscrowCreation) ReadAttachmentBytes(d encoding.Decoder) {
+	tx.Attachment.Amount = d.ReadUint64()
+	tx.Attachment.Deadline = d.ReadUint32()
+	tx.Attachment.DeadlineAction = pb.DeadlineAction((d.ReadUint8()))
+	tx.Attachment.RequiredSigners = int32(d.ReadUint8())
+	tx.Attachment.Signers = make([]uint64, d.ReadUint8())
+	for i := range tx.Attachment.Signers {
+		tx.Attachment.Signers[i] = d.ReadUint64()
+	}
+}
+
 func (tx *EscrowCreation) AttachmentSizeInBytes() int {
 	return 8 + 4 + 1 + 1 + 1 + len(tx.Attachment.Signers)*8
 }

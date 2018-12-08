@@ -11,6 +11,10 @@ type Decoder interface {
 	ReadInt8() int8
 
 	ReadBytes(l int) []byte
+
+	Step(i int)
+	Position() int
+	Reset(i int)
 }
 
 type decoder struct {
@@ -74,4 +78,16 @@ func (d *decoder) ReadBytes(l int) []byte {
 	bs := d.bs[d.i : d.i+l]
 	d.i += l
 	return bs
+}
+
+func (d *decoder) Step(i int) {
+	d.i += i
+}
+
+func (d *decoder) Position() int {
+	return d.i
+}
+
+func (d *decoder) Reset(i int) {
+	d.i = i
 }

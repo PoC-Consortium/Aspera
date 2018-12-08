@@ -30,6 +30,16 @@ func (tx *MultiOutCreation) WriteAttachmentBytes(e encoding.Encoder) {
 	}
 }
 
+func (tx *MultiOutCreation) ReadAttachmentBytes(d encoding.Decoder) {
+	tx.Attachment.Recipients = make([]*pb.MultiOutCreation_Attachment_Recipients, d.ReadUint8())
+	for i := range tx.Attachment.Recipients {
+		tx.Attachment.Recipients[i] = &pb.MultiOutCreation_Attachment_Recipients{
+			Id:     d.ReadUint64(),
+			Amount: d.ReadUint64(),
+		}
+	}
+}
+
 func (tx *MultiOutCreation) AttachmentSizeInBytes() int {
 	return 1 + len(tx.Attachment.Recipients)*(8+8)
 }

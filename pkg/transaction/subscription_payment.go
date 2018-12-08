@@ -14,14 +14,24 @@ type SubscriptionPayment struct {
 	*pb.SubscriptionPayment
 }
 
-func (tx *SubscriptionPayment) WriteAttachmentBytes(e encoding.Encoder) {
-	for _, id := range tx.Attachment.Ids {
-		e.WriteUint64(id)
+func EmptySubscriptionPayment() *SubscriptionPayment {
+	return &SubscriptionPayment{
+		SubscriptionPayment: &pb.SubscriptionPayment{
+			Attachment: &pb.SubscriptionPayment_Attachment{},
+		},
 	}
 }
 
+func (tx *SubscriptionPayment) WriteAttachmentBytes(e encoding.Encoder) {
+	e.WriteUint64(tx.Attachment.Id)
+}
+
+func (tx *SubscriptionPayment) ReadAttachmentBytes(d encoding.Decoder) {
+	tx.Attachment.Id = d.ReadUint64()
+}
+
 func (tx *SubscriptionPayment) AttachmentSizeInBytes() int {
-	return len(tx.Attachment.Ids) * 8
+	return 8
 }
 
 func (tx *SubscriptionPayment) GetType() uint16 {

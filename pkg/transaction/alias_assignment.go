@@ -29,6 +29,13 @@ func (tx *AliasAssignment) WriteAttachmentBytes(e encoding.Encoder) {
 	e.WriteBytes(tx.Attachment.Uri)
 }
 
+func (tx *AliasAssignment) ReadAttachmentBytes(d encoding.Decoder) {
+	aliasLen := d.ReadUint8()
+	tx.Attachment.Alias = d.ReadBytes(int(aliasLen))
+	uriLen := d.ReadUint16()
+	tx.Attachment.Uri = d.ReadBytes(int(uriLen))
+}
+
 func (tx *AliasAssignment) AttachmentSizeInBytes() int {
 	return 1 + len(tx.Attachment.Alias) + 2 + len(tx.Attachment.Uri)
 }

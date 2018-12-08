@@ -27,6 +27,11 @@ func (tx *DigitalGoodsPriceChange) WriteAttachmentBytes(e encoding.Encoder) {
 	e.WriteUint64(tx.Attachment.Price)
 }
 
+func (tx *DigitalGoodsPriceChange) ReadAttachmentBytes(d encoding.Decoder) {
+	tx.Attachment.Id = d.ReadUint64()
+	tx.Attachment.Price = d.ReadUint64()
+}
+
 func (tx *DigitalGoodsPriceChange) AttachmentSizeInBytes() int {
 	return 8 + 8
 }

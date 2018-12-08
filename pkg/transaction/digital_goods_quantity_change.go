@@ -27,6 +27,11 @@ func (tx *DigitalGoodsQuantityChange) WriteAttachmentBytes(e encoding.Encoder) {
 	e.WriteInt32(tx.Attachment.Delta)
 }
 
+func (tx *DigitalGoodsQuantityChange) ReadAttachmentBytes(d encoding.Decoder) {
+	tx.Attachment.Id = d.ReadUint64()
+	tx.Attachment.Delta = d.ReadInt32()
+}
+
 func (tx *DigitalGoodsQuantityChange) AttachmentSizeInBytes() int {
 	return 8 + 4
 }

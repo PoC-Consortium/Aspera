@@ -26,6 +26,10 @@ func (tx *EffectiveBalanceLeasing) WriteAttachmentBytes(e encoding.Encoder) {
 	e.WriteUint16(uint16(tx.Attachment.Period))
 }
 
+func (tx *EffectiveBalanceLeasing) ReadAttachmentBytes(d encoding.Decoder) {
+	tx.Attachment.Period = uint32(d.ReadUint16())
+}
+
 func (tx *EffectiveBalanceLeasing) AttachmentSizeInBytes() int {
 	return 2
 }

@@ -33,6 +33,7 @@ var (
 type Transaction interface {
 	GetType() uint16
 	WriteAttachmentBytes(e encoding.Encoder)
+	ReadAttachmentBytes(e encoding.Decoder)
 	AttachmentSizeInBytes() int
 	GetHeader() *pb.TransactionHeader
 	SetHeader(*pb.TransactionHeader)

@@ -31,6 +31,15 @@ func (tx *AssetTransfer) WriteAttachmentBytes(e encoding.Encoder) {
 	}
 }
 
+func (tx *AssetTransfer) ReadAttachmentBytes(d encoding.Decoder) {
+	tx.Attachment.Asset = d.ReadUint64()
+	tx.Attachment.Quantity = d.ReadUint64()
+	if tx.Header.Version == 0 {
+		commentLen := d.ReadUint16()
+		tx.Attachment.Comment = d.ReadBytes(int(commentLen))
+	}
+}
+
 func (tx *AssetTransfer) AttachmentSizeInBytes() int {
 	if tx.Header.Version == 0 {
 		return 8 + 8 + 2 + len(tx.Attachment.Comment)

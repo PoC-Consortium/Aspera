@@ -26,6 +26,10 @@ func (tx *DigitalGoodsFeedback) WriteAttachmentBytes(e encoding.Encoder) {
 	e.WriteUint64(tx.Attachment.Purchase)
 }
 
+func (tx *DigitalGoodsFeedback) ReadAttachmentBytes(d encoding.Decoder) {
+	tx.Attachment.Purchase = d.ReadUint64()
+}
+
 func (tx *DigitalGoodsFeedback) AttachmentSizeInBytes() int {
 	return 8
 }

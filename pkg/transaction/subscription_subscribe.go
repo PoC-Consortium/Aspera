@@ -29,6 +29,10 @@ func (tx *SubscriptionSubscribe) AttachmentSizeInBytes() int {
 	return 4
 }
 
+func (tx *SubscriptionSubscribe) ReadAttachmentBytes(d encoding.Decoder) {
+	tx.Attachment.Frequency = d.ReadUint32()
+}
+
 func (tx *SubscriptionSubscribe) GetType() uint16 {
 	return SubscriptionSubscribeSubType<<8 | SubscriptionSubscribeType
 }
