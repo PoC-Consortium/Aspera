@@ -33,3 +33,11 @@ func (tx *EffectiveBalanceLeasing) AttachmentSizeInBytes() int {
 func (tx *EffectiveBalanceLeasing) GetType() uint16 {
 	return EffectiveBalanceLeasingSubType<<8 | EffectiveBalanceLeasingType
 }
+
+func (tx *EffectiveBalanceLeasing) SetAppendix(a *pb.Appendix) {
+	tx.Appendix = a
+}
+
+func (tx *EffectiveBalanceLeasing) SetHeader(h *pb.TransactionHeader) {
+	tx.Header = h
+}

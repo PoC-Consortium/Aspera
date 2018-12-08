@@ -40,3 +40,11 @@ func (tx *EscrowCreation) AttachmentSizeInBytes() int {
 func (tx *EscrowCreation) GetType() uint16 {
 	return EscrowCreationSubType<<8 | EscrowCreationType
 }
+
+func (tx *EscrowCreation) SetAppendix(a *pb.Appendix) {
+	tx.Appendix = a
+}
+
+func (tx *EscrowCreation) SetHeader(h *pb.TransactionHeader) {
+	tx.Header = h
+}

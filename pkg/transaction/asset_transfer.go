@@ -42,3 +42,11 @@ func (tx *AssetTransfer) AttachmentSizeInBytes() int {
 func (tx *AssetTransfer) GetType() uint16 {
 	return AssetTransferSubType<<8 | AssetTransferType
 }
+
+func (tx *AssetTransfer) SetAppendix(a *pb.Appendix) {
+	tx.Appendix = a
+}
+
+func (tx *AssetTransfer) SetHeader(h *pb.TransactionHeader) {
+	tx.Header = h
+}

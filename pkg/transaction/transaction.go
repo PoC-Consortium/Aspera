@@ -35,7 +35,9 @@ type Transaction interface {
 	WriteAttachmentBytes(e encoding.Encoder)
 	AttachmentSizeInBytes() int
 	GetHeader() *pb.TransactionHeader
+	SetHeader(*pb.TransactionHeader)
 	GetAppendix() *pb.Appendix
+	SetAppendix(*pb.Appendix)
 	proto.Message
 }
 

@@ -34,3 +34,11 @@ func (tx *DigitalGoodsQuantityChange) AttachmentSizeInBytes() int {
 func (tx *DigitalGoodsQuantityChange) GetType() uint16 {
 	return DigitalGoodsQuantityChangeSubType<<8 | DigitalGoodsQuantityChangeType
 }
+
+func (tx *DigitalGoodsQuantityChange) SetAppendix(a *pb.Appendix) {
+	tx.Appendix = a
+}
+
+func (tx *DigitalGoodsQuantityChange) SetHeader(h *pb.TransactionHeader) {
+	tx.Header = h
+}

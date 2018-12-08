@@ -34,3 +34,11 @@ func (tx *DigitalGoodsRefund) AttachmentSizeInBytes() int {
 func (tx *DigitalGoodsRefund) GetType() uint16 {
 	return DigitalGoodsRefundSubType<<8 | DigitalGoodsRefundType
 }
+
+func (tx *DigitalGoodsRefund) SetAppendix(a *pb.Appendix) {
+	tx.Appendix = a
+}
+
+func (tx *DigitalGoodsRefund) SetHeader(h *pb.TransactionHeader) {
+	tx.Header = h
+}

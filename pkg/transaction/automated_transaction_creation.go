@@ -37,3 +37,11 @@ func (tx *AutomatedTransactionsCreation) AttachmentSizeInBytes() int {
 func (tx *AutomatedTransactionsCreation) GetType() uint16 {
 	return AutomatedTransactionsCreationSubType<<8 | AutomatedTransactionsCreationType
 }
+
+func (tx *AutomatedTransactionsCreation) SetAppendix(a *pb.Appendix) {
+	tx.Appendix = a
+}
+
+func (tx *AutomatedTransactionsCreation) SetHeader(h *pb.TransactionHeader) {
+	tx.Header = h
+}

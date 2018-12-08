@@ -35,3 +35,11 @@ func (tx *AskOrderPlacement) AttachmentSizeInBytes() int {
 func (tx *AskOrderPlacement) GetType() uint16 {
 	return AskOrderPlacementSubType<<8 | AskOrderPlacementType
 }
+
+func (tx *AskOrderPlacement) SetAppendix(a *pb.Appendix) {
+	tx.Appendix = a
+}
+
+func (tx *AskOrderPlacement) SetHeader(h *pb.TransactionHeader) {
+	tx.Header = h
+}

@@ -37,3 +37,11 @@ func (tx *MultiOutCreation) AttachmentSizeInBytes() int {
 func (tx *MultiOutCreation) GetType() uint16 {
 	return MultiOutCreationSubType<<8 | MultiOutCreationType
 }
+
+func (tx *MultiOutCreation) SetAppendix(a *pb.Appendix) {
+	tx.Appendix = a
+}
+
+func (tx *MultiOutCreation) SetHeader(h *pb.TransactionHeader) {
+	tx.Header = h
+}

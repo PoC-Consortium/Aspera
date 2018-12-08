@@ -29,3 +29,11 @@ func (tx *OrdinaryPayment) AttachmentSizeInBytes() int {
 func (tx *OrdinaryPayment) GetType() uint16 {
 	return OrdinaryPaymentSubType<<8 | OrdinaryPaymentType
 }
+
+func (tx *OrdinaryPayment) SetAppendix(a *pb.Appendix) {
+	tx.Appendix = a
+}
+
+func (tx *OrdinaryPayment) SetHeader(h *pb.TransactionHeader) {
+	tx.Header = h
+}

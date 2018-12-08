@@ -36,3 +36,11 @@ func (tx *AccountInfo) AttachmentSizeInBytes() int {
 func (tx *AccountInfo) GetType() uint16 {
 	return AccountInfoSubType<<8 | AccountInfoType
 }
+
+func (tx *AccountInfo) SetAppendix(a *pb.Appendix) {
+	tx.Appendix = a
+}
+
+func (tx *AccountInfo) SetHeader(h *pb.TransactionHeader) {
+	tx.Header = h
+}

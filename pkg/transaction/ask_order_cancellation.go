@@ -33,3 +33,11 @@ func (tx *AskOrderCancellation) AttachmentSizeInBytes() int {
 func (tx *AskOrderCancellation) GetType() uint16 {
 	return AskOrderCancellationSubType<<8 | AskOrderCancellationType
 }
+
+func (tx *AskOrderCancellation) SetAppendix(a *pb.Appendix) {
+	tx.Appendix = a
+}
+
+func (tx *AskOrderCancellation) SetHeader(h *pb.TransactionHeader) {
+	tx.Header = h
+}

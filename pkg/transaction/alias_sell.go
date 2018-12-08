@@ -35,3 +35,11 @@ func (tx *AliasSell) AttachmentSizeInBytes() int {
 func (tx *AliasSell) GetType() uint16 {
 	return AliasSellSubType<<8 | AliasSellType
 }
+
+func (tx *AliasSell) SetAppendix(a *pb.Appendix) {
+	tx.Appendix = a
+}
+
+func (tx *AliasSell) SetHeader(h *pb.TransactionHeader) {
+	tx.Header = h
+}

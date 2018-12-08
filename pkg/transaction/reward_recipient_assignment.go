@@ -29,3 +29,11 @@ func (tx *RewardRecipientAssignment) AttachmentSizeInBytes() int {
 func (tx *RewardRecipientAssignment) GetType() uint16 {
 	return RewardRecipientAssignmentSubType<<8 | RewardRecipientAssignmentType
 }
+
+func (tx *RewardRecipientAssignment) SetAppendix(a *pb.Appendix) {
+	tx.Appendix = a
+}
+
+func (tx *RewardRecipientAssignment) SetHeader(h *pb.TransactionHeader) {
+	tx.Header = h
+}

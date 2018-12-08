@@ -36,3 +36,11 @@ func (tx *MultiSameOutCreation) AttachmentSizeInBytes() int {
 func (tx *MultiSameOutCreation) GetType() uint16 {
 	return MultiSameOutCreationSubType<<8 | MultiSameOutCreationType
 }
+
+func (tx *MultiSameOutCreation) SetAppendix(a *pb.Appendix) {
+	tx.Appendix = a
+}
+
+func (tx *MultiSameOutCreation) SetHeader(h *pb.TransactionHeader) {
+	tx.Header = h
+}

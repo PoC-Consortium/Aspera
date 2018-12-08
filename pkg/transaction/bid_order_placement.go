@@ -35,3 +35,11 @@ func (tx *BidOrderPlacement) AttachmentSizeInBytes() int {
 func (tx *BidOrderPlacement) GetType() uint16 {
 	return BidOrderPlacementSubType<<8 | BidOrderPlacementType
 }
+
+func (tx *BidOrderPlacement) SetAppendix(a *pb.Appendix) {
+	tx.Appendix = a
+}
+
+func (tx *BidOrderPlacement) SetHeader(h *pb.TransactionHeader) {
+	tx.Header = h
+}
