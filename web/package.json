@@ -88,6 +88,8 @@
     "typescript": "^2.9.2"
   },
   "husky": {
-    "pre-push": "npm run test:ci"
+    "hooks": {
+      "pre-push": "npm run test:ci"
+    }
   }
 }
