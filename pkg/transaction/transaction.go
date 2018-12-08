@@ -1,7 +1,9 @@
 package transaction
 
 import (
+	"encoding/hex"
 	"errors"
+	"math"
 	"strings"
 
 	pb "github.com/PoC-Consortium/Aspera/pkg/api/p2p"
@@ -114,6 +116,100 @@ func ToBytes(tx Transaction) []byte {
 	return e.Bytes()
 }
 
+func FromBytes(bs []byte) (Transaction, error) {
+	var tx Transaction
+	var err error
+	// defer func() {
+	// 	if r := recover(); r != nil {
+	// 		err = errors.New("invalid transaction bytes")
+	// 		tx = nil
+	// 	}
+	// }()
+
+	d := encoding.NewDecoder(bs)
+
+	h, txType, txSubType, flags := ReadHeaderAndTypesAndFlags(d)
+	// ToDo: redundancy... GetType() implemented for all txs
+	switch int16(txSubType)<<8 | int16(txType) {
+	case AccountInfoSubType<<8 | AccountInfoType:
+		tx = EmptyAccountInfo()
+	case AliasAssignmentSubType<<8 | AliasAssignmentType:
+		tx = EmptyAliasAssignment()
+	case AliasBuySubType<<8 | AliasBuyType:
+		tx = EmptyAliasBuy()
+	case AliasSellSubType<<8 | AliasSellType:
+		tx = EmptyAliasSell()
+	case ArbitaryMessageSubType<<8 | ArbitaryMessageType:
+		tx = EmptyArbitraryMessage()
+		// later in the blockchain all transactions can store messages as appendices
+		// by setting this flag we assure that the content will be parsed
+		// like an appendix
+		flags |= 1
+	case AskOrderCancellationSubType<<8 | AskOrderCancellationType:
+		tx = EmptyAskOrderCancellation()
+	case AskOrderPlacementSubType<<8 | AskOrderPlacementType:
+		tx = EmptyAskOrderPlacement()
+	case AssetIssuanceSubType<<8 | AssetIssuanceType:
+		tx = EmptyAssetIssuance()
+	case AssetTransferSubType<<8 | AssetTransferType:
+		tx = EmptyAssetTransfer()
+	case AutomatedTransactionsCreationSubType<<8 | AutomatedTransactionsCreationType:
+		tx = EmptyAutomatedTransactionCreation()
+	case BidOrderCancellationSubType<<8 | BidOrderCancellationType:
+		tx = EmptyBidOrderCancellation()
+	case BidOrderPlacementSubType<<8 | BidOrderPlacementType:
+		tx = EmptyBidOrderPlacement()
+	case DigitalGoodsDelistingSubType<<8 | DigitalGoodsDelistingType:
+		tx = EmptyDigitalGoodsDelisting()
+	case DigitalGoodsDeliverySubType<<8 | DigitalGoodsDeliveryType:
+		tx = EmptyDigitalGoodsDelivery()
+	case DigitalGoodsFeedbackSubType<<8 | DigitalGoodsFeedbackType:
+		tx = EmptyDigitalGoodsFeedback()
+	case DigitalGoodsListingSubType<<8 | DigitalGoodsListingType:
+		tx = EmptyDigitalGoodsListing()
+	case DigitalGoodsPriceChangeSubType<<8 | DigitalGoodsPriceChangeType:
+		tx = EmptyDigitalGoodsPriceChange()
+	case DigitalGoodsPurchaseSubType<<8 | DigitalGoodsPurchaseType:
+		tx = EmptyDigitalGoodsPurchase()
+	case DigitalGoodsQuantityChangeSubType<<8 | DigitalGoodsQuantityChangeType:
+		tx = EmptyDigitalGoodsQuantityChange()
+	case DigitalGoodsRefundSubType<<8 | DigitalGoodsRefundType:
+		tx = EmptyDigitalGoodsRefund()
+	case EffectiveBalanceLeasingSubType<<8 | EffectiveBalanceLeasingType:
+		tx = EmptyEffectiveBalanceLeasing()
+	case EscrowCreationSubType<<8 | EscrowCreationType:
+		tx = EmptyEscrowCreation()
+	case EscrowResultSubType<<8 | EscrowResultType:
+		tx = EmptyEscrowResult()
+	case EscrowSignSubType<<8 | EscrowSignType:
+		tx = EmptyEscrowSign()
+	case MultiOutCreationSubType<<8 | MultiOutCreationType:
+		tx = EmptyMultiOutCreation()
+	case MultiSameOutCreationSubType<<8 | MultiSameOutCreationType:
+		tx = EmptyMultiSameOutCreation()
+	case OrdinaryPaymentSubType<<8 | OrdinaryPaymentType:
+		tx = EmptyOrdinaryPayment()
+	case RewardRecipientAssignmentSubType<<8 | RewardRecipientAssignmentType:
+		tx = EmptyRewardRecipientAssignment()
+	case SubscriptionCancelSubType<<8 | SubscriptionCancelType:
+		tx = EmptySubscriptionCancel()
+	case SubscriptionPaymentSubType<<8 | SubscriptionPaymentType:
+		tx = EmptySubscriptionPayment()
+	case SubscriptionSubscribeSubType<<8 | SubscriptionSubscribeType:
+		tx = EmptySubscriptionSubscribe()
+	default:
+		panic("unknown tx type")
+	}
+
+	tx.SetHeader(h)
+	tx.ReadAttachmentBytes(d)
+	if flags != 0 {
+		tx.SetAppendix(ReadAppendixBytes(d, h.Version, flags))
+	}
+
+	return tx, err
+}
+
 func CalculateID(txBsWithZeroedSignature []byte) uint64 {
 	_, txId := crypto.BytesToHashAndID(txBsWithZeroedSignature)
 	return txId
@@ -213,6 +309,32 @@ func WriteHeader(e encoding.Encoder, h *pb.TransactionHeader, flags uint32, txTy
 	}
 }
 
+func ReadHeaderAndTypesAndFlags(d encoding.Decoder) (*pb.TransactionHeader, uint8, uint8, uint32) {
+	var h pb.TransactionHeader
+	var flags uint32
+	txType := d.ReadUint8()
+	subTypeAndVersion := d.ReadUint8()
+	txSubType := subTypeAndVersion & 0x0F
+	h.Version = uint32((subTypeAndVersion & 0xF0) >> 4)
+	h.Timestamp = d.ReadUint32()
+	h.Deadline = uint32(d.ReadUint16())
+	h.SenderPublicKey = d.ReadBytes(64)
+	h.Recipient = d.ReadUint64()
+	h.Amount = d.ReadUint64()
+	h.Fee = d.ReadUint64()
+	h.ReferencedTransactionFullHash = d.ReadBytes(32)
+	h.Signature = d.ReadBytes(32)
+	if h.Version > 0 {
+		flags = d.ReadUint32()
+		h.EcBlockHeight = d.ReadUint32()
+		h.EcBlockId = d.ReadUint64()
+		// if txType != 0 && txType != 1 {
+		d.ReadUint8()
+		// }
+	}
+	return &h, txType, txSubType, flags
+}
+
 func HeaderSizeInBytes(h *pb.TransactionHeader, txType uint16) int {
 	l := 2 + 4 + 2 + 32 + 8 + 8 + 8 + 32 + 64
 	if h.Version > 0 {
@@ -253,6 +375,69 @@ func WriteAppendix(e encoding.Encoder, a *pb.Appendix, version uint32) {
 		e.WriteBytesWithInt32Len(a.EncryptToSelfMessage.IsText, a.EncryptToSelfMessage.Data)
 		e.WriteBytes(a.EncryptToSelfMessage.Nonce)
 	}
+}
+
+func ReadAppendixBytes(d encoding.Decoder, version uint32, flags uint32) *pb.Appendix {
+	a := new(pb.Appendix)
+	if (flags & 1) != 0 {
+		msg := new(pb.Appendix_Message)
+		if version > 0 {
+			d.ReadUint8()
+		}
+		len := d.ReadInt32()
+		if len < 0 {
+			msg.IsText = true
+			len &= math.MaxInt32
+			msg.Content = d.ReadBytes(int(len))
+		} else {
+			msg.Content = make([]byte, len*2)
+			hex.Encode(msg.Content, d.ReadBytes(int(len)))
+		}
+		a.Message = msg
+	}
+	if (flags & (1 << 1)) != 0 {
+		msg := new(pb.Appendix_EncryptedMessage)
+		if version > 0 {
+			d.ReadUint8()
+		}
+		len := d.ReadInt32()
+		if len < 0 {
+			msg.IsText = true
+			len &= math.MaxInt32
+			msg.Data = d.ReadBytes(int(len))
+		} else {
+			msg.Data = make([]byte, len*2)
+			hex.Encode(msg.Data, d.ReadBytes(int(len)))
+		}
+		msg.Nonce = d.ReadBytes(32)
+		a.EncryptedMessage = msg
+	}
+	if (flags & (1 << 2)) != 0 {
+		publicKeyAnnouncement := new(pb.Appendix_PublicKeyAnnouncement)
+		if version > 0 {
+			d.ReadUint8()
+		}
+		publicKeyAnnouncement.PublicKey = d.ReadBytes(64)
+		a.PublicKeyAnnouncement = publicKeyAnnouncement
+	}
+	if (flags & (1 << 3)) != 0 {
+		msg := new(pb.Appendix_EncryptedMessage)
+		if version > 0 {
+			d.ReadUint8()
+		}
+		len := d.ReadInt32()
+		if len < 0 {
+			msg.IsText = true
+			len &= math.MaxInt32
+			msg.Data = d.ReadBytes(int(len))
+		} else {
+			msg.Data = make([]byte, len*2)
+			hex.Encode(msg.Data, d.ReadBytes(int(len)))
+		}
+		msg.Nonce = d.ReadBytes(32)
+		a.EncryptToSelfMessage = msg
+	}
+	return a
 }
 
 func AppendixSizeInBytes(a *pb.Appendix, version uint32) int {
