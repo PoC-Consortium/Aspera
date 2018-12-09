@@ -1,12 +1,12 @@
-import { Injectable } from '@angular/core';
+import {Inject, Injectable, Optional} from '@angular/core';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
 import { Store } from "../model/abstract";
 import { Account, Settings, constants } from "../model";
 
 import * as Loki from "lokijs";
-import * as LokiIndexedAdapter from "lokijs/src/loki-indexed-adapter.js";
 import { AccountService } from './account.service';
+import {StoreConfig} from "../config/store.config";
 
 @Injectable()
 export class StoreService {
@@ -15,11 +15,12 @@ export class StoreService {
     public ready: BehaviorSubject<any> = new BehaviorSubject(false);
     public settings: BehaviorSubject<any> = new BehaviorSubject(false);
 
-    constructor() {
-        this.store = new Loki(constants.database, {
+    constructor(private storeConfig : StoreConfig) {
+
+        this.store = new Loki(storeConfig.databaseName, {
             autoload: true,
             autoloadCallback: this.init.bind(this),
-            adapter: new LokiIndexedAdapter()
+            adapter: storeConfig.persistenceAdapter
         });
     }
 
@@ -72,7 +73,7 @@ export class StoreService {
                 } else {
                     accounts.chain().find({ id : account.id }).update(w => {
                         w.balance = account.balance;
-                        w.type = account.type; 
+                        w.type = account.type;
                         w.selected = account.selected;
                         w.keys = account.keys;
                         w.transactions = account.transactions;

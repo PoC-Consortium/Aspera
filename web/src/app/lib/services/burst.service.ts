@@ -40,7 +40,8 @@ export class BurstService {
     let requestOptions = BurstUtil.getRequestOptions();
     requestOptions.params = params;
 
-    return this.httpService.get<Block | HttpError>(this.nodeUrl, requestOptions);
+//    return this.httpService.get<Block | HttpError>(this.nodeUrl, requestOptions);
+    return this.httpService.get<Block | HttpError>("https://wallet.burst.cryptoguru.org:8125/burst", requestOptions);
   }
 
   public translateServerError(response) {
