@@ -3,6 +3,8 @@ import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
 import { Account, Settings} from "../../model";
 
+
+// TODO: not sure if we need this mock...should be possible to do this another way (ngMocks, jest.mocking?)
 @Injectable()
 export class StoreService {
 

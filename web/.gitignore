@@ -27,6 +27,7 @@ src/environments/environment.prod.ts
 npm-debug.log
 testem.log
 /typings
+loki.test.db
 
 
 # e2e

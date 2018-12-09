@@ -7,7 +7,7 @@
   "scripts": {
     "start": "ng serve --proxy-config proxy.conf.json",
     "test": "jest --watch",
-    "test:ci": "jest --runInBand"
+    "test:ci": "jest --runInBand --coverage"
   },
   "jest": {
     "preset": "jest-preset-angular",
@@ -66,6 +66,7 @@
     "karma-coverage-istanbul-reporter": "~2.0.0",
     "karma-jasmine": "~1.1.1",
     "karma-jasmine-html-reporter": "^0.2.2",
+    "ng-mocks": "^7.2.0",
     "protractor": "^5.4.1",
     "script-loader": "^0.7.2",
     "ts-node": "~5.0.1",
