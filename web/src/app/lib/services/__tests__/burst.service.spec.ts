@@ -11,18 +11,6 @@ jest.mock('../../i18n/i18n.service');
 describe('BurstService', () => {
 
     beforeEach(() => {
-
-        I18nService.mockClear();
-        StoreService.mockClear();
-
-        StoreService.mockImplementation(() => {
-            return {
-                settings: {
-                    subscribe : jest.fn()
-                },
-            };
-        });
-
         TestBed.configureTestingModule({
             imports: [HttpClientTestingModule],
             providers: [
