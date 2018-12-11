@@ -1,5 +1,5 @@
-import {constants} from "../model/constants";
-import LokiIndexedAdapter from "lokijs/src/loki-indexed-adapter.js";
+import {constants} from "../model";
+import {LokiLocalStorageAdapter} from "lokijs" //loki-indexed-adapter.js";
 
 export class StoreConfig {
     public databaseName: string;
@@ -9,7 +9,7 @@ export class StoreConfig {
 const appConfigFactory = () => {
     const config = new StoreConfig();
     config.databaseName = constants.database;
-    config.persistenceAdapter = new LokiIndexedAdapter();
+    config.persistenceAdapter = new LokiLocalStorageAdapter();
     return config;
 };
 
