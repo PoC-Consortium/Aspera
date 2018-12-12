@@ -1,0 +1,76 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`AppFooterComponent should be rendered correctly 1`] = `
+<app-footer>
+  <footer
+    class="main-footer"
+  >
+    <div>
+      <ul
+        class="footer-info"
+      >
+        <li>
+          <a
+            href="https://burst-coin.org"
+            target="_blank"
+          >
+            <i
+              aria-hidden="true"
+              class="fa fa-globe"
+            />
+             Website
+          </a>
+        </li>
+        <li>
+          <a
+            href="https://explore.burst.cryptoguru.org/"
+            target="_blank"
+          >
+            <i
+              aria-hidden="true"
+              class="fa fa-database"
+            />
+             Block Explorer
+          </a>
+        </li>
+        <li>
+          <a
+            href="https://twitter.com/burstcoin_dev"
+            target="_blank"
+          >
+            <i
+              aria-hidden="true"
+              class="fa fa-twitter"
+            />
+             Twitter
+          </a>
+        </li>
+        <li>
+          <a
+            href="https://github.com/PoC-Consortium"
+            target="_blank"
+          >
+            <i
+              aria-hidden="true"
+              class="fa fa-comment"
+            />
+             Discord
+          </a>
+        </li>
+        <li>
+          <a
+            href="https://github.com/PoC-Consortium"
+            target="_blank"
+          >
+            <i
+              aria-hidden="true"
+              class="fa fa-github"
+            />
+             Github
+          </a>
+        </li>
+      </ul>
+    </div>
+  </footer>
+</app-footer>
+`;

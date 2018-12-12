@@ -27,6 +27,8 @@ src/environments/environment.prod.ts
 npm-debug.log
 testem.log
 /typings
+loki.test.db
+
 
 # e2e
 /e2e/*.js
@@ -35,3 +37,5 @@ testem.log
 #System Files
 .DS_Store
 Thumbs.db
+
+

@@ -31,9 +31,11 @@ let modules = [
 // Main App
 import { App } from './app.component';
 
-
 // Main Routes
 import { routing } from './app.routing';
+
+// Configs
+import {StoreConfig, appConfigFactory} from "./lib/config/store.config";
 
 @NgModule({
     bootstrap: [App],
@@ -45,6 +47,7 @@ import { routing } from './app.routing';
         routing
     ],
     providers: [
+        { provide: StoreConfig, useFactory: appConfigFactory }
     ]
 })
 
