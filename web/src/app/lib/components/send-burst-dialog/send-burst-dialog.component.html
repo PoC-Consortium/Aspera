@@ -7,5 +7,6 @@
     <app-send-multi-out-form [fees]="data.fees" [close]="this.dialogRef.close" [balance]="data.account.balance" (submit)="sendBurstMultiOut($event)"></app-send-multi-out-form>
   </mat-tab>
   <mat-tab label="Message">
+    <app-send-message-form [fees]="data.fees" [close]="this.dialogRef.close" [balance]="data.account.balance" (submit)="sendMessage($event)"></app-send-message-form>
   </mat-tab>
 </mat-tab-group>

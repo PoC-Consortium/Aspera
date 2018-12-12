@@ -36,6 +36,7 @@ import { SendMultiOutFormComponent } from './components/send-multi-out-form';
 import { BurstInputValidatorDirective } from './components/send-burst-form/burst-input-validator.directive';
 
 import { NgxMaskModule } from 'ngx-mask';
+import { SendMessageFormComponent } from './components/send-message-form/send-message-form.component';
 
 const NGA_COMPONENTS = [
     AppFooterComponent,
@@ -74,7 +75,8 @@ const NGA_VALIDATORS = [
         ...NGA_DIRECTIVES,
         ...NGA_COMPONENTS,
         SendBurstFormComponent,
-        SendMultiOutFormComponent
+        SendMultiOutFormComponent,
+        SendMessageFormComponent
     ],
     imports: [
         CommonModule,

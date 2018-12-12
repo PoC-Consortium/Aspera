@@ -33,6 +33,7 @@ export class SendBurstDialogComponent implements OnInit {
       ...transaction 
     };
 
+    // todo: move to service
     if (transactionToSend.attachment && transactionToSend.attachment.encryptedMessage) {
       const recipientPublicKey = await this.accountService.getAccountPublicKey(transaction.recipientAddress);
       const encryptedMessage = await this.cryptoService.encryptMessage(transactionToSend.attachment.encryptedMessage, 
@@ -45,6 +46,20 @@ export class SendBurstDialogComponent implements OnInit {
     }
 
     return this.accountService.doTransaction(transactionToSend, this.data.account.keys.signPrivateKey, pin).then((transaction: Transaction) => {
+      console.log(transaction);
+      this.closeDialog();
+    });
+  }
+
+
+  sendMessage(transactionRequest) {
+    const { transaction, pin } = transactionRequest;
+    let transactionToSend: Transaction = { 
+      senderPublicKey: this.data.account.keys.publicKey,
+      ...transaction 
+    };
+
+    return this.accountService.sendMessage(transactionToSend, this.data.account.keys.signPrivateKey, pin).then((transaction: Transaction) => {
       console.log(transaction);
       this.closeDialog();
     });
