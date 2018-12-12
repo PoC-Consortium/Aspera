@@ -353,20 +353,40 @@ export class AccountService {
                 .set("publicKey", transaction.senderPublicKey)
                 .set("recipient", transaction.recipientAddress);
             if (transaction.attachment != undefined) {
-                if (transaction.attachment.type == "encrypted_message") {
-                    let em: EncryptedMessage = <EncryptedMessage>transaction.attachment;
-                    params = params.set("encryptedMessageData", em.data)
-                        .set("encryptedMessageNonce", em.nonce)
-                        .set("messageToEncryptIsText", String(em.isText));
-                } else if (transaction.attachment.type == "message") {
-                    let m: Message = <Message>transaction.attachment;
-                    params = params.set("message", m.message)
-                        .set("messageIsText", String(m.messageIsText))
-                }
+                params = this.constructAttachment(transaction, params);
             }
             let requestOptions = BurstUtil.getRequestOptions();
             requestOptions.params = params;
             // request 'sendMoney' to burst node
+            return this.http.post(this.nodeUrl, {}, requestOptions)
+                .timeout(constants.connectionTimeout)
+                .toPromise<any>() // todo
+                .then(this.postTransaction(resolve, reject, transaction, encryptedPrivateKey, pin))
+                .catch(error => { console.log(error); reject("Transaction error: Generating transaction. Check the recipient!") });
+        });
+    }
+
+
+    /*
+    * Method responsible for sending a message
+    */
+   public sendMessage(transaction: Transaction, encryptedPrivateKey: string, pin: string): Promise<Transaction> {
+        return new Promise((resolve, reject) => {
+
+            let params: HttpParams = new HttpParams()
+                .set("requestType", "sendMessage")
+                .set("deadline", "1440") // todo
+                .set("feeNQT", BurstUtil.convertNumberToString(transaction.feeNQT))
+                .set("publicKey", transaction.senderPublicKey)
+                .set("recipient", transaction.recipientAddress);
+
+            if (transaction.attachment != undefined) {
+                params = this.constructAttachment(transaction, params);
+            }
+
+            let requestOptions = BurstUtil.getRequestOptions();
+            requestOptions.params = params;
+
             return this.http.post(this.nodeUrl, {}, requestOptions)
                 .timeout(constants.connectionTimeout)
                 .toPromise<any>() // todo
@@ -417,6 +437,21 @@ export class AccountService {
             reject("Transaction error: Generating transaction. Check the recipient!");
         }
     };
+
+    private constructAttachment(transaction: Transaction, params: HttpParams) {
+        if (transaction.attachment.type == "encrypted_message") {
+            let em: EncryptedMessage = <EncryptedMessage>transaction.attachment;
+            params = params.set("encryptedMessageData", em.data)
+                .set("encryptedMessageNonce", em.nonce)
+                .set("messageToEncryptIsText", String(em.isText));
+        }
+        else if (transaction.attachment.type == "message") {
+            let m: Message = <Message>transaction.attachment;
+            params = params.set("message", m.message)
+                .set("messageIsText", String(m.messageIsText));
+        }
+        return params;
+    }
 
     public doMultiOutTransaction(transaction: Transaction, encryptedPrivateKey: string, pin: string, sameAmount: boolean): Promise<Transaction> {
         return new Promise((resolve, reject) => {
