@@ -24,6 +24,14 @@
             background:rgba(#3c8dbc, .15);
             border-right:5px solid rgba(#3c8dbc, .5);
         }
+        > span {
+            position: relative;
+            top:-7px;
+            left:5px;
+        }
+        &.selected {
+            background:rgba(#3c8dbc, .15);
+        }
     }
     strong {    
         display: block;
@@ -34,14 +42,29 @@
         overflow: hidden;
         direction: rtl;
     }
-    span {
-        position: relative;
-        top:-7px;
-        left:5px;
-    }
     .nav-bottom {
         position: absolute;
         bottom: 0;
         width: 100%;
+    }
+
+    a {
+        color:#fff;
+        text-decoration: none;
+    }
+
+    ul ul {
+        padding-top:10px;
+        li {
+            padding:5px 15px 5px 0;
+            i {
+                padding-right:5px;
+            }
+            &:hover {
+                background:none;
+                border:none;
+                text-decoration: underline;
+            }
+        }
     }
 }

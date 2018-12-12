@@ -9,6 +9,7 @@ import { SetupComponent } from './setup/setup.component';
 import { AccountNewComponent } from './setup/account/account.component';
 import { CreateActiveAccountComponent } from './setup/account/create-active/create.component';
 import { CreatePassiveAccountComponent } from './setup/account/create-passive/create-passive.component';
+import { MessagesComponent } from './messages/messages.component';
 
 // noinspection TypeScriptValidateTypes
 const routes: Routes = [
@@ -37,7 +38,8 @@ const routes: Routes = [
                 path: 'setup/create/passive',
                 component: CreatePassiveAccountComponent
             },
-            { path: 'transactions', component: TransactionsComponent }
+            { path: 'transactions', component: TransactionsComponent },
+            { path: 'messages', component: MessagesComponent }
         ]
     }
 ];
