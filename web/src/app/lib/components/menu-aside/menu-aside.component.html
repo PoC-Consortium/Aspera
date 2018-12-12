@@ -2,9 +2,23 @@
     <img class="logo" src="public/assets/img/logo.png">
 
     <ul class="nav">
-        <li *ngFor="let account of accounts" (click)="selectAccount(account)" routerLink="/">
+        <li *ngFor="let account of accounts" (click)="selectAccount(account)" routerLink="/" [ngClass]="{'selected': account.selected}">
             <strong>{{ account.address }}</strong>
-            {{ account.balance }} 
+            {{ account.balance }}
+            <ul *ngIf="account.selected">
+                <li>
+                    <a routerLink="/dashboard/transactions" title="{{'Transactions' | i18n}}">
+                        <i class="fa fa-lg fa-fw fa-exchange"></i> 
+                        <span class="menu-item-parent">{{'Transactions' | i18n}}</span>
+                    </a>
+                </li>
+                <li>
+                    <a routerLink="/dashboard/messages" title="{{'Messages' | i18n}}">
+                        <i class="fa fa-lg fa-fw fa-envelope"></i> 
+                        <span class="menu-item-parent">{{'Messages' | i18n}}</span>
+                    </a>
+                </li>
+            </ul> 
         </li>
         <li routerLink="/dashboard/setup/create">
             <mat-icon>add_box</mat-icon>

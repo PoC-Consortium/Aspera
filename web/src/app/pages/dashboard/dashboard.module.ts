@@ -11,6 +11,7 @@ import { AccountsModule } from './accounts/accounts.module';
 import { SetupModule } from './setup/setup.module';
 import { HomeModule } from './home/home.module';
 import { TransactionsModule } from './transactions/transactions.module';
+import { MessagesComponent } from './messages/messages.component';
 
 @NgModule({
     imports: [
@@ -25,7 +26,8 @@ import { TransactionsModule } from './transactions/transactions.module';
         routing,
     ],
     declarations: [
-        DashboardComponent
+        DashboardComponent,
+        MessagesComponent
     ]
 })
 export class DashboardModule {
