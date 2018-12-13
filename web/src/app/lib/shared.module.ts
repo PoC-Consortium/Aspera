@@ -31,8 +31,8 @@ import {
 } from './services';
 import { I18nModule } from './i18n/i18n.module';
 import { MatDialogModule, MatFormFieldModule, MatInputModule, MatTabsModule, MatCheckboxModule, MatGridListModule } from '@angular/material';
-import { SendBurstFormComponent } from './components/send-burst-form/send-burst-form.component';
-import { SendMultiOutFormComponent } from './components/send-multi-out-form/send-multi-out-form.component';
+import { SendBurstFormComponent } from './components/send-burst-form';
+import { SendMultiOutFormComponent } from './components/send-multi-out-form';
 import { BurstInputValidatorDirective } from './components/send-burst-form/burst-input-validator.directive';
 
 import { NgxMaskModule } from 'ngx-mask';

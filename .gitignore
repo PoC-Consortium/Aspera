@@ -4,3 +4,12 @@ var/*
 
 *.o
 *.a
+
+
+# IDEs and editors
+/.idea
+.project
+.classpath
+*.launch
+.settings/
+.vscode
