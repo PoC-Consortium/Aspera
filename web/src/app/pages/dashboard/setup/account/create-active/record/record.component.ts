@@ -1,6 +1,4 @@
-import { Component, OnInit, OnDestroy, NgZone, ViewEncapsulation, ElementRef } from '@angular/core';
-import { Router } from '@angular/router';
-import { CryptoService } from '../../../../../../lib/services';
+import { Component, OnInit } from '@angular/core';
 import { CreateService } from '../../create.service';
 
 @Component({
@@ -11,9 +9,7 @@ import { CreateService } from '../../create.service';
 export class AccountCreateRecordComponent implements OnInit {
 
     constructor(
-        private router: Router,
         private createService: CreateService,
-        private _ngZone: NgZone
     ) { }
 
     public ngOnInit() {

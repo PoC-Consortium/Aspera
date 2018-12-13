@@ -5,8 +5,6 @@ import { SharedModule } from '../../../lib/shared.module';
 
 import { SetupRouting } from './setup.routing';
 import { SetupComponent } from './setup.component';
-import { NodeSetupComponent } from './node/node.component';
-import { NodeSetupAddressComponent } from './node/address/address.component';
 import { AccountNewComponent } from './account/account.component';
 import { CreatePassiveAccountComponent } from './account/create-passive/create-passive.component';
 import { CreateActiveAccountComponent } from './account/create-active/create.component';
@@ -14,9 +12,7 @@ import { AccountCreatePinComponent } from './account/create-active/pin/pin.compo
 import { AccountCreateRecordComponent } from './account/create-active/record/record.component';
 import { AccountCreateSeedComponent } from './account/create-active/seed/seed.component';
 
-import { SetupService } from './setup.service';
 import { CreateService } from './account/create.service';
-import { NodeService } from './node/node.service';
 
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -26,7 +22,7 @@ import { MatExpansionModule } from '@angular/material/expansion';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatGridListModule } from '@angular/material/grid-list';
 import { MatIconModule } from '@angular/material/icon';
-import { MatInputModule } from '@angular/material';
+import { MatInputModule, MatSelectModule } from '@angular/material';
 import { MatListModule } from '@angular/material/list';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
@@ -48,6 +44,7 @@ import { NgxMaskModule } from 'ngx-mask';
         MatIconModule,
         MatInputModule,
         MatListModule,
+        MatSelectModule,
         MatProgressBarModule,
         MatProgressSpinnerModule,
         MatSlideToggleModule,
@@ -67,13 +64,9 @@ import { NgxMaskModule } from 'ngx-mask';
         AccountCreateRecordComponent,
         AccountCreateSeedComponent,
         AccountNewComponent,
-        NodeSetupComponent,
-        NodeSetupAddressComponent,
     ],
     providers: [
         CreateService,
-        NodeService,
-        SetupService
     ],
     exports: [
         AccountNewComponent,
