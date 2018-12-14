@@ -1,8 +1,6 @@
 import { Component, OnInit, OnDestroy, ViewEncapsulation } from '@angular/core';
 import { Router } from '@angular/router';
-import { CryptoService } from '../../../../../../lib/services';
 import { CreateService } from '../../create.service';
-import { SetupService } from '../../../setup.service';
 import { NotifierService } from 'angular-notifier';
 
 @Component({
@@ -15,7 +13,6 @@ export class AccountCreatePinComponent implements OnInit {
     constructor(
         private router: Router,
         private createService: CreateService,
-        private setupService: SetupService,
         private notificationService: NotifierService
     ) { }
 
