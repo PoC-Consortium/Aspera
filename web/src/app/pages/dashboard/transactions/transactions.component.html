@@ -1,8 +1,5 @@
 <mat-card class="transaction-header">
-    <mat-grid-list cols="8" rowHeight="80px">
-        <mat-grid-tile class="border-divide-right" [colspan]="2" [rowspan]="1">
-            {{ account }}
-        </mat-grid-tile>
+    <mat-grid-list cols="6" rowHeight="80px">
         <mat-grid-tile class="border-divide-right" [colspan]="5" [rowspan]="1">
             <div class="transaction-filter">
                 Filter:
@@ -12,10 +9,10 @@
                     <input matInput (keyup)="applyFilter($event.target.value)" placeholder="Search">
                 </mat-form-field>
             </div>
-            <div class="transaction-filter">
-                <mat-checkbox class="transaction-checkbox" [(ngModel)]="checked">Incoming</mat-checkbox>
-                <mat-checkbox class="transaction-checkbox" [(ngModel)]="checked">Outgoing</mat-checkbox>
-            </div>
+            <!-- <div class="transaction-filter">
+                <mat-checkbox class="transaction-checkbox" [(ngModel)]="incoming" (click)="applyIncomingOutgoingFilter()">Incoming</mat-checkbox>
+                <mat-checkbox class="transaction-checkbox" [(ngModel)]="outgoing" (click)="applyIncomingOutgoingFilter()">Outgoing</mat-checkbox>
+            </div> -->
             <div class="transaction-filter">
                 <mat-form-field>
                     <input matInput [matDatepicker]="pickerFrom" placeholder="From">
@@ -36,77 +33,71 @@
     </mat-grid-list>
 </mat-card>
 <mat-card>
-    <mat-tab-group>
-        <mat-tab label="List">
-            <h3>Ordinary Payment</h3>
-            <mat-table #table [dataSource]="dataSource" matSort>
-                <!-- Color Column -->
-                <ng-container matColumnDef="type">
-                    <mat-header-cell *matHeaderCellDef mat-sort-header></mat-header-cell>
-                    <mat-cell *matCellDef="let transaction">
-                        <mat-icon *ngIf="isOwnAccount(transaction.senderAddress)" class="indicator danger">keyboard_arrow_left</mat-icon>
-                        <mat-icon *ngIf="!isOwnAccount(transaction.senderAddress)" class="indicator success">keyboard_arrow_right</mat-icon>
-                    </mat-cell>
-                </ng-container>
+    <h3>{{ 'transactions' | i18n }}</h3>
+    <mat-table #table [dataSource]="dataSource" matSort>
 
-                <!-- Name Column -->
-                <ng-container matColumnDef="opposite">
-                    <mat-header-cell *matHeaderCellDef mat-sort-header>
-                        <mat-icon>account_box</mat-icon>&nbsp;Opposite</mat-header-cell>
-                    <mat-cell *matCellDef="let transaction">
-                        <span *ngIf="isOwnAccount(transaction.senderAddress)">{{transaction.recipientAddress}}</span>
-                        <span *ngIf="!isOwnAccount(transaction.senderAddress)">{{transaction.senderAddress}}</span>
-                    </mat-cell>
-                </ng-container>
+        <ng-container matColumnDef="transaction_id">
+            <mat-header-cell *matHeaderCellDef mat-sort-header>{{ 'transaction_id' | i18n }}</mat-header-cell>
+            <mat-cell *matCellDef="let transaction">
+                <span class="link" (click)="openTransactionModal(transaction)">{{ transaction.id }}</span>
+            </mat-cell>
+        </ng-container>
 
-                <!-- Weight Column -->
-                <ng-container matColumnDef="amount">
-                    <mat-header-cell *matHeaderCellDef mat-sort-header>
-                        <mat-icon>local_atm</mat-icon>&nbsp;Amount</mat-header-cell>
-                    <mat-cell *matCellDef="let transaction"> {{transaction.amountNQT| number : '1.0-8'}}</mat-cell>
-                </ng-container>
+        <ng-container matColumnDef="attachment">
+            <mat-header-cell *matHeaderCellDef mat-sort-header>
+                <mat-icon>mail</mat-icon>
+            </mat-header-cell>
+            <mat-cell *matCellDef="let transaction">
+                <span *ngIf="transaction.attachment"><mat-icon>mail</mat-icon></span>
+            </mat-cell>
+        </ng-container>
 
-                <!-- Color Column -->
-                <ng-container matColumnDef="fee">
-                    <mat-header-cell *matHeaderCellDef mat-sort-header>
-                        <mat-icon>compare_arrows</mat-icon>&nbsp;Fee</mat-header-cell>
-                    <mat-cell *matCellDef="let transaction"> {{transaction.feeNQT | number : '1.0-8'}}</mat-cell>
-                </ng-container>
+        <ng-container matColumnDef="timestamp">
+            <mat-header-cell *matHeaderCellDef mat-sort-header>
+                <mat-icon>schedule</mat-icon>&nbsp;Date</mat-header-cell>
+            <mat-cell *matCellDef="let transaction" title="{{convertTimestamp(transaction.timestamp) | date:'MMM d, y, h:mm:ss'}}">
+                {{convertTimestamp(transaction.timestamp) | timeAgo}}
+            </mat-cell>
+        </ng-container>
 
-                <!-- Color Column -->
-                <ng-container matColumnDef="attachment">
-                    <mat-header-cell *matHeaderCellDef mat-sort-header>
-                        <mat-icon>note</mat-icon>&nbsp;Note</mat-header-cell>
-                    <mat-cell *matCellDef="let transaction">
-                        <span *ngIf="transaction.attachment == undefined">-</span>
-                    </mat-cell>
-                </ng-container>
+        <ng-container matColumnDef="type">
+            <mat-header-cell *matHeaderCellDef mat-sort-header></mat-header-cell>
+            <mat-cell *matCellDef="let transaction">
+                {{ getTransactionNameFromType(transaction) | i18n }}
+            </mat-cell>
+        </ng-container>
 
-                <!-- Color Column -->
-                <ng-container matColumnDef="timestamp">
-                    <mat-header-cell *matHeaderCellDef mat-sort-header>
-                        <mat-icon>schedule</mat-icon>&nbsp;Date</mat-header-cell>
-                    <mat-cell *matCellDef="let transaction">
-                        {{convertTimestamp(transaction.timestamp) | timeAgo}}
-                        <br>
-                        <small class="full-date">{{convertTimestamp(transaction.timestamp) | date:'MMM d, y, h:mm:ss'}}</small>
-                    </mat-cell>
-                </ng-container>
+        <ng-container matColumnDef="amount">
+            <mat-header-cell *matHeaderCellDef mat-sort-header>
+                <mat-icon>local_atm</mat-icon>&nbsp;{{ 'amount' | i18n }}</mat-header-cell>
+            <mat-cell *matCellDef="let transaction"> {{transaction.amountNQT| number : '1.0-8'}}</mat-cell>
+        </ng-container>
 
-                <!-- Color Column -->
-                <ng-container matColumnDef="confirmed">
-                    <mat-header-cell *matHeaderCellDef mat-sort-header></mat-header-cell>
-                    <mat-cell *matCellDef="let transaction">
-                        <mat-icon *ngIf="transaction.confirmed">check</mat-icon>
-                    </mat-cell>
-                </ng-container>
+        <ng-container matColumnDef="fee">
+            <mat-header-cell *matHeaderCellDef mat-sort-header>
+                <mat-icon>compare_arrows</mat-icon>&nbsp;{{ 'fee' | i18n }}</mat-header-cell>
+            <mat-cell *matCellDef="let transaction"> {{transaction.feeNQT | number : '1.0-8'}}</mat-cell>
+        </ng-container>
 
-                <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
-                <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
-            </mat-table>
-            <mat-paginator #paginator [pageSize]="10" [pageSizeOptions]="[10, 20, 500]" [showFirstLastButtons]="true">
-            </mat-paginator>
-        </mat-tab>
-        <mat-tab label="Graphs">Content 2</mat-tab>
-    </mat-tab-group>
+        <ng-container matColumnDef="account">
+            <mat-header-cell *matHeaderCellDef mat-sort-header>
+                <mat-icon>account_box</mat-icon>&nbsp;{{ 'account' | i18n }}</mat-header-cell>
+            <mat-cell *matCellDef="let transaction">
+                <span *ngIf="isOwnAccount(transaction.senderAddress)">{{transaction.recipientAddress}}</span>
+                <span *ngIf="!isOwnAccount(transaction.senderAddress)">{{transaction.senderAddress}}</span>
+            </mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="confirmed">
+            <mat-header-cell *matHeaderCellDef mat-sort-header>{{ 'confirmed' | i18n }}</mat-header-cell>
+            <mat-cell *matCellDef="let transaction">
+                <mat-icon *ngIf="transaction.confirmed">check</mat-icon>
+            </mat-cell>
+        </ng-container>
+
+        <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+        <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+    </mat-table>
+    <mat-paginator #paginator [pageSize]="10" [pageSizeOptions]="[10, 20, 500]" [showFirstLastButtons]="true">
+    </mat-paginator>
 </mat-card>

@@ -15,6 +15,7 @@ export interface Attachment {
 */
 export class Attachment {
     public type?: string;
+    public priceNQT?: string;
 
     constructor(type: string) {
         this.type = type;

@@ -187,3 +187,12 @@ body, html, .particle, .wrapper {
 h2 {
   font-size: 1em;
 }
+
+.link {
+  color: #3c8dbc;
+  text-decoration: none;
+  cursor: pointer;
+  &:hover {
+    text-decoration: underline;
+  }
+}
