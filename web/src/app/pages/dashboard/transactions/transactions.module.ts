@@ -20,6 +20,7 @@ import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatSelectModule } from '@angular/material/select';
 import { MatTableModule } from '@angular/material/table';
 import { MatTabsModule } from '@angular/material/tabs';
+import { I18nModule } from 'src/app/lib/i18n/i18n.module';
 
 @NgModule({
     imports: [
@@ -43,7 +44,8 @@ import { MatTabsModule } from '@angular/material/tabs';
         MatSortModule,
         MatTableModule,
         MatTabsModule,
-        ReactiveFormsModule
+        ReactiveFormsModule,
+        I18nModule
     ],
     declarations: [
         TransactionsComponent

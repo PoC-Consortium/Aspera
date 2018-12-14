@@ -84,7 +84,7 @@ export const constants = {
         { "name": "CryptoGuru", "region": "South America", "location": "Munich", "address": "https://wallet.burst.cryptoguru.org", "port": 8125, "selected": false, "ping": -1 },
     ],
     supportUrl: "https://github.com/poc-consortium/burstcoin-mobile-doc/issues",
-    transactionCount: "100",
+    transactionCount: "500",
     transactionUrl: "https://explore.burst.cryptoguru.org/transaction/",
     twitter: "https://twitter.com/PoC_Consortium",
     version: "0.2.1"
