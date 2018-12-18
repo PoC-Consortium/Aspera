@@ -351,7 +351,7 @@ export class AccountService {
                 .set("deadline", "1440") // todo
                 .set("feeNQT", BurstUtil.convertNumberToString(transaction.feeNQT))
                 .set("publicKey", transaction.senderPublicKey)
-                .set("recipient", transaction.recipientAddress);
+                .set("recipientAddress", transaction.recipientAddress);
             if (transaction.attachment != undefined) {
                 params = this.constructAttachment(transaction, params);
             }
@@ -378,7 +378,7 @@ export class AccountService {
                 .set("deadline", "1440") // todo
                 .set("feeNQT", BurstUtil.convertNumberToString(transaction.feeNQT))
                 .set("publicKey", transaction.senderPublicKey)
-                .set("recipient", transaction.recipientAddress);
+                .set("recipientAddress", transaction.recipientAddress);
 
             if (transaction.attachment != undefined) {
                 params = this.constructAttachment(transaction, params);

@@ -662,7 +662,7 @@
    "raw_transaction_details" : "Detalls de la transacció sense processar",
    "recent_blocks" : "Darrers blocs",
    "recent_transactions" : "Transaccions Recents",
-   "recipient" : "Destinatari",
+   "recipientAddress" : "Destinatari",
    "recipient_account" : "Compte del Destinatari",
    "recipient_alias_suggestion" : "Si voleu escriure un àlies, afegiu @ al principi.",
    "recipient_info" : "El compte del destinatari té una clau pública i un saldo de __burst__ burst.",

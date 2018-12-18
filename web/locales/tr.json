@@ -662,7 +662,7 @@
    "raw_transaction_details" : "Ham işlem ayrıntıları",
    "recent_blocks" : "Son bloklar",
    "recent_transactions" : "Son işlemler",
-   "recipient" : "Alıcı",
+   "recipientAddress" : "Alıcı",
    "recipient_account" : "Alıcı hesabı",
    "recipient_alias_suggestion" : "If you want to type an alias, prepend it with the @ character.",
    "recipient_info" : "The recipient account has a public key and a balance of __burst__ BURST.",

@@ -1,0 +1,11 @@
+h2 span {
+    font-size: 14px;
+    font-weight: normal;
+    color: #666;
+    float: right;
+}
+
+th, td {
+    padding:5px;
+    text-align: left;
+}

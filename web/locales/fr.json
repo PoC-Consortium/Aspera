@@ -662,7 +662,7 @@
     "raw_transaction_details": "Détails de la transaction brute",
     "recent_blocks": "Blocs récents",
     "recent_transactions": "Transactions récentes",
-    "recipient": "Destinataire",
+    "recipientAddress": "Destinataire",
     "recipient_account": "Compte bénéficiaire",
     "recipient_alias_suggestion": "Si vous souhaitez envoyer les BURST par le biais d'un alias, ajoutez un @ avant ce dernier.",
     "recipient_info": "Le compte bénéficiaire possède une clé publique et un solde de __burst__ BURST.",

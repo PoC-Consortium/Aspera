@@ -662,7 +662,7 @@
    "raw_transaction_details" : "Detalii tranzacție neprocesată",
    "recent_blocks" : "Blocuri recente",
    "recent_transactions" : "Tranzacţii recente",
-   "recipient" : "Destinatar",
+   "recipientAddress" : "Destinatar",
    "recipient_account" : "Cont destinatar",
    "recipient_alias_suggestion" : "Dacă dorești să introduci un alias, precedează-l cu caracterul @.",
    "recipient_info" : "Contul destinatarului are o cheie publică şi un sold de __burst__ burst.",

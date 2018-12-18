@@ -671,7 +671,7 @@
     "raw_transaction_details": "Nieobrobione dane transakcji",
     "recent_blocks": "Ostatnie bloki",
     "recent_transactions": "Ostatnie transakcje",
-    "recipient": "Odbiorca",
+    "recipientAddress": "Odbiorca",
     "recipient_account": "Konto odbiorcy",
     "recipient_alias_suggestion": "Alias musi być poprzedzony znakiem @.",
     "recipient_info": "Konto odbiorcy posiada klucz publiczny i balans równy __burst__ BURST.",

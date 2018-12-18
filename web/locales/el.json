@@ -662,7 +662,7 @@
    "raw_transaction_details" : "Raw Transaction Details",
    "recent_blocks" : "Recent Blocks",
    "recent_transactions" : "Recent Transactions",
-   "recipient" : "Παραλήπτης",
+   "recipientAddress" : "Παραλήπτης",
    "recipient_account" : "Recipient Account",
    "recipient_alias_suggestion" : "If you want to type an alias, prepend it with the @ character.",
    "recipient_info" : "Ο λογαριασμός του παραλήπτη έχει δημόσιο κλειδί και το υπόλοιπό του ανέρχεται σε __burst__ burst.",

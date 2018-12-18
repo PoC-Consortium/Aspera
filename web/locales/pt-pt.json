@@ -662,7 +662,7 @@
     "raw_transaction_details": "Dados sem processar da Transação",
     "recent_blocks": "Blocos Recentes",
     "recent_transactions": "Transações recentes",
-    "recipient": "Destinatário",
+    "recipientAddress": "Destinatário",
     "recipient_account": "Conta de Destino",
     "recipient_alias_suggestion": "Se você quiser digitar um alias, coloque @ na frente.",
     "recipient_info": "A conta do destinatário tem chave pública e um saldo de __burst__ BURST.",

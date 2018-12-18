@@ -662,7 +662,7 @@
     "raw_transaction_details": "Ruwe transactiedetails",
     "recent_blocks": "Recente blokken",
     "recent_transactions": "Recente Transacties",
-    "recipient": "Ontvanger",
+    "recipientAddress": "Ontvanger",
     "recipient_account": "Ontvangend Rekening",
     "recipient_alias_suggestion": "Als je een Alias wilt intypen begin dan door eerst een \"@\" teken in te voeren.",
     "recipient_info": "De ontvangende account heeft een openbare sleutel en een balans van __burst__ BURST.",

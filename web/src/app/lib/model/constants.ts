@@ -86,6 +86,5 @@ export const constants = {
     supportUrl: "https://github.com/poc-consortium/burstcoin-mobile-doc/issues",
     transactionCount: "500",
     transactionUrl: "https://explore.burst.cryptoguru.org/transaction/",
-    twitter: "https://twitter.com/PoC_Consortium",
-    version: "0.2.1"
+    twitter: "https://twitter.com/PoC_Consortium"
 }

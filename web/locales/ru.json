@@ -662,7 +662,7 @@
     "raw_transaction_details": "Детали необработанной транзакции",
     "recent_blocks": "Последние блоки",
     "recent_transactions": "Последние Транзакции",
-    "recipient": "Получатель",
+    "recipientAddress": "Получатель",
     "recipient_account": "Счет получателя",
     "recipient_alias_suggestion": "Если вы хотите ввести псевдоним, введите перед ним символ @.",
     "recipient_info": "Счет получателя имеет открытый ключ и баланс __burst__ BURST.",

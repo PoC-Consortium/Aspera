@@ -662,7 +662,7 @@
     "raw_transaction_details": "未処理トランザクションの詳細",
     "recent_blocks": "最近のブロック",
     "recent_transactions": "最近の取引",
-    "recipient": "受信者",
+    "recipientAddress": "受信者",
     "recipient_account": "受信者のアカウント",
     "recipient_alias_suggestion": "エイリアスを入力する場合は、先頭に@ 文字を付けてください。",
     "recipient_info": "受信者のアカウントには公開キーがあり、残高は__burst__ BURSTです。",

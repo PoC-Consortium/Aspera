@@ -662,7 +662,7 @@
     "raw_transaction_details": "Surové detaily transakcie",
     "recent_blocks": "Posledné bloky",
     "recent_transactions": "Nedávne transakcie",
-    "recipient": "Príjemca",
+    "recipientAddress": "Príjemca",
     "recipient_account": "Účet príjemcu",
     "recipient_alias_suggestion": "Ak chcete zadať alias, na začiatok aliasu pripojte znak @.",
     "recipient_info": "Účet príjemcu má verejný kľúč a zostatok __burst__ BURST.",

@@ -662,7 +662,7 @@
    "raw_transaction_details" : "Данни за необработена сделка",
    "recent_blocks" : "Последни блока",
    "recent_transactions" : "Последни сделки",
-   "recipient" : "Получател",
+   "recipientAddress" : "Получател",
    "recipient_account" : "Сметка на получателя",
    "recipient_alias_suggestion" : "Ако искате да въведедете псевдоним, добавете знака @ като представка.",
    "recipient_info" : "Сметката на получателя има публичен ключ и наличност от __BURST__ BURST.",

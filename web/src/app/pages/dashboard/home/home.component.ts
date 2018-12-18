@@ -51,7 +51,6 @@ export class HomeComponent implements OnInit {
                 this.account = account;
                 this.accountService.getTransactions(account.id)
                     .then((transactions) => {
-                        console.log(transactions);
                         this.recentTransactionData = new MatTableDataSource<Transaction>(transactions);
                         this.recentTransactionData.sort = this.sort;
                     },

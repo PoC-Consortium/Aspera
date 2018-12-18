@@ -662,7 +662,7 @@
     "raw_transaction_details": "Detalji Transakcije",
     "recent_blocks": "Pređašnji Blokovi",
     "recent_transactions": "Poslednje Transakcije",
-    "recipient": "Primalac",
+    "recipientAddress": "Primalac",
     "recipient_account": "Nalog Primaoca",
     "recipient_alias_suggestion": "Ako želite da kucate alias, ispred alias-a kucajte @ karakter.",
     "recipient_info": "Nalog primaoca poseduje javni ključ i saldo od __burst__ BURST.",

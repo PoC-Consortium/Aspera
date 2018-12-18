@@ -15,12 +15,14 @@ import { MatExpansionModule } from '@angular/material/expansion';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatGridListModule } from '@angular/material/grid-list';
 import { MatIconModule } from '@angular/material/icon';
-import { MatNativeDateModule, MatInputModule, MatSortModule } from '@angular/material';
+import { MatNativeDateModule, MatInputModule, MatSortModule, MatDialogModule } from '@angular/material';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatSelectModule } from '@angular/material/select';
 import { MatTableModule } from '@angular/material/table';
 import { MatTabsModule } from '@angular/material/tabs';
 import { I18nModule } from 'src/app/lib/i18n/i18n.module';
+import { TransactionDetailsDialogComponent } from './transaction-details-dialog/transaction-details-dialog.component';
+import { TransactionRowValueCellComponent } from './transaction-row-value-cell/transaction-row-value-cell.component';
 
 @NgModule({
     imports: [
@@ -45,11 +47,15 @@ import { I18nModule } from 'src/app/lib/i18n/i18n.module';
         MatTableModule,
         MatTabsModule,
         ReactiveFormsModule,
-        I18nModule
+        I18nModule,
+        MatDialogModule
     ],
     declarations: [
-        TransactionsComponent
+        TransactionDetailsDialogComponent,
+        TransactionsComponent,
+        TransactionRowValueCellComponent,
     ],
+    entryComponents: [ TransactionDetailsDialogComponent ],
     providers: [
     ]
 })

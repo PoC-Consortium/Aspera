@@ -662,7 +662,7 @@
     "raw_transaction_details": "Transaktion tiedot",
     "recent_blocks": "Viimeiset lohkot",
     "recent_transactions": "Viimeiset tapahtumat",
-    "recipient": "Vastaanottaja",
+    "recipientAddress": "Vastaanottaja",
     "recipient_account": "Vastaanottajan tili",
     "recipient_alias_suggestion": "Jos haluat kirjoittaa aliaksen, laita sen eteen @-merkki.",
     "recipient_info": "Vastaanottavalla tilillä on julkinen avain ja tilin saldo on __burst__ BURST.",

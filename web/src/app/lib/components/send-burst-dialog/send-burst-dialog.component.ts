@@ -16,7 +16,7 @@ export class SendBurstDialogComponent implements OnInit {
     @Inject(MAT_DIALOG_DATA) public data,
     public cryptoService: CryptoService,
     public accountService: AccountService) { 
-    }
+  }
 
   closeDialog(): void {
     this.dialogRef.close();

@@ -662,7 +662,7 @@
     "raw_transaction_details": "Transakcijos išsami informacija",
     "recent_blocks": "Paskutiniai blokai",
     "recent_transactions": "Paskutinės transakcijos",
-    "recipient": "Gavėjas",
+    "recipientAddress": "Gavėjas",
     "recipient_account": "Gavėjo sąskaita",
     "recipient_alias_suggestion": "Jei norite įvesti pseudinimą, pridėkite jį prie @ simbolio.",
     "recipient_info": "Gavėjo sąskaita turi viešąjį raktą ir __burst__ BURST joje.",

@@ -4,6 +4,7 @@
 
 import { constants } from "./constants";
 import { environment } from "../../../environments/environment";
+import { version } from '../../../../package.json';
 
 /*
 * Settings class
@@ -32,6 +33,6 @@ export class Settings {
         this.node = data.node || environment.defaultNode;
         this.marketUrl = data.marketUrl || environment.marketUrl;
         this.theme = data.theme || constants.defaultTheme;
-        this.version = data.version || constants.version;
+        this.version = data.version || version;
     }
 }

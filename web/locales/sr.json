@@ -662,7 +662,7 @@
     "raw_transaction_details": "Детаљи Трансакције",
     "recent_blocks": "Пређашњи Блокови",
     "recent_transactions": "Последње Трансакције",
-    "recipient": "Прималац",
+    "recipientAddress": "Прималац",
     "recipient_account": "Налог Примаоца",
     "recipient_alias_suggestion": "Ако желите да куцате алиас, испред алиас-а куцајте @ карактер.",
     "recipient_info": "Налог примаоца поседује јавни кључ и салдо од __burst__ BURST.",

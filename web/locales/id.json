@@ -662,7 +662,7 @@
     "raw_transaction_details": "Rincian transaksi mentah",
     "recent_blocks": "Hari blok",
     "recent_transactions": "Transaksi terakhir",
-    "recipient": "Penerima",
+    "recipientAddress": "Penerima",
     "recipient_account": "Rekening Penerima",
     "recipient_alias_suggestion": "Jika Anda ingin mengetik alias, tambahkan dengan karakter @.",
     "recipient_info": "Rekening penerima memiliki kunci publik dan keseimbangan __burst__ BURST.",

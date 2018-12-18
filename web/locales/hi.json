@@ -662,7 +662,7 @@
    "raw_transaction_details" : "कच्चे हस्तांतरण विवरण",
    "recent_blocks" : "हाल ही में ब्लॉक",
    "recent_transactions" : "हाल ही में लेन-देन",
-   "recipient" : "प्राप्तकर्ता",
+   "recipientAddress" : "प्राप्तकर्ता",
    "recipient_account" : "प्राप्तकर्ता खाता",
    "recipient_alias_suggestion" : "If you want to type an alias, prepend it with the @ character.",
    "recipient_info" : "The recipient account has a public key and a balance of __burst__ BURST.",

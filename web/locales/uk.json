@@ -662,7 +662,7 @@
     "raw_transaction_details": "RAW деталі транзакції",
     "recent_blocks": "Останні блокі",
     "recent_transactions": "Останні Транзакції",
-    "recipient": "Одержувач",
+    "recipientAddress": "Одержувач",
     "recipient_account": "Акаунт одержувача",
     "recipient_alias_suggestion": "Якщо ви хочете ввести альяс, введіть перед ним символ @.",
     "recipient_info": "Рахунок одержувача має відкритий ключ і баланс __burst__ BURST.",

@@ -675,7 +675,7 @@
     "raw_transaction_details": "Raw Transaction Details",
     "recent_blocks": "Recent Blocks",
     "recent_transactions": "Recent Transactions",
-    "recipient": "Recipient",
+    "recipientAddress": "Recipient",
     "recipient_account": "Recipient Account",
     "recipient_alias_suggestion": "If you want to type an alias, prepend it with the @ character.",
     "recipient_info": "The recipient account has a public key and a balance of __burst__ BURST.",

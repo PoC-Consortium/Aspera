@@ -662,7 +662,7 @@
     "raw_transaction_details": "Alle Details zur Transaktion",
     "recent_blocks": "Letzte Blöcke",
     "recent_transactions": "Letzte Transaktionen",
-    "recipient": "Empfänger",
+    "recipientAddress": "Empfänger",
     "recipient_account": "Empfängerkonto",
     "recipient_alias_suggestion": "Wenn Sie einen Alias eingeben möchten, stellen Sie ein @-Zeichen voran.",
     "recipient_info": "Das Empfängerkonto verfügt über einen öffentlichen Schlüssel und ein Guthaben über __burst__ BURST.",

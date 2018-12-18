@@ -1,10 +1,11 @@
 import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
-import { MatPaginator, MatTableDataSource, MatSort } from '@angular/material';
+import { MatPaginator, MatTableDataSource, MatSort, MatDialog } from '@angular/material';
 import { TimeAgoPipe } from 'time-ago-pipe';
 import { Transaction, Account } from '../../../lib/model';
 import { AccountService, StoreService } from '../../../lib/services';
 import { Converter } from '../../../lib/util';
+import { TransactionDetailsDialogComponent } from './transaction-details-dialog';
 
 @Component({
     selector: 'app-transactions',
@@ -24,7 +25,8 @@ export class TransactionsComponent {
 
     constructor(
         private accountService: AccountService,
-        private storeService: StoreService
+        private storeService: StoreService,
+        private dialog: MatDialog
     ) {}
 
     public ngOnInit() {
@@ -200,4 +202,18 @@ export class TransactionsComponent {
         }
         return transactionType;
     };
+
+    public openTransactionModal(transaction: Transaction): void {
+        console.log(transaction);
+
+        const dialogRef = this.dialog.open(TransactionDetailsDialogComponent, {
+            width: '600px',
+            data: { transaction: transaction }
+        });
+
+        dialogRef.afterClosed().subscribe(result => {
+            console.log('The dialog was closed', result);
+        });
+
+    }
 }

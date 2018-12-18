@@ -662,7 +662,7 @@
    "raw_transaction_details" : "Detalji transakcije",
    "recent_blocks" : "Posljednji blokovi",
    "recent_transactions" : "Posljednje transakcije",
-   "recipient" : "Primatelj",
+   "recipientAddress" : "Primatelj",
    "recipient_account" : "Račun primalaca",
    "recipient_alias_suggestion" : "Ako želite unijeti pseudonim ispred (pseudonima) koristite @ znak.",
    "recipient_info" : "Račun primaoca posjeduje javni ključ i saldo od __burst__ burst.",

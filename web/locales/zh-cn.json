@@ -662,7 +662,7 @@
     "raw_transaction_details": "原始交易详情",
     "recent_blocks": "最新的区块",
     "recent_transactions": "最近的交易",
-    "recipient": "接收者",
+    "recipientAddress": "接收者",
     "recipient_account": "接收者帐户",
     "recipient_alias_suggestion": "如果您想要输入一个别名，请以 @ 开头。",
     "recipient_info": "接收者帐户拥有公钥和 __burst__ BURST 的余额。",
