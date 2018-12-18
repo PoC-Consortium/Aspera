@@ -1,7 +1,7 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
-import { EncryptedMessage, Message } from 'src/app/lib/model';
-import { CryptoService, BurstService } from 'src/app/lib/services';
+import { EncryptedMessage, Message, Account } from 'src/app/lib/model';
+import { CryptoService, BurstService, StoreService } from 'src/app/lib/services';
 
 
 @Component({
@@ -17,15 +17,22 @@ export class TransactionDetailsDialogComponent implements OnInit {
   detailsData: Map<string, string | Message | EncryptedMessage | number>;
   encryptedMessage = false;
   unencryptedMessage = false;
+  account: Account;
 
   constructor(
     public dialogRef: MatDialogRef<TransactionDetailsDialogComponent>,
     private burstService: BurstService,
+    private storeService: StoreService,
     @Inject(MAT_DIALOG_DATA) public data) { 
-      data.transaction.transactionType = this.burstService.getTransactionNameFromType(this.data.transaction);
-      const transactionDetails = Object.keys(data.transaction).map((key:string): [string, string | Message | EncryptedMessage | number] => [ key, data.transaction[key]]);
-      this.detailsData = new Map(transactionDetails);
-      this.infoData = new Map(transactionDetails.filter((row) => this.infoRows.indexOf(row[0]) > -1));
+      
+      this.storeService.getSelectedAccount()
+        .then((account) => {
+            this.account = account;
+            data.transaction.transactionType = this.burstService.getTransactionNameFromType(this.data.transaction, this.account);
+            const transactionDetails = Object.keys(data.transaction).map((key:string): [string, string | Message | EncryptedMessage | number] => [ key, data.transaction[key]]);
+            this.detailsData = new Map(transactionDetails);
+            this.infoData = new Map(transactionDetails.filter((row) => this.infoRows.indexOf(row[0]) > -1));
+        });
   }
 
   closeDialog(): void {

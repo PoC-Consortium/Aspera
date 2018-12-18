@@ -17,10 +17,6 @@ export class BurstService {
 
         this.storeService.settings.subscribe((settings: Settings) => {
             this.nodeUrl = settings.node;
-            this.storeService.getSelectedAccount()
-                .then((account) => {
-                    this.account = account;
-                });
         });
 
     }
@@ -266,7 +262,7 @@ export class BurstService {
     };
 
 
-    public getTransactionNameFromType(transaction: Transaction) {
+    public getTransactionNameFromType(transaction: Transaction, account: Account) {
         var transactionType = "unknown";
         if (transaction.type === 0) {
             transactionType = "ordinary_payment";
@@ -293,7 +289,7 @@ export class BurstService {
                 break;
             case 6:
                 if (transaction.attachment.priceNQT == "0") {
-                    if (this.account && (transaction.senderId === this.account.address) && (transaction.recipientId == this.account.address)) {
+                    if (this.account && (transaction.senderId === account.address) && (transaction.recipientId == account.address)) {
                         transactionType = "alias_sale_cancellation";
                     }
                     else {

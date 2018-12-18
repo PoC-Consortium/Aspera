@@ -63,7 +63,7 @@
         <ng-container matColumnDef="type">
             <mat-header-cell *matHeaderCellDef mat-sort-header></mat-header-cell>
             <mat-cell *matCellDef="let transaction">
-                {{ getTransactionNameFromType(transaction) | i18n }}
+                {{ burstService.getTransactionNameFromType(transaction, account) | i18n }}
             </mat-cell>
         </ng-container>
 
