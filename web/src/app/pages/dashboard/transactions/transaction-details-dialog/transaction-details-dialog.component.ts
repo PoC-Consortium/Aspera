@@ -17,8 +17,6 @@ export class TransactionDetailsDialogComponent implements OnInit {
   infoRows = ['transactionType', 'attachment', 'amountNQT', 'feeNQT', 'senderAddress', 'recipientAddress'];
   infoData: Map<string, TransactionDetailsCellValue>;
   detailsData: Map<string, TransactionDetailsCellValue>;
-  encryptedMessage = false;
-  unencryptedMessage = false;
   account: Account;
 
   constructor(
