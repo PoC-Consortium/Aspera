@@ -3,6 +3,8 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { EncryptedMessage, Message, Account } from 'src/app/lib/model';
 import { CryptoService, BurstService, StoreService } from 'src/app/lib/services';
 
+type TransactionDetailsCellValue = string | Message | EncryptedMessage | number;
+type TransactionDetailsCellValueMap = [string, TransactionDetailsCellValue];
 
 @Component({
   selector: 'app-transaction-details-dialog',
@@ -13,8 +15,8 @@ export class TransactionDetailsDialogComponent implements OnInit {
 
   infoColumns = ['key', 'value'];
   infoRows = ['transactionType', 'attachment', 'amountNQT', 'feeNQT', 'senderAddress', 'recipientAddress'];
-  infoData: Map<string, string | Message | EncryptedMessage | number>;
-  detailsData: Map<string, string | Message | EncryptedMessage | number>;
+  infoData: Map<string, TransactionDetailsCellValue>;
+  detailsData: Map<string, TransactionDetailsCellValue>;
   encryptedMessage = false;
   unencryptedMessage = false;
   account: Account;
@@ -29,7 +31,7 @@ export class TransactionDetailsDialogComponent implements OnInit {
         .then((account) => {
             this.account = account;
             data.transaction.transactionType = this.burstService.getTransactionNameFromType(this.data.transaction, this.account);
-            const transactionDetails = Object.keys(data.transaction).map((key:string): [string, string | Message | EncryptedMessage | number] => [ key, data.transaction[key]]);
+            const transactionDetails = Object.keys(data.transaction).map((key:string): TransactionDetailsCellValueMap => [ key, data.transaction[key]]);
             this.detailsData = new Map(transactionDetails);
             this.infoData = new Map(transactionDetails.filter((row) => this.infoRows.indexOf(row[0]) > -1));
         });
@@ -39,11 +41,11 @@ export class TransactionDetailsDialogComponent implements OnInit {
     this.dialogRef.close();
   }
 
-  public getInfoData(): [string, string | Message | EncryptedMessage | number][] {
+  public getInfoData(): TransactionDetailsCellValueMap[] {
     return Array.from(this.infoData.entries());
   } 
 
-  public getDetailsData(): [string, string | Message | EncryptedMessage | number][] {
+  public getDetailsData(): TransactionDetailsCellValueMap[] {
     return Array.from(this.detailsData.entries());
   } 
 
