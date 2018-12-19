@@ -826,6 +826,7 @@
    "trade_history" : "Ιστορικό κινήσεων",
    "transaction" : "Συναλλαγή",
    "transactions" : "Συναλλαγές",
+   "transaction_info": "Συναλλαγή __id__",
    "transactions_per_hour" : "Συναλλαγές ανά ώρα",
    "transaction_bytes" : "Transaction Bytes",
    "transaction_details" : "Transaction Details",

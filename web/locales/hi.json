@@ -826,6 +826,7 @@
    "trade_history" : "व्यापार के इतिहास",
    "transaction" : "लेन-देन",
    "transactions" : "लेन-देन",
+   "transaction_info": "लेन-देन __id__",
    "transactions_per_hour" : "लेनदेन प्रति घंटा",
    "transaction_bytes" : "लेन-देन बाइट्स",
    "transaction_details" : "लेन-देन विवरण",

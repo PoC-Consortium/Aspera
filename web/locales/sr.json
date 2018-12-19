@@ -826,6 +826,7 @@
     "trade_history": "Историја Трговања",
     "transaction": "Трансакција",
     "transactions": "Трансакције",
+    "transaction_info": "Трансакција __id__",
     "transactions_per_hour": "Трансакције по Сату",
     "transaction_bytes": "Bytes Трансакције",
     "transaction_details": "Детаљи Трансакције",

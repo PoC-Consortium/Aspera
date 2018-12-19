@@ -826,6 +826,7 @@
    "trade_history" : "Istorial Tranzacții",
    "transaction" : "Tranzacție",
    "transactions" : "Tranzacții",
+   "transaction_info": "Tranzacție __id__",
    "transactions_per_hour" : "Tranzacţii pe oră",
    "transaction_bytes" : "Bytes Tranzacţie",
    "transaction_details" : "Detalii Tranzacție",

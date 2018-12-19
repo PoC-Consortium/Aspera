@@ -826,6 +826,7 @@
    "trade_history" : "Търговия история",
    "transaction" : "Сделка",
    "transactions" : "Сделки",
+   "transaction_info": "Сделка __id__",
    "transactions_per_hour" : "Сделки за час",
    "transaction_bytes" : "Сделка байта",
    "transaction_details" : "Сделка подробности",

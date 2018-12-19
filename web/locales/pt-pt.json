@@ -826,6 +826,7 @@
     "trade_history": "História dos intercâmbios",
     "transaction": "Transação",
     "transactions": "Transações",
+    "transaction_info": "Transação __id__",
     "transactions_per_hour": "Transações Por Hora",
     "transaction_bytes": "Bytes de Transacção",
     "transaction_details": "Detalhes de Transacção",

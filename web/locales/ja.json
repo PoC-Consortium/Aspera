@@ -826,6 +826,7 @@
     "trade_history": "取引履歴",
     "transaction": "トランザクション",
     "transactions": "トランザクション",
+    "transaction_info": "トランザクション __id__",
     "transactions_per_hour": "1 時間あたりのトランザクション数",
     "transaction_bytes": "トランザクションのバイト",
     "transaction_details": "トランザクションの詳細",

@@ -826,6 +826,7 @@
     "trade_history": "Sejarah Perdagangan",
     "transaction": "Transaksi",
     "transactions": "Transaksi",
+    "transaction_info": "Transaksi __id__",
     "transactions_per_hour": "Transaksi Per jam",
     "transaction_bytes": "Transaksi byte",
     "transaction_details": "Rincian transaksi",

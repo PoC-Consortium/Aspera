@@ -826,6 +826,7 @@
     "trade_history": "Handelsgeschiedenis",
     "transaction": "Transactie",
     "transactions": "Transacties",
+    "transaction_info": "Transactie __id__",
     "transactions_per_hour": "Transacties Per uur",
     "transaction_bytes": "Transactie Bytes",
     "transaction_details": "Transactie details",

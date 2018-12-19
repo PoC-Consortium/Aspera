@@ -1,4 +1,4 @@
-<h2>{{ 'transaction_info' | i18n }}</h2>
+<h2>{{ 'transaction_info' | i18n: { id: data.transaction.id } }}</h2>
 <mat-tab-group>
   <mat-tab label="{{ 'info' | i18n }}">
       <table class="info table">

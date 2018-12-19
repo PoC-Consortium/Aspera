@@ -826,6 +826,7 @@
    "trade_history" : "Ticaret tarihi",
    "transaction" : "İşlem",
    "transactions" : "İşlemler",
+   "transaction_info": "İşlem __id__",
    "transactions_per_hour" : "Saat başına işlemler",
    "transaction_bytes" : "İşlem baytı",
    "transaction_details" : "İşlem ayrıntıları",

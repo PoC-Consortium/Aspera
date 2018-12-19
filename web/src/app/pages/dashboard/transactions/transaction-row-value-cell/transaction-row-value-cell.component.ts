@@ -1,6 +1,7 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { Attachment, EncryptedMessage, Message } from 'src/app/lib/model';
 import { BurstService } from 'src/app/lib/services';
+import { BurstUtil } from 'src/app/lib/util';
 
 @Component({
   selector: 'app-transaction-row-value-cell',
@@ -16,7 +17,6 @@ export class TransactionRowValueCellComponent implements OnInit {
   constructor() { }
 
   ngOnInit() {
-    console.log(this.value);
     switch(this.value && this.value.constructor) {
       case Message: {
         this.valueType = 'Message';
@@ -26,12 +26,21 @@ export class TransactionRowValueCellComponent implements OnInit {
         this.valueType = 'EncryptedMessage';
         break;
       }
+      case String:
+        if (BurstUtil.isBurstcoinAddress(this.value as string)) {
+          this.valueType = 'BurstAddress';
+        }
     }
   }
+
 
   public showPinPrompt() {
     console.log('show pin prompt');
     // return this.cryptoService.decryptMessage(this.value.data, this.value.nonce, encryptedPrivateKey, pinHash, )
+  }
+
+  public showAccountDialog(address: string) {
+    console.log('show account dialog', address);
   }
 }
  

@@ -17,7 +17,7 @@ export class I18nService {
     this.state = new Subject();
 
     this.initLanguage(constants.defaultLanguage || 'en');
-    this.fetch(this.currentLanguage.code)
+    this.fetch(this.currentLanguage.code);
   }
 
   private fetch(locale: any) {
@@ -51,7 +51,16 @@ export class I18nService {
   }
 
   public getTranslation(phrase:string, opts?:object):string {
-    return this.data && this.data[phrase] ? this.data[phrase] : phrase
+    return this.data && this.data[phrase] ? this.interpolate(this.data[phrase], opts) : phrase
+  }
+
+  private interpolate(phrase:string, opts?:object): string {
+    const toBeTranslated = phrase.match(/__([^ ]*)__/gm);
+    if (!toBeTranslated) return phrase;
+    for (var i = 0; i < toBeTranslated.length; i++) {
+      phrase = phrase.replace(toBeTranslated[i], opts && opts[toBeTranslated[i].replace(/__/g, "")]);
+    }
+    return phrase;
   }
 
 }

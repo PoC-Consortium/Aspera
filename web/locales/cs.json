@@ -826,6 +826,7 @@
    "trade_history" : "Historie obchodování",
    "transaction" : "Transakce",
    "transactions" : "Transakce",
+   "transaction_info": "Transakce __id__",
    "transactions_per_hour" : "Transakce za hodinu",
    "transaction_bytes" : "Transaction Bytes",
    "transaction_details" : "Podrobnosti transakce",

@@ -826,6 +826,7 @@
    "trade_history" : "Històrial del Intercanvis",
    "transaction" : "Transacció",
    "transactions" : "Transaccions",
+   "transaction_info": "Transacció __id__",
    "transactions_per_hour" : "Transaccions Per Hora",
    "transaction_bytes" : "Transacció Bytes",
    "transaction_details" : "Detalls de la Transacció",

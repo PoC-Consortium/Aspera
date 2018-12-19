@@ -46,6 +46,7 @@ import { TransactionRowValueCellComponent } from './transaction-row-value-cell/t
         MatSortModule,
         MatTableModule,
         MatTabsModule,
+        MatTableModule,
         ReactiveFormsModule,
         I18nModule,
         MatDialogModule

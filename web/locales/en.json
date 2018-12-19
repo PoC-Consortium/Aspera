@@ -843,6 +843,7 @@
     "trade_history": "Trade History",
     "transaction": "Transaction",
     "transactions": "Transactions",
+    "transaction_info": "Transaction __id__",
     "transactions_per_hour": "Transactions Per Hour",
     "transaction_bytes": "Transaction Bytes",
     "transaction_details": "Transaction Details",

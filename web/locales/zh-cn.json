@@ -826,6 +826,7 @@
     "trade_history": "交易历史记录",
     "transaction": "交易",
     "transactions": "交易",
+    "transaction_info": "交易 __id__",
     "transactions_per_hour": "每小时的交易次数",
     "transaction_bytes": "交易字节",
     "transaction_details": "交易详情",

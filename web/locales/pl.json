@@ -836,6 +836,7 @@
     "trade_history": "Historia zleceń",
     "transaction": "Transakcja",
     "transactions": "Transakcje",
+    "transaction_info": "Transakcja __id__",
     "transactions_per_hour": "Transackcji na godzinę",
     "transaction_bytes": "Bajty transakcji",
     "transaction_details": "Szczegóły transakcji",

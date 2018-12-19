@@ -826,6 +826,7 @@
     "trade_history": "Kauppahistoria",
     "transaction": "Tapahtuma",
     "transactions": "Transaktiot",
+    "transaction_info": "Tapahtuma __id__",
     "transactions_per_hour": "Tapahtumia tunnissa",
     "transaction_bytes": "Tapahtuman tavua",
     "transaction_details": "Tapahtuman tiedot",
