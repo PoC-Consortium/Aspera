@@ -1,34 +1,28 @@
 <mat-card class="transaction-header">
-    <mat-grid-list cols="6" rowHeight="80px">
-        <mat-grid-tile class="border-divide-right" [colspan]="5" [rowspan]="1">
+    <mat-grid-list cols="8" rowHeight="80px">
+        <mat-grid-tile class="border-divide-right" [colspan]="4" [rowspan]="1">
             <div class="transaction-filter">
                 Filter:
             </div>
             <div class="transaction-filter">
                 <mat-form-field class="search-form">
-                    <input matInput (keyup)="applyFilter($event.target.value)" placeholder="Search">
-                </mat-form-field>
-            </div>
-            <!-- <div class="transaction-filter">
-                <mat-checkbox class="transaction-checkbox" [(ngModel)]="incoming" (click)="applyIncomingOutgoingFilter()">Incoming</mat-checkbox>
-                <mat-checkbox class="transaction-checkbox" [(ngModel)]="outgoing" (click)="applyIncomingOutgoingFilter()">Outgoing</mat-checkbox>
-            </div> -->
-            <div class="transaction-filter">
-                <mat-form-field>
-                    <input matInput [matDatepicker]="pickerFrom" placeholder="From">
-                    <mat-datepicker-toggle matSuffix [for]="pickerFrom"></mat-datepicker-toggle>
-                    <mat-datepicker #pickerFrom></mat-datepicker>
-                </mat-form-field>
-
-                <mat-form-field>
-                    <input matInput [matDatepicker]="pickerTo" placeholder="To">
-                    <mat-datepicker-toggle matSuffix [for]="pickerTo"></mat-datepicker-toggle>
-                    <mat-datepicker #pickerTo></mat-datepicker>
+                    <input matInput (keyup)="applyFilter($event.target.value)" placeholder="Search" #query>
                 </mat-form-field>
             </div>
         </mat-grid-tile>
-        <mat-grid-tile [colspan]="1" [rowspan]="1">
-            <mat-icon class="sync-icon">check</mat-icon>
+        <mat-grid-tile [colspan]="2" [rowspan]="1">
+            <mat-form-field>
+                <input matInput [matDatepicker]="pickerFrom" placeholder="From" [formControl]="pickerFromField" (dateChange)="applyFilter(this.query.value)">
+                <mat-datepicker-toggle matSuffix [for]="pickerFrom"></mat-datepicker-toggle>
+                <mat-datepicker #pickerFrom></mat-datepicker>
+            </mat-form-field>
+        </mat-grid-tile>
+        <mat-grid-tile [colspan]="2" [rowspan]="1">
+            <mat-form-field>
+                <input matInput [matDatepicker]="pickerTo" placeholder="To" [formControl]="pickerToField" (dateChange)="applyFilter(this.query.value)">
+                <mat-datepicker-toggle matSuffix [for]="pickerTo"></mat-datepicker-toggle>
+                <mat-datepicker #pickerTo></mat-datepicker>
+            </mat-form-field>
         </mat-grid-tile>
     </mat-grid-list>
 </mat-card>
